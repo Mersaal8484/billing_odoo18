@@ -35,6 +35,13 @@ class MeterReading {
   final ReadingSyncStatus syncStatus;
   final String? lastError;
 
+  /// بصمة الفترة (date.range id) التي كانت مفتوحة فعلياً وقت التقاط هذه
+  /// القراءة ميدانياً — تُملأ من `_MeterInfo.currentPeriodId` عند الحفظ.
+  /// [SyncEngine] يقارنها بالفترة المفتوحة حالياً وقت الرفع؛ إن اختلفتا لا
+  /// تُرفع تلقائياً (تمنع إلصاق قراءة من فترة مغلقة بفترة جديدة بالخطأ).
+  /// null فقط للقراءات القديمة المحفوظة قبل إضافة هذا الحقل.
+  final int? capturedPeriodId;
+
   const MeterReading({
     required this.id,
     this.remoteId,
@@ -50,6 +57,7 @@ class MeterReading {
     this.photoUuid,
     this.syncStatus = ReadingSyncStatus.draft,
     this.lastError,
+    this.capturedPeriodId,
   });
 
   MeterReading copyWith({
@@ -76,6 +84,7 @@ class MeterReading {
       photoUuid: photoUuid ?? this.photoUuid,
       syncStatus: syncStatus ?? this.syncStatus,
       lastError: lastError,
+      capturedPeriodId: capturedPeriodId,
     );
   }
 

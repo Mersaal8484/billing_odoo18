@@ -30,6 +30,7 @@ class DriftReadingRepository implements ReadingRepository {
             meterRemoteId: drift.Value(reading.meterRemoteId),
             readingValue: drift.Value(reading.readingValue),
             readingDate: drift.Value(reading.readingDate),
+            capturedPeriodId: drift.Value(reading.capturedPeriodId),
             readingCategory: drift.Value(reading.category.name),
             isEstimated: drift.Value(reading.isEstimated),
             remarks: drift.Value(reading.remarks),
@@ -95,6 +96,7 @@ class DriftReadingRepository implements ReadingRepository {
         meterRemoteId: row.meterRemoteId,
         readingValue: row.readingValue,
         readingDate: row.readingDate,
+        capturedPeriodId: row.capturedPeriodId,
         category: ReadingCategory.values.firstWhere(
           (c) => c.name == row.readingCategory,
           orElse: () => ReadingCategory.customer,

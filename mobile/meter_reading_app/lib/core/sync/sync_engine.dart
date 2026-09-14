@@ -170,15 +170,53 @@ class SyncEngine {
     }
     _publish();
 
+    // يُملأ داخل try بعد فلترة بصمة الفترة؛ يبقى متاحاً لكتل catch أدناه
+    // حتى لا تُعاد كتابة رسالة الخطأ الواضحة لقراءات الفترة المغلقة
+    // برسالة خطأ عامة عند فشل لاحق في نفس عملية الرفع.
+    List<MeterReading> readingsToUpload = readings;
+
     try {
       final periodId = await readingApi.getCurrentPeriodId();
+
+      // ── فلترة "بصمة الفترة" ──────────────────────────────────────────
+      // قراءة أُخذت ميدانياً في فترة أُغلقت لاحقاً (لم تُزامَن في وقتها)
+      // لا يجب أن تُلصق تلقائياً بالفترة المفتوحة الآن. القراءات القديمة
+      // (قبل إضافة هذا الحقل، capturedPeriodId == null) تُعامل كما كانت
+      // سابقاً حفاظاً على التوافق مع البيانات المحفوظة مسبقاً.
+      final upload = <MeterReading>[];
+      final staleReadings = <MeterReading>[];
+      for (final r in readings) {
+        if (r.capturedPeriodId != null && r.capturedPeriodId != periodId) {
+          staleReadings.add(r);
+        } else {
+          upload.add(r);
+        }
+      }
+      readingsToUpload = upload;
+      if (staleReadings.isNotEmpty) {
+        for (final r in staleReadings) {
+          await readingRepository.updateSyncStatus(
+            r.id,
+            ReadingSyncStatus.error,
+            error:
+                'هذه القراءة أُخذت في فترة مغلقة (رقم ${r.capturedPeriodId}) '
+                'وليست الفترة المفتوحة حالياً (رقم $periodId). لم تُرفع '
+                'تلقائياً — راجعها من طابور المزامنة قبل إعادة المحاولة.',
+          );
+        }
+      }
+      if (readingsToUpload.isEmpty) {
+        _publish();
+        return;
+      }
+
       final batchResult = await readingApi.createBatch(dateRangeId: periodId);
       final batchId = batchResult['batch_id'] as int;
 
       // رفع البيانات
       final payloads = <MeterReadingPayload>[];
       final imageFilesByReadingId = <String, File>{};
-      for (final reading in readings) {
+      for (final reading in readingsToUpload) {
         File? imageFile;
         if (reading.imageLocalPath != null) {
           final candidate = File(reading.imageLocalPath!);
@@ -205,7 +243,7 @@ class SyncEngine {
       await readingApi.uploadData(batchId: batchId, readings: payloads);
 
       // رفع الصور
-      for (final r in readings) {
+      for (final r in readingsToUpload) {
         final file = imageFilesByReadingId[r.id];
         if (file == null) continue;
         await readingApi.uploadImageMultipart(
@@ -219,14 +257,17 @@ class SyncEngine {
       // تأكيد الـ batch
       await readingApi.confirmBatch(batchId);
 
-      // تحديث الحالة إلى synced
-      for (final r in readings) {
+      // تحديث الحالة إلى synced — فقط للقراءات التي فعلاً رُفعت
+      // (القراءات المتأخرة عن فترة مغلقة وُسمت بخطأ واضح أعلاه ولا تُلمس هنا)
+      for (final r in readingsToUpload) {
         await readingRepository.updateSyncStatus(r.id, ReadingSyncStatus.synced);
       }
       _lastSuccess = DateTime.now();
       _publish();
     } on OdooSessionExpiredException catch (e) {
-      for (final r in readings) {
+      // فقط القراءات التي كانت قيد الرفع الفعلي؛ قراءات الفترة المغلقة
+      // (إن فُلترت قبل هذا الفشل) تحتفظ برسالتها التفصيلية الخاصة بها.
+      for (final r in readingsToUpload) {
         await readingRepository.updateSyncStatus(
             r.id, ReadingSyncStatus.error, error: e.toString());
       }
@@ -239,7 +280,7 @@ class SyncEngine {
       );
       _ctrl.add(_last);
     } catch (e) {
-      for (final r in readings) {
+      for (final r in readingsToUpload) {
         await readingRepository.updateSyncStatus(
             r.id, ReadingSyncStatus.error, error: e.toString());
       }

@@ -304,6 +304,9 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
         imageLocalPath: _capturedImage!.path,
         photoUuid: const Uuid().v4(),
         syncStatus: ReadingSyncStatus.draft,
+        // بصمة الفترة المفتوحة الآن — يقارنها SyncEngine بالفترة المفتوحة
+        // وقت الرفع لاحقاً، فلا تُلصق قراءة قديمة بفترة جديدة بالخطأ.
+        capturedPeriodId: _meterInfo?.currentPeriodId,
       );
 
       // 1. حفظ محلي

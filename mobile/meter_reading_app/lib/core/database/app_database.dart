@@ -79,6 +79,10 @@ class Readings extends Table {
   IntColumn get meterRemoteId => integer().references(Meters, #remoteId)();
   RealColumn get readingValue => real()();
   DateTimeColumn get readingDate => dateTime()();
+  /// بصمة الفترة (date.range id) المفتوحة وقت التقاط القراءة ميدانياً —
+  /// يمنع SyncEngine من إلصاق قراءة قديمة غير مُزامَنة بفترة جديدة مختلفة
+  /// عند الرفع. nullable لتوافق الصفوف القديمة قبل هذا العمود (migration v3).
+  IntColumn get capturedPeriodId => integer().nullable()();
   TextColumn get readingCategory =>
       text().withDefault(const Constant('customer'))();
   BoolColumn get isEstimated => boolean().withDefault(const Constant(false))();
@@ -128,7 +132,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -143,6 +147,9 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(readings, readings.syncAttempts);
           await m.addColumn(readings, readings.syncBatchId);
           await m.createTable(syncBatches);
+        }
+        if (from < 3) {
+          await m.addColumn(readings, readings.capturedPeriodId);
         }
       },
     );

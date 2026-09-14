@@ -358,6 +358,13 @@ class _SyncedInvoiceTile extends StatelessWidget {
                           backgroundColor: Colors.green.shade600,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 8),
+                          // ── لازم نلغي minimumSize الموروث من filledButtonTheme
+                          // (Size.fromHeight(56) = عرض لانهائي) وإلا فإن هذا
+                          // الزر داخل Row يسبب BoxConstraints forces an
+                          // infinite width ويفشل رسم كل العنصر (والقائمة كلها
+                          // تظهر فارغة بصمت في release/profile).
+                          minimumSize: const Size(80, 40),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         onPressed: () => context.push(
                           '/collector/payment/${account.id}',
@@ -372,6 +379,8 @@ class _SyncedInvoiceTile extends StatelessWidget {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 8),
+                          minimumSize: const Size(80, 40),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: const Text('مسددة',
                             style: TextStyle(fontSize: 13)),
