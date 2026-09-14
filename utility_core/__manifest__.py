@@ -90,7 +90,6 @@ User Role.
         'data/utility_migration_cron.xml',
         'views/utility_migration_mapping_views.xml',
         'views/utility_migration_batch_views.xml',
-        'wizards/views/utility_migration_import_wizard_views.xml',
         'views/utility_migration_customer_views.xml',
         'views/utility_migration_feeder_views.xml',
         'views/utility_migration_transformer_views.xml',

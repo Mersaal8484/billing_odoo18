@@ -112,7 +112,7 @@
                 <field name="collection_state" widget="badge"
                        decoration-success="collection_state == 'open'"
                        decoration-info="collection_state == 'closing'"
-                       decoration-secondary="collection_state == 'reconciled'"
+                       decoration-warning="collection_state == 'reconciled'"
                        decoration-muted="collection_state == 'locked'"
                        string="حالة التحصيل"/>
                 <!-- الإحصائيات -->
@@ -371,7 +371,7 @@
                                     <field name="collection_state" widget="badge"
                                            decoration-success="collection_state == 'open'"
                                            decoration-info="collection_state == 'closing'"
-                                           decoration-secondary="collection_state == 'reconciled'"
+                                           decoration-warning="collection_state == 'reconciled'"
                                            decoration-muted="collection_state == 'locked'"/>
                                     <field name="collection_reconciled_at" readonly="1"
                                            attrs="{'invisible': [('collection_reconciled_at', '=', False)]}"/>
