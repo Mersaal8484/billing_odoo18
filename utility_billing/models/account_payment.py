@@ -155,14 +155,25 @@ class AccountPayment(models.Model):
             payment.qr_code_url = '/report/barcode/?barcode_type=QR&value=%s' % quote(payload)
 
     def _get_payment_period_for_order(self, order):
-        """Return only the payment period directly linked to the bill period via reading_period_id."""
+        """Return the payment period for a bill's date_range_id.
+
+        نموذج الدورة الموحد: السجل نفسه يحمل كلا النطاقين — نُرجع date_range_id مباشرة.
+        السجلات التاريخية (period_role='payment'): نبحث بـ reading_period_id أو parent_id.
+        """
         if not order or not order.date_range_id:
             return self.env['date.range']
 
+        order_period = order.date_range_id
+
+        # السجل الموحد (قراءة): يحمل نطاق الدفع بداخله — نُرجع السجل نفسه
+        if order_period.period_role == 'reading':
+            return order_period
+
+        # التوافق العكسي: سجل قديم له period_role آخر — نبحث عن سجل الدفع التاريخي
         # 1. البحث باستخدام الرابط المباشر الصريح reading_period_id
         period = self.env['date.range'].search([
             ('period_role', '=', 'payment'),
-            ('reading_period_id', '=', order.date_range_id.id),
+            ('reading_period_id', '=', order_period.id),
             ('company_id', 'in', [order.company_id.id, False]),
         ], order='is_current_period desc, date_start desc, id desc', limit=1)
 
@@ -170,25 +181,53 @@ class AccountPayment(models.Model):
         if not period:
             period = self.env['date.range'].search([
                 ('period_role', '=', 'payment'),
-                ('parent_id', '=', order.date_range_id.id),
+                ('parent_id', '=', order_period.id),
                 ('company_id', 'in', [order.company_id.id, False]),
             ], order='is_current_period desc, date_start desc, id desc', limit=1)
+
+        # 3. إذا لم يوجد سجل دفع منفصل — السجل نفسه يحمل الدفع (تحويل غير مكتمل لدورة بدون payment period)
+        if not period:
+            return order_period
 
         return period
 
     def _validate_utility_payment_period(self):
-        """Ensure a utility payment belongs to the bill's exact reading period."""
+        """Ensure a utility payment is linked to the correct billing cycle.
+
+        السجل الموحد (period_role='reading'):
+          - date_range_id للدفعة يجب أن يطابق date_range_id للفاتورة.
+          - collection_state يجب أن يكون 'open' أو 'closing'.
+        السجلات التاريخية (period_role='payment'): التحقق بالمنطق القديم.
+        """
         for payment in self.filtered('utility_sale_order_id'):
             order_period = payment.utility_sale_order_id.date_range_id
             if not order_period:
                 raise ValidationError(_('لا يمكن تسجيل التحصيل لأن الفاتورة غير مرتبطة بفترة قراءة.'))
             if not payment.date_range_id:
                 raise ValidationError(_('لا توجد فترة دفع مرتبطة بفترة قراءة الفاتورة "%s".') % order_period.display_name)
-            if payment.date_range_id.period_role != 'payment':
+
+            pay_period = payment.date_range_id
+
+            # السجل الموحد (period_role='reading'): تحقق مباشر
+            if pay_period.period_role == 'reading':
+                if pay_period != order_period:
+                    raise ValidationError(_(
+                        'فترة الدفعة يجب أن تطابق فترة قراءة الفاتورة "%s".، الفترة الحالية: "%s".'
+                    ) % (order_period.display_name, pay_period.display_name))
+                if pay_period.collection_state not in ('open', 'closing'):
+                    raise ValidationError(_(
+                        'حالة التحصيل للدورة "%s" هي "%s". لا يمكن تسجيل دفعة بعد إغلاق التحصيل.'
+                    ) % (pay_period.display_name, pay_period.collection_state))
+                return
+
+            # التوافق العكسي: سجلات تاريخية (period_role != 'reading')
+            if pay_period.period_role != 'payment':
                 raise ValidationError(_('فترة التحصيل يجب أن تكون من نوع سداد وتحصيل.'))
-            linked_reading_period = payment.date_range_id.reading_period_id or payment.date_range_id.parent_id
+            linked_reading_period = pay_period.reading_period_id or pay_period.parent_id
             if linked_reading_period != order_period:
-                raise ValidationError(_('فترة التحصيل يجب أن تكون فترة الدفع المرتبطة مباشرة بفترة قراءة الفاتورة "%s".') % order_period.display_name)
+                raise ValidationError(_(
+                    'فترة التحصيل يجب أن تكون فترة الدفع المرتبطة مباشرة بفترة قراءة الفاتورة "%s".'
+                ) % order_period.display_name)
 
     def _validate_utility_payment_amount(self):
         """Validate and lock the exact utility invoice before posting payment."""

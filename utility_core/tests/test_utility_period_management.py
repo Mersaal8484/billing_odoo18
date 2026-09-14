@@ -216,10 +216,17 @@ class TestUtilityPeriodManagement(TransactionCase):
         self.assertTrue(p_h1)
         self.assertEqual(p_h1.consumption_start, date(2026, 2, 1))
         self.assertEqual(p_h1.consumption_end, date(2026, 2, 15))
+        # التحقق من أن الدورة موحدة: حقول الدفع موجودة في نفس السجل ولا يوجد سجل منفصل للتحصيل
+        self.assertTrue(p_h1.payment_start)
+        self.assertTrue(p_h1.payment_end)
+        self.assertFalse(self.DateRange.search([('cycle_key', '=', 'SEMI-2026-02-H1'), ('period_role', '=', 'payment')]))
 
         self.assertTrue(p_h2)
         self.assertEqual(p_h2.consumption_start, date(2026, 2, 16))
         self.assertEqual(p_h2.consumption_end, date(2026, 2, 28))
+        self.assertTrue(p_h2.payment_start)
+        self.assertTrue(p_h2.payment_end)
+        self.assertFalse(self.DateRange.search([('cycle_key', '=', 'SEMI-2026-02-H2'), ('period_role', '=', 'payment')]))
 
     def test_06_reading_after_consumption_within_window(self):
         """6. قبول قراءة مأخوذة بعد نهاية الاستهلاك طالما ضمن نافذة القراءة المسموحة"""
@@ -598,3 +605,48 @@ class TestUtilityPeriodManagement(TransactionCase):
 
         period.action_open_reading()
         self.assertEqual(period.state, 'open')
+
+    def test_26_unified_cycle_payment_dates_constraint(self):
+        """26. التحقق من قيد ترتيب تواريخ نطاق الدفع في الدورة الموحدة"""
+        with self.assertRaises(ValidationError):
+            self.DateRange.create({
+                'name': 'دورة بتواريخ دفع غير صحيحة',
+                'period_code': 'READ-INV-PAYDATES',
+                'cycle_key': 'INV-PAYDATES',
+                'period_role': 'reading',
+                'billing_cadence': 'monthly',
+                'date_start': date(2026, 10, 1),
+                'date_end': date(2026, 10, 31),
+                'payment_start': date(2026, 10, 25),
+                'payment_end': date(2026, 10, 10), # قبل البداية!
+            })
+
+    def test_27_unified_cycle_independent_states(self):
+        """27. التحقق من استقلالية حالتي القراءة والتحصيل في الدورة الموحدة"""
+        period = self.DateRange.create({
+            'name': 'دورة موحدة استقلالية الحالات',
+            'period_code': 'READ-INDEP-01',
+            'cycle_key': 'INDEP-01',
+            'period_role': 'reading',
+            'billing_cadence': 'monthly',
+            'date_start': date(2026, 11, 1),
+            'date_end': date(2026, 11, 30),
+            'payment_start': date(2026, 11, 5),
+            'payment_end': date(2026, 12, 10),
+            'state': 'open',
+            'reading_state': 'open',
+            'collection_state': 'open',
+        })
+        self.assertEqual(period.reading_state, 'open')
+        self.assertEqual(period.collection_state, 'open')
+
+        # إغلاق القراءة يبقي التحصيل مفتوحاً
+        period.action_close_reading()
+        self.assertEqual(period.reading_state, 'closed')
+        self.assertEqual(period.collection_state, 'open')
+        self.assertEqual(period.state, 'open')
+
+        # مطابقة التحصيل بعد إغلاق القراءة تؤدي لإغلاق الدورة بالكامل
+        period.action_reconcile_collection()
+        self.assertEqual(period.collection_state, 'reconciled')
+        self.assertEqual(period.state, 'closed')

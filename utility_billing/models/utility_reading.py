@@ -134,7 +134,7 @@ class UtilityReading(models.Model):
         if (self.env.context.get('allow_billing_adjustment')
                 or self.env.context.get('_bypass_reading_protection')):
             return
-        if self.filtered(lambda reading: reading.date_range_id.state in ('closed', 'locked')):
+        if self.filtered(lambda reading: getattr(reading.date_range_id, 'reading_state', False) in ('closed', 'locked') or reading.date_range_id.state in ('closed', 'locked')):
             raise ValidationError(_(
                 'لا يمكن تعديل قراءة مرتبطة بفترة مغلقة أو مقفلة. '
                 'استخدم مسار تعديل الفوترة المعتمد.'))
@@ -144,7 +144,10 @@ class UtilityReading(models.Model):
         period_ids = [vals.get('date_range_id') for vals in vals_list if vals.get('date_range_id')]
         if period_ids and not self.env.context.get('allow_billing_adjustment'):
             closed = self.env['date.range'].search([
-                ('id', 'in', period_ids), ('state', 'in', ('closed', 'locked')),
+                ('id', 'in', period_ids),
+                '|',
+                ('reading_state', 'in', ('closed', 'locked')),
+                ('state', 'in', ('closed', 'locked')),
             ], limit=1)
             if closed:
                 raise ValidationError(_(

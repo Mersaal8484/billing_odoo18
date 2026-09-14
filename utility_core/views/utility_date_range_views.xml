@@ -81,35 +81,47 @@
          DATE RANGE — Views (Redesigned & Simplified)
          ===================================================================== -->
 
-    <!-- Tree View: الفترات الزمنية -->
+    <!-- Tree View: الدورات الموحدة -->
     <record id="view_utility_date_range_tree" model="ir.ui.view">
         <field name="name">date.range.utility.tree</field>
         <field name="model">date.range</field>
         <field name="priority" eval="5"/>
         <field name="arch" type="xml">
-            <tree decoration-success="state == 'open'"
-                  decoration-info="state == 'closing'"
-                  decoration-warning="state == 'closed'"
+            <tree decoration-success="reading_state == 'open' and collection_state == 'open'"
+                  decoration-info="reading_state == 'closing' or collection_state == 'closing'"
+                  decoration-warning="reading_state == 'closed'"
                   decoration-muted="state == 'locked'">
                 <field name="period_code"/>
-                <field name="cycle_key" optional="show"/>
                 <field name="name"/>
-                <field name="period_role" widget="badge"
-                       decoration-warning="period_role == 'reading'"
-                       decoration-info="period_role == 'payment'"/>
                 <field name="billing_cadence" widget="badge"
                        decoration-success="billing_cadence == 'monthly'"
                        decoration-primary="billing_cadence == 'semi_monthly'"/>
-                <field name="state" widget="badge"
-                       decoration-success="state == 'open'"
-                       decoration-info="state == 'closing'"
-                       decoration-warning="state == 'reconciled'"
-                       decoration-muted="state in ('closed', 'locked')"/>
-                <field name="date_start" string="تاريخ البداية"/>
-                <field name="date_end" string="تاريخ النهاية"/>
+                <!-- تواريخ القراءة -->
+                <field name="date_start" string="من القراءة"/>
+                <field name="date_end" string="إلى القراءة"/>
+                <!-- نطاق الدفع -->
+                <field name="payment_start" string="من الدفع" optional="show"/>
+                <field name="payment_end" string="إلى الدفع" optional="show"/>
+                <!-- الحالات المستقلة -->
+                <field name="reading_state" widget="badge"
+                       decoration-success="reading_state == 'open'"
+                       decoration-info="reading_state == 'closing'"
+                       decoration-warning="reading_state == 'closed'"
+                       decoration-muted="reading_state == 'locked'"
+                       string="حالة القراءة"/>
+                <field name="collection_state" widget="badge"
+                       decoration-success="collection_state == 'open'"
+                       decoration-info="collection_state == 'closing'"
+                       decoration-secondary="collection_state == 'reconciled'"
+                       decoration-muted="collection_state == 'locked'"
+                       string="حالة التحصيل"/>
+                <!-- الإحصائيات -->
                 <field name="received_readings" string="القراءات" optional="show"/>
                 <field name="bills_generated" string="الفواتير" optional="show"/>
                 <field name="collection_rate" string="نسبة التحصيل %" widget="progressbar" optional="show"/>
+                <!-- حقول التوافق العكسي -->
+                <field name="period_role" optional="hide"/>
+                <field name="state" optional="hide"/>
                 <field name="active" widget="boolean_toggle"/>
             </tree>
         </field>
@@ -123,24 +135,38 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_open_period" type="object" string="فتح الفترة للعمليات" class="oe_highlight"
+                    <!-- === الدورة الموحدة: أزرار القراءة === -->
+                    <button name="action_open_period" type="object" string="فتح الدورة للعمليات" class="oe_highlight"
                             attrs="{'invisible': [('state', '!=', 'planned')]}"/>
-                    <button name="action_start_closing" type="object" string="بدء الإغلاق والمطابقة" class="btn-info"
-                            attrs="{'invisible': [('state', '!=', 'open')]}"/>
-                    <button name="action_close_period" type="object" string="إغلاق الفترة" class="btn-danger"
-                            confirm="هل أنت تأكد من إغلاق الفترة بعد استكمال كافة القراءات والمطابقات؟"
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('state', 'not in', ('open', 'closing'))]}"/>
-                    <button name="action_reconcile_payment" type="object" string="مطابقة التحصيل" class="btn-success"
+
+                    <!-- أزرار القراءة -->
+                    <button name="action_start_closing" type="object" string="بدء إغلاق القراءة" class="btn-warning"
+                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('reading_state', 'not in', ('open',))]}"/>
+                    <button name="action_close_reading" type="object" string="إغلاق القراءة" class="btn-danger"
+                            confirm="هل أنت متأكد من إغلاق القراءة؟ التحصيل سيبقى مفتوحاً."
+                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('reading_state', 'not in', ('open', 'closing'))]}"/>
+                    <button name="action_open_reading" type="object" string="إعادة فتح القراءة" class="btn-outline-warning"
+                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('reading_state', 'not in', ('closing', 'closed'))]}"/>
+
+                    <!-- أزرار التحصيل -->
+                    <button name="action_reconcile_collection" type="object" string="مطابقة التحصيل" class="btn-success"
+                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('collection_state', 'not in', ('open', 'closing'))]}"/>
+                    <button name="action_open_payment" type="object" string="إعادة فتح التحصيل" class="btn-outline-success"
+                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('collection_state', 'not in', ('closing', 'reconciled'))]}"/>
+
+                    <!-- التوافق العكسي: أزرار فترات payment التاريخية -->
+                    <button name="action_reconcile_payment" type="object" string="مطابقة التحصيل (تاريخي)" class="btn-success"
                             attrs="{'invisible': ['|', ('period_role', '!=', 'payment'), ('state', 'not in', ('open', 'closing', 'closed'))]}"/>
+                    <button name="action_close_payment" type="object" string="إغلاق التحصيل (تاريخي)" class="btn-danger"
+                            attrs="{'invisible': ['|', ('period_role', '!=', 'payment'), ('state', 'not in', ('open',))]}"/>
+
+                    <!-- إقفال تاريخي ومعالج التعديل -->
                     <button name="action_lock_period" type="object" string="إقفال تاريخي" class="btn-outline-dark"
                             attrs="{'invisible': [('state', 'not in', ('closed', 'reconciled'))]}"/>
-
-                    <!-- زر التعديل والتمديد المنضبط -->
                     <button name="%(action_utility_period_adjust_wizard)d" type="action"
                             string="تعديل / تمديد الفترة" class="btn-secondary"
                             context="{'default_period_id': active_id}"
                             attrs="{'invisible': [('state', '=', 'locked')]}"/>
-
                     <button name="action_sync_regions_by_cadence" type="object"
                             string="مزامنة المناطق حسب الدورية"
                             class="btn-outline-info"
@@ -148,9 +174,11 @@
                             attrs="{'invisible': [('state', '!=', 'planned')]}"
                             confirm="سيتم تحديث المناطق المشتركة في هذه الفترة بناءً على دوريتها. هل تريد المتابعة؟"/>
 
+                    <!-- شريط الحالة: دورة موحدة (reading) -->
                     <field name="state" widget="statusbar"
                            statusbar_visible="planned,open,closing,closed,locked"
-                           attrs="{'invisible': [('period_role', '=', 'payment')]}"/>
+                           attrs="{'invisible': [('period_role', '!=', 'reading')]}"/>
+                    <!-- شريط الحالة: فترة تحصيل تاريخية (payment) -->
                     <field name="state" widget="statusbar"
                            statusbar_visible="planned,open,closing,reconciled,locked"
                            attrs="{'invisible': [('period_role', '=', 'reading')]}"/>
@@ -240,12 +268,16 @@
                                     <div class="d-flex align-items-center">
                                         <i class="fa fa-calendar fa-2x text-success me-3" title="التواريخ والنوافذ"/>
                                         <div>
-                                            <h4 class="mb-0">التواريخ والنوافذ التشغيلية</h4>
-                                            <small class="text-muted">فترات الاستهلاك ونوافذ القراءة والتحصيل</small>
+                                            <h4 class="mb-0">نطاقات القراءة والدفع</h4>
+                                            <small class="text-muted">نطاق القراءة (date_start/end) ونطاق الدفع (payment_start/end)</small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="card-body">
+                                    <!-- نطاق القراءة -->
+                                    <div class="row mb-2">
+                                        <div class="col-12"><small class="text-muted fw-bold"><i class="fa fa-book"/> نطاق القراءة والفوترة</small></div>
+                                    </div>
                                     <div class="row">
                                         <div class="col-6 mb-3">
                                             <label for="date_start" class="o_light_label"/>
@@ -266,6 +298,21 @@
                                             <field name="consumption_end"/>
                                         </div>
                                     </div>
+                                    <!-- نطاق الدفع (الدورة الموحدة) -->
+                                    <div class="row mb-2" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
+                                        <div class="col-12"><small class="text-muted fw-bold"><i class="fa fa-money"/> نطاق الدفع والتحصيل</small></div>
+                                    </div>
+                                    <div class="row" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
+                                        <div class="col-6 mb-3">
+                                            <label for="payment_start" class="o_light_label"/>
+                                            <field name="payment_start"/>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <label for="payment_end" class="o_light_label"/>
+                                            <field name="payment_end"/>
+                                        </div>
+                                    </div>
+                                    <!-- نوافذ القراءة التفصيلية -->
                                     <div class="row" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
                                         <div class="col-6 mb-3">
                                             <label for="reading_window_start" class="o_light_label"/>
@@ -276,6 +323,7 @@
                                             <field name="reading_window_end"/>
                                         </div>
                                     </div>
+                                    <!-- نوافذ التحصيل التاريخية -->
                                     <div class="row" attrs="{'invisible': [('period_role', '!=', 'payment')]}">
                                         <div class="col-6 mb-3">
                                             <label for="payment_window_start" class="o_light_label"/>
@@ -292,14 +340,62 @@
                     </div>
 
                     <notebook>
+                        <!-- === تبويب القراءة (للدورات الموحدة) === -->
+                        <page string="حالة القراءة" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
+                            <group>
+                                <group string="نطاق القراءة">
+                                    <field name="reading_state" widget="badge"
+                                           decoration-success="reading_state == 'open'"
+                                           decoration-info="reading_state == 'closing'"
+                                           decoration-warning="reading_state == 'closed'"
+                                           decoration-muted="reading_state == 'locked'"/>
+                                    <field name="reading_closed_at" readonly="1"
+                                           attrs="{'invisible': [('reading_closed_at', '=', False)]}"/>
+                                </group>
+                                <group string="إحصائيات القراءة">
+                                    <field name="received_readings"/>
+                                    <field name="pending_review"/>
+                                    <field name="approved_readings"/>
+                                    <field name="rejected_readings"/>
+                                    <field name="missing_readings"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- === تبويب التحصيل (للدورات الموحدة) === -->
+                        <page string="حالة التحصيل" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
+                            <group>
+                                <group string="نطاق الدفع">
+                                    <field name="payment_start"/>
+                                    <field name="payment_end"/>
+                                    <field name="collection_state" widget="badge"
+                                           decoration-success="collection_state == 'open'"
+                                           decoration-info="collection_state == 'closing'"
+                                           decoration-secondary="collection_state == 'reconciled'"
+                                           decoration-muted="collection_state == 'locked'"/>
+                                    <field name="collection_reconciled_at" readonly="1"
+                                           attrs="{'invisible': [('collection_reconciled_at', '=', False)]}"/>
+                                </group>
+                                <group string="إحصائيات التحصيل">
+                                    <field name="bills_generated"/>
+                                    <field name="billed_amount"/>
+                                    <field name="collected_in_window"/>
+                                    <field name="outstanding_amount"/>
+                                    <field name="collection_rate" widget="progressbar"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- === المناطق المشتركة === -->
                         <page string="المناطق المشتركة">
-                            <field name="region_ids" widget="many2many_tags" options="{'no_create': True}" readonly="1"/>
+                            <field name="region_ids" widget="many2many_tags" options="{&#x27;no_create&#x27;: True}" readonly="1"/>
                             <div class="text-muted mt-2">
-                                <i class="fa fa-info-circle"/> المناطق snapshot مشتقة تلقائياً من الدورية أو من فترة القراءة المرتبطة، وتعديلها يدوياً غير مسموح.
+                                <i class="fa fa-info-circle"/> المناطق snapshot مشتقة تلقائياً من الدورية، وتعديلها يدوياً غير مسموح.
                             </div>
                         </page>
 
-                        <page string="فترات التحصيل المرتبطة" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
+                        <!-- === فترات التحصيل التاريخية (للسجلات القديمة فقط) === -->
+                        <page string="فترات التحصيل المرتبطة (تاريخي)" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
                             <field name="payment_period_ids" readonly="1">
                                 <tree>
                                     <field name="period_code"/>
@@ -310,6 +406,9 @@
                                     <field name="collected_in_window"/>
                                 </tree>
                             </field>
+                            <div class="text-muted mt-2">
+                                <i class="fa fa-info-circle"/> هذه السجلات تاريخية. في الدورات الجديدة يُستخدم payment_start/end في نفس السجل.
+                            </div>
                         </page>
 
                         <page string="سجل التدقيق والتغييرات">
@@ -327,7 +426,7 @@
                         </page>
 
                         <page string="ملاحظات">
-                            <field name="notes" placeholder="ملاحظات إضافية عن هذه الفترة..."/>
+                            <field name="notes" placeholder="ملاحظات إضافية عن هذه الدورة..."/>
                         </page>
                     </notebook>
                 </sheet>
@@ -348,11 +447,21 @@
                 <field name="type_id"/>
 
                 <!-- فلاتر الدور -->
-                <filter string="فترات القراءة والمراجعة" name="reading_roles" domain="[('period_role', '=', 'reading')]"/>
-                <filter string="فترات السداد والتحصيل" name="payment_roles" domain="[('period_role', '=', 'payment')]"/>
+                <filter string="الدورات الموحدة (قراءة)" name="reading_roles" domain="[('period_role', '=', 'reading')]"/>
+                <filter string="فترات تحصيل تاريخية" name="payment_roles" domain="[('period_role', '=', 'payment')]"/>
                 <separator/>
 
-                <!-- فلاتر الحالة -->
+                <!-- فلاتر حالة القراءة -->
+                <filter string="القراءة مفتوحة" name="reading_open" domain="[('reading_state', '=', 'open')]"/>
+                <filter string="القراءة مغلقة" name="reading_closed" domain="[('reading_state', '=', 'closed')]"/>
+                <separator/>
+
+                <!-- فلاتر حالة التحصيل -->
+                <filter string="التحصيل مفتوح" name="collection_open" domain="[('collection_state', '=', 'open')]"/>
+                <filter string="التحصيل تمت مطابقته" name="collection_reconciled" domain="[('collection_state', '=', 'reconciled')]"/>
+                <separator/>
+
+                <!-- فلاتر الحالة الإجمالية -->
                 <filter string="الفترات المفتوحة" name="open_periods" domain="[('state', '=', 'open')]"/>
                 <filter string="قيد الإغلاق والمطابقة" name="closing_periods" domain="[('state', '=', 'closing')]"/>
                 <filter string="المغلقة والمطابقة" name="closed_periods" domain="[('state', 'in', ('closed', 'reconciled'))]"/>
@@ -369,6 +478,8 @@
                     <filter string="رمز الدورة التشغيلية" name="group_cycle" context="{'group_by': 'cycle_key'}"/>
                     <filter string="دور الفترة"      name="group_role"     context="{'group_by': 'period_role'}"/>
                     <filter string="دورية الفوترة"   name="group_cadence"  context="{'group_by': 'billing_cadence'}"/>
+                    <filter string="حالة القراءة"    name="group_reading_state" context="{'group_by': 'reading_state'}"/>
+                    <filter string="حالة التحصيل"   name="group_collection_state" context="{'group_by': 'collection_state'}"/>
                     <filter string="حالة الفترة"     name="group_state"    context="{'group_by': 'state'}"/>
                 </group>
             </search>

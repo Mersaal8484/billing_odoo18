@@ -359,6 +359,9 @@ class UtilitySaleOrder(models.Model):
             res['consumption'] = self.consumption
         if self.workflow_process_id and self.workflow_process_id.invoice_date_is_order_date:
             res['invoice_date'] = self.date_order.date()
+        elif self.date_range_id and self.date_range_id.date_start:
+            # الدورة الموحدة: تاريخ الفاتورة الافتراضي = أول يوم من نطاق القراءة
+            res.setdefault('invoice_date', self.date_range_id.date_start)
         if self.type_id:
             res['sale_type_id'] = self.type_id.id
             if self.type_id.journal_id:

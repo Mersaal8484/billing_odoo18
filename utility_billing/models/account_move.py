@@ -37,6 +37,8 @@ class AccountMove(models.Model):
                     raise ValidationError(_('شريك الفاتورة يجب أن يطابق شريك الحساب الكهربائي.'))
                 vals['partner_id'] = expected_partner_id
                 vals['utility_customer_id'] = order.customer_id.id
+                if not vals.get('invoice_date') and order.date_range_id and order.date_range_id.date_start:
+                    vals['invoice_date'] = order.date_range_id.date_start
             customer_id = vals.get('utility_customer_id')
             if customer_id and not order_id:
                 customer = self.env['utility.customer'].browse(customer_id).exists()
