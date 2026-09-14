@@ -109,7 +109,13 @@ class ReceiptScreen extends ConsumerWidget {
   Future<void> _printReceipt(BuildContext context, WidgetRef ref) async {
     try {
       final printer = ref.read(thermalPrinterServiceProvider);
-      await printer.printCollectionReceipt(receipt);
+      // اسم المحصل المسجّل دخوله حالياً (نفس حساب Odoo)، يُطبع كسطر إضافي
+      // في السند. إن لم تتوفر جلسة أو اسم، يُترك السطر فارغاً بدون أي خطأ.
+      final collectorName = ref.read(authServiceProvider).currentUser?.name;
+      await printer.printCollectionReceipt(
+        receipt,
+        collectorName: collectorName,
+      );
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تم الإرسال للطابعة ✓')),

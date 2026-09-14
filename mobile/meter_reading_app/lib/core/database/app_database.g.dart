@@ -2035,6 +2035,12 @@ class $ReadingsTable extends Readings with TableInfo<$ReadingsTable, Reading> {
   late final GeneratedColumn<DateTime> readingDate = GeneratedColumn<DateTime>(
       'reading_date', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _capturedPeriodIdMeta =
+      const VerificationMeta('capturedPeriodId');
+  @override
+  late final GeneratedColumn<int> capturedPeriodId = GeneratedColumn<int>(
+      'captured_period_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _readingCategoryMeta =
       const VerificationMeta('readingCategory');
   @override
@@ -2127,6 +2133,7 @@ class $ReadingsTable extends Readings with TableInfo<$ReadingsTable, Reading> {
         meterRemoteId,
         readingValue,
         readingDate,
+        capturedPeriodId,
         readingCategory,
         isEstimated,
         remarks,
@@ -2182,6 +2189,12 @@ class $ReadingsTable extends Readings with TableInfo<$ReadingsTable, Reading> {
               data['reading_date']!, _readingDateMeta));
     } else if (isInserting) {
       context.missing(_readingDateMeta);
+    }
+    if (data.containsKey('captured_period_id')) {
+      context.handle(
+          _capturedPeriodIdMeta,
+          capturedPeriodId.isAcceptableOrUnknown(
+              data['captured_period_id']!, _capturedPeriodIdMeta));
     }
     if (data.containsKey('reading_category')) {
       context.handle(
@@ -2272,6 +2285,8 @@ class $ReadingsTable extends Readings with TableInfo<$ReadingsTable, Reading> {
           .read(DriftSqlType.double, data['${effectivePrefix}reading_value'])!,
       readingDate: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}reading_date'])!,
+      capturedPeriodId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}captured_period_id']),
       readingCategory: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}reading_category'])!,
       isEstimated: attachedDatabase.typeMapping
@@ -2313,6 +2328,11 @@ class Reading extends DataClass implements Insertable<Reading> {
   final int meterRemoteId;
   final double readingValue;
   final DateTime readingDate;
+
+  /// بصمة الفترة (date.range id) المفتوحة وقت التقاط القراءة ميدانياً —
+  /// يمنع SyncEngine من إلصاق قراءة قديمة غير مُزامَنة بفترة جديدة مختلفة
+  /// عند الرفع. nullable لتوافق الصفوف القديمة قبل هذا العمود (migration v3).
+  final int? capturedPeriodId;
   final String readingCategory;
   final bool isEstimated;
   final String? remarks;
@@ -2331,6 +2351,7 @@ class Reading extends DataClass implements Insertable<Reading> {
       required this.meterRemoteId,
       required this.readingValue,
       required this.readingDate,
+      this.capturedPeriodId,
       required this.readingCategory,
       required this.isEstimated,
       this.remarks,
@@ -2353,6 +2374,9 @@ class Reading extends DataClass implements Insertable<Reading> {
     map['meter_remote_id'] = Variable<int>(meterRemoteId);
     map['reading_value'] = Variable<double>(readingValue);
     map['reading_date'] = Variable<DateTime>(readingDate);
+    if (!nullToAbsent || capturedPeriodId != null) {
+      map['captured_period_id'] = Variable<int>(capturedPeriodId);
+    }
     map['reading_category'] = Variable<String>(readingCategory);
     map['is_estimated'] = Variable<bool>(isEstimated);
     if (!nullToAbsent || remarks != null) {
@@ -2391,6 +2415,9 @@ class Reading extends DataClass implements Insertable<Reading> {
       meterRemoteId: Value(meterRemoteId),
       readingValue: Value(readingValue),
       readingDate: Value(readingDate),
+      capturedPeriodId: capturedPeriodId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(capturedPeriodId),
       readingCategory: Value(readingCategory),
       isEstimated: Value(isEstimated),
       remarks: remarks == null && nullToAbsent
@@ -2427,6 +2454,7 @@ class Reading extends DataClass implements Insertable<Reading> {
       meterRemoteId: serializer.fromJson<int>(json['meterRemoteId']),
       readingValue: serializer.fromJson<double>(json['readingValue']),
       readingDate: serializer.fromJson<DateTime>(json['readingDate']),
+      capturedPeriodId: serializer.fromJson<int?>(json['capturedPeriodId']),
       readingCategory: serializer.fromJson<String>(json['readingCategory']),
       isEstimated: serializer.fromJson<bool>(json['isEstimated']),
       remarks: serializer.fromJson<String?>(json['remarks']),
@@ -2452,6 +2480,7 @@ class Reading extends DataClass implements Insertable<Reading> {
       'meterRemoteId': serializer.toJson<int>(meterRemoteId),
       'readingValue': serializer.toJson<double>(readingValue),
       'readingDate': serializer.toJson<DateTime>(readingDate),
+      'capturedPeriodId': serializer.toJson<int?>(capturedPeriodId),
       'readingCategory': serializer.toJson<String>(readingCategory),
       'isEstimated': serializer.toJson<bool>(isEstimated),
       'remarks': serializer.toJson<String?>(remarks),
@@ -2475,6 +2504,7 @@ class Reading extends DataClass implements Insertable<Reading> {
           int? meterRemoteId,
           double? readingValue,
           DateTime? readingDate,
+          Value<int?> capturedPeriodId = const Value.absent(),
           String? readingCategory,
           bool? isEstimated,
           Value<String?> remarks = const Value.absent(),
@@ -2493,6 +2523,9 @@ class Reading extends DataClass implements Insertable<Reading> {
         meterRemoteId: meterRemoteId ?? this.meterRemoteId,
         readingValue: readingValue ?? this.readingValue,
         readingDate: readingDate ?? this.readingDate,
+        capturedPeriodId: capturedPeriodId.present
+            ? capturedPeriodId.value
+            : this.capturedPeriodId,
         readingCategory: readingCategory ?? this.readingCategory,
         isEstimated: isEstimated ?? this.isEstimated,
         remarks: remarks.present ? remarks.value : this.remarks,
@@ -2523,6 +2556,9 @@ class Reading extends DataClass implements Insertable<Reading> {
           : this.readingValue,
       readingDate:
           data.readingDate.present ? data.readingDate.value : this.readingDate,
+      capturedPeriodId: data.capturedPeriodId.present
+          ? data.capturedPeriodId.value
+          : this.capturedPeriodId,
       readingCategory: data.readingCategory.present
           ? data.readingCategory.value
           : this.readingCategory,
@@ -2559,6 +2595,7 @@ class Reading extends DataClass implements Insertable<Reading> {
           ..write('meterRemoteId: $meterRemoteId, ')
           ..write('readingValue: $readingValue, ')
           ..write('readingDate: $readingDate, ')
+          ..write('capturedPeriodId: $capturedPeriodId, ')
           ..write('readingCategory: $readingCategory, ')
           ..write('isEstimated: $isEstimated, ')
           ..write('remarks: $remarks, ')
@@ -2582,6 +2619,7 @@ class Reading extends DataClass implements Insertable<Reading> {
       meterRemoteId,
       readingValue,
       readingDate,
+      capturedPeriodId,
       readingCategory,
       isEstimated,
       remarks,
@@ -2603,6 +2641,7 @@ class Reading extends DataClass implements Insertable<Reading> {
           other.meterRemoteId == this.meterRemoteId &&
           other.readingValue == this.readingValue &&
           other.readingDate == this.readingDate &&
+          other.capturedPeriodId == this.capturedPeriodId &&
           other.readingCategory == this.readingCategory &&
           other.isEstimated == this.isEstimated &&
           other.remarks == this.remarks &&
@@ -2623,6 +2662,7 @@ class ReadingsCompanion extends UpdateCompanion<Reading> {
   final Value<int> meterRemoteId;
   final Value<double> readingValue;
   final Value<DateTime> readingDate;
+  final Value<int?> capturedPeriodId;
   final Value<String> readingCategory;
   final Value<bool> isEstimated;
   final Value<String?> remarks;
@@ -2642,6 +2682,7 @@ class ReadingsCompanion extends UpdateCompanion<Reading> {
     this.meterRemoteId = const Value.absent(),
     this.readingValue = const Value.absent(),
     this.readingDate = const Value.absent(),
+    this.capturedPeriodId = const Value.absent(),
     this.readingCategory = const Value.absent(),
     this.isEstimated = const Value.absent(),
     this.remarks = const Value.absent(),
@@ -2662,6 +2703,7 @@ class ReadingsCompanion extends UpdateCompanion<Reading> {
     required int meterRemoteId,
     required double readingValue,
     required DateTime readingDate,
+    this.capturedPeriodId = const Value.absent(),
     this.readingCategory = const Value.absent(),
     this.isEstimated = const Value.absent(),
     this.remarks = const Value.absent(),
@@ -2687,6 +2729,7 @@ class ReadingsCompanion extends UpdateCompanion<Reading> {
     Expression<int>? meterRemoteId,
     Expression<double>? readingValue,
     Expression<DateTime>? readingDate,
+    Expression<int>? capturedPeriodId,
     Expression<String>? readingCategory,
     Expression<bool>? isEstimated,
     Expression<String>? remarks,
@@ -2707,6 +2750,7 @@ class ReadingsCompanion extends UpdateCompanion<Reading> {
       if (meterRemoteId != null) 'meter_remote_id': meterRemoteId,
       if (readingValue != null) 'reading_value': readingValue,
       if (readingDate != null) 'reading_date': readingDate,
+      if (capturedPeriodId != null) 'captured_period_id': capturedPeriodId,
       if (readingCategory != null) 'reading_category': readingCategory,
       if (isEstimated != null) 'is_estimated': isEstimated,
       if (remarks != null) 'remarks': remarks,
@@ -2731,6 +2775,7 @@ class ReadingsCompanion extends UpdateCompanion<Reading> {
       Value<int>? meterRemoteId,
       Value<double>? readingValue,
       Value<DateTime>? readingDate,
+      Value<int?>? capturedPeriodId,
       Value<String>? readingCategory,
       Value<bool>? isEstimated,
       Value<String?>? remarks,
@@ -2750,6 +2795,7 @@ class ReadingsCompanion extends UpdateCompanion<Reading> {
       meterRemoteId: meterRemoteId ?? this.meterRemoteId,
       readingValue: readingValue ?? this.readingValue,
       readingDate: readingDate ?? this.readingDate,
+      capturedPeriodId: capturedPeriodId ?? this.capturedPeriodId,
       readingCategory: readingCategory ?? this.readingCategory,
       isEstimated: isEstimated ?? this.isEstimated,
       remarks: remarks ?? this.remarks,
@@ -2785,6 +2831,9 @@ class ReadingsCompanion extends UpdateCompanion<Reading> {
     }
     if (readingDate.present) {
       map['reading_date'] = Variable<DateTime>(readingDate.value);
+    }
+    if (capturedPeriodId.present) {
+      map['captured_period_id'] = Variable<int>(capturedPeriodId.value);
     }
     if (readingCategory.present) {
       map['reading_category'] = Variable<String>(readingCategory.value);
@@ -2838,6 +2887,7 @@ class ReadingsCompanion extends UpdateCompanion<Reading> {
           ..write('meterRemoteId: $meterRemoteId, ')
           ..write('readingValue: $readingValue, ')
           ..write('readingDate: $readingDate, ')
+          ..write('capturedPeriodId: $capturedPeriodId, ')
           ..write('readingCategory: $readingCategory, ')
           ..write('isEstimated: $isEstimated, ')
           ..write('remarks: $remarks, ')
@@ -4393,6 +4443,7 @@ typedef $$ReadingsTableCreateCompanionBuilder = ReadingsCompanion Function({
   required int meterRemoteId,
   required double readingValue,
   required DateTime readingDate,
+  Value<int?> capturedPeriodId,
   Value<String> readingCategory,
   Value<bool> isEstimated,
   Value<String?> remarks,
@@ -4413,6 +4464,7 @@ typedef $$ReadingsTableUpdateCompanionBuilder = ReadingsCompanion Function({
   Value<int> meterRemoteId,
   Value<double> readingValue,
   Value<DateTime> readingDate,
+  Value<int?> capturedPeriodId,
   Value<String> readingCategory,
   Value<bool> isEstimated,
   Value<String?> remarks,
@@ -4483,6 +4535,10 @@ class $$ReadingsTableFilterComposer
 
   ColumnFilters<DateTime> get readingDate => $composableBuilder(
       column: $table.readingDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get capturedPeriodId => $composableBuilder(
+      column: $table.capturedPeriodId,
+      builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get readingCategory => $composableBuilder(
       column: $table.readingCategory,
@@ -4584,6 +4640,10 @@ class $$ReadingsTableOrderingComposer
   ColumnOrderings<DateTime> get readingDate => $composableBuilder(
       column: $table.readingDate, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get capturedPeriodId => $composableBuilder(
+      column: $table.capturedPeriodId,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get readingCategory => $composableBuilder(
       column: $table.readingCategory,
       builder: (column) => ColumnOrderings(column));
@@ -4683,6 +4743,9 @@ class $$ReadingsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get readingDate => $composableBuilder(
       column: $table.readingDate, builder: (column) => column);
+
+  GeneratedColumn<int> get capturedPeriodId => $composableBuilder(
+      column: $table.capturedPeriodId, builder: (column) => column);
 
   GeneratedColumn<String> get readingCategory => $composableBuilder(
       column: $table.readingCategory, builder: (column) => column);
@@ -4786,6 +4849,7 @@ class $$ReadingsTableTableManager extends RootTableManager<
             Value<int> meterRemoteId = const Value.absent(),
             Value<double> readingValue = const Value.absent(),
             Value<DateTime> readingDate = const Value.absent(),
+            Value<int?> capturedPeriodId = const Value.absent(),
             Value<String> readingCategory = const Value.absent(),
             Value<bool> isEstimated = const Value.absent(),
             Value<String?> remarks = const Value.absent(),
@@ -4806,6 +4870,7 @@ class $$ReadingsTableTableManager extends RootTableManager<
             meterRemoteId: meterRemoteId,
             readingValue: readingValue,
             readingDate: readingDate,
+            capturedPeriodId: capturedPeriodId,
             readingCategory: readingCategory,
             isEstimated: isEstimated,
             remarks: remarks,
@@ -4826,6 +4891,7 @@ class $$ReadingsTableTableManager extends RootTableManager<
             required int meterRemoteId,
             required double readingValue,
             required DateTime readingDate,
+            Value<int?> capturedPeriodId = const Value.absent(),
             Value<String> readingCategory = const Value.absent(),
             Value<bool> isEstimated = const Value.absent(),
             Value<String?> remarks = const Value.absent(),
@@ -4846,6 +4912,7 @@ class $$ReadingsTableTableManager extends RootTableManager<
             meterRemoteId: meterRemoteId,
             readingValue: readingValue,
             readingDate: readingDate,
+            capturedPeriodId: capturedPeriodId,
             readingCategory: readingCategory,
             isEstimated: isEstimated,
             remarks: remarks,

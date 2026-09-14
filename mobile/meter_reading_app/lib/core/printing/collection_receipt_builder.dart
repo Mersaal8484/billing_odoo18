@@ -1,9 +1,19 @@
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:image/image.dart' as img;
 
 import '../../features/collections/domain/collection_models.dart';
 
 /// Builds ESC/POS bytes for 80mm Bluetooth thermal printers.
 class CollectionReceiptBuilder {
+  static const _logoAssetPath = 'assets/icons/pec_logo.png';
+
+  // Cached after first successful load so we don't decode the PNG on every
+  // print. If loading/decoding ever fails, this stays null and the receipt
+  // simply prints without a logo — it never blocks or breaks printing.
+  static img.Image? _logoImage;
+  static bool _logoLoadAttempted = false;
+
   static const _headerStyles = PosStyles(
     align: PosAlign.center,
     bold: true,
@@ -28,12 +38,40 @@ class CollectionReceiptBuilder {
     codeTable: 'CP864',
   );
 
-  static Future<List<int>> build(CollectionReceipt receipt) async {
+  static Future<void> _loadLogo() async {
+    if (_logoLoadAttempted) return;
+    _logoLoadAttempted = true;
+    try {
+      final data = await rootBundle.load(_logoAssetPath);
+      final decoded = img.decodeImage(data.buffer.asUint8List());
+      if (decoded == null) return;
+      // 80mm paper prints at ~576 dots wide; keep the logo comfortably
+      // narrower than that so it stays centered with margin either side.
+      final resized = img.copyResize(decoded, width: 300);
+      _logoImage = resized;
+    } catch (_) {
+      // Logo missing or undecodable: receipt still prints without it.
+      _logoImage = null;
+    }
+  }
+
+  static Future<List<int>> build(
+    CollectionReceipt receipt, {
+    String? collectorName,
+  }) async {
+    await _loadLogo();
+
     final profile = await CapabilityProfile.load();
     final generator = Generator(PaperSize.mm80, profile);
     final bytes = <int>[];
 
     bytes.addAll(generator.reset());
+
+    if (_logoImage != null) {
+      bytes.addAll(generator.image(_logoImage!, align: PosAlign.center));
+      bytes.addAll(generator.emptyLines(1));
+    }
+
     bytes.addAll(generator.text(
       'المؤسسة العامة للكهرباء',
       styles: _headerStyles,
@@ -49,6 +87,9 @@ class CollectionReceiptBuilder {
     bytes.addAll(generator.hr());
 
     bytes.addAll(_row(generator, 'المرجع', receipt.reference));
+    if (collectorName != null && collectorName.trim().isNotEmpty) {
+      bytes.addAll(_row(generator, 'اسم المحصل', collectorName.trim()));
+    }
     bytes.addAll(_row(generator, 'المشترك', receipt.account.customer.name));
     bytes.addAll(
         _row(generator, 'رقم الحساب', receipt.account.customer.accountNumber));

@@ -133,9 +133,14 @@ class ThermalPrinterService {
   }
 
   /// Prints a collection receipt on the selected or saved thermal printer.
+  ///
+  /// [collectorName] is the currently logged-in collector's display name
+  /// (from the Odoo session). It is optional and, when omitted or empty,
+  /// the receipt simply skips that row — no other behavior changes.
   Future<void> printCollectionReceipt(
     CollectionReceipt receipt, {
     ThermalPrinterDevice? device,
+    String? collectorName,
   }) async {
     final connectedDevice = await ensureConnected(device: device);
     if (connectedDevice == null) {
@@ -144,7 +149,10 @@ class ThermalPrinterService {
       );
     }
 
-    final bytes = await CollectionReceiptBuilder.build(receipt);
+    final bytes = await CollectionReceiptBuilder.build(
+      receipt,
+      collectorName: collectorName,
+    );
     await printBytes(bytes);
   }
 
