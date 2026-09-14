@@ -61,7 +61,7 @@ class AccountPayment(models.Model):
     date_range_id = fields.Many2one(
         'date.range',
         string='فترة الدفع',
-        domain="[('period_role', '=', 'payment')]",
+        domain="[('period_role', 'in', ('reading', 'payment'))]",
     )
     timing_classification = fields.Selection([
         ('on_time', 'في الموعد المحدد'),
@@ -473,13 +473,30 @@ class AccountPayment(models.Model):
                 )
             # تحديد تصنيف توقيت السداد
             period = payment.date_range_id
+            pay_date = payment.date or fields.Date.context_today(payment)
             pay_datetime = fields.Datetime.to_datetime(payment.date) or fields.Datetime.now()
-            if period and period.payment_window_start and period.payment_window_end:
+            # فحص حالة التحصيل: مفتوحة أو قيد الإغلاق (مع مراعاة استقلالية التحصيل عن القراءة)
+            is_collection_active = (
+                getattr(period, 'collection_state', False) in ('open', 'closing')
+                or (period and period.state in ('open', 'closing', 'payment_open'))
+            )
+
+            # 1. الدورة الموحدة: نطاق الدفع الصريح (Date)
+            if period and period.payment_start and period.payment_end:
+                if period.payment_start <= pay_date <= period.payment_end:
+                    payment.timing_classification = 'on_time' if is_collection_active else 'late'
+                elif pay_date > period.payment_end:
+                    payment.timing_classification = 'late'
+                else:
+                    payment.timing_classification = 'outside_window'
+            # 2. السجلات التاريخية أو الدقيقة: نافذة التحصيل (Datetime)
+            elif period and period.payment_window_start and period.payment_window_end:
                 if period.payment_window_start <= pay_datetime <= period.payment_window_end:
-                    payment.timing_classification = 'on_time'
+                    payment.timing_classification = 'on_time' if is_collection_active else 'late'
                 else:
                     payment.timing_classification = 'late' if pay_datetime > period.payment_window_end else 'outside_window'
-            elif period and period.state in ('open', 'payment_open'):
+            # 3. اعتماد حالة التحصيل إذا كانت الفترة بدون نطاق صريح
+            elif period and is_collection_active:
                 payment.timing_classification = 'on_time'
             elif order:
                 payment.timing_classification = 'late'

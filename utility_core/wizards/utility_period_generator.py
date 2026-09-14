@@ -181,9 +181,11 @@ class UtilityPeriodGenerator(models.TransientModel):
             # نافذة القراءة (توقيت دقيق)
             'reading_window_start': rw_start,
             'reading_window_end': rw_end,
-            # نطاق الدفع الصريح
+            # نطاق الدفع الصريح ونوافذ التحصيل (لضمان التوافق بين Date و Datetime)
             'payment_start': pay_start,
             'payment_end': pay_end,
+            'payment_window_start': datetime.combine(pay_start, time.min),
+            'payment_window_end': datetime.combine(pay_end, time.max.replace(microsecond=0)),
         }
         if prev_period_id:
             period_vals['previous_period_id'] = prev_period_id

@@ -103,31 +103,10 @@ def migrate(cr, version):
         cr.rowcount
     )
 
-    # ── 4. إعادة توجيه مراجع account_payment ────────────────────────────
-    # الدفعات التي كانت مرتبطة بسجل payment التاريخي
-    # تُحوَّل للإشارة إلى سجل القراءة (الموحد) بدلاً منه.
-    # هذا لا يُغيّر المستندات المالية — فقط date_range_id (حقل إحصائي).
-    cr.execute("""
-        WITH payment_to_reading AS (
-            SELECT
-                p.id AS payment_dr_id,
-                r.id AS reading_dr_id
-            FROM date_range p
-            JOIN date_range r ON r.id = p.reading_period_id
-            WHERE p.period_role = 'payment'
-              AND p.reading_period_id IS NOT NULL
-        )
-        UPDATE account_payment ap
-        SET date_range_id = ptr.reading_dr_id
-        FROM payment_to_reading ptr
-        WHERE ap.date_range_id = ptr.payment_dr_id
-          AND ap.date_range_id IS NOT NULL
-    """)
-    redirected_payments = cr.rowcount
-    _logger.info(
-        'utility_core post-migrate: %d account_payment records redirected to unified cycle',
-        redirected_payments
-    )
+    # ── 4. الحفاظ على مراجع account_payment التاريخية دون تعديل ──────
+    # السجلات التاريخية لـ account_payment تحتفظ بـ date_range_id كما هي
+    # دون تعديل لحماية سلامة التحقق، رموز QR، وتصنيف التوقيت للدفعات المنشورة.
+    _logger.info('utility_core post-migrate: historical account_payment references preserved intact')
 
     # ── 5. تقرير التحقق بعد الترحيل ──────────────────────────────────
     cr.execute(VERIFY_REPORT_QUERY)

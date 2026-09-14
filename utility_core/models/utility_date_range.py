@@ -624,6 +624,19 @@ class DateRange(models.Model):
                 else:
                     vals['date_end'] = fields.Date.today().replace(day=28)
 
+            # مزامنة تلقائية لنطاق الدفع (Date) مع نافذة التحصيل (Datetime)
+            if vals.get('payment_start') and not vals.get('payment_window_start'):
+                p_s = fields.Date.to_date(vals['payment_start'])
+                vals['payment_window_start'] = datetime.datetime.combine(p_s, datetime.time.min) if p_s else False
+            elif vals.get('payment_window_start') and not vals.get('payment_start'):
+                vals['payment_start'] = fields.Date.to_date(vals['payment_window_start'])
+
+            if vals.get('payment_end') and not vals.get('payment_window_end'):
+                p_e = fields.Date.to_date(vals['payment_end'])
+                vals['payment_window_end'] = datetime.datetime.combine(p_e, datetime.time.max.replace(microsecond=0)) if p_e else False
+            elif vals.get('payment_window_end') and not vals.get('payment_end'):
+                vals['payment_end'] = fields.Date.to_date(vals['payment_window_end'])
+
             if role == 'reading' and not is_fiscal and 'region_ids' not in vals:
                 regions = self._get_regions_for_billing_cadence(cadence)
                 if regions:
@@ -672,7 +685,9 @@ class DateRange(models.Model):
         'cycle_key', 'region_ids', 'billing_cadence', 'period_role', 'reading_period_id',
     })
     # حقول نطاق الدفع محمية بعد فتح الدورة للتشغيل
-    _PAYMENT_SCOPE_PROTECTED_FIELDS = frozenset({'payment_start', 'payment_end'})
+    _PAYMENT_SCOPE_PROTECTED_FIELDS = frozenset({
+        'payment_start', 'payment_end', 'payment_window_start', 'payment_window_end',
+    })
     _PAYMENT_SCOPE_MUTABLE_STATES = frozenset({'planned', 'open'})
     # الحالة الوحيدة التي يُسمح فيها بتعديل النطاق
     _SCOPE_MUTABLE_STATES = frozenset({'planned'})
@@ -687,6 +702,19 @@ class DateRange(models.Model):
         Context bypass: _bypass_period_scope_protection يُستخدم داخلياً فقط.
         """
         vals = dict(vals)
+
+        # مزامنة تلقائية لنطاق الدفع (Date) مع نافذة التحصيل (Datetime) عند التعديل
+        if 'payment_start' in vals and 'payment_window_start' not in vals:
+            p_s = fields.Date.to_date(vals['payment_start'])
+            vals['payment_window_start'] = datetime.datetime.combine(p_s, datetime.time.min) if p_s else False
+        elif 'payment_window_start' in vals and 'payment_start' not in vals:
+            vals['payment_start'] = fields.Date.to_date(vals['payment_window_start'])
+
+        if 'payment_end' in vals and 'payment_window_end' not in vals:
+            p_e = fields.Date.to_date(vals['payment_end'])
+            vals['payment_window_end'] = datetime.datetime.combine(p_e, datetime.time.max.replace(microsecond=0)) if p_e else False
+        elif 'payment_window_end' in vals and 'payment_end' not in vals:
+            vals['payment_end'] = fields.Date.to_date(vals['payment_window_end'])
         scope_changed = set(vals.keys()) & self._SCOPE_PROTECTED_FIELDS
         if scope_changed and not (
             self.env.context.get('_bypass_period_scope_protection') or

@@ -238,9 +238,9 @@
                                         <label for="cycle_key" class="o_light_label"/>
                                         <field name="cycle_key" placeholder="مثال: SEMI-2026-08-H1"/>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="mb-3" attrs="{'invisible': [('period_role', '=', 'reading')]}">
                                         <label for="period_role" class="o_light_label"/>
-                                        <field name="period_role"/>
+                                        <field name="period_role" readonly="1"/>
                                     </div>
                                     <div class="mb-3">
                                         <label for="billing_cadence" class="o_light_label"/>

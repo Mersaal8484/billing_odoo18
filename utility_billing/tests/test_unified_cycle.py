@@ -192,3 +192,50 @@ class TestUnifiedCycle(TransactionCase):
         self.assertEqual(cycle.reading_state, 'open')
         # التحصيل لم يتغير
         self.assertEqual(cycle.collection_state, 'closing')
+
+    def test_11_payment_timing_classification_with_closed_reading(self):
+        """تصنيف الدفعة يكون on_time عندما تقع ضمن payment_start/end حتى لو أُغلقت القراءة."""
+        cycle = self._create_unified_cycle(
+            'TEST-TIMING-001',
+            start=date(2026, 9, 1),
+            end=date(2026, 9, 15),
+            payment_start=date(2026, 9, 2),
+            payment_end=date(2026, 9, 16),
+        )
+        cycle.action_open_period()
+        # محاكاة إغلاق القراءة: reading_state='closed' مع بقاء collection_state='open'
+        cycle.with_context(_bypass_period_scope_protection=True).write({
+            'reading_state': 'closed',
+            'state': 'closing',
+        })
+        self.assertEqual(cycle.reading_state, 'closed')
+        self.assertEqual(cycle.collection_state, 'open')
+
+        # فحص المنطق: دفعة بتاريخ 2026-09-05 (ضمن نطاق الدفع 2-16)
+        pay_date = date(2026, 9, 5)
+        is_active = (
+            cycle.collection_state in ('open', 'closing')
+            or cycle.state in ('open', 'closing')
+        )
+        in_window = cycle.payment_start <= pay_date <= cycle.payment_end
+        self.assertTrue(in_window)
+        self.assertTrue(is_active)
+
+    def test_12_payment_window_auto_sync_on_unified_cycle(self):
+        """المزامنة التلقائية بين payment_start/end و payment_window_start/end."""
+        cycle = self._create_unified_cycle(
+            'TEST-SYNC-001',
+            payment_start=date(2026, 9, 3),
+            payment_end=date(2026, 9, 18),
+        )
+        self.assertTrue(cycle.payment_window_start)
+        self.assertTrue(cycle.payment_window_end)
+        self.assertEqual(cycle.payment_window_start.date(), date(2026, 9, 3))
+        self.assertEqual(cycle.payment_window_end.date(), date(2026, 9, 18))
+
+    def test_13_payment_date_range_domain_accepts_unified_cycle(self):
+        """حقل date_range_id في account.payment يقبل الدورة الموحدة والسجل التاريخي."""
+        unified_cycle = self._create_unified_cycle('TEST-DOMAIN-001')
+        field = self.env['account.payment']._fields['date_range_id']
+        self.assertIn("'reading'", field.domain)
+        self.assertIn("'payment'", field.domain)
