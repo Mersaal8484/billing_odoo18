@@ -233,6 +233,12 @@
                             <field name="active" widget="boolean_toggle"/>
                         </group>
                         <group string="النطاقات الزمنية للتشغيل">
+                            <label for="consumption_start" string="فترة الاستهلاك"/>
+                            <div class="o_row">
+                                <field name="consumption_start" widget="daterange" options="{'related_end_date': 'consumption_end'}" class="oe_inline"/>
+                                <span class="o_form_label mx-2">إلى</span>
+                                <field name="consumption_end" class="oe_inline"/>
+                            </div>
                             <label for="date_start" string="نطاق القراءة"/>
                             <div class="o_row">
                                 <field name="date_start" widget="daterange" options="{'related_end_date': 'date_end'}" class="oe_inline"/>
@@ -278,24 +284,6 @@
                                     <separator string="مؤشرات التحصيل"/>
                                     <field name="outstanding_amount" string="المبلغ المتبقي"/>
                                     <field name="collection_rate" widget="progressbar" string="نسبة التحصيل"/>
-                                </group>
-                            </group>
-                        </page>
-
-                        <!-- التبويب 2: النوافذ التشغيلية التفصيلية -->
-                        <page string="النوافذ التشغيلية التفصيلية">
-                            <group>
-                                <group string="فترة الاستهلاك">
-                                    <field name="consumption_start"/>
-                                    <field name="consumption_end"/>
-                                </group>
-                                <group string="نافذة القراءة والرفع الميداني">
-                                    <field name="reading_window_start"/>
-                                    <field name="reading_window_end"/>
-                                </group>
-                                <group string="نافذة التحصيل بالساعة (دقيق)">
-                                    <field name="payment_window_start"/>
-                                    <field name="payment_window_end"/>
                                 </group>
                             </group>
                         </page>
