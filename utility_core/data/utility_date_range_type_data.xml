@@ -12,7 +12,7 @@
             <field name="reading_start_offset_days">-2</field>
             <field name="reading_end_offset_days">3</field>
             <field name="payment_start_offset_days">1</field>
-            <field name="payment_end_offset_days">15</field>
+            <field name="payment_end_offset_days">1</field>
             <field name="active" eval="True"/>
             <field name="company_id" eval="False"/>
         </record>
@@ -26,7 +26,7 @@
             <field name="reading_start_offset_days">-3</field>
             <field name="reading_end_offset_days">5</field>
             <field name="payment_start_offset_days">1</field>
-            <field name="payment_end_offset_days">25</field>
+            <field name="payment_end_offset_days">1</field>
             <field name="active" eval="True"/>
             <field name="company_id" eval="False"/>
         </record>

@@ -93,7 +93,7 @@ class DateRangeType(models.Model):
     )
     payment_end_offset_days = fields.Integer(
         string="إزاحة نهاية التحصيل (أيام بعد نهاية الاستهلاك)",
-        default=13
+        default=1
     )
 
     @api.model
