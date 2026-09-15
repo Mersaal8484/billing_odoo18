@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- فاتورة استهلاك دورية -->
+    <record id="sale_order_type_periodic" model="sale.order.type">
+        <field name="name">فاتورة استهلاك دورية</field>
+        <field name="code">UTIL_PERIODIC</field>
+        <field name="sequence">10</field>
+        <field name="description">فواتير دورات القراءة والفوترة الشهرية الدورية لاستهلاك الطاقة الكهربائية للمشتركين.</field>
+    </record>
+
+    <!-- فاتورة تسوية استهلاك -->
+    <record id="sale_order_type_settlement" model="sale.order.type">
+        <field name="name">فاتورة تسوية استهلاك</field>
+        <field name="code">UTIL_SETTLEMENT</field>
+        <field name="sequence">20</field>
+        <field name="description">فواتير التسويات الختامية، تصحيح القراءات، تدوير العداد (Rollover)، وفروقات الاستهلاك الاستثنائية.</field>
+    </record>
+
+    <!-- فاتورة رسوم وخدمات المشتركين -->
+    <record id="sale_order_type_services" model="sale.order.type">
+        <field name="name">فاتورة رسوم وخدمات المشتركين</field>
+        <field name="code">UTIL_SERVICES</field>
+        <field name="sequence">30</field>
+        <field name="description">فواتير رسوم إدخال وتوصيل الخدمة، رسوم الفحص والتفتيش، استبدال العدادات، وإعادة الخدمة بعد الفصل.</field>
+    </record>
+
+    <!-- فاتورة غرامات ومخالفات -->
+    <record id="sale_order_type_penalty" model="sale.order.type">
+        <field name="name">فاتورة غرامات ومخالفات</field>
+        <field name="code">UTIL_PENALTY</field>
+        <field name="sequence">40</field>
+        <field name="description">فواتير تحصيل الغرامات التأخيرية ومحاضر التلاعب والعبث بالعدادات والتوصيلات المباشرة غير القانونية.</field>
+    </record>
+
+</odoo>

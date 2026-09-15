@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- ============================================================ -->
+    <!-- 1. أوامر العمل النموذجية للعمليات الميدانية                     -->
+    <!-- ============================================================ -->
+
+    <!-- أمر عمل تركيب عداد جديد -->
+    <record id="work_order_template_installation" model="utility.work.order">
+        <field name="work_order_number">WO-TMP-INS-001</field>
+        <field name="work_type">installation</field>
+        <field name="priority">high</field>
+        <field name="description">أمر عمل تركيب عداد كهربائي جديد لمشترك سكني، يشمل تجهيز الكابلات، تثبيت لوحة العداد، تركيب الأختام التأمينية، والتحقق من سلامة الجهد والطور.</field>
+        <field name="state">draft</field>
+    </record>
+
+    <!-- أمر عمل صيانة وقائية ومعايرة -->
+    <record id="work_order_template_maintenance" model="utility.work.order">
+        <field name="work_order_number">WO-TMP-MNT-001</field>
+        <field name="work_type">maintenance</field>
+        <field name="priority">normal</field>
+        <field name="description">أمر عمل صيانة دورية وفحص فني لصناديق التوزيع وقواطع المشتركين، والتأكد من عدم وجود كربنة أو تسريب كهربائي وتنظيف نقاط التوصيل.</field>
+        <field name="state">draft</field>
+    </record>
+
+    <!-- أمر عمل فصل الخدمة لعدم السداد -->
+    <record id="work_order_template_disconnection" model="utility.work.order">
+        <field name="work_order_number">WO-TMP-DIS-001</field>
+        <field name="work_type">disconnection</field>
+        <field name="priority">normal</field>
+        <field name="description">أمر عمل فصل التيار الكهربائي عن المشترك الميداني نتيجة تجاوز فترة السماح وتراكم المديونية، مع توثيق قراءة الفصل والأختام وتصوير العداد.</field>
+        <field name="state">draft</field>
+    </record>
+
+    <!-- أمر عمل إعادة توصيل الخدمة بعد السداد -->
+    <record id="work_order_template_reconnection" model="utility.work.order">
+        <field name="work_order_number">WO-TMP-REC-001</field>
+        <field name="work_type">reconnection</field>
+        <field name="priority">urgent</field>
+        <field name="description">أمر عمل إعادة توصيل الخدمة الكهربائية فوراً بعد قيام المشترك بسداد المتأخرات ورسوم الإعادة، مع التحقق من سلامة التوصيل وتأمين العداد.</field>
+        <field name="state">draft</field>
+    </record>
+
+    <!-- أمر عمل فحص واختبار دقة العداد -->
+    <record id="work_order_template_inspection" model="utility.work.order">
+        <field name="work_order_number">WO-TMP-INSP-001</field>
+        <field name="work_type">inspection</field>
+        <field name="priority">normal</field>
+        <field name="description">أمر تفتيش وفحص فني ومعايرة دقة قياس العداد في الموقع، بناءً على شكوى ارتفاع استهلاك أو اشتباه بوجود خطأ في احتساب الطاقة.</field>
+        <field name="state">draft</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 2. الإنذارات الفنية والتشغيلية الميدانية                      -->
+    <!-- ============================================================ -->
+
+    <!-- إنذار تلاعب بالعداد أو طاقة عكسية -->
+    <record id="alarm_tamper_warning" model="utility.alarm">
+        <field name="alarm_code">ALM-TMP-001</field>
+        <field name="alarm_type">tamper</field>
+        <field name="severity">critical</field>
+        <field name="description">إنذار تلاعب: رصد اشتباه تلاعب في العداد أو فتح غطاء التوصيلات أو رصد تيار في السلك الأرضي مع وجود طاقة عكسية.</field>
+        <field name="state">open</field>
+    </record>
+
+    <!-- إنذار انقطاع التيار الكهربائي -->
+    <record id="alarm_power_failure_warning" model="utility.alarm">
+        <field name="alarm_code">ALM-PWR-001</field>
+        <field name="alarm_type">power_failure</field>
+        <field name="severity">emergency</field>
+        <field name="description">إنذار انقطاع تيار: توقف التغذية الكهربائية بالكامل عن المحطة الفرعية أو الفيدر الرئيسي مما أدى لخروج المحول عن الخدمة.</field>
+        <field name="state">open</field>
+    </record>
+
+    <!-- إنذار هبوط حاد في الجهد -->
+    <record id="alarm_under_voltage_warning" model="utility.alarm">
+        <field name="alarm_code">ALM-UV-001</field>
+        <field name="alarm_type">under_voltage</field>
+        <field name="severity">warning</field>
+        <field name="description">إنذار انخفاض الجهد: هبوط الجهد الكهربائي عند نهاية مسار التوزيع إلى أقل من 190 فولت مما يؤثر على أجهزة المشتركين.</field>
+        <field name="state">open</field>
+    </record>
+
+    <!-- إنذار حمل زائد وتيار مرتفع -->
+    <record id="alarm_over_current_warning" model="utility.alarm">
+        <field name="alarm_code">ALM-OC-001</field>
+        <field name="alarm_type">over_current</field>
+        <field name="severity">critical</field>
+        <field name="description">إنذار تيار زائد: تجاوز الحمل الكهربائي المسحوب للسعة المقننة للمحول بنسبة تزيد عن 110% مما يهدد بحدوث تلف في العوازل.</field>
+        <field name="state">open</field>
+    </record>
+
+    <!-- إنذار انخفاض بطارية العداد الإلكتروني -->
+    <record id="alarm_battery_warning" model="utility.alarm">
+        <field name="alarm_code">ALM-BAT-001</field>
+        <field name="alarm_type">battery</field>
+        <field name="severity">info</field>
+        <field name="description">إنذار بطارية: انخفاض شحن البطارية الداخلية للعداد الإلكتروني الذكي، يلزم جدولة صيانة واستبدال البطارية لضمان استمرار عمل الساعة الداخلية.</field>
+        <field name="state">open</field>
+    </record>
+
+</odoo>

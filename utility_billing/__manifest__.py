@@ -25,6 +25,7 @@ debt management, collections, and online payment gateway integration.
         'data/utility_cron_extras.xml',
         'data/utility_cron_batch.xml',
         'data/utility_billing_adjustment_data.xml',
+        'data/utility_penalty_type_data.xml',
         'views/utility_billing_menu.xml',
         'views/utility_transformer_loss_report_views.xml',
         'views/utility_service_charge_views.xml',

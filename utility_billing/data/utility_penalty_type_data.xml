@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- غرامة تأخر عن السداد -->
+    <record id="penalty_type_late_payment" model="utility.penalty.type">
+        <field name="name">غرامة تأخر عن السداد</field>
+        <field name="code">LATE_PAY</field>
+        <field name="description">تُفرض على المشترك عند التأخر في سداد فاتورة الاستهلاك الشهرية بعد انتهاء فترة السماح المقررة.</field>
+    </record>
+
+    <!-- غرامة إعادة الخدمة بعد الفصل -->
+    <record id="penalty_type_reconnection" model="utility.penalty.type">
+        <field name="name">غرامة ورسوم إعادة الخدمة بعد الفصل</field>
+        <field name="code">RECONNECT</field>
+        <field name="description">رسوم وغرامة إعادة توصيل التيار الكهربائي بعد فصله بسبب تراكم المديونية أو مخالفة شروط العقد.</field>
+    </record>
+
+    <!-- غرامة تلاعب وعبث بالعداد -->
+    <record id="penalty_type_tamper" model="utility.penalty.type">
+        <field name="name">غرامة تلاعب وعبث بالعداد</field>
+        <field name="code">TAMPER</field>
+        <field name="description">تُفرض عند ثبوت التلاعب الميكانيكي أو الإلكتروني بالعداد أو استخدام مغناطيس أو فتح الغطاء الداخلي للعداد.</field>
+    </record>
+
+    <!-- غرامة توصيل مباشر غير قانوني -->
+    <record id="penalty_type_illegal_connection" model="utility.penalty.type">
+        <field name="name">غرامة توصيل مباشر غير قانوني (سرقة تيار)</field>
+        <field name="code">ILLEGAL_CONN</field>
+        <field name="description">تُفرض عند ضبط توصيل مباشر من خطوط الشبكة أو كباري قبل العداد بدون ترخيص قانوني.</field>
+    </record>
+
+    <!-- غرامة كسر الأختام التأمينية -->
+    <record id="penalty_type_seal_broken" model="utility.penalty.type">
+        <field name="name">غرامة كسر الأختام التأمينية</field>
+        <field name="code">SEAL_BROKEN</field>
+        <field name="description">تُفرض عند وجود كسر أو إتلاف للأختام الرصاصية أو البلاستيكية المؤمّنة للعداد أو الصندوق.</field>
+    </record>
+
+    <!-- غرامة تجاوز الأحمال المقررة -->
+    <record id="penalty_type_overload" model="utility.penalty.type">
+        <field name="name">غرامة تجاوز الأحمال التعاقدية</field>
+        <field name="code">OVERLOAD</field>
+        <field name="description">تُفرض عند تجاوز سعة القاطع أو الحمل الأقصى المتفق عليه في عقد الاشتراك دون موافقة المؤسسة.</field>
+    </record>
+
+</odoo>

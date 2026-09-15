@@ -23,6 +23,7 @@ Maintenance, Alarm, Work Order.
         'security/utility_operations_security.xml',
         'data/utility_sequence.xml',
         'data/utility_cron.xml',
+        'data/utility_operations_data.xml',
         'views/utility_service_order_views.xml',
         'views/utility_installation_views.xml',
         'views/utility_inspection_views.xml',
