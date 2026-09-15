@@ -68,7 +68,7 @@ class UtilityPeriodGenerator(models.TransientModel):
         else:
             prev_year = year
             prev_month = month - 1
-        _, prev_last_day = calendar.monthrange(prev_year, prev_month)
+        prev_weekday, prev_last_day = calendar.monthrange(prev_year, prev_month)
 
         cadences = ['monthly', 'semi_monthly'] if self.billing_cadence == 'all' else [self.billing_cadence]
 
