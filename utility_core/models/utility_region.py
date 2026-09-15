@@ -73,6 +73,15 @@ class UtilityRegion(models.Model):
         for r in self:
             r.zone_count = len(r.zone_ids)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('parent_id') and not vals.get('recurring_rule_type'):
+                parent = self.browse(vals['parent_id'])
+                if parent.exists() and parent.recurring_rule_type:
+                    vals['recurring_rule_type'] = parent.recurring_rule_type
+        return super().create(vals_list)
+
     @api.onchange('parent_id')
     def _onchange_parent_id_inherit_cadence(self):
         if self.parent_id and self.parent_id.recurring_rule_type:

@@ -46,7 +46,7 @@
                                  t-attf-style="background-image:url('#{kanban_image('utility.meter.reader', 'image_1920', record.id.raw_value)}')">
                                 <t t-if="!record.image_1920.raw_value">
                                     <div class="d-flex align-items-center justify-content-center h-100 bg-light text-muted">
-                                        <i class="fa fa-user fa-3x"/>
+                                        <i class="fa fa-user fa-3x" title="صورة القارئ" aria-label="صورة القارئ"/>
                                     </div>
                                 </t>
                             </div>
@@ -56,22 +56,22 @@
                                         <field name="name"/>
                                     </strong>
                                     <div class="text-muted" t-if="record.code.raw_value">
-                                        <i class="fa fa-id-badge me-1"/> <field name="code"/>
+                                        <i class="fa fa-id-badge me-1" title="رمز الكاشف" aria-label="رمز الكاشف"/> <field name="code"/>
                                     </div>
                                     <div class="text-muted" t-if="record.mobile.raw_value">
-                                        <i class="fa fa-phone me-1"/> <field name="mobile"/>
+                                        <i class="fa fa-phone me-1" title="رقم الهاتف" aria-label="رقم الهاتف"/> <field name="mobile"/>
                                     </div>
                                     <div class="text-muted" t-if="record.user_id.raw_value">
-                                        <i class="fa fa-user-circle me-1"/> <field name="user_id"/>
+                                        <i class="fa fa-user-circle me-1" title="حساب المستخدم" aria-label="حساب المستخدم"/> <field name="user_id"/>
                                     </div>
                                 </div>
                                 <div class="o_kanban_record_bottom mt-2 pt-2 border-top">
                                     <div class="oe_kanban_bottom_left">
                                         <span class="badge rounded-pill text-bg-primary me-1">
-                                            <i class="fa fa-road me-1"/> <t t-esc="record.route_count.value"/> مسارات
+                                            <i class="fa fa-road me-1" title="المسارات" aria-label="المسارات"/> <t t-esc="record.route_count.value"/> مسارات
                                         </span>
                                         <span class="badge rounded-pill text-bg-info">
-                                            <i class="fa fa-users me-1"/> <t t-esc="record.customer_count.value"/> مشترك
+                                            <i class="fa fa-users me-1" title="المشتركون" aria-label="المشتركون"/> <t t-esc="record.customer_count.value"/> مشترك
                                         </span>
                                     </div>
                                     <div class="oe_kanban_bottom_right">
@@ -149,7 +149,7 @@
                     <notebook>
                         <page string="المسارات المخصصة" name="routes">
                             <div class="alert alert-info d-flex align-items-center mb-3" role="alert">
-                                <i class="fa fa-info-circle fa-2x me-3 ms-2 text-info"/>
+                                <i class="fa fa-info-circle fa-2x me-3 ms-2 text-info" title="توجيه ميداني" aria-label="توجيه ميداني"/>
                                 <div>
                                     <strong>توجيه ميداني:</strong>
                                     عند تعيين مسار للكاشف، ستظهر له جميع حسابات المشتركين التابعة لهذا المسار تلقائياً في تطبيق القارئ الميداني.

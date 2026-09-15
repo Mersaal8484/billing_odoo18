@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- ============================================================ -->
+    <!-- 1. المناطق الرئيسية (Level 1: Regions)                      -->
+    <!-- ============================================================ -->
+    <record id="region_first" model="utility.region">
+        <field name="name">المنطقة الأولى</field>
+        <field name="code">REG-01</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_second" model="utility.region">
+        <field name="name">المنطقة الثانية</field>
+        <field name="code">REG-02</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_third" model="utility.region">
+        <field name="name">المنطقة الثالثة</field>
+        <field name="code">REG-03</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_fourth" model="utility.region">
+        <field name="name">المنطقة الرابعة</field>
+        <field name="code">REG-04</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_hodeidah" model="utility.region">
+        <field name="name">منطقة الحديدة</field>
+        <field name="code">REG-HUD</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_second_distribution" model="utility.region">
+        <field name="name">المنطقة الثانية توزيع</field>
+        <field name="code">REG-DIS-02</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_hajjah" model="utility.region">
+        <field name="name">منطقة حجة</field>
+        <field name="code">REG-HAJ</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_generation" model="utility.region">
+        <field name="name">منطقة التوليد</field>
+        <field name="code">REG-GEN</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_rada" model="utility.region">
+        <field name="name">منطقة رداع</field>
+        <field name="code">REG-RAD</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_amran" model="utility.region">
+        <field name="name">منطقة عمران</field>
+        <field name="code">REG-AMR</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_dhamar" model="utility.region">
+        <field name="name">منطقة ذمار</field>
+        <field name="code">REG-DHA</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_sanaa" model="utility.region">
+        <field name="name">منطقة صنعاء</field>
+        <field name="code">REG-SAN</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_ibb" model="utility.region">
+        <field name="name">منطقة إب</field>
+        <field name="code">REG-IBB</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_saada" model="utility.region">
+        <field name="name">منطقة صعدة</field>
+        <field name="code">REG-SAA</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_taiz" model="utility.region">
+        <field name="name">منطقة تعز</field>
+        <field name="code">REG-TAZ</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_mahwit" model="utility.region">
+        <field name="name">منطقة المحويت</field>
+        <field name="code">REG-MAH</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_yarim" model="utility.region">
+        <field name="name">منطقة يريم</field>
+        <field name="code">REG-YAR</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <record id="region_bayda" model="utility.region">
+        <field name="name">منطقة البيضاء</field>
+        <field name="code">REG-BAY</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">monthly</field>
+    </record>
+
+    <record id="region_jawf" model="utility.region">
+        <field name="name">منطقة الجوف</field>
+        <field name="code">REG-JAW</field>
+        <field name="type">region</field>
+        <field name="recurring_rule_type">semi_monthly</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 2. الفروع التشغيلية (Level 2: Areas / Branches)            -->
+    <!-- ============================================================ -->
+
+    <!-- فرع تلقائي: المنطقة الأولى (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_first" model="utility.region">
+        <field name="name">فرع المنطقة الأولى</field>
+        <field name="code">BR-REG-01</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_first"/>
+    </record>
+
+    <!-- فرع تلقائي: المنطقة الثانية (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_second" model="utility.region">
+        <field name="name">فرع المنطقة الثانية</field>
+        <field name="code">BR-REG-02</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_second"/>
+    </record>
+
+    <!-- فرع تلقائي: المنطقة الثالثة (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_third" model="utility.region">
+        <field name="name">فرع المنطقة الثالثة</field>
+        <field name="code">BR-REG-03</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_third"/>
+    </record>
+
+    <!-- فرع تلقائي: المنطقة الرابعة (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_fourth" model="utility.region">
+        <field name="name">فرع المنطقة الرابعة</field>
+        <field name="code">BR-REG-04</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_fourth"/>
+    </record>
+
+    <!-- فروع منطقة الحديدة -->
+    <record id="area_8190" model="utility.region">
+        <field name="name">فرع الضحي</field>
+        <field name="code">8190</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hodeidah"/>
+    </record>
+    <record id="area_8189" model="utility.region">
+        <field name="name">فرع الحسينية</field>
+        <field name="code">8189</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hodeidah"/>
+    </record>
+    <record id="area_8188" model="utility.region">
+        <field name="name">فرع التحيتا</field>
+        <field name="code">8188</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hodeidah"/>
+    </record>
+    <record id="area_8187" model="utility.region">
+        <field name="name">فرع الزيدية</field>
+        <field name="code">8187</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hodeidah"/>
+    </record>
+    <record id="area_8185" model="utility.region">
+        <field name="name">فرع زبيد</field>
+        <field name="code">8185</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hodeidah"/>
+    </record>
+    <record id="area_8183" model="utility.region">
+        <field name="name">فرع بيت الفقيه</field>
+        <field name="code">8183</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hodeidah"/>
+    </record>
+    <record id="area_8182" model="utility.region">
+        <field name="name">فرع المنصورية</field>
+        <field name="code">8182</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hodeidah"/>
+    </record>
+    <record id="area_8184" model="utility.region">
+        <field name="name">فرع الجراحي</field>
+        <field name="code">8184</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hodeidah"/>
+    </record>
+    <record id="area_8181" model="utility.region">
+        <field name="name">فرع المراوعة</field>
+        <field name="code">8181</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hodeidah"/>
+    </record>
+    <record id="area_8186" model="utility.region">
+        <field name="name">فرع الكدن</field>
+        <field name="code">8186</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hodeidah"/>
+    </record>
+    <record id="area_8162" model="utility.region">
+        <field name="name">فرع باجل</field>
+        <field name="code">8162</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hodeidah"/>
+    </record>
+
+    <!-- فرع تلقائي: المنطقة الثانية توزيع (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_second_distribution" model="utility.region">
+        <field name="name">فرع المنطقة الثانية توزيع</field>
+        <field name="code">BR-REG-DIS-02</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_second_distribution"/>
+    </record>
+
+    <!-- فروع منطقة حجة -->
+    <record id="area_8179" model="utility.region">
+        <field name="name">فرع الزهرة</field>
+        <field name="code">8179</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hajjah"/>
+    </record>
+    <record id="area_8225" model="utility.region">
+        <field name="name">فرع افلح اليمن (جياح)</field>
+        <field name="code">8225</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hajjah"/>
+    </record>
+    <record id="area_8178" model="utility.region">
+        <field name="name">فرع الشاهل</field>
+        <field name="code">8178</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hajjah"/>
+    </record>
+    <record id="area_8177" model="utility.region">
+        <field name="name">فرع المحابشه</field>
+        <field name="code">8177</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hajjah"/>
+    </record>
+    <record id="area_8226" model="utility.region">
+        <field name="name">فرع المفتاح</field>
+        <field name="code">8226</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hajjah"/>
+    </record>
+    <record id="area_8175" model="utility.region">
+        <field name="name">فرع عبس</field>
+        <field name="code">8175</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hajjah"/>
+    </record>
+    <record id="area_8176" model="utility.region">
+        <field name="name">فرع كحلان الشرف</field>
+        <field name="code">8176</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hajjah"/>
+    </record>
+    <record id="area_8227" model="utility.region">
+        <field name="name">فرع كحلان عفار</field>
+        <field name="code">8227</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hajjah"/>
+    </record>
+    <record id="area_8228" model="utility.region">
+        <field name="name">فرع المنطقة</field>
+        <field name="code">8228</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hajjah"/>
+    </record>
+    <record id="area_8494" model="utility.region">
+        <field name="name">فرع مبين حجة</field>
+        <field name="code">8494</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_hajjah"/>
+    </record>
+
+    <!-- فرع تلقائي: منطقة التوليد (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_generation" model="utility.region">
+        <field name="name">فرع منطقة التوليد</field>
+        <field name="code">BR-REG-GEN</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_generation"/>
+    </record>
+
+    <!-- فرع تلقائي: منطقة رداع (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_rada" model="utility.region">
+        <field name="name">فرع منطقة رداع</field>
+        <field name="code">BR-REG-RAD</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_rada"/>
+    </record>
+
+    <!-- فروع منطقة عمران -->
+    <record id="area_8201" model="utility.region">
+        <field name="name">فرع خمر</field>
+        <field name="code">8201</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_amran"/>
+    </record>
+    <record id="area_8569" model="utility.region">
+        <field name="name">فرع خارف عمران</field>
+        <field name="code">8569</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_amran"/>
+    </record>
+    <record id="area_8202" model="utility.region">
+        <field name="name">فرع ريدة</field>
+        <field name="code">8202</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_amran"/>
+    </record>
+    <record id="area_8204" model="utility.region">
+        <field name="name">فرع ذيبين</field>
+        <field name="code">8204</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_amran"/>
+    </record>
+    <record id="area_8205" model="utility.region">
+        <field name="name">فرع عيال سريح</field>
+        <field name="code">8205</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_amran"/>
+    </record>
+    <record id="area_8200" model="utility.region">
+        <field name="name">فرع ثلا</field>
+        <field name="code">8200</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_amran"/>
+    </record>
+    <record id="area_8199" model="utility.region">
+        <field name="name">فرع حبابة</field>
+        <field name="code">8199</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_amran"/>
+    </record>
+    <record id="area_8174" model="utility.region">
+        <field name="name">فرع حوث</field>
+        <field name="code">8174</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_amran"/>
+    </record>
+
+    <!-- فروع منطقة ذمار -->
+    <record id="area_8206" model="utility.region">
+        <field name="name">فرع معبر</field>
+        <field name="code">8206</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_dhamar"/>
+    </record>
+
+    <!-- فرع تلقائي: منطقة صنعاء (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_sanaa" model="utility.region">
+        <field name="name">فرع منطقة صنعاء</field>
+        <field name="code">BR-REG-SAN</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_sanaa"/>
+    </record>
+
+    <!-- فروع منطقة إب -->
+    <record id="area_8215" model="utility.region">
+        <field name="name">فرع طبيع</field>
+        <field name="code">8215</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_ibb"/>
+    </record>
+    <record id="area_8210" model="utility.region">
+        <field name="name">فرع حزم العدين</field>
+        <field name="code">8210</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_ibb"/>
+    </record>
+    <record id="area_8211" model="utility.region">
+        <field name="name">فرع مذيخرة</field>
+        <field name="code">8211</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_ibb"/>
+    </record>
+    <record id="area_8209" model="utility.region">
+        <field name="name">فرع العدين</field>
+        <field name="code">8209</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_ibb"/>
+    </record>
+    <record id="area_8208" model="utility.region">
+        <field name="name">فرع حبيش</field>
+        <field name="code">8208</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_ibb"/>
+    </record>
+    <record id="area_8207" model="utility.region">
+        <field name="name">فرع مذيخرة</field>
+        <field name="code">8207</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_ibb"/>
+    </record>
+    <record id="area_8329" model="utility.region">
+        <field name="name">فرع المخادر - منطقة اب</field>
+        <field name="code">8329</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_ibb"/>
+    </record>
+    <record id="area_8212" model="utility.region">
+        <field name="name">فرع المجمعة</field>
+        <field name="code">8212</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_ibb"/>
+    </record>
+    <record id="area_8213" model="utility.region">
+        <field name="name">فرع جبلة</field>
+        <field name="code">8213</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_ibb"/>
+    </record>
+    <record id="area_8214" model="utility.region">
+        <field name="name">فرع القاعدة</field>
+        <field name="code">8214</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_ibb"/>
+    </record>
+    <record id="area_8229" model="utility.region">
+        <field name="name">مركز المحافظة</field>
+        <field name="code">8229</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_ibb"/>
+    </record>
+    <record id="area_8369" model="utility.region">
+        <field name="name">فرع العزلة</field>
+        <field name="code">8369</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_ibb"/>
+    </record>
+
+    <!-- فرع تلقائي: منطقة صعدة (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_saada" model="utility.region">
+        <field name="name">فرع منطقة صعدة</field>
+        <field name="code">BR-REG-SAA</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_saada"/>
+    </record>
+
+    <!-- فرع تلقائي: منطقة تعز (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_taiz" model="utility.region">
+        <field name="name">فرع منطقة تعز</field>
+        <field name="code">BR-REG-TAZ</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_taiz"/>
+    </record>
+
+    <!-- فروع منطقة المحويت -->
+    <record id="area_8196" model="utility.region">
+        <field name="name">فرع حفاش</field>
+        <field name="code">8196</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_mahwit"/>
+    </record>
+    <record id="area_8197" model="utility.region">
+        <field name="name">فرع خميس بني سعد</field>
+        <field name="code">8197</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_mahwit"/>
+    </record>
+    <record id="area_8198" model="utility.region">
+        <field name="name">فرع خميس بني سعد</field>
+        <field name="code">8198</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_mahwit"/>
+    </record>
+    <record id="area_8195" model="utility.region">
+        <field name="name">فرع الخبت</field>
+        <field name="code">8195</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_mahwit"/>
+    </record>
+    <record id="area_8194" model="utility.region">
+        <field name="name">فرع الرجم</field>
+        <field name="code">8194</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_mahwit"/>
+    </record>
+    <record id="area_8193" model="utility.region">
+        <field name="name">فرع الطويلة</field>
+        <field name="code">8193</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_mahwit"/>
+    </record>
+    <record id="area_8191" model="utility.region">
+        <field name="name">فرع شبام</field>
+        <field name="code">8191</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_mahwit"/>
+    </record>
+    <record id="area_8192" model="utility.region">
+        <field name="name">فرع الاهجر</field>
+        <field name="code">8192</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_mahwit"/>
+    </record>
+    <record id="area_8396" model="utility.region">
+        <field name="name">فرع شبام-المحويت</field>
+        <field name="code">8396</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_mahwit"/>
+    </record>
+
+    <!-- فرع تلقائي: منطقة يريم (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_yarim" model="utility.region">
+        <field name="name">فرع منطقة يريم</field>
+        <field name="code">BR-REG-YAR</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_yarim"/>
+    </record>
+
+    <!-- فرع تلقائي: منطقة البيضاء (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_bayda" model="utility.region">
+        <field name="name">فرع منطقة البيضاء</field>
+        <field name="code">BR-REG-BAY</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_bayda"/>
+    </record>
+
+    <!-- فرع تلقائي: منطقة الجوف (لا يوجد لها فروع في الجدول المورد) -->
+    <record id="area_region_jawf" model="utility.region">
+        <field name="name">فرع منطقة الجوف</field>
+        <field name="code">BR-REG-JAW</field>
+        <field name="type">area</field>
+        <field name="parent_id" ref="region_jawf"/>
+    </record>
+
+</odoo>
