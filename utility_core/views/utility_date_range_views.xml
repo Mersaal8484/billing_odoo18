@@ -122,7 +122,7 @@
                 <!-- حقول التوافق العكسي -->
                 <field name="period_role" optional="hide"/>
                 <field name="state" optional="hide"/>
-                <field name="active" widget="boolean_toggle"/>
+                <field name="active" optional="hide"/>
             </tree>
         </field>
     </record>
@@ -230,7 +230,7 @@
                             <field name="billing_cadence"/>
                             <field name="type_id" options="{'no_create': True}"/>
                             <field name="reading_period_id" attrs="{'invisible': [('period_role', '!=', 'payment')]}" options="{'no_create': True}"/>
-                            <field name="active" widget="boolean_toggle"/>
+                            <field name="active" invisible="1"/>
                         </group>
                         <group string="النطاقات الزمنية للتشغيل">
                             <label for="consumption_start" string="فترة الاستهلاك"/>
@@ -256,8 +256,8 @@
 
                     <!-- التبويبات المنظمة -->
                     <notebook>
-                        <!-- التبويب 1: متابعة العمليات والإحصائيات -->
-                        <page string="متابعة العمليات والإحصائيات" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
+                        <!-- التبويب 1: متابعة العمليات -->
+                        <page string="متابعة العمليات" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
                             <group>
                                 <group string="عمليات القراءة والفوترة">
                                     <field name="reading_state" widget="badge"
@@ -267,11 +267,6 @@
                                            decoration-muted="reading_state in ('locked', 'planned')"/>
                                     <field name="reading_closed_at" readonly="1"
                                            attrs="{'invisible': [('reading_closed_at', '=', False)]}"/>
-                                    <separator string="مؤشرات القراءات"/>
-                                    <field name="approved_readings" string="قراءات معتمدة"/>
-                                    <field name="pending_review" string="قيد المراجعة"/>
-                                    <field name="rejected_readings" string="قراءات مرفوضة"/>
-                                    <field name="missing_readings" string="قراءات مفقودة"/>
                                 </group>
                                 <group string="عمليات التحصيل والسداد">
                                     <field name="collection_state" widget="badge"
@@ -281,9 +276,6 @@
                                            decoration-muted="collection_state in ('locked', 'planned')"/>
                                     <field name="collection_reconciled_at" readonly="1"
                                            attrs="{'invisible': [('collection_reconciled_at', '=', False)]}"/>
-                                    <separator string="مؤشرات التحصيل"/>
-                                    <field name="outstanding_amount" string="المبلغ المتبقي"/>
-                                    <field name="collection_rate" widget="progressbar" string="نسبة التحصيل"/>
                                 </group>
                             </group>
                         </page>
