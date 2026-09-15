@@ -91,7 +91,7 @@
                   decoration-info="reading_state == 'closing' or collection_state == 'closing'"
                   decoration-warning="reading_state == 'closed'"
                   decoration-muted="state in ('locked', 'planned')">
-                <field name="period_code"/>
+                <field name="cycle_key" string="رمز الدورة"/>
                 <field name="name"/>
                 <field name="billing_cadence" widget="badge"
                        decoration-success="billing_cadence == 'monthly'"
@@ -220,8 +220,7 @@
                         <div class="o_row">
                             <span class="text-muted fw-bold">رمز الدورة:</span>
                             <field name="cycle_key" readonly="1" class="oe_inline"/>
-                            <span class="text-muted ms-3 me-1">رمز الفترة:</span>
-                            <field name="period_code" readonly="1" class="oe_inline"/>
+                            <field name="period_code" invisible="1"/>
                         </div>
                     </div>
 
