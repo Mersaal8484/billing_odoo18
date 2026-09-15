@@ -95,6 +95,13 @@ final collectionRepositoryProvider = Provider<CollectionRepository>((ref) {
   return repo;
 });
 
+/// ملخص تحصيل اليوم يُقرأ خارج build حتى تتعامل الشاشات معه كـ AsyncValue.
+final collectorDailySummaryProvider =
+    StreamProvider.autoDispose<CollectorDailySummary>((ref) {
+  final repo = ref.watch(collectionRepositoryProvider);
+  return repo.watchAccounts().map((_) => repo.dailySummary());
+});
+
 final imageProcessingServiceProvider = Provider<ImageProcessingService>((ref) {
   return ImageProcessingService();
 });

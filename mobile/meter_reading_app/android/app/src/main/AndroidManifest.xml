@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -13,7 +14,8 @@
     <application
         android:label="تطبيق الكاشف والمتحصل"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -41,6 +43,25 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- يعطّل التهيئة التلقائية لـ WorkManager عبر androidx.startup.
+             السبب: في بناء release، R8 يصغّر/يعيد تسمية الـ constructor
+             الداخلي لـ WorkDatabase_Impl الذي تستدعيه هذه المكتبة عبر
+             reflection، فيطيح التطبيق فوراً عند الإقلاع بخطأ:
+             "NoSuchMethodException: androidx.work.impl.WorkDatabase_Impl.<init>".
+             هذا التهيئة التلقائية أصلاً زائدة عن الحاجة لأن التطبيق يُهيّئ
+             WorkManager يدوياً بنفسه في main.dart عبر
+             Workmanager().initialize(callbackDispatcher). -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

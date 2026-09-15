@@ -392,19 +392,35 @@ class _PhotoCaptureScreenState extends ConsumerState<PhotoCaptureScreen>
                   '${((_processedSizeBytes ?? 0) / 1024).toStringAsFixed(1)} KB',
                   style: const TextStyle(color: Colors.white70)),
               const Spacer(),
-              OutlinedButton(
-                onPressed: _retake,
-                style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.white54),
-                    minimumSize: const Size(80, 40)),
-                child: const Text('إعادة التصوير'),
+              SizedBox(
+                width: 130,
+                height: 44,
+                child: OutlinedButton(
+                  onPressed: _retake,
+                  style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.white54),
+                      // إلغاء صريح لأي وراثة محتملة من الثيم العام بدل
+                      // الاعتماد فقط على SizedBox الخارجي.
+                      minimumSize: const Size(80, 40),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                  child: const Text('إعادة التصوير'),
+                ),
               ),
               const SizedBox(width: 12),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(_capturedPath),
-                style: FilledButton.styleFrom(minimumSize: const Size(80, 40)),
-                child: const Text('استخدام الصورة'),
+              SizedBox(
+                width: 130,
+                height: 44,
+                child: FilledButton(
+                  onPressed: () => Navigator.of(context).pop(_capturedPath),
+                  style: FilledButton.styleFrom(
+                      // إلغاء صريح لـ minimumSize: Size.fromHeight(56) الموروث
+                      // من app_theme.dart (عرض لانهائي) — لا نعتمد فقط على
+                      // SizedBox الخارجي لتفادي هذا الخلل مرة أخرى.
+                      minimumSize: const Size(80, 40),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                  child: const Text('استخدام الصورة'),
+                ),
               ),
             ],
           ),

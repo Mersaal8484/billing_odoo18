@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../app/providers.dart';
+import '../../../shared/widgets/metric_card.dart';
 import '../../../shared/widgets/state_widgets.dart';
 import '../domain/collection_models.dart';
 
@@ -294,17 +295,33 @@ class _CollectionReportScreenState
             child: Row(
               children: [
                 Expanded(
-                  child: _ReportMetric(
+                  child: MetricCard(
                     icon: Icons.receipt_long_outlined,
                     label: 'إجمالي المعاملات',
                     value: '${report.totalCount}',
+                    layout: MetricCardLayout.iconLabelValue,
+                    card: false,
+                    padding: EdgeInsets.zero,
+                    iconSpacing: 8,
+                    labelValueSpacing: 4,
+                    labelTextAlign: TextAlign.center,
+                    valueTextAlign: TextAlign.center,
+                    valueStyle: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                 ),
                 Expanded(
-                  child: _ReportMetric(
+                  child: MetricCard(
                     icon: Icons.payments_outlined,
                     label: 'المبلغ المدفوع',
                     value: '${report.totalAmount.toStringAsFixed(2)} ريال',
+                    layout: MetricCardLayout.iconLabelValue,
+                    card: false,
+                    padding: EdgeInsets.zero,
+                    iconSpacing: 8,
+                    labelValueSpacing: 4,
+                    labelTextAlign: TextAlign.center,
+                    valueTextAlign: TextAlign.center,
+                    valueStyle: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                 ),
               ],
@@ -313,39 +330,6 @@ class _CollectionReportScreenState
         ),
         const SizedBox(height: 16),
         ...report.transactions.map((tx) => _TransactionTile(transaction: tx)),
-      ],
-    );
-  }
-}
-
-class _ReportMetric extends StatelessWidget {
-  const _ReportMetric({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  final IconData icon;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: Theme.of(context).colorScheme.primary),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(fontWeight: FontWeight.w800),
-          textAlign: TextAlign.center,
-        ),
       ],
     );
   }

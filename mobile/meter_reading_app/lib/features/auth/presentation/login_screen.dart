@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/providers.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/network/odoo_api_client.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -17,6 +18,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _userCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   bool _loading = false;
+  bool _clearingSession = false;
   bool _obscure = true;
   String? _errorText;
 
@@ -132,6 +134,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           )
                         : const Text('تسجيل الدخول'),
                   ),
+                  const SizedBox(height: 12),
+                  TextButton.icon(
+                    onPressed:
+                        (_loading || _clearingSession) ? null : _clearSession,
+                    icon: _clearingSession
+                        ? const SizedBox(
+                            height: 16,
+                            width: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.cleaning_services_outlined,
+                            size: 18),
+                    label: const Text('مسح بيانات الجلسة المحلية'),
+                  ),
                 ],
               ),
             ),
@@ -151,7 +167,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final auth = ref.read(authServiceProvider);
       final userInfo = await auth.login(
-        db: 'invoice_utility_erp',
+        db: kOdooDb,
         login: _userCtrl.text.trim(),
         password: _passCtrl.text,
       );
@@ -172,6 +188,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  /// يمسح كل بيانات الجلسة المحفوظة محلياً (كوكيز + db/login القديمة)
+  /// بدون الحاجة لتعليمات يدوية من إعدادات أندرويد.
+  Future<void> _clearSession() async {
+    setState(() {
+      _clearingSession = true;
+      _errorText = null;
+    });
+    try {
+      final auth = ref.read(authServiceProvider);
+      await auth.clearLocalSession();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم مسح بيانات الجلسة المحلية')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _clearingSession = false);
     }
   }
 

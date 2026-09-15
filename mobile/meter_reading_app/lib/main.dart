@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workmanager/workmanager.dart';
@@ -18,10 +20,10 @@ import 'features/readings/data/drift_reading_repository.dart';
 //   • جهاز حقيقي على نفس الشبكة ← 'http://192.168.1.XX:8069'
 //   • سيرفر إنتاج ← 'https://erp.example.com'
 // ──────────────────────────────────────────────────────────────────────────────
-const _kOdooBaseUrl = 'http://192.168.8.134:8170';
+const _kOdooBaseUrl = 'http://37.60.243.200:8069';
 
-// اسم قاعدة البيانات في odoo.conf  ← يُستخدم في LoginScreen أيضاً
-const kOdooDb = 'invoice_utility_erp';
+// ملاحظة: اسم قاعدة البيانات (kOdooDb) انتقل إلى core/config/app_config.dart
+// حتى يستورده LoginScreen من نفس المصدر بدل كتابته يدوياً كنص منفصل.
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Background sync dispatcher — يعمل في isolate منفصل عند إطلاق WorkManager
@@ -58,47 +60,74 @@ void callbackDispatcher() {
 // ──────────────────────────────────────────────────────────────────────────────
 // main
 // ──────────────────────────────────────────────────────────────────────────────
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() {
+  // نلتقط أي استثناء غير متوقّع (حتى لو صار قبل runApp) ونطبعه كاملاً في
+  // الـ console بدل ما يختفي بصمت ("keeps stopping" بدون أي تفاصيل).
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // 1️⃣ بناء HTTP client (يحمّل cookie jar المحفوظ من آخر جلسة)
-  final apiClient = await OdooApiClient.create(
-    defaultBaseUrl: _kOdooBaseUrl,
-  );
+    // اطبع أي خطأ داخل شجرة الـ widgets بالتفصيل أيضاً (بدل الشاشة الحمراء
+    // فقط في debug، وبدل الاختفاء الصامت في release).
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.dumpErrorToConsole(details);
+    };
 
-  // 2️⃣ فتح قاعدة البيانات المحلية
-  final db = AppDatabase();
+    // 1️⃣ بناء HTTP client (يحمّل cookie jar المحفوظ من آخر جلسة)
+    final apiClient = await OdooApiClient.create(
+      defaultBaseUrl: _kOdooBaseUrl,
+    );
 
-  // 3️⃣ التحقق من وجود session cookie صالح → نتخطى شاشة Login إذا كان موجوداً
-  final authService = AuthService(apiClient);
-  final isLoggedIn = await authService.restoreSession();
+    // 2️⃣ فتح قاعدة البيانات المحلية
+    final db = AppDatabase();
 
-  // 4️⃣ تسجيل WorkManager للمزامنة الدورية في الخلفية
-  await Workmanager().initialize(callbackDispatcher);
-  await Workmanager().registerPeriodicTask(
-    'sync-task-id',
-    'sync_batch_task',
-    frequency: const Duration(minutes: 15),
-    existingWorkPolicy: ExistingPeriodicWorkPolicy.keep, // لا تُعيد التسجيل إذا كانت موجودة
-    constraints: Constraints(networkType: NetworkType.connected),
-  );
+    // 3️⃣ التحقق من وجود session cookie صالح → نتخطى شاشة Login إذا كان موجوداً
+    final authService = AuthService(apiClient);
+    final isLoggedIn = await authService.restoreSession();
 
-  runApp(
-    ProviderScope(
-      overrides: [
-        // ✅ تمرير OdooApiClient الحقيقي بدلاً من UnimplementedError
-        odooApiClientProvider.overrideWithValue(apiClient),
+    // 4️⃣ تسجيل WorkManager للمزامنة الدورية في الخلفية.
+    // مُحاط بـ try/catch عمداً: فشل تسجيل المزامنة الخلفية (مثلاً بسبب توافق
+    // بلجن معيّن مع إصدار Android/الجهاز) لا يجب أن يمنع التطبيق من الإقلاع
+    // إطلاقاً — أسوأ حالة نخسرها هي المزامنة التلقائية بالخلفية فقط، والمستخدم
+    // ما زال يقدر يزامن يدوياً من داخل التطبيق.
+    try {
+      await Workmanager().initialize(callbackDispatcher);
+      await Workmanager().registerPeriodicTask(
+        'sync-task-id',
+        'sync_batch_task',
+        frequency: const Duration(minutes: 15),
+        existingWorkPolicy:
+            ExistingPeriodicWorkPolicy.keep, // لا تُعيد التسجيل إذا كانت موجودة
+        constraints: Constraints(networkType: NetworkType.connected),
+      );
+    } catch (e, st) {
+      // اطبع الخطأ بوضوح بدل تجاهله بصمت — يساعدنا نعرف فوراً لو هذا هو
+      // سبب أي كراش مستقبلي عند الإقلاع.
+      debugPrint('⚠️ WorkManager init failed (background sync disabled): $e');
+      debugPrint(st.toString());
+    }
 
-        // ✅ نفس instance قاعدة البيانات في كل التطبيق
-        databaseProvider.overrideWithValue(db),
+    runApp(
+      ProviderScope(
+        overrides: [
+          // ✅ تمرير OdooApiClient الحقيقي بدلاً من UnimplementedError
+          odooApiClientProvider.overrideWithValue(apiClient),
 
-        // ✅ حالة تسجيل الدخول من الـ cookie الحقيقي
-        authStateProvider.overrideWith((ref) => isLoggedIn),
+          // ✅ نفس instance قاعدة البيانات في كل التطبيق
+          databaseProvider.overrideWithValue(db),
 
-        // ✅ تمرير AuthService بعد استعادة بيانات الجلسة
-        authServiceProvider.overrideWithValue(authService),
-      ],
-      child: const MeterReadingApp(),
-    ),
-  );
+          // ✅ حالة تسجيل الدخول من الـ cookie الحقيقي
+          authStateProvider.overrideWith((ref) => isLoggedIn),
+
+          // ✅ تمرير AuthService بعد استعادة بيانات الجلسة
+          authServiceProvider.overrideWithValue(authService),
+        ],
+        child: const MeterReadingApp(),
+      ),
+    );
+  }, (error, stackTrace) {
+    // أي استثناء غير ملتقط في أي مكان بعد هذي النقطة يُطبع كاملاً هنا
+    // بدل ما يسبب "keeps stopping" صامت بدون أي أثر.
+    debugPrint('🔴 UNCAUGHT ERROR: $error');
+    debugPrint(stackTrace.toString());
+  });
 }

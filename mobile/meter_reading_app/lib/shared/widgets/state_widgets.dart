@@ -152,29 +152,63 @@ class SyncStatusChip extends StatelessWidget {
   final String label;
   final Color color;
   final IconData icon;
-  const SyncStatusChip(
-      {super.key,
-      required this.label,
-      required this.color,
-      required this.icon});
+  final bool showIcon;
+  final EdgeInsetsGeometry padding;
+  final double borderRadius;
+  final double iconSize;
+  final double spacing;
+  final double fontSize;
+  final FontWeight fontWeight;
+  final double backgroundOpacity;
+
+  const SyncStatusChip({
+    super.key,
+    required this.label,
+    required this.color,
+    required this.icon,
+    this.showIcon = true,
+    this.padding = const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    this.borderRadius = 20,
+    this.iconSize = 14,
+    this.spacing = 4,
+    this.fontSize = 12,
+    this.fontWeight = FontWeight.w700,
+    this.backgroundOpacity = 0.12,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: padding,
       decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(20)),
+        color: color.withValues(alpha: backgroundOpacity),
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 4),
-          Text(label,
-              style: TextStyle(
-                  color: color, fontSize: 12, fontWeight: FontWeight.w700)),
+          if (showIcon) ...[
+            Icon(icon, size: iconSize, color: color),
+            SizedBox(width: spacing),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: fontSize,
+              fontWeight: fontWeight,
+            ),
+          ),
         ],
       ),
     );
   }
+}
+
+class StatusVisual {
+  final String label;
+  final IconData icon;
+  final Color color;
+
+  const StatusVisual(this.label, this.icon, this.color);
 }

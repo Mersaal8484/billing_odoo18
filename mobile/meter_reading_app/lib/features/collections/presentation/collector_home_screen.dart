@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/providers.dart';
+import '../../../shared/widgets/metric_card.dart';
 import '../../../shared/widgets/state_widgets.dart';
 import '../domain/collection_models.dart';
 
@@ -151,7 +152,6 @@ class _CollectorHomeScreenState extends ConsumerState<CollectorHomeScreen> {
   Widget build(BuildContext context) {
     final repository = ref.watch(collectionRepositoryProvider);
     final summary = repository.dailySummary();
-    final period = repository.currentPeriod;
     final invoiceEntries = _filteredSyncedInvoices();
 
     return Scaffold(
@@ -187,18 +187,24 @@ class _CollectorHomeScreenState extends ConsumerState<CollectorHomeScreen> {
             child: Row(
               children: [
                 Expanded(
-                  child: _SummaryTile(
+                  child: MetricCard(
                     icon: Icons.payments_outlined,
                     label: 'هذه الجلسة',
                     value: '${summary.collectedAmount.toStringAsFixed(0)} ريال',
+                    layout: MetricCardLayout.iconLeading,
+                    iconSpacing: 8,
+                    valueStyle: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _SummaryTile(
+                  child: MetricCard(
                     icon: Icons.receipt_long_outlined,
                     label: 'العمليات',
                     value: '${summary.operationCount}',
+                    layout: MetricCardLayout.iconLeading,
+                    iconSpacing: 8,
+                    valueStyle: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                 ),
               ],
@@ -358,13 +364,8 @@ class _SyncedInvoiceTile extends StatelessWidget {
                           backgroundColor: Colors.green.shade600,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 8),
-                          // ── لازم نلغي minimumSize الموروث من filledButtonTheme
-                          // (Size.fromHeight(56) = عرض لانهائي) وإلا فإن هذا
-                          // الزر داخل Row يسبب BoxConstraints forces an
-                          // infinite width ويفشل رسم كل العنصر (والقائمة كلها
-                          // تظهر فارغة بصمت في release/profile).
                           minimumSize: const Size(80, 40),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,    
                         ),
                         onPressed: () => context.push(
                           '/collector/payment/${account.id}',
@@ -379,8 +380,6 @@ class _SyncedInvoiceTile extends StatelessWidget {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 8),
-                          minimumSize: const Size(80, 40),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: const Text('مسددة',
                             style: TextStyle(fontSize: 13)),
@@ -409,7 +408,16 @@ class _SyncedInvoiceTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                _StatusBadge(color: badgeColor, text: badgeText),
+                SyncStatusChip(
+                  label: badgeText,
+                  color: badgeColor,
+                  icon: Icons.circle,
+                  showIcon: false,
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  borderRadius: 20,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
               ],
             ),
           ],
@@ -419,69 +427,4 @@ class _SyncedInvoiceTile extends StatelessWidget {
   }
 }
 
-// ── شارة الحالة ──────────────────────────────────────────────────────────────
-class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({required this.color, required this.text});
 
-  final Color color;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}
-
-// ── بطاقة ملخص الجلسة ────────────────────────────────────────────────────────
-class _SummaryTile extends StatelessWidget {
-  const _SummaryTile({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  final IconData icon;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label, style: Theme.of(context).textTheme.bodySmall),
-                  Text(
-                    value,
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

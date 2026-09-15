@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
+import '../../../shared/widgets/metric_card.dart';
 import '../../../shared/widgets/state_widgets.dart';
 import '../../customers/domain/entities.dart';
 
@@ -11,8 +12,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final assignments = ref.watch(assignmentsProvider(const AssignmentQuery()));
-    final collectionSummary =
-        ref.watch(collectionRepositoryProvider).dailySummary();
+    final collectionSummary = ref.watch(collectorDailySummaryProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('لوحة المشرف')),
@@ -35,18 +35,32 @@ class SupervisorDashboardScreen extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _MetricCard(
+                    child: MetricCard(
                       icon: Icons.rule_folder_outlined,
                       label: 'بانتظار الاعتماد',
                       value: '${pendingDecision.length}',
+                      layout: MetricCardLayout.iconValueLabel,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      iconSpacing: 10,
+                      valueStyle: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w800),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: _MetricCard(
+                    child: MetricCard(
                       icon: Icons.report_problem_outlined,
                       label: 'مرفوضة',
                       value: '${rejected.length}',
+                      layout: MetricCardLayout.iconValueLabel,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      iconSpacing: 10,
+                      valueStyle: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w800),
                     ),
                   ),
                 ],
@@ -55,19 +69,37 @@ class SupervisorDashboardScreen extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _MetricCard(
+                    child: MetricCard(
                       icon: Icons.build_outlined,
                       label: 'مصعدة لفني',
                       value: '${escalated.length}',
+                      layout: MetricCardLayout.iconValueLabel,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      iconSpacing: 10,
+                      valueStyle: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w800),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: _MetricCard(
+                    child: MetricCard(
                       icon: Icons.payments_outlined,
                       label: 'تحصيل اليوم',
-                      value:
-                          '${collectionSummary.collectedAmount.toStringAsFixed(0)} ﷼',
+                      value: collectionSummary.when(
+                        data: (summary) =>
+                            '${summary.collectedAmount.toStringAsFixed(0)} ﷼',
+                        loading: () => '…',
+                        error: (_, __) => '—',
+                      ),
+                      layout: MetricCardLayout.iconValueLabel,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      iconSpacing: 10,
+                      valueStyle: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w800),
                     ),
                   ),
                 ],
@@ -77,13 +109,11 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                   style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
               if (pendingDecision.isEmpty)
-                const Card(
-                  child: ListTile(
-                    leading: Icon(Icons.check_circle_outline),
-                    title: Text('لا توجد قراءات معلقة الآن'),
-                    subtitle:
-                        Text('ستظهر هنا قرارات الكاشفين التي تحتاج اعتمادًا.'),
-                  ),
+                const EmptyState(
+                  icon: Icons.check_circle_outline,
+                  title: 'لا توجد قراءات معلقة الآن',
+                  subtitle:
+                      'ستظهر هنا قرارات الكاشفين التي تحتاج اعتمادًا.',
                 )
               else
                 ...pendingDecision.map((assignment) =>
@@ -92,45 +122,15 @@ class SupervisorDashboardScreen extends ConsumerWidget {
               Text('أداء الفرق',
                   style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
-              // فريق يمني: أحمد علي (كاشف) ومحمد عبدالسلام (متحصل)
-              const _PerformanceTile(
-                  name: 'أحمد علي', role: 'كاشف', done: 18, total: 24),
-              const _PerformanceTile(
-                  name: 'محمد عبدالسلام', role: 'متحصل', done: 7, total: 11),
+              const EmptyState(
+                icon: Icons.groups_outlined,
+                title: 'بيانات أداء الفرق غير متاحة بعد',
+                subtitle:
+                    'ستظهر مهام الكاشفين والمتحصلين بعد توفير بيانات الأداء من النظام.',
+              ),
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-class _MetricCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-
-  const _MetricCard(
-      {required this.icon, required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(height: 10),
-            Text(value,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(fontWeight: FontWeight.w800)),
-            Text(label, style: Theme.of(context).textTheme.bodySmall),
-          ],
-        ),
       ),
     );
   }
@@ -194,42 +194,3 @@ class _DecisionReviewTile extends ConsumerWidget {
   }
 }
 
-class _PerformanceTile extends StatelessWidget {
-  final String name;
-  final String role;
-  final int done;
-  final int total;
-
-  const _PerformanceTile(
-      {required this.name,
-      required this.role,
-      required this.done,
-      required this.total});
-
-  @override
-  Widget build(BuildContext context) {
-    final progress = total == 0 ? 0.0 : done / total;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                    child: Text(name,
-                        style: const TextStyle(fontWeight: FontWeight.w800))),
-                Text(role),
-              ],
-            ),
-            const SizedBox(height: 10),
-            LinearProgressIndicator(value: progress, minHeight: 8),
-            const SizedBox(height: 8),
-            Text('$done من $total مهمة مكتملة'),
-          ],
-        ),
-      ),
-    );
-  }
-}
