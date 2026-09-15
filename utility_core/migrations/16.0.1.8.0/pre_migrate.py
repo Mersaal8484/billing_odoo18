@@ -49,6 +49,30 @@ def migrate(cr, version):
     """)
     _logger.info('utility_core 16.0.1.8.0 pre-migrate: updated planned collection states (%d rows)', cr.rowcount)
 
+    # 2.1 توحيد نافذة القراءة والتحصيل مع نطاقات البداية والنهاية
+    cr.execute("""
+        UPDATE date_range
+        SET reading_window_start = date_start::timestamp,
+            reading_window_end = (date_end::timestamp + interval '23 hours 59 minutes 59 seconds')
+        WHERE date_start IS NOT NULL AND date_end IS NOT NULL;
+    """)
+    cr.execute("""
+        UPDATE date_range
+        SET consumption_start = date_start
+        WHERE consumption_start IS NULL AND date_start IS NOT NULL;
+    """)
+    cr.execute("""
+        UPDATE date_range
+        SET consumption_end = date_end
+        WHERE consumption_end IS NULL AND date_end IS NOT NULL;
+    """)
+    cr.execute("""
+        UPDATE date_range
+        SET payment_window_start = payment_start::timestamp,
+            payment_window_end = (payment_end::timestamp + interval '23 hours 59 minutes 59 seconds')
+        WHERE payment_start IS NOT NULL AND payment_end IS NOT NULL;
+    """)
+
     # 3. معالجة أي تكرار تاريخي لفترات مفتوحة لنفس الدورية والشركة:
     # إبقاء أحدث فترة مفتوحة فقط، وإغلاق الفترات الأقدم لتفادي تعارض القيد
     cr.execute("""

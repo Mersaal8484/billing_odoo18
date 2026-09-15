@@ -676,6 +676,24 @@ class DateRange(models.Model):
                 else:
                     vals['date_end'] = fields.Date.today().replace(day=28)
 
+            # مزامنة تلقائية لنطاق القراءة مع نافذة القراءة وفترة الاستهلاك
+            if vals.get('date_start') and not vals.get('reading_window_start'):
+                d_s = fields.Date.to_date(vals['date_start'])
+                vals['reading_window_start'] = datetime.datetime.combine(d_s, datetime.time.min) if d_s else False
+            elif vals.get('reading_window_start') and not vals.get('date_start'):
+                vals['date_start'] = fields.Date.to_date(vals['reading_window_start'])
+
+            if vals.get('date_end') and not vals.get('reading_window_end'):
+                d_e = fields.Date.to_date(vals['date_end'])
+                vals['reading_window_end'] = datetime.datetime.combine(d_e, datetime.time.max.replace(microsecond=0)) if d_e else False
+            elif vals.get('reading_window_end') and not vals.get('date_end'):
+                vals['date_end'] = fields.Date.to_date(vals['reading_window_end'])
+
+            if not vals.get('consumption_start') and vals.get('date_start'):
+                vals['consumption_start'] = vals['date_start']
+            if not vals.get('consumption_end') and vals.get('date_end'):
+                vals['consumption_end'] = vals['date_end']
+
             # مزامنة تلقائية لنطاق الدفع (Date) مع نافذة التحصيل (Datetime)
             if vals.get('payment_start') and not vals.get('payment_window_start'):
                 p_s = fields.Date.to_date(vals['payment_start'])
@@ -754,6 +772,19 @@ class DateRange(models.Model):
         Context bypass: _bypass_period_scope_protection يُستخدم داخلياً فقط.
         """
         vals = dict(vals)
+
+        # مزامنة تلقائية لنطاق القراءة مع نافذة القراءة وفترة الاستهلاك
+        if 'date_start' in vals and 'reading_window_start' not in vals:
+            d_s = fields.Date.to_date(vals['date_start'])
+            vals['reading_window_start'] = datetime.datetime.combine(d_s, datetime.time.min) if d_s else False
+        elif 'reading_window_start' in vals and 'date_start' not in vals:
+            vals['date_start'] = fields.Date.to_date(vals['reading_window_start'])
+
+        if 'date_end' in vals and 'reading_window_end' not in vals:
+            d_e = fields.Date.to_date(vals['date_end'])
+            vals['reading_window_end'] = datetime.datetime.combine(d_e, datetime.time.max.replace(microsecond=0)) if d_e else False
+        elif 'reading_window_end' in vals and 'date_end' not in vals:
+            vals['date_end'] = fields.Date.to_date(vals['reading_window_end'])
 
         # مزامنة تلقائية لنطاق الدفع (Date) مع نافذة التحصيل (Datetime) عند التعديل
         if 'payment_start' in vals and 'payment_window_start' not in vals:

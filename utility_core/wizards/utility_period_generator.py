@@ -141,8 +141,8 @@ class UtilityPeriodGenerator(models.TransientModel):
             p_start_off = period_type.payment_start_offset_days
             p_end_off = period_type.payment_end_offset_days
 
-        rw_start = self._to_utc_start_of_day(c_end + timedelta(days=r_start_off))
-        rw_end = self._to_utc_end_of_day(c_end + timedelta(days=r_end_off))
+        rw_start = self._to_utc_start_of_day(c_start)
+        rw_end = self._to_utc_end_of_day(c_end)
 
         # نطاق الدفع الصريح (حقول Date)
         pay_start = c_start + timedelta(days=p_start_off)
