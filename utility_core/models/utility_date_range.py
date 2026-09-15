@@ -933,12 +933,10 @@ class DateRange(models.Model):
             rec._log_state_transition(old_s, 'open', _("فتح الدورة للعمليات التشغيلية"))
 
     def action_open_reading(self):
-        """إعادة فتح القراءة فقط (reading_state → open) دون المساس بالتحصيل."""
+        """فتح أو إعادة فتح القراءة فقط (reading_state → open) دون المساس بالتحصيل."""
         for rec in self:
             if rec.reading_state == 'locked':
                 raise ValidationError(_("لا يمكن إعادة فتح قراءة مقفلة تاريخياً."))
-            if rec.state not in ('open', 'closing', 'closed'):
-                raise ValidationError(_("لا يمكن فتح القراءة: الدورة غير نشطة (حالة: %s).") % rec.state)
             cadence = normalize_billing_cadence(rec.billing_cadence)
             cadence_name = dict(BILLING_PERIOD_TYPES).get(rec.billing_cadence, rec.billing_cadence)
             open_reading = self.search([
@@ -955,16 +953,28 @@ class DateRange(models.Model):
                     "يجب إغلاق فترة القراءة المفتوحة أولاً."
                 ) % (cadence_name, other.period_code or other.cycle_key or other.name, other.name))
             old_rs = rec.reading_state
-            rec.write({'reading_state': 'open'})
-            rec._log_state_transition(old_rs, 'open', _("إعادة فتح القراءة — تعديل مسجل"))
+            write_vals = {'reading_state': 'open'}
+            if rec.state == 'planned':
+                write_vals['state'] = 'open'
+                if not rec.opened_at:
+                    write_vals['opened_at'] = fields.Datetime.now()
+                final_regions = rec._get_regions_for_billing_cadence(rec.billing_cadence)
+                if final_regions:
+                    write_vals['region_ids'] = [(6, 0, final_regions.ids)]
+                if not rec.payment_start and rec.date_start:
+                    write_vals['payment_start'] = rec.date_start + datetime.timedelta(days=1)
+                if not rec.payment_end and rec.date_end:
+                    write_vals['payment_end'] = rec.date_end + datetime.timedelta(days=1)
+            elif rec.state in ('closed', 'closing'):
+                write_vals['state'] = 'open'
+            rec.write(write_vals)
+            rec._log_state_transition(old_rs, 'open', _("فتح/إعادة فتح القراءة للعمليات"))
 
     def action_open_payment(self):
-        """فتح/إعادة فتح التحصيل (collection_state → open)."""
+        """فتح أو إعادة فتح التحصيل (collection_state → open)."""
         for rec in self:
             if rec.collection_state == 'locked':
                 raise ValidationError(_("لا يمكن إعادة فتح تحصيل مقفل تاريخياً."))
-            if rec.state not in ('open', 'closing', 'closed'):
-                raise ValidationError(_("لا يمكن فتح التحصيل: الدورة غير نشطة (حالة: %s).") % rec.state)
             cadence = normalize_billing_cadence(rec.billing_cadence)
             cadence_name = dict(BILLING_PERIOD_TYPES).get(rec.billing_cadence, rec.billing_cadence)
             open_collection = self.search([
@@ -981,8 +991,22 @@ class DateRange(models.Model):
                     "يجب إغلاق أو مطابقة فترة التحصيل المفتوحة أولاً قبل فتح فترة تحصيل أخرى."
                 ) % (cadence_name, other.period_code or other.cycle_key or other.name, other.name))
             old_cs = rec.collection_state
-            rec.write({'collection_state': 'open'})
-            rec._log_state_transition(old_cs, 'open', _("فتح/إعادة فتح التحصيل — تعديل مسجل"))
+            write_vals = {'collection_state': 'open'}
+            if rec.state == 'planned':
+                write_vals['state'] = 'open'
+                if not rec.opened_at:
+                    write_vals['opened_at'] = fields.Datetime.now()
+                final_regions = rec._get_regions_for_billing_cadence(rec.billing_cadence)
+                if final_regions:
+                    write_vals['region_ids'] = [(6, 0, final_regions.ids)]
+                if not rec.payment_start and rec.date_start:
+                    write_vals['payment_start'] = rec.date_start + datetime.timedelta(days=1)
+                if not rec.payment_end and rec.date_end:
+                    write_vals['payment_end'] = rec.date_end + datetime.timedelta(days=1)
+            elif rec.state == 'closed':
+                write_vals['state'] = 'closing'
+            rec.write(write_vals)
+            rec._log_state_transition(old_cs, 'open', _("فتح/إعادة فتح التحصيل للعمليات"))
 
     def action_start_closing(self):
         """بدء إغلاق القراءة فقط: reading_state → closing. لا يُغلق التحصيل."""

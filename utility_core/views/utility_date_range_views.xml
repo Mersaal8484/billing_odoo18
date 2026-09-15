@@ -143,17 +143,18 @@
                             attrs="{'invisible': [('state', '!=', 'planned')]}"
                             confirm="سيتم تحديث المناطق المشتركة في هذه الفترة بناءً على دوريتها. هل تريد المتابعة؟"/>
 
-                    <!-- مرحلة العمليات: إغلاق القراءة ومطابقة التحصيل بعد الفتح -->
-                    <button name="action_close_reading" type="object" string="إغلاق القراءة" class="btn-danger"
+                    <!-- التحكم المباشر بالقراءة -->
+                    <button name="action_open_reading" type="object" string="فتح القراءة" class="btn-primary" icon="fa-play"
+                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('reading_state', '=', 'open')]}"/>
+                    <button name="action_close_reading" type="object" string="إغلاق القراءة" class="btn-danger" icon="fa-lock"
                             confirm="هل أنت متأكد من إغلاق القراءة؟ التحصيل سيبقى مفتوحاً."
-                            attrs="{'invisible': ['|', '|', ('period_role', '!=', 'reading'), ('state', 'not in', ('open', 'closing')), ('reading_state', 'not in', ('open', 'closing'))]}"/>
-                    <button name="action_open_reading" type="object" string="إعادة فتح القراءة" class="btn-outline-warning"
-                            attrs="{'invisible': ['|', '|', ('period_role', '!=', 'reading'), ('state', 'not in', ('open', 'closing')), ('reading_state', '!=', 'closed')]}"/>
+                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('reading_state', 'not in', ('open', 'closing'))]}"/>
 
-                    <button name="action_reconcile_collection" type="object" string="مطابقة التحصيل" class="btn-success"
-                            attrs="{'invisible': ['|', '|', ('period_role', '!=', 'reading'), ('state', 'not in', ('open', 'closing')), ('collection_state', 'not in', ('open', 'closing'))]}"/>
-                    <button name="action_open_payment" type="object" string="فتح / إعادة فتح التحصيل" class="btn-outline-success"
-                            attrs="{'invisible': ['|', '|', ('period_role', '!=', 'reading'), ('state', 'not in', ('open', 'closing', 'closed')), ('collection_state', 'not in', ('planned', 'reconciled'))]}"/>
+                    <!-- التحكم المباشر بالتحصيل -->
+                    <button name="action_open_payment" type="object" string="فتح التحصيل" class="btn-success" icon="fa-play"
+                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('collection_state', '=', 'open')]}"/>
+                    <button name="action_reconcile_collection" type="object" string="مطابقة وإغلاق التحصيل" class="btn-outline-success" icon="fa-check-square-o"
+                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('collection_state', 'not in', ('open', 'closing'))]}"/>
 
                     <!-- التوافق العكسي: أزرار فترات payment التاريخية -->
                     <button name="action_reconcile_payment" type="object" string="مطابقة التحصيل (تاريخي)" class="btn-success"
@@ -218,17 +219,17 @@
                         </h1>
                         <div class="o_row">
                             <span class="text-muted fw-bold">رمز الدورة:</span>
-                            <field name="cycle_key" placeholder="مثال: SEMI-2026-08-H1" class="oe_inline me-3"/>
-                            <span class="text-muted fw-bold">رمز الفترة:</span>
-                            <field name="period_code" placeholder="مثال: CYCLE-SEMI-2026-08-H1" class="oe_inline"/>
+                            <field name="cycle_key" readonly="1" class="oe_inline"/>
+                            <span class="text-muted ms-3 me-1">رمز الفترة:</span>
+                            <field name="period_code" readonly="1" class="oe_inline"/>
                         </div>
                     </div>
 
                     <!-- الجسم الأساسي: مجموعات Odoo الأصلية الواضحة والمنظمة -->
                     <group>
                         <group string="بيانات الدورة والتهيئة">
-                            <field name="billing_cadence"/>
-                            <field name="type_id" options="{'no_create': True}"/>
+                            <field name="billing_cadence" widget="radio" options="{'horizontal': true}"/>
+                            <field name="type_id" options="{'no_create': True, 'no_open': True}"/>
                             <field name="reading_period_id" attrs="{'invisible': [('period_role', '!=', 'payment')]}" options="{'no_create': True}"/>
                             <field name="active" invisible="1"/>
                         </group>
@@ -267,6 +268,15 @@
                                            decoration-muted="reading_state in ('locked', 'planned')"/>
                                     <field name="reading_closed_at" readonly="1"
                                            attrs="{'invisible': [('reading_closed_at', '=', False)]}"/>
+                                    <div class="mt16">
+                                        <button name="action_open_reading" type="object" string="بدء / فتح القراءة"
+                                                class="btn btn-sm btn-primary me-2" icon="fa-play"
+                                                attrs="{'invisible': [('reading_state', '=', 'open')]}"/>
+                                        <button name="action_close_reading" type="object" string="إغلاق القراءة"
+                                                class="btn btn-sm btn-danger" icon="fa-lock"
+                                                confirm="هل أنت متأكد من إغلاق القراءة؟ التحصيل سيبقى مفتوحاً."
+                                                attrs="{'invisible': [('reading_state', 'not in', ('open', 'closing'))]}"/>
+                                    </div>
                                 </group>
                                 <group string="عمليات التحصيل والسداد">
                                     <field name="collection_state" widget="badge"
@@ -276,6 +286,15 @@
                                            decoration-muted="collection_state in ('locked', 'planned')"/>
                                     <field name="collection_reconciled_at" readonly="1"
                                            attrs="{'invisible': [('collection_reconciled_at', '=', False)]}"/>
+                                    <div class="mt16">
+                                        <button name="action_open_payment" type="object" string="بدء / فتح التحصيل"
+                                                class="btn btn-sm btn-success me-2" icon="fa-play"
+                                                attrs="{'invisible': [('collection_state', '=', 'open')]}"/>
+                                        <button name="action_reconcile_collection" type="object" string="مطابقة وإغلاق التحصيل"
+                                                class="btn btn-sm btn-outline-success" icon="fa-check-square-o"
+                                                confirm="هل أنت متأكد من مطابقة وإغلاق التحصيل لهذه الدورة؟"
+                                                attrs="{'invisible': [('collection_state', 'not in', ('open', 'closing'))]}"/>
+                                    </div>
                                 </group>
                             </group>
                         </page>

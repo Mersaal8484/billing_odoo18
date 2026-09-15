@@ -61,7 +61,14 @@ class UtilityPeriodGenerator(models.TransientModel):
         DateRange = self.env['date.range'].sudo()
         generated_periods = DateRange
 
-        cadences = ['monthly', 'semi_monthly'] if self.billing_cadence == 'all' else [self.billing_cadence]
+        # حساب الشهر السابق للنظام الآجل
+        if month == 1:
+            prev_year = year - 1
+            prev_month = 12
+        else:
+            prev_year = year
+            prev_month = month - 1
+        _, prev_last_day = calendar.monthrange(prev_year, prev_month)
 
         for cadence in cadences:
             target_regions = DateRange._get_regions_for_billing_cadence(cadence)
@@ -71,35 +78,45 @@ class UtilityPeriodGenerator(models.TransientModel):
                 ) % cadence)
 
             if cadence == 'monthly':
-                c_start = date(year, month, 1)
-                c_end = date(year, month, last_day)
+                # نافذة القراءة: خلال شهر الفوترة المختار
+                r_start = date(year, month, 1)
+                r_end = date(year, month, last_day)
+                # فترة الاستهلاك في النظام الآجل: الشهر السابق كاملاً
+                c_start = date(prev_year, prev_month, 1)
+                c_end = date(prev_year, prev_month, prev_last_day)
                 cycle_key = f"MONTHLY-{year:04d}-{month:02d}"
                 name = f"شهر {month:02d}-{year:04d}"
 
                 period = self._create_unified_cycle(
-                    cycle_key, cadence, c_start, c_end, name, target_regions
+                    cycle_key, cadence, r_start, r_end, c_start, c_end, name, target_regions
                 )
                 generated_periods |= period
 
             elif cadence == 'semi_monthly':
-                # H1: 01 to 15
-                h1_start = date(year, month, 1)
-                h1_end = date(year, month, 15)
+                # H1: نافذة القراءة من 1 إلى 15 من الشهر المختار
+                h1_r_start = date(year, month, 1)
+                h1_r_end = date(year, month, 15)
+                # فترة الاستهلاك في النظام الآجل: النصف الثاني من الشهر السابق (16 إلى نهاية الشهر السابق)
+                h1_c_start = date(prev_year, prev_month, 16)
+                h1_c_end = date(prev_year, prev_month, prev_last_day)
                 h1_cycle_key = f"SEMI-{year:04d}-{month:02d}-H1"
                 h1_name = f"النصف الأول {month:02d}-{year:04d}"
 
                 h1_period = self._create_unified_cycle(
-                    h1_cycle_key, cadence, h1_start, h1_end, h1_name, target_regions
+                    h1_cycle_key, cadence, h1_r_start, h1_r_end, h1_c_start, h1_c_end, h1_name, target_regions
                 )
 
-                # H2: 16 to month-end
-                h2_start = date(year, month, 16)
-                h2_end = date(year, month, last_day)
+                # H2: نافذة القراءة من 16 إلى نهاية الشهر المختار
+                h2_r_start = date(year, month, 16)
+                h2_r_end = date(year, month, last_day)
+                # فترة الاستهلاك في النظام الآجل: النصف الأول من الشهر المختار (1 إلى 15)
+                h2_c_start = date(year, month, 1)
+                h2_c_end = date(year, month, 15)
                 h2_cycle_key = f"SEMI-{year:04d}-{month:02d}-H2"
                 h2_name = f"النصف الثاني {month:02d}-{year:04d}"
 
                 h2_period = self._create_unified_cycle(
-                    h2_cycle_key, cadence, h2_start, h2_end, h2_name, target_regions,
+                    h2_cycle_key, cadence, h2_r_start, h2_r_end, h2_c_start, h2_c_end, h2_name, target_regions,
                     prev_period_id=h1_period.id,
                 )
 
@@ -114,14 +131,15 @@ class UtilityPeriodGenerator(models.TransientModel):
         }
 
     def _create_unified_cycle(
-        self, cycle_key, cadence, c_start, c_end, name,
+        self, cycle_key, cadence, r_start, r_end, c_start, c_end, name,
         target_regions, prev_period_id=False,
     ):
-        """إنشاء سجل دورة موحّد واحد يحمل نطاقَي القراءة والدفع.
+        """إنشاء سجل دورة موحّد واحد يحمل نطاقَي القراءة والدفع وفترة الاستهلاك الآجل.
 
         - period_role = 'reading' دائماً للسجلات الجديدة.
-        - date_start / date_end = نطاق القراءة/الاستهلاك.
-        - payment_start / payment_end محسوبان من الإزاحة.
+        - date_start / date_end = نطاق القراءة الفعلي.
+        - consumption_start / consumption_end = دورة الاستهلاك المحسوبة للنظام الآجل.
+        - payment_start / payment_end محسوبان من إزاحة القراءة.
         - idempotency: يتحقق بـ cycle_key + period_role='reading' فقط.
         """
         DateRange = self.env['date.range'].sudo()
@@ -131,22 +149,18 @@ class UtilityPeriodGenerator(models.TransientModel):
 
         # تحديد إزاحات النوافذ
         if self.override_offsets:
-            r_start_off = self.reading_start_offset_days
-            r_end_off = self.reading_end_offset_days
             p_start_off = self.payment_start_offset_days
             p_end_off = self.payment_end_offset_days
         else:
-            r_start_off = period_type.reading_start_offset_days
-            r_end_off = period_type.reading_end_offset_days
             p_start_off = period_type.payment_start_offset_days
             p_end_off = period_type.payment_end_offset_days
 
-        rw_start = self._to_utc_start_of_day(c_start)
-        rw_end = self._to_utc_end_of_day(c_end)
+        rw_start = self._to_utc_start_of_day(r_start)
+        rw_end = self._to_utc_end_of_day(r_end)
 
-        # نطاق الدفع الصريح (حقول Date)
-        pay_start = c_start + timedelta(days=p_start_off)
-        pay_end = c_end + timedelta(days=p_end_off)
+        # نطاق الدفع الصريح (حقول Date) محسوب بناءً على تاريخ القراءة
+        pay_start = r_start + timedelta(days=p_start_off)
+        pay_end = r_end + timedelta(days=p_end_off)
 
         # Idempotency: البحث بـ cycle_key + period_role='reading' فقط
         existing = DateRange.search([
@@ -175,15 +189,16 @@ class UtilityPeriodGenerator(models.TransientModel):
             'state': 'planned',
             'reading_state': 'planned',
             'collection_state': 'planned',
-            # نطاق القراءة = date_start / date_end
-            'date_start': c_start,
-            'date_end': c_end,
+            # نطاق القراءة الفعلي = date_start / date_end
+            'date_start': r_start,
+            'date_end': r_end,
+            # فترة الاستهلاك في النظام الآجل (تسبق القراءة)
             'consumption_start': c_start,
             'consumption_end': c_end,
             # نافذة القراءة (توقيت دقيق)
             'reading_window_start': rw_start,
             'reading_window_end': rw_end,
-            # نطاق الدفع الصريح ونوافذ التحصيل (لضمان التوافق بين Date و Datetime)
+            # نطاق الدفع الصريح ونوافذ التحصيل
             'payment_start': pay_start,
             'payment_end': pay_end,
             'payment_window_start': datetime.combine(pay_start, time.min),
@@ -209,7 +224,7 @@ class UtilityPeriodGenerator(models.TransientModel):
         """
         name = reading_name.replace(' (قراءة ومراجعة)', '').replace(' (reading)', '')
         period = self._create_unified_cycle(
-            cycle_key, cadence, c_start, c_end, name, target_regions,
+            cycle_key, cadence, c_start, c_end, c_start, c_end, name, target_regions,
             prev_period_id=prev_reading_id or prev_payment_id,
         )
         return period, period
