@@ -186,3 +186,6 @@ class TestUtilityInfrastructureSettings(TransactionCase):
         self.assertTrue(company.legacy_three_phase_meter_model_id)
         self.assertEqual(company.legacy_single_phase_meter_model_id.phase, 'single')
         self.assertEqual(company.legacy_three_phase_meter_model_id.phase, 'three')
+        yer = self.env.ref('base.YER', raise_if_not_found=False) or self.env['res.currency'].search([('name', '=', 'YER')], limit=1)
+        self.assertTrue(yer.active)
+        self.assertEqual(company.currency_id, yer)

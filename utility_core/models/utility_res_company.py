@@ -187,6 +187,19 @@ class ResCompany(models.Model):
                 if not company.account_journal_payment_credit_account_id:
                     vals['account_journal_payment_credit_account_id'] = outstanding_acc.id
 
+            # تفعيل عملة الريال اليمني وتعيينها للشركة
+            yer = self.env.ref('base.YER', raise_if_not_found=False) or self.env['res.currency'].search([('name', '=', 'YER')], limit=1)
+            if yer:
+                if not yer.active:
+                    yer.active = True
+                if company.currency_id != yer:
+                    has_moves = self.env['account.move.line'].search_count([('company_id', '=', company.id)]) > 0
+                    if not has_moves:
+                        vals['currency_id'] = yer.id
+            country_ye = self.env.ref('base.ye', raise_if_not_found=False) or self.env['res.country'].search([('code', '=', 'YE')], limit=1)
+            if country_ye and not company.country_id:
+                vals['country_id'] = country_ye.id
+
             if vals:
                 company.write(vals)
 

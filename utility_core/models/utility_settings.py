@@ -439,7 +439,21 @@ class ResConfigSettings(models.TransientModel):
                 })
             company.legacy_three_phase_meter_model_id = m3
 
-        # 5. Sync populated values back to current in-memory settings view
+        # 5. Currency & Country (العملة: الريال اليمني YER والدولة: اليمن)
+        yer_curr = self.env.ref('base.YER', raise_if_not_found=False) or self.env['res.currency'].search([('name', '=', 'YER')], limit=1)
+        if yer_curr:
+            if not yer_curr.active:
+                yer_curr.active = True
+            if company.currency_id != yer_curr:
+                has_moves = self.env['account.move.line'].search_count([('company_id', '=', company.id)]) > 0
+                if not has_moves:
+                    company.currency_id = yer_curr
+
+        country_ye = self.env.ref('base.ye', raise_if_not_found=False) or self.env['res.country'].search([('code', '=', 'YE')], limit=1)
+        if country_ye and not company.country_id:
+            company.country_id = country_ye
+
+        # 6. Sync populated values back to current in-memory settings view
         fields_to_sync = [
             'electricity_product_id', 'discount_product_id', 'penalty_product_id',
             'mu_allim_product_id', 'cleaning_product_id', 'local_fee_product_id',
@@ -450,6 +464,7 @@ class ResConfigSettings(models.TransientModel):
             'deposit_account_id', 'settlement_account_id', 'writeoff_account_id',
             'opening_clearing_account_id',
             'legacy_single_phase_meter_model_id', 'legacy_three_phase_meter_model_id',
+            'currency_id',
         ]
         for fname in fields_to_sync:
             if hasattr(self, fname) and hasattr(company, fname):
@@ -462,7 +477,7 @@ class ResConfigSettings(models.TransientModel):
             'tag': 'display_notification',
             'params': {
                 'title': _('توليد البيانات الافتراضية'),
-                'message': _('تم فحص وتوليد الحسابات واليوميات والمنتجات وموديلات العدادات الافتراضية الناقصة بنجاح!'),
+                'message': _('تم فحص وتوليد الحسابات واليوميات والمنتجات والعملة (الريال اليمني) وموديلات العدادات بنجاح!'),
                 'sticky': False,
                 'type': 'success',
                 'next': {'type': 'ir.actions.client', 'tag': 'reload'}
