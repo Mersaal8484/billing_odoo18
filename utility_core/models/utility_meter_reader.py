@@ -26,6 +26,8 @@ class UtilityMeterReader(models.Model):
         tracking=True,
         help='ربط اختياري بسجل موظف موجود في النظام',
     )
+    image_1920 = fields.Image('الصورة', max_width=1920, max_height=1920)
+    notes = fields.Text('ملاحظات')
     route_ids = fields.Many2many(
         'utility.route',
         'meter_reader_route_rel',
@@ -33,9 +35,20 @@ class UtilityMeterReader(models.Model):
         string='المسارات المخصصة',
         tracking=True,
     )
+    route_count = fields.Integer(
+        'عدد المسارات',
+        compute='_compute_route_count',
+        store=False,
+    )
+    customer_ids = fields.Many2many(
+        'utility.customer',
+        string='المشتركون التابعون',
+        compute='_compute_customers',
+        help='قائمة المشتركين التابعين للمسارات المخصصة لهذا الكاشف',
+    )
     customer_count = fields.Integer(
         'عدد المشتركين',
-        compute='_compute_customer_count',
+        compute='_compute_customers',
         store=False,
     )
 
@@ -45,14 +58,46 @@ class UtilityMeterReader(models.Model):
     ]
 
     @api.depends('route_ids')
-    def _compute_customer_count(self):
+    def _compute_route_count(self):
+        for reader in self:
+            reader.route_count = len(reader.route_ids)
+
+    @api.depends('route_ids')
+    def _compute_customers(self):
         for reader in self:
             if reader.route_ids:
-                reader.customer_count = self.env['utility.customer'].search_count([
+                customers = self.env['utility.customer'].search([
                     ('route_id', 'in', reader.route_ids.ids),
                 ])
+                reader.customer_ids = customers
+                reader.customer_count = len(customers)
             else:
+                reader.customer_ids = False
                 reader.customer_count = 0
+
+    @api.onchange('user_id')
+    def _onchange_user_id(self):
+        if self.user_id:
+            if not self.name or self.name == _('جديد'):
+                self.name = self.user_id.name
+            if not self.mobile and self.user_id.phone:
+                self.mobile = self.user_id.phone
+            elif not self.mobile and self.user_id.mobile:
+                self.mobile = self.user_id.mobile
+            if self.user_id.image_1920 and not self.image_1920:
+                self.image_1920 = self.user_id.image_1920
+
+    @api.onchange('staff_id')
+    def _onchange_staff_id(self):
+        if self.staff_id:
+            if not self.name or self.name == _('جديد'):
+                self.name = self.staff_id.name
+            if not self.code and self.staff_id.employee_code:
+                self.code = self.staff_id.employee_code
+            if not self.mobile and self.staff_id.mobile:
+                self.mobile = self.staff_id.mobile
+            if not self.user_id and self.staff_id.user_id:
+                self.user_id = self.staff_id.user_id
 
     def _sync_user_routes(self):
         """تحديث assigned_route_ids في res.users ليطابق مسارات الكاشف."""
@@ -110,3 +155,19 @@ class UtilityMeterReader(models.Model):
             'view_mode': 'tree,form',
             'domain': [('id', 'in', self.route_ids.ids)],
         }
+
+    def action_sync_routes(self):
+        """مزامنة المسارات فورياً مع حساب المستخدم وتطبيق الموبايل"""
+        self.ensure_one()
+        self._sync_user_routes()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('تمت المزامنة بنجاح'),
+                'message': _('تم تحديث مسارات الكاشف ومزامنتها بنجاح مع حساب المستخدم وتطبيق الموبايل.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+

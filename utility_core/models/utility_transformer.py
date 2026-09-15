@@ -52,10 +52,11 @@ class UtilityTransformer(models.Model):
         domain="[('transformer_id', '=', id)]",
         help='العداد الذي يقيس إجمالي الطاقة الداخلة إلى المحول أو الفيدر',
     )
-    customer_ids = fields.One2many(
-        'utility.customer', 'transformer_id',
+    customer_ids = fields.Many2many(
+        'utility.customer',
         string='عقود المشتركين',
-        help='عقود المشتركين المغذاة من هذا المحول'
+        compute='_compute_customer_ids',
+        help='عقود المشتركين المغذاة من هذا المحول عبر مسارات التوزيع المرتبطة به'
     )
     private_customer_id = fields.Many2one(
         'utility.customer', string='الحساب الخاص المالك', readonly=True,
@@ -66,10 +67,15 @@ class UtilityTransformer(models.Model):
         string='مسارات التوزيع',
         help='مسارات التوزيع المرتبطة بهذا المحول'
     )
+    route_count = fields.Integer(
+        'عدد المسارات',
+        compute='_compute_route_count',
+        store=True,
+    )
     customer_count = fields.Integer(
         'عدد العقود',
-        compute='_compute_customer_count',
-        store=True
+        compute='_compute_customer_ids',
+        store=True,
     )
 
     notes = fields.Text('ملاحظات')
@@ -104,6 +110,7 @@ class UtilityTransformer(models.Model):
                     % transformer.display_name
                 )
             if (transformer.private_customer_id
+                    and transformer.customer_ids
                     and transformer.private_customer_id not in transformer.customer_ids):
                 raise ValidationError(
                     _('الحساب المحدد كمُالك للمحول الخاص غير مرتبط به فعليًا.')
@@ -126,10 +133,17 @@ class UtilityTransformer(models.Model):
                 raise ValidationError(_('عداد الربط يجب أن يكون عداد محول مرتبطًا بهذا المحول نفسه.'))
 
     # ===== Compute =====
-    @api.depends('customer_ids')
-    def _compute_customer_count(self):
+    @api.depends('route_ids')
+    def _compute_route_count(self):
         for rec in self:
-            rec.customer_count = len(rec.customer_ids)
+            rec.route_count = len(rec.route_ids)
+
+    @api.depends('route_ids.customer_ids')
+    def _compute_customer_ids(self):
+        for rec in self:
+            customers = rec.route_ids.mapped('customer_ids')
+            rec.customer_ids = customers
+            rec.customer_count = len(customers)
 
     # ===== Actions =====
     def action_view_customers(self):
@@ -138,8 +152,22 @@ class UtilityTransformer(models.Model):
             'type': 'ir.actions.act_window',
             'name': f'عقود {self.name}',
             'res_model': 'utility.customer',
-            'domain': [('transformer_id', '=', self.id)],
+            'domain': [('route_id', 'in', self.route_ids.ids)],
             'views': [(False, 'tree'), (False, 'form')],
+            'context': {
+                'default_route_id': self.route_ids[:1].id if self.route_ids else False,
+            },
+        }
+
+    def action_view_routes(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'مسارات {self.name}',
+            'res_model': 'utility.route',
+            'domain': [('id', 'in', self.route_ids.ids)],
+            'views': [(False, 'tree'), (False, 'form')],
+            'context': {'default_transformer_id': self.id},
         }
 
     def action_create_coupling_meter(self):

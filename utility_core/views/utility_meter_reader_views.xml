@@ -14,10 +14,75 @@
                 <field name="name"/>
                 <field name="user_id"/>
                 <field name="mobile" optional="show"/>
+                <field name="route_count" string="عدد المسارات"/>
                 <field name="route_ids" widget="many2many_tags" optional="show"/>
                 <field name="customer_count" string="عدد المشتركين"/>
                 <field name="active" invisible="1"/>
             </tree>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Kanban View                                                    -->
+    <!-- ============================================================ -->
+    <record id="view_utility_meter_reader_kanban" model="ir.ui.view">
+        <field name="name">utility.meter.reader.kanban</field>
+        <field name="model">utility.meter.reader</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="user_id"/>
+                <field name="mobile"/>
+                <field name="route_count"/>
+                <field name="customer_count"/>
+                <field name="active"/>
+                <field name="image_1920"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                            <div class="o_kanban_image d-none d-md-block"
+                                 t-attf-style="background-image:url('#{kanban_image('utility.meter.reader', 'image_1920', record.id.raw_value)}')">
+                                <t t-if="!record.image_1920.raw_value">
+                                    <div class="d-flex align-items-center justify-content-center h-100 bg-light text-muted">
+                                        <i class="fa fa-user fa-3x"/>
+                                    </div>
+                                </t>
+                            </div>
+                            <div class="oe_kanban_details d-flex flex-column justify-content-between">
+                                <div>
+                                    <strong class="o_kanban_record_title fs-5">
+                                        <field name="name"/>
+                                    </strong>
+                                    <div class="text-muted" t-if="record.code.raw_value">
+                                        <i class="fa fa-id-badge me-1"/> <field name="code"/>
+                                    </div>
+                                    <div class="text-muted" t-if="record.mobile.raw_value">
+                                        <i class="fa fa-phone me-1"/> <field name="mobile"/>
+                                    </div>
+                                    <div class="text-muted" t-if="record.user_id.raw_value">
+                                        <i class="fa fa-user-circle me-1"/> <field name="user_id"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom mt-2 pt-2 border-top">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span class="badge rounded-pill text-bg-primary me-1">
+                                            <i class="fa fa-road me-1"/> <t t-esc="record.route_count.value"/> مسارات
+                                        </span>
+                                        <span class="badge rounded-pill text-bg-info">
+                                            <i class="fa fa-users me-1"/> <t t-esc="record.customer_count.value"/> مشترك
+                                        </span>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="active" widget="boolean_toggle"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
         </field>
     </record>
 
@@ -30,69 +95,96 @@
         <field name="arch" type="xml">
             <form string="كاشف قراءة العدادات">
                 <header>
-                    <button name="action_view_customers" type="object"
-                            string="عرض المشتركين" class="btn-secondary"
-                            icon="fa-users"
-                            attrs="{'invisible': [('customer_count', '=', 0)]}"/>
+                    <button name="action_sync_routes" type="object"
+                            string="مزامنة المسارات مع التطبيق" class="btn-primary"
+                            icon="fa-refresh"
+                            help="تحديث مسارات الكاشف ومزامنتها فوراً مع حساب المستخدم وتطبيق الموبايل"/>
                 </header>
                 <sheet>
                     <field name="active" invisible="1"/>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="action_view_customers" type="object"
-                                class="oe_stat_button" icon="fa-users">
-                            <field name="customer_count" widget="statinfo"
-                                   string="مشتركون"/>
-                        </button>
-                        <button name="action_view_routes" type="object"
-                                class="oe_stat_button" icon="fa-road">
-                            <field name="route_ids" string="مسارات"
-                                   widget="statinfo_field"/>
-                        </button>
-                    </div>
                     <widget name="web_ribbon" title="معطّل"
                             bg_color="bg-danger"
                             attrs="{'invisible': [('active', '=', True)]}"/>
-                    <div class="oe_title">
-                        <label for="name" string="اسم الكاشف / الموظف"/>
-                        <h1>
-                            <field name="name" placeholder="الاسم الكامل"/>
-                        </h1>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_routes" type="object"
+                                class="oe_stat_button" icon="fa-road">
+                            <field name="route_count" widget="statinfo" string="مسارات"/>
+                        </button>
+                        <button name="action_view_customers" type="object"
+                                class="oe_stat_button" icon="fa-users">
+                            <field name="customer_count" widget="statinfo" string="مشتركون"/>
+                        </button>
                     </div>
+
+                    <field name="image_1920" widget="image" class="oe_avatar"
+                           options="{'preview_image': 'image_1920'}"/>
+
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" string="اسم الكاشف / الموظف"/>
+                        <h1>
+                            <field name="name" placeholder="اسم الكاشف بالكامل..."/>
+                        </h1>
+                        <div class="o_row">
+                            <label for="code" string="رمز الكاشف:" class="fw-bold me-1"/>
+                            <field name="code" placeholder="مثال: RDR-001" class="oe_inline"/>
+                        </div>
+                    </div>
+
                     <group>
-                        <group string="بيانات الكاشف">
-                            <field name="code" placeholder="مثال: RDR-001"/>
-                            <field name="mobile" placeholder="777123456"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                        <group string="بيانات الاتصال والعمل">
+                            <field name="mobile" widget="phone" placeholder="مثال: 777123456"/>
+                            <field name="staff_id" options="{'no_create': True}"
+                                   placeholder="ربط اختياري بموظف..."/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   options="{'no_create': True}"/>
                         </group>
-                        <group string="حساب النظام والتطبيق">
+                        <group string="حساب الدخول وتطبيق الميدان">
                             <field name="user_id"
                                    domain="[('share', '=', False)]"
                                    options="{'no_create': False}"
-                                   help="حساب الدخول الذي يستخدمه الكاشف في التطبيق"/>
-                            <field name="staff_id"
-                                   options="{'no_create': True}"
-                                   help="ربط اختياري بسجل موظف في النظام"/>
+                                   placeholder="اختر حساب المستخدم للتطبيق..."/>
                         </group>
                     </group>
 
                     <notebook>
                         <page string="المسارات المخصصة" name="routes">
-                            <div class="alert alert-info" role="alert">
-                                <strong>ملاحظة:</strong> عند تعيين مسار للكاشف، سيظهر له تلقائياً
-                                جميع مشتركي هذا المسار في التطبيق.
-                                يمكنك تعيين أكثر من مسار للكاشف الواحد.
+                            <div class="alert alert-info d-flex align-items-center mb-3" role="alert">
+                                <i class="fa fa-info-circle fa-2x me-3 ms-2 text-info"/>
+                                <div>
+                                    <strong>توجيه ميداني:</strong>
+                                    عند تعيين مسار للكاشف، ستظهر له جميع حسابات المشتركين التابعة لهذا المسار تلقائياً في تطبيق القارئ الميداني.
+                                    يمكن تعيين عدة مسارات للكاشف الواحد.
+                                </div>
                             </div>
-                            <field name="route_ids"
-                                   widget="many2many_checkboxes"
-                                   options="{'no_create': True}">
-                                <tree>
+                            <field name="route_ids" nolabel="1">
+                                <tree string="المسارات المخصصة" decoration-muted="active == False">
                                     <field name="code"/>
                                     <field name="name"/>
-                                    <field name="region_id"/>
                                     <field name="area_id"/>
-                                    <field name="customer_count" string="المشتركون"/>
+                                    <field name="region_id" optional="show"/>
+                                    <field name="transformer_id" optional="show"/>
+                                    <field name="customer_count" string="عدد المشتركين" sum="إجمالي المشتركين"/>
+                                    <field name="active" invisible="1"/>
                                 </tree>
                             </field>
+                        </page>
+                        <page string="قائمة المشتركين" name="customers">
+                            <field name="customer_ids" readonly="1" nolabel="1">
+                                <tree string="مشتركو الكاشف" limit="25">
+                                    <field name="customer_number"/>
+                                    <field name="partner_id"/>
+                                    <field name="route_id"/>
+                                    <field name="meter_id"/>
+                                    <field name="mobile" optional="show"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'active'"
+                                           decoration-warning="state in ('suspended', 'disconnected')"
+                                           decoration-danger="state == 'closed'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="ملاحظات" name="notes">
+                            <field name="notes" placeholder="أي ملاحظات إدارية أو تعليمات موجهة للكاشف..." nolabel="1"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -134,7 +226,7 @@
     <record id="action_utility_meter_reader" model="ir.actions.act_window">
         <field name="name">كشافو قراءة العدادات</field>
         <field name="res_model">utility.meter.reader</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">kanban,tree,form</field>
         <field name="search_view_id" ref="view_utility_meter_reader_search"/>
         <field name="context">{'search_default_active': 1}</field>
     </record>
