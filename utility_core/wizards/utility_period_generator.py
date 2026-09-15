@@ -173,6 +173,8 @@ class UtilityPeriodGenerator(models.TransientModel):
             'region_ids': [(6, 0, target_regions.ids)],
             'type_id': period_type.id,
             'state': 'planned',
+            'reading_state': 'planned',
+            'collection_state': 'planned',
             # نطاق القراءة = date_start / date_end
             'date_start': c_start,
             'date_end': c_end,

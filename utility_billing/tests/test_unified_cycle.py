@@ -61,6 +61,8 @@ class TestUnifiedCycle(TransactionCase):
     def test_02_unified_cycle_independent_states(self):
         """حالة القراءة وحالة التحصيل مستقلتان."""
         cycle = self._create_unified_cycle()
+        self.assertEqual(cycle.reading_state, 'planned')
+        self.assertEqual(cycle.collection_state, 'planned')
         cycle.action_open_period()
 
         # الحالتان مفتوحتان
@@ -239,3 +241,62 @@ class TestUnifiedCycle(TransactionCase):
         field = self.env['account.payment']._fields['date_range_id']
         self.assertIn("'reading'", field.domain)
         self.assertIn("'payment'", field.domain)
+
+    def test_14_default_states_are_planned(self):
+        """السجلات المنشأة حديثاً تبدأ بحالة planned للقراءة والتحصيل."""
+        cycle = self._create_unified_cycle('TEST-PLANNED-001')
+        self.assertEqual(cycle.state, 'planned')
+        self.assertEqual(cycle.reading_state, 'planned')
+        self.assertEqual(cycle.collection_state, 'planned')
+
+    def test_15_single_open_reading_period_constraint(self):
+        """يمنع فتح فترتي قراءة معاً لنفس الدورية والشركة."""
+        c1 = self._create_unified_cycle('TEST-SINGLE-READ-01', start=date(2026, 9, 1), end=date(2026, 9, 15))
+        c2 = self._create_unified_cycle('TEST-SINGLE-READ-02', start=date(2026, 9, 16), end=date(2026, 9, 30))
+
+        c1.action_open_period()
+        self.assertEqual(c1.reading_state, 'open')
+
+        # محاولة فتح الدورة الثانية للقراءة يجب أن تفشل
+        with self.assertRaises(ValidationError):
+            c2.action_open_period()
+
+    def test_16_single_open_collection_period_constraint(self):
+        """يمنع فتح فترتي تحصيل معاً لنفس الدورية والشركة."""
+        c1 = self._create_unified_cycle('TEST-SINGLE-COLL-01', start=date(2026, 9, 1), end=date(2026, 9, 15))
+        c2 = self._create_unified_cycle('TEST-SINGLE-COLL-02', start=date(2026, 9, 16), end=date(2026, 9, 30))
+
+        c1.action_open_period()
+        self.assertEqual(c1.collection_state, 'open')
+
+        # إغلاق قراءة الدورة الأولى
+        c1.with_context(_bypass_period_scope_protection=True).write({'reading_state': 'closed'})
+
+        # فتح الدورة الثانية: القراءة تُفتح ولكن التحصيل يبقى planned لأن تحصيل c1 لا يزال مفتوحاً
+        c2.action_open_period()
+        self.assertEqual(c2.reading_state, 'open')
+        self.assertEqual(c2.collection_state, 'planned')
+
+        # محاولة فتح تحصيل c2 مباشرة بينما تحصيل c1 مفتوح تطلق ValidationError
+        with self.assertRaises(ValidationError):
+            c2.action_open_payment()
+
+    def test_17_open_second_collection_after_reconciling_first(self):
+        """يمكن فتح تحصيل الدورة الثانية بعد إغلاق أو مطابقة تحصيل الدورة الأولى."""
+        c1 = self._create_unified_cycle('TEST-SEQ-COLL-01', start=date(2026, 9, 1), end=date(2026, 9, 15))
+        c2 = self._create_unified_cycle('TEST-SEQ-COLL-02', start=date(2026, 9, 16), end=date(2026, 9, 30))
+
+        c1.action_open_period()
+        c1.with_context(_bypass_period_scope_protection=True).write({'reading_state': 'closed'})
+
+        c2.action_open_period()
+        self.assertEqual(c2.collection_state, 'planned')
+
+        # مطابقة تحصيل c1
+        c1.action_reconcile_collection()
+        self.assertEqual(c1.collection_state, 'reconciled')
+
+        # الآن يمكن فتح تحصيل c2 بنجاح
+        c2.action_open_payment()
+        self.assertEqual(c2.collection_state, 'open')
+

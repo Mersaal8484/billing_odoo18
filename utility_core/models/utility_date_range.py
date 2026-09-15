@@ -48,6 +48,7 @@ PERIOD_STATE_SELECTION = [
 
 # حالات القراءة المستقلة في السجل الموحد
 READING_STATE_SELECTION = [
+    ('planned', 'مخططة'),
     ('open',    'مفتوحة للقراءة'),
     ('closing', 'قيد الإغلاق'),
     ('closed',  'مغلقة'),
@@ -56,6 +57,7 @@ READING_STATE_SELECTION = [
 
 # حالات التحصيل المستقلة في السجل الموحد
 COLLECTION_STATE_SELECTION = [
+    ('planned',    'مخطط'),
     ('open',       'مفتوح للتحصيل'),
     ('closing',    'قيد المطابقة'),
     ('reconciled', 'تمت المطابقة'),
@@ -162,7 +164,7 @@ class DateRange(models.Model):
     reading_state = fields.Selection(
         READING_STATE_SELECTION,
         string="حالة القراءة",
-        default='open',
+        default='planned',
         required=True,
         index=True,
         copy=False,
@@ -172,7 +174,7 @@ class DateRange(models.Model):
     collection_state = fields.Selection(
         COLLECTION_STATE_SELECTION,
         string="حالة التحصيل",
-        default='open',
+        default='planned',
         required=True,
         index=True,
         copy=False,
@@ -442,6 +444,56 @@ class DateRange(models.Model):
         for rec in self:
             if rec.payment_start and rec.payment_end and rec.payment_start > rec.payment_end:
                 raise ValidationError(_("تاريخ بداية الدفع يجب أن يكون قبل أو يساوي تاريخ نهاية الدفع."))
+
+    @api.constrains('reading_state', 'collection_state', 'state', 'billing_cadence', 'company_id', 'active', 'period_role')
+    def _check_single_open_period(self):
+        """قيد تشغيلي: يمنع وجود أكثر من فترة قراءة مفتوحة في نفس الوقت،
+        وكذلك يمنع وجود أكثر من فترة تحصيل مفتوحة في نفس الوقت لنفس الدورية والشركة.
+        """
+        cadence_labels = dict(BILLING_PERIOD_TYPES)
+        for rec in self:
+            if not rec.active or rec.period_role != 'reading':
+                continue
+            cadence = normalize_billing_cadence(rec.billing_cadence)
+            cadence_name = cadence_labels.get(rec.billing_cadence, rec.billing_cadence)
+
+            # 1. التحقق من فترة القراءة: فترة واحدة مفتوحة فقط
+            if rec.reading_state == 'open':
+                duplicate_reading = self.search([
+                    ('id', '!=', rec.id),
+                    ('active', '=', True),
+                    ('period_role', '=', 'reading'),
+                    ('company_id', '=', rec.company_id.id),
+                    ('reading_state', '=', 'open'),
+                ]).filtered(
+                    lambda r: normalize_billing_cadence(r.billing_cadence) == cadence
+                )
+                if duplicate_reading:
+                    other = duplicate_reading[0]
+                    raise ValidationError(_(
+                        "لا يمكن فتح أكثر من فترة قراءة في نفس الوقت لنفس الدورية (%s).\n"
+                        "الفترة المفتوحة حالياً: [%s - %s].\n"
+                        "يجب إغلاق فترة القراءة الحالية أولاً قبل فتح فترة جديدة."
+                    ) % (cadence_name, other.period_code or other.cycle_key or other.name, other.name))
+
+            # 2. التحقق من فترة التحصيل: فترة واحدة مفتوحة فقط
+            if rec.collection_state == 'open':
+                duplicate_collection = self.search([
+                    ('id', '!=', rec.id),
+                    ('active', '=', True),
+                    ('period_role', '=', 'reading'),
+                    ('company_id', '=', rec.company_id.id),
+                    ('collection_state', '=', 'open'),
+                ]).filtered(
+                    lambda r: normalize_billing_cadence(r.billing_cadence) == cadence
+                )
+                if duplicate_collection:
+                    other = duplicate_collection[0]
+                    raise ValidationError(_(
+                        "لا يمكن فتح أكثر من فترة تحصيل في نفس الوقت لنفس الدورية (%s).\n"
+                        "فترة التحصيل المفتوحة حالياً: [%s - %s].\n"
+                        "يجب إغلاق أو مطابقة فترة التحصيل الحالية أولاً قبل فتح فترة تحصيل جديدة."
+                    ) % (cadence_name, other.period_code or other.cycle_key or other.name, other.name))
 
     @api.constrains('cycle_key', 'period_role', 'company_id')
     def _check_cycle_key_unique(self):
@@ -798,11 +850,40 @@ class DateRange(models.Model):
             if rec.state == 'locked':
                 raise ValidationError(_("لا يمكن فتح فترة مقفلة تاريخياً (locked)."))
             rec._validate_state_transition(['planned'], _('فتح الفترة'))
+            cadence = normalize_billing_cadence(rec.billing_cadence)
+            cadence_name = dict(BILLING_PERIOD_TYPES).get(rec.billing_cadence, rec.billing_cadence)
+
+            # التحقق من عدم وجود دورة قراءة مفتوحة لنفس الدورية
+            open_reading = self.search([
+                ('id', '!=', rec.id),
+                ('active', '=', True),
+                ('period_role', '=', 'reading'),
+                ('company_id', '=', rec.company_id.id),
+                ('reading_state', '=', 'open'),
+            ]).filtered(lambda r: normalize_billing_cadence(r.billing_cadence) == cadence)
+            if open_reading:
+                other = open_reading[0]
+                raise ValidationError(_(
+                    "لا يمكن فتح دورة جديدة للعمليات: توجد بالفعل فترة قراءة مفتوحة لنفس الدورية (%s): [%s - %s].\n"
+                    "يجب إغلاق فترة القراءة الحالية أولاً قبل فتح فترة جديدة."
+                ) % (cadence_name, other.period_code or other.cycle_key or other.name, other.name))
+
+            # فحص إمكانية فتح التحصيل بالتزامن
+            open_collection = self.search([
+                ('id', '!=', rec.id),
+                ('active', '=', True),
+                ('period_role', '=', 'reading'),
+                ('company_id', '=', rec.company_id.id),
+                ('collection_state', '=', 'open'),
+            ]).filtered(lambda r: normalize_billing_cadence(r.billing_cadence) == cadence)
+
+            target_collection_state = 'planned' if open_collection else 'open'
+
             old_s = rec.state
             write_vals = {
                 'state': 'open',
                 'reading_state': 'open',
-                'collection_state': 'open',
+                'collection_state': target_collection_state,
                 'opened_at': fields.Datetime.now() if not rec.opened_at else rec.opened_at,
             }
             if old_s == 'planned':
@@ -827,6 +908,21 @@ class DateRange(models.Model):
                 raise ValidationError(_("لا يمكن إعادة فتح قراءة مقفلة تاريخياً."))
             if rec.state not in ('open', 'closing', 'closed'):
                 raise ValidationError(_("لا يمكن فتح القراءة: الدورة غير نشطة (حالة: %s).") % rec.state)
+            cadence = normalize_billing_cadence(rec.billing_cadence)
+            cadence_name = dict(BILLING_PERIOD_TYPES).get(rec.billing_cadence, rec.billing_cadence)
+            open_reading = self.search([
+                ('id', '!=', rec.id),
+                ('active', '=', True),
+                ('period_role', '=', 'reading'),
+                ('company_id', '=', rec.company_id.id),
+                ('reading_state', '=', 'open'),
+            ]).filtered(lambda r: normalize_billing_cadence(r.billing_cadence) == cadence)
+            if open_reading:
+                other = open_reading[0]
+                raise ValidationError(_(
+                    "توجد بالفعل فترة قراءة مفتوحة لنفس الدورية (%s): [%s - %s]. "
+                    "يجب إغلاق فترة القراءة المفتوحة أولاً."
+                ) % (cadence_name, other.period_code or other.cycle_key or other.name, other.name))
             old_rs = rec.reading_state
             rec.write({'reading_state': 'open'})
             rec._log_state_transition(old_rs, 'open', _("إعادة فتح القراءة — تعديل مسجل"))
@@ -838,9 +934,24 @@ class DateRange(models.Model):
                 raise ValidationError(_("لا يمكن إعادة فتح تحصيل مقفل تاريخياً."))
             if rec.state not in ('open', 'closing', 'closed'):
                 raise ValidationError(_("لا يمكن فتح التحصيل: الدورة غير نشطة (حالة: %s).") % rec.state)
+            cadence = normalize_billing_cadence(rec.billing_cadence)
+            cadence_name = dict(BILLING_PERIOD_TYPES).get(rec.billing_cadence, rec.billing_cadence)
+            open_collection = self.search([
+                ('id', '!=', rec.id),
+                ('active', '=', True),
+                ('period_role', '=', 'reading'),
+                ('company_id', '=', rec.company_id.id),
+                ('collection_state', '=', 'open'),
+            ]).filtered(lambda r: normalize_billing_cadence(r.billing_cadence) == cadence)
+            if open_collection:
+                other = open_collection[0]
+                raise ValidationError(_(
+                    "توجد بالفعل فترة تحصيل مفتوحة لنفس الدورية (%s): [%s - %s]. "
+                    "يجب إغلاق أو مطابقة فترة التحصيل المفتوحة أولاً قبل فتح فترة تحصيل أخرى."
+                ) % (cadence_name, other.period_code or other.cycle_key or other.name, other.name))
             old_cs = rec.collection_state
             rec.write({'collection_state': 'open'})
-            rec._log_state_transition(old_cs, 'open', _("إعادة فتح التحصيل — تعديل مسجل"))
+            rec._log_state_transition(old_cs, 'open', _("فتح/إعادة فتح التحصيل — تعديل مسجل"))
 
     def action_start_closing(self):
         """بدء إغلاق القراءة فقط: reading_state → closing. لا يُغلق التحصيل."""
