@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- أنواع الفترات الزمنية الأساسية لدورات الفوترة (Date Range Types) -->
+
+        <!-- 1. نصف شهري (Semi-Monthly) - الدورية الأكثر استخداماً -->
+        <record id="date_range_type_semi_monthly" model="date.range.type">
+            <field name="name">دورة نصف شهرية</field>
+            <field name="default_billing_period">semi_monthly</field>
+            <field name="fiscal_year" eval="False"/>
+            <field name="allow_overlap" eval="True"/>
+            <field name="reading_start_offset_days">-2</field>
+            <field name="reading_end_offset_days">3</field>
+            <field name="payment_start_offset_days">1</field>
+            <field name="payment_end_offset_days">15</field>
+            <field name="active" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- 2. شهري (Monthly) -->
+        <record id="date_range_type_monthly" model="date.range.type">
+            <field name="name">دورة شهرية</field>
+            <field name="default_billing_period">monthly</field>
+            <field name="fiscal_year" eval="False"/>
+            <field name="allow_overlap" eval="True"/>
+            <field name="reading_start_offset_days">-3</field>
+            <field name="reading_end_offset_days">5</field>
+            <field name="payment_start_offset_days">1</field>
+            <field name="payment_end_offset_days">25</field>
+            <field name="active" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- 3. أسبوعي (Weekly) -->
+        <record id="date_range_type_weekly" model="date.range.type">
+            <field name="name">دورة أسبوعية</field>
+            <field name="default_billing_period">weekly</field>
+            <field name="fiscal_year" eval="False"/>
+            <field name="allow_overlap" eval="True"/>
+            <field name="reading_start_offset_days">-1</field>
+            <field name="reading_end_offset_days">1</field>
+            <field name="payment_start_offset_days">1</field>
+            <field name="payment_end_offset_days">6</field>
+            <field name="active" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- 4. يومي (Daily) -->
+        <record id="date_range_type_daily" model="date.range.type">
+            <field name="name">دورة يومية</field>
+            <field name="default_billing_period">daily</field>
+            <field name="fiscal_year" eval="False"/>
+            <field name="allow_overlap" eval="True"/>
+            <field name="reading_start_offset_days">0</field>
+            <field name="reading_end_offset_days">1</field>
+            <field name="payment_start_offset_days">1</field>
+            <field name="payment_end_offset_days">2</field>
+            <field name="active" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- 5. ربع سنوي (Quarterly) -->
+        <record id="date_range_type_quarterly" model="date.range.type">
+            <field name="name">دورة ربع سنوية</field>
+            <field name="default_billing_period">quarterly</field>
+            <field name="fiscal_year" eval="False"/>
+            <field name="allow_overlap" eval="True"/>
+            <field name="reading_start_offset_days">-5</field>
+            <field name="reading_end_offset_days">7</field>
+            <field name="payment_start_offset_days">1</field>
+            <field name="payment_end_offset_days">45</field>
+            <field name="active" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- 6. سنوي (Yearly) -->
+        <record id="date_range_type_yearly" model="date.range.type">
+            <field name="name">دورة سنوية</field>
+            <field name="default_billing_period">yearly</field>
+            <field name="fiscal_year" eval="False"/>
+            <field name="allow_overlap" eval="True"/>
+            <field name="reading_start_offset_days">-10</field>
+            <field name="reading_end_offset_days">15</field>
+            <field name="payment_start_offset_days">1</field>
+            <field name="payment_end_offset_days">90</field>
+            <field name="active" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

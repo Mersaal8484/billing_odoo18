@@ -21,6 +21,7 @@ User Role.
         'security/utility_security.xml',
         'security/ir.model.access.csv',
         'data/utility_sequence.xml',
+        'data/utility_date_range_type_data.xml',
         'data/utility_user_role_data.xml',
         'data/utility_meter_type_data.xml',
         'data/utility_meter_status_data.xml',
