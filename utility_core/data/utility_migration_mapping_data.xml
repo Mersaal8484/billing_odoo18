@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- ============================================================ -->
+    <!-- 1. ترميز المناطق المتسلسل (Region Mappings: r1, r2, ...)     -->
+    <!-- ============================================================ -->
+    <!-- المنطقة الأولى (REG-01) -->
+    <record id="mapping_region_r1" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r1</field>
+        <field name="region_id" ref="region_first"/>
+    </record>
+    <!-- المنطقة الثانية (REG-02) -->
+    <record id="mapping_region_r2" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r2</field>
+        <field name="region_id" ref="region_second"/>
+    </record>
+    <!-- المنطقة الثالثة (REG-03) -->
+    <record id="mapping_region_r3" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r3</field>
+        <field name="region_id" ref="region_third"/>
+    </record>
+    <!-- المنطقة الرابعة (REG-04) -->
+    <record id="mapping_region_r4" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r4</field>
+        <field name="region_id" ref="region_fourth"/>
+    </record>
+    <!-- منطقة الحديدة (REG-HUD) -->
+    <record id="mapping_region_r5" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r5</field>
+        <field name="region_id" ref="region_hodeidah"/>
+    </record>
+    <!-- المنطقة الثانية توزيع (REG-DIS-02) -->
+    <record id="mapping_region_r6" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r6</field>
+        <field name="region_id" ref="region_second_distribution"/>
+    </record>
+    <!-- منطقة حجة (REG-HAJ) -->
+    <record id="mapping_region_r7" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r7</field>
+        <field name="region_id" ref="region_hajjah"/>
+    </record>
+    <!-- منطقة التوليد (REG-GEN) -->
+    <record id="mapping_region_r8" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r8</field>
+        <field name="region_id" ref="region_generation"/>
+    </record>
+    <!-- منطقة رداع (REG-RAD) -->
+    <record id="mapping_region_r9" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r9</field>
+        <field name="region_id" ref="region_rada"/>
+    </record>
+    <!-- منطقة عمران (REG-AMR) -->
+    <record id="mapping_region_r10" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r10</field>
+        <field name="region_id" ref="region_amran"/>
+    </record>
+    <!-- منطقة ذمار (REG-DHA) -->
+    <record id="mapping_region_r11" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r11</field>
+        <field name="region_id" ref="region_dhamar"/>
+    </record>
+    <!-- منطقة صنعاء (REG-SAN) -->
+    <record id="mapping_region_r12" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r12</field>
+        <field name="region_id" ref="region_sanaa"/>
+    </record>
+    <!-- منطقة إب (REG-IBB) -->
+    <record id="mapping_region_r13" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r13</field>
+        <field name="region_id" ref="region_ibb"/>
+    </record>
+    <!-- منطقة صعدة (REG-SAA) -->
+    <record id="mapping_region_r14" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r14</field>
+        <field name="region_id" ref="region_saada"/>
+    </record>
+    <!-- منطقة تعز (REG-TAZ) -->
+    <record id="mapping_region_r15" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r15</field>
+        <field name="region_id" ref="region_taiz"/>
+    </record>
+    <!-- منطقة المحويت (REG-MAH) -->
+    <record id="mapping_region_r16" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r16</field>
+        <field name="region_id" ref="region_mahwit"/>
+    </record>
+    <!-- منطقة يريم (REG-YAR) -->
+    <record id="mapping_region_r17" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r17</field>
+        <field name="region_id" ref="region_yarim"/>
+    </record>
+    <!-- منطقة البيضاء (REG-BAY) -->
+    <record id="mapping_region_r18" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r18</field>
+        <field name="region_id" ref="region_bayda"/>
+    </record>
+    <!-- منطقة الجوف (REG-JAW) -->
+    <record id="mapping_region_r19" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">r19</field>
+        <field name="region_id" ref="region_jawf"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 1.1 مطابقة المناطق بأسمائها العربية الشائعة (Alias Mappings) -->
+    <!-- ============================================================ -->
+    <record id="mapping_region_alias_first_1" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">المنطقة الأولى</field>
+        <field name="region_id" ref="region_first"/>
+    </record>
+    <record id="mapping_region_alias_first_2" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">المنطقة الاولى</field>
+        <field name="region_id" ref="region_first"/>
+    </record>
+    <record id="mapping_region_alias_second" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">المنطقة الثانية</field>
+        <field name="region_id" ref="region_second"/>
+    </record>
+    <record id="mapping_region_alias_third" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">المنطقة الثالثة</field>
+        <field name="region_id" ref="region_third"/>
+    </record>
+    <record id="mapping_region_alias_fourth_1" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">المنطقة الرابعة</field>
+        <field name="region_id" ref="region_fourth"/>
+    </record>
+    <record id="mapping_region_alias_fourth_2" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">المنطقة الرابعه</field>
+        <field name="region_id" ref="region_fourth"/>
+    </record>
+    <record id="mapping_region_alias_hodeidah" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة الحديدة</field>
+        <field name="region_id" ref="region_hodeidah"/>
+    </record>
+    <record id="mapping_region_alias_second_dist" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">المنطقة الثانية توزيع</field>
+        <field name="region_id" ref="region_second_distribution"/>
+    </record>
+    <record id="mapping_region_alias_hajjah" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة حجة</field>
+        <field name="region_id" ref="region_hajjah"/>
+    </record>
+    <record id="mapping_region_alias_gen" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة التوليد</field>
+        <field name="region_id" ref="region_generation"/>
+    </record>
+    <record id="mapping_region_alias_rada" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة رداع</field>
+        <field name="region_id" ref="region_rada"/>
+    </record>
+    <record id="mapping_region_alias_amran" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة عمران</field>
+        <field name="region_id" ref="region_amran"/>
+    </record>
+    <record id="mapping_region_alias_dhamar" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة ذمار</field>
+        <field name="region_id" ref="region_dhamar"/>
+    </record>
+    <record id="mapping_region_alias_sanaa" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة صنعاء</field>
+        <field name="region_id" ref="region_sanaa"/>
+    </record>
+    <record id="mapping_region_alias_ibb_1" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة إب</field>
+        <field name="region_id" ref="region_ibb"/>
+    </record>
+    <record id="mapping_region_alias_ibb_2" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة اب</field>
+        <field name="region_id" ref="region_ibb"/>
+    </record>
+    <record id="mapping_region_alias_saada" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة صعدة</field>
+        <field name="region_id" ref="region_saada"/>
+    </record>
+    <record id="mapping_region_alias_taiz" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة تعز</field>
+        <field name="region_id" ref="region_taiz"/>
+    </record>
+    <record id="mapping_region_alias_mahwit" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة المحويت</field>
+        <field name="region_id" ref="region_mahwit"/>
+    </record>
+    <record id="mapping_region_alias_yarim" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة يريم</field>
+        <field name="region_id" ref="region_yarim"/>
+    </record>
+    <record id="mapping_region_alias_bayda" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة البيضاء</field>
+        <field name="region_id" ref="region_bayda"/>
+    </record>
+    <record id="mapping_region_alias_jawf" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">منطقة الجوف</field>
+        <field name="region_id" ref="region_jawf"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 2. ترميز الفئات (Category Mappings: c1, c2, ...)           -->
+    <!-- ============================================================ -->
+    <!-- أهالي (CAT_PUB) -->
+    <record id="mapping_category_c1" model="utility.migration.mapping">
+        <field name="mapping_type">category</field>
+        <field name="legacy_code">c1</field>
+        <field name="category_id" ref="cat_public"/>
+    </record>
+    <!-- كبار مستهلكين (CAT_LARGE) -->
+    <record id="mapping_category_c2" model="utility.migration.mapping">
+        <field name="mapping_type">category</field>
+        <field name="legacy_code">c2</field>
+        <field name="category_id" ref="cat_large"/>
+    </record>
+    <!-- حكومي (CAT_GOV) -->
+    <record id="mapping_category_c3" model="utility.migration.mapping">
+        <field name="mapping_type">category</field>
+        <field name="legacy_code">c3</field>
+        <field name="category_id" ref="cat_government"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 3. ترميز أنواع المشتركين (Subscriber Mappings: s1, s2, ...) -->
+    <!-- ============================================================ -->
+    <!-- اهالي ملاك (PUB_OWNER) -->
+    <record id="mapping_subscriber_s1" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">s1</field>
+        <field name="subscriber_type_id" ref="sub_category_public"/>
+    </record>
+    <!-- اهالي مستاجر (PUB_TENANT) -->
+    <record id="mapping_subscriber_s2" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">s2</field>
+        <field name="subscriber_type_id" ref="sub_public_tenant"/>
+    </record>
+    <!-- تجاري (COM) -->
+    <record id="mapping_subscriber_s3" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">s3</field>
+        <field name="subscriber_type_id" ref="sub_public_commercial"/>
+    </record>
+    <!-- جوامع (MOSQUE) -->
+    <record id="mapping_subscriber_s4" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">s4</field>
+        <field name="subscriber_type_id" ref="sub_public_mosque"/>
+    </record>
+    <!-- دكاتره (DOCTOR) -->
+    <record id="mapping_subscriber_s5" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">s5</field>
+        <field name="subscriber_type_id" ref="sub_public_doctor"/>
+    </record>
+    <!-- مرعي (PASTURE) -->
+    <record id="mapping_subscriber_s6" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">s6</field>
+        <field name="subscriber_type_id" ref="sub_public_pasture"/>
+    </record>
+    <!-- شهداء (MARTYR) -->
+    <record id="mapping_subscriber_s7" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">s7</field>
+        <field name="subscriber_type_id" ref="sub_public_martyr"/>
+    </record>
+    <!-- حكومي أ (GOV_A) -->
+    <record id="mapping_subscriber_s8" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">s8</field>
+        <field name="subscriber_type_id" ref="sub_category_government_new"/>
+    </record>
+    <!-- حكومي ب (GOV_B) -->
+    <record id="mapping_subscriber_s9" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">s9</field>
+        <field name="subscriber_type_id" ref="sub_gov_b"/>
+    </record>
+    <!-- الاتصالات (TELECOM) -->
+    <record id="mapping_subscriber_s10" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">s10</field>
+        <field name="subscriber_type_id" ref="sub_category_large"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 4. ترميز الفروع (Area / Branch Mappings: b1, b2, ...)        -->
+    <!-- ============================================================ -->
+    <!-- فرع المنطقة الأولى (BR-REG-01) -->
+    <record id="mapping_area_b1" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b1</field>
+        <field name="area_id" ref="area_region_first"/>
+    </record>
+    <!-- فرع المنطقة الثانية (BR-REG-02) -->
+    <record id="mapping_area_b2" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b2</field>
+        <field name="area_id" ref="area_region_second"/>
+    </record>
+    <!-- فرع المنطقة الثالثة (BR-REG-03) -->
+    <record id="mapping_area_b3" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b3</field>
+        <field name="area_id" ref="area_region_third"/>
+    </record>
+    <!-- فرع المنطقة الرابعة (BR-REG-04) -->
+    <record id="mapping_area_b4" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b4</field>
+        <field name="area_id" ref="area_region_fourth"/>
+    </record>
+    <!-- فرع الضحي (8190) -->
+    <record id="mapping_area_b5" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b5</field>
+        <field name="area_id" ref="area_8190"/>
+    </record>
+    <!-- فرع الحسينية (8189) -->
+    <record id="mapping_area_b6" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b6</field>
+        <field name="area_id" ref="area_8189"/>
+    </record>
+    <!-- فرع التحيتا (8188) -->
+    <record id="mapping_area_b7" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b7</field>
+        <field name="area_id" ref="area_8188"/>
+    </record>
+    <!-- فرع الزيدية (8187) -->
+    <record id="mapping_area_b8" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b8</field>
+        <field name="area_id" ref="area_8187"/>
+    </record>
+    <!-- فرع زبيد (8185) -->
+    <record id="mapping_area_b9" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b9</field>
+        <field name="area_id" ref="area_8185"/>
+    </record>
+    <!-- فرع بيت الفقيه (8183) -->
+    <record id="mapping_area_b10" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b10</field>
+        <field name="area_id" ref="area_8183"/>
+    </record>
+    <!-- فرع المنصورية (8182) -->
+    <record id="mapping_area_b11" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b11</field>
+        <field name="area_id" ref="area_8182"/>
+    </record>
+    <!-- فرع الجراحي (8184) -->
+    <record id="mapping_area_b12" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b12</field>
+        <field name="area_id" ref="area_8184"/>
+    </record>
+    <!-- فرع المراوعة (8181) -->
+    <record id="mapping_area_b13" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b13</field>
+        <field name="area_id" ref="area_8181"/>
+    </record>
+    <!-- فرع الكدن (8186) -->
+    <record id="mapping_area_b14" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b14</field>
+        <field name="area_id" ref="area_8186"/>
+    </record>
+    <!-- فرع باجل (8162) -->
+    <record id="mapping_area_b15" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b15</field>
+        <field name="area_id" ref="area_8162"/>
+    </record>
+    <!-- فرع المنطقة الثانية توزيع (BR-REG-DIS-02) -->
+    <record id="mapping_area_b16" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b16</field>
+        <field name="area_id" ref="area_region_second_distribution"/>
+    </record>
+    <!-- فرع الزهرة (8179) -->
+    <record id="mapping_area_b17" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b17</field>
+        <field name="area_id" ref="area_8179"/>
+    </record>
+    <!-- فرع افلح اليمن (جياح) (8225) -->
+    <record id="mapping_area_b18" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b18</field>
+        <field name="area_id" ref="area_8225"/>
+    </record>
+    <!-- فرع الشاهل (8178) -->
+    <record id="mapping_area_b19" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b19</field>
+        <field name="area_id" ref="area_8178"/>
+    </record>
+    <!-- فرع المحابشه (8177) -->
+    <record id="mapping_area_b20" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b20</field>
+        <field name="area_id" ref="area_8177"/>
+    </record>
+    <!-- فرع المفتاح (8226) -->
+    <record id="mapping_area_b21" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b21</field>
+        <field name="area_id" ref="area_8226"/>
+    </record>
+    <!-- فرع عبس (8175) -->
+    <record id="mapping_area_b22" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b22</field>
+        <field name="area_id" ref="area_8175"/>
+    </record>
+    <!-- فرع كحلان الشرف (8176) -->
+    <record id="mapping_area_b23" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b23</field>
+        <field name="area_id" ref="area_8176"/>
+    </record>
+    <!-- فرع كحلان عفار (8227) -->
+    <record id="mapping_area_b24" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b24</field>
+        <field name="area_id" ref="area_8227"/>
+    </record>
+    <!-- فرع المنطقة (8228) -->
+    <record id="mapping_area_b25" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b25</field>
+        <field name="area_id" ref="area_8228"/>
+    </record>
+    <!-- فرع مبين حجة (8494) -->
+    <record id="mapping_area_b26" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b26</field>
+        <field name="area_id" ref="area_8494"/>
+    </record>
+    <!-- فرع منطقة التوليد (BR-REG-GEN) -->
+    <record id="mapping_area_b27" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b27</field>
+        <field name="area_id" ref="area_region_generation"/>
+    </record>
+    <!-- فرع منطقة رداع (BR-REG-RAD) -->
+    <record id="mapping_area_b28" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b28</field>
+        <field name="area_id" ref="area_region_rada"/>
+    </record>
+    <!-- فرع خمر (8201) -->
+    <record id="mapping_area_b29" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b29</field>
+        <field name="area_id" ref="area_8201"/>
+    </record>
+    <!-- فرع خارف عمران (8569) -->
+    <record id="mapping_area_b30" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b30</field>
+        <field name="area_id" ref="area_8569"/>
+    </record>
+    <!-- فرع ريدة (8202) -->
+    <record id="mapping_area_b31" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b31</field>
+        <field name="area_id" ref="area_8202"/>
+    </record>
+    <!-- فرع ذيبين (8204) -->
+    <record id="mapping_area_b32" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b32</field>
+        <field name="area_id" ref="area_8204"/>
+    </record>
+    <!-- فرع عيال سريح (8205) -->
+    <record id="mapping_area_b33" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b33</field>
+        <field name="area_id" ref="area_8205"/>
+    </record>
+    <!-- فرع ثلا (8200) -->
+    <record id="mapping_area_b34" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b34</field>
+        <field name="area_id" ref="area_8200"/>
+    </record>
+    <!-- فرع حبابة (8199) -->
+    <record id="mapping_area_b35" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b35</field>
+        <field name="area_id" ref="area_8199"/>
+    </record>
+    <!-- فرع حوث (8174) -->
+    <record id="mapping_area_b36" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b36</field>
+        <field name="area_id" ref="area_8174"/>
+    </record>
+    <!-- فرع معبر (8206) -->
+    <record id="mapping_area_b37" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b37</field>
+        <field name="area_id" ref="area_8206"/>
+    </record>
+    <!-- فرع منطقة صنعاء (BR-REG-SAN) -->
+    <record id="mapping_area_b38" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b38</field>
+        <field name="area_id" ref="area_region_sanaa"/>
+    </record>
+    <!-- فرع طبيع (8215) -->
+    <record id="mapping_area_b39" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b39</field>
+        <field name="area_id" ref="area_8215"/>
+    </record>
+    <!-- فرع حزم العدين (8210) -->
+    <record id="mapping_area_b40" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b40</field>
+        <field name="area_id" ref="area_8210"/>
+    </record>
+    <!-- فرع مذيخرة (8211) -->
+    <record id="mapping_area_b41" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b41</field>
+        <field name="area_id" ref="area_8211"/>
+    </record>
+    <!-- فرع العدين (8209) -->
+    <record id="mapping_area_b42" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b42</field>
+        <field name="area_id" ref="area_8209"/>
+    </record>
+    <!-- فرع حبيش (8208) -->
+    <record id="mapping_area_b43" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b43</field>
+        <field name="area_id" ref="area_8208"/>
+    </record>
+    <!-- فرع مذيخرة (8207) -->
+    <record id="mapping_area_b44" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b44</field>
+        <field name="area_id" ref="area_8207"/>
+    </record>
+    <!-- فرع المخادر - منطقة اب (8329) -->
+    <record id="mapping_area_b45" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b45</field>
+        <field name="area_id" ref="area_8329"/>
+    </record>
+    <!-- فرع المجمعة (8212) -->
+    <record id="mapping_area_b46" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b46</field>
+        <field name="area_id" ref="area_8212"/>
+    </record>
+    <!-- فرع جبلة (8213) -->
+    <record id="mapping_area_b47" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b47</field>
+        <field name="area_id" ref="area_8213"/>
+    </record>
+    <!-- فرع القاعدة (8214) -->
+    <record id="mapping_area_b48" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b48</field>
+        <field name="area_id" ref="area_8214"/>
+    </record>
+    <!-- مركز المحافظة (8229) -->
+    <record id="mapping_area_b49" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b49</field>
+        <field name="area_id" ref="area_8229"/>
+    </record>
+    <!-- فرع العزلة (8369) -->
+    <record id="mapping_area_b50" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b50</field>
+        <field name="area_id" ref="area_8369"/>
+    </record>
+    <!-- فرع منطقة صعدة (BR-REG-SAA) -->
+    <record id="mapping_area_b51" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b51</field>
+        <field name="area_id" ref="area_region_saada"/>
+    </record>
+    <!-- فرع منطقة تعز (BR-REG-TAZ) -->
+    <record id="mapping_area_b52" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b52</field>
+        <field name="area_id" ref="area_region_taiz"/>
+    </record>
+    <!-- فرع حفاش (8196) -->
+    <record id="mapping_area_b53" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b53</field>
+        <field name="area_id" ref="area_8196"/>
+    </record>
+    <!-- فرع خميس بني سعد (8197) -->
+    <record id="mapping_area_b54" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b54</field>
+        <field name="area_id" ref="area_8197"/>
+    </record>
+    <!-- فرع خميس بني سعد (8198) -->
+    <record id="mapping_area_b55" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b55</field>
+        <field name="area_id" ref="area_8198"/>
+    </record>
+    <!-- فرع الخبت (8195) -->
+    <record id="mapping_area_b56" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b56</field>
+        <field name="area_id" ref="area_8195"/>
+    </record>
+    <!-- فرع الرجم (8194) -->
+    <record id="mapping_area_b57" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b57</field>
+        <field name="area_id" ref="area_8194"/>
+    </record>
+    <!-- فرع الطويلة (8193) -->
+    <record id="mapping_area_b58" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b58</field>
+        <field name="area_id" ref="area_8193"/>
+    </record>
+    <!-- فرع شبام (8191) -->
+    <record id="mapping_area_b59" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b59</field>
+        <field name="area_id" ref="area_8191"/>
+    </record>
+    <!-- فرع الاهجر (8192) -->
+    <record id="mapping_area_b60" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b60</field>
+        <field name="area_id" ref="area_8192"/>
+    </record>
+    <!-- فرع شبام-المحويت (8396) -->
+    <record id="mapping_area_b61" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b61</field>
+        <field name="area_id" ref="area_8396"/>
+    </record>
+    <!-- فرع منطقة يريم (BR-REG-YAR) -->
+    <record id="mapping_area_b62" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b62</field>
+        <field name="area_id" ref="area_region_yarim"/>
+    </record>
+    <!-- فرع منطقة البيضاء (BR-REG-BAY) -->
+    <record id="mapping_area_b63" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b63</field>
+        <field name="area_id" ref="area_region_bayda"/>
+    </record>
+    <!-- فرع منطقة الجوف (BR-REG-JAW) -->
+    <record id="mapping_area_b64" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">b64</field>
+        <field name="area_id" ref="area_region_jawf"/>
+    </record>
+
+</odoo>

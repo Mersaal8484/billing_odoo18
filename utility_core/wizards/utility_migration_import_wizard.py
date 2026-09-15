@@ -312,17 +312,21 @@ class UtilityMigrationImportWizard(models.TransientModel):
                 if not any(self._has_cell_value(v) for v in row):
                     continue
                 raise self._error('MISSING_FEEDER_IDENTITY', row_number, 'feeder_code/legacy_analytic_id', identity)
-            dup_source_row = self._identity_guard(seen, identity, row_number)
+            feeder_name = str(self._cell(row, header_map, 'feeder_name') or identity).strip()
+            meter_number = str(self._cell(row, header_map, 'meter_number') or '').strip()
+            # يسمح بتكرار رمز الفيدر/الخلية على ألا يتكرر العداد والاسم لنفس الرمز معاً
+            guard_identity = (identity, meter_number, feeder_name)
+            dup_source_row = self._identity_guard(seen, guard_identity, row_number)
             is_dup = dup_source_row is not None
             values = {
-                'name': str(self._cell(row, header_map, 'feeder_name') or identity).strip(),
+                'name': feeder_name,
                 'feeder_code': code, 'legacy_analytic_id': analytic,
-                'feeder_name': str(self._cell(row, header_map, 'feeder_name') or identity).strip(),
+                'feeder_name': feeder_name,
                 'legacy_region': str(self._cell(row, header_map, 'legacy_region') or '').strip(),
                 'legacy_area': str(self._cell(row, header_map, 'legacy_area') or '').strip(),
                 'is_active': self.parse_bool(self._cell(row, header_map, 'is_active'), True, 'is_active', row_number),
                 'is_production_area': self.parse_bool(self._cell(row, header_map, 'is_production_area'), False, 'is_production_area', row_number),
-                'meter_number': str(self._cell(row, header_map, 'meter_number') or '').strip(),
+                'meter_number': meter_number,
                 'meter_multiplier': self._parse_multiplier(self._cell(row, header_map, 'meter_multiplier'), row_number, 'meter_multiplier'),
                 'is_calculation_cell': self.parse_bool(self._cell(row, header_map, 'is_calculation_cell'), True, 'is_calculation_cell', row_number),
                 'description': str(self._cell(row, header_map, 'description') or '').strip(),
@@ -331,7 +335,7 @@ class UtilityMigrationImportWizard(models.TransientModel):
                 'source_row_number': row_number,
             }
             if is_dup:
-                values['error_message'] = _('تكرار هوية في ملف الإكسل: الصف %s مكرر مع الصف %s (الهوية: %s)') % (row_number, dup_source_row, identity)
+                values['error_message'] = _('تكرار هوية في ملف الإكسل: الصف %s مكرر مع الصف %s (الرمز: %s، العداد: %s، الاسم: %s)') % (row_number, dup_source_row, identity, meter_number or '-', feeder_name)
             current = self.parse_reading(self._cell(row, header_map, 'current_reading'), 'current_reading', row_number)
             opening = self.parse_reading(self._cell(row, header_map, 'opening_reading'), 'opening_reading', row_number)
             if current is not None:
