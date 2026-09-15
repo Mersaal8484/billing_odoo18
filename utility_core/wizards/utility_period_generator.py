@@ -70,6 +70,8 @@ class UtilityPeriodGenerator(models.TransientModel):
             prev_month = month - 1
         _, prev_last_day = calendar.monthrange(prev_year, prev_month)
 
+        cadences = ['monthly', 'semi_monthly'] if self.billing_cadence == 'all' else [self.billing_cadence]
+
         for cadence in cadences:
             target_regions = DateRange._get_regions_for_billing_cadence(cadence)
             if not target_regions:
