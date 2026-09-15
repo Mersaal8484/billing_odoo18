@@ -276,148 +276,149 @@ class ResConfigSettings(models.TransientModel):
         """فحص وتوليد الإعدادات الافتراضية والحسابات والمنتجات وموديلات العدادات الناقصة للشركة."""
         self.ensure_one()
         company = self.company_id or self.env.company
+        product_obj = self.env['product.product']
+        journal_obj = self.env['account.journal']
+        account_obj = self.env['account.account']
+        model_obj = self.env['utility.meter.model']
+
+        # Helper to get or create product
+        def _get_or_create_product(field_name, name, xml_ref=None):
+            if getattr(company, field_name):
+                return getattr(company, field_name)
+            prod = False
+            if xml_ref:
+                rec = self.env.ref(xml_ref, raise_if_not_found=False)
+                if rec and (not getattr(rec, 'company_id', False) or rec.company_id == company):
+                    prod = rec
+            if not prod:
+                prod = product_obj.search([('name', '=', name)], limit=1)
+            if not prod:
+                prod = product_obj.create({
+                    'name': name,
+                    'type': 'service',
+                    'lst_price': 0.0,
+                })
+            setattr(company, field_name, prod)
+            return prod
+
+        # Helper to get or create journal
+        def _get_or_create_journal(field_name, default_code, name, jtype, xml_ref=None):
+            if getattr(company, field_name):
+                return getattr(company, field_name)
+            j = False
+            if xml_ref:
+                rec = self.env.ref(xml_ref, raise_if_not_found=False)
+                if rec and (not getattr(rec, 'company_id', False) or rec.company_id == company):
+                    j = rec
+            if not j:
+                j = journal_obj.search([
+                    ('code', '=', default_code),
+                    ('company_id', 'in', (company.id, False))
+                ], limit=1)
+            if not j:
+                j = journal_obj.search([
+                    ('type', '=', jtype),
+                    ('name', 'ilike', name),
+                    ('company_id', 'in', (company.id, False))
+                ], limit=1)
+            if not j:
+                j = journal_obj.search([
+                    ('type', '=', jtype),
+                    ('company_id', 'in', (company.id, False))
+                ], limit=1)
+            if not j:
+                code = default_code
+                suffix = 1
+                while journal_obj.search([('code', '=', code), ('company_id', 'in', (company.id, False))], limit=1):
+                    code = f"{default_code[:3]}{suffix}"
+                    suffix += 1
+                j = journal_obj.create({
+                    'name': name,
+                    'code': code,
+                    'type': jtype,
+                    'company_id': company.id,
+                })
+            setattr(company, field_name, j)
+            return j
+
+        # Helper to get or create account
+        def _get_or_create_account(field_name, default_code, name, acc_type, xml_ref=None, search_domain=None):
+            if getattr(company, field_name):
+                return getattr(company, field_name)
+            acc = False
+            if xml_ref:
+                rec = self.env.ref(xml_ref, raise_if_not_found=False)
+                if rec and (not getattr(rec, 'company_id', False) or rec.company_id == company):
+                    acc = rec
+            if not acc and search_domain:
+                acc = account_obj.search([
+                    ('company_id', 'in', (company.id, False)),
+                    ('deprecated', '=', False)
+                ] + search_domain, limit=1)
+            if not acc:
+                acc = account_obj.search([
+                    ('code', '=', default_code),
+                    ('company_id', 'in', (company.id, False)),
+                    ('deprecated', '=', False)
+                ], limit=1)
+            if not acc:
+                acc = account_obj.search([
+                    ('name', 'ilike', name),
+                    ('company_id', 'in', (company.id, False)),
+                    ('deprecated', '=', False)
+                ], limit=1)
+            if not acc and acc_type:
+                acc = account_obj.search([
+                    ('account_type', '=', acc_type),
+                    ('company_id', 'in', (company.id, False)),
+                    ('deprecated', '=', False)
+                ], limit=1)
+            if not acc:
+                code = default_code
+                suffix = 1
+                while account_obj.search([('code', '=', code), ('company_id', 'in', (company.id, False))], limit=1):
+                    code = f"{default_code[:5]}{suffix}"
+                    suffix += 1
+                acc = account_obj.create({
+                    'name': name,
+                    'code': code,
+                    'account_type': acc_type,
+                    'company_id': company.id,
+                })
+            setattr(company, field_name, acc)
+            return acc
 
         # 1. Products (المنتجات)
-        product_obj = self.env['product.product']
-
-        # طاقة الكهرباء الرئيسية
-        if not company.electricity_product_id:
-            prod = product_obj.search([('name', '=', 'طاقة الكهرباء الرئيسية')], limit=1)
-            if not prod:
-                prod = product_obj.create({
-                    'name': 'طاقة الكهرباء الرئيسية',
-                    'type': 'service',
-                    'lst_price': 0.0,
-                })
-            company.electricity_product_id = prod
-
-        # الخصم والإعفاءات
-        if not company.discount_product_id:
-            prod = product_obj.search([('name', '=', 'خصم وإعفاءات الكهرباء')], limit=1)
-            if not prod:
-                prod = product_obj.create({
-                    'name': 'خصم وإعفاءات الكهرباء',
-                    'type': 'service',
-                    'lst_price': 0.0,
-                })
-            company.discount_product_id = prod
-
-        # الغرامات
-        if not company.penalty_product_id:
-            prod = product_obj.search([('name', '=', 'غرامة تأخير / مخالفة')], limit=1)
-            if not prod:
-                prod = product_obj.create({
-                    'name': 'غرامة تأخير / مخالفة',
-                    'type': 'service',
-                    'lst_price': 0.0,
-                })
-            company.penalty_product_id = prod
-
-        # رسم المعلم
-        if not company.mu_allim_product_id:
-            prod = product_obj.search([('name', '=', 'رسم المعلم')], limit=1)
-            if not prod:
-                prod = product_obj.create({
-                    'name': 'رسم المعلم',
-                    'type': 'service',
-                    'lst_price': 0.0,
-                })
-            company.mu_allim_product_id = prod
-
-        # رسم النظافة
-        if not company.cleaning_product_id:
-            prod = product_obj.search([('name', '=', 'رسم النظافة')], limit=1)
-            if not prod:
-                prod = product_obj.create({
-                    'name': 'رسم النظافة',
-                    'type': 'service',
-                    'lst_price': 0.0,
-                })
-            company.cleaning_product_id = prod
-
-        # رسم المجالس المحلية
-        if not company.local_fee_product_id:
-            prod = product_obj.search([('name', '=', 'رسم المجالس المحلية')], limit=1)
-            if not prod:
-                prod = product_obj.create({
-                    'name': 'رسم المجالس المحلية',
-                    'type': 'service',
-                    'lst_price': 0.0,
-                })
-            company.local_fee_product_id = prod
-
-        # رسم المحول الخاص
-        if not company.private_transformer_fee_product_id:
-            prod = product_obj.search([('name', '=', 'رسوم المحول الخاص')], limit=1)
-            if not prod:
-                prod = product_obj.create({
-                    'name': 'رسوم المحول الخاص',
-                    'type': 'service',
-                    'lst_price': 0.0,
-                })
-            company.private_transformer_fee_product_id = prod
+        _get_or_create_product('electricity_product_id', 'طاقة الكهرباء الرئيسية', 'utility_core.utility_product_consumption')
+        _get_or_create_product('discount_product_id', 'خصم وإعفاءات الكهرباء', 'utility_core.utility_product_discount')
+        _get_or_create_product('penalty_product_id', 'غرامة تأخير / مخالفة', 'utility_core.utility_product_penalty')
+        _get_or_create_product('mu_allim_product_id', 'رسم المعلم', 'utility_core.utility_product_mu_allim')
+        _get_or_create_product('cleaning_product_id', 'رسم النظافة', 'utility_core.utility_product_cleaning')
+        _get_or_create_product('local_fee_product_id', 'رسم المجالس المحلية', 'utility_core.utility_product_municipality')
+        _get_or_create_product('private_transformer_fee_product_id', 'رسوم المحول الخاص', 'utility_core.utility_product_private_transformer_fee')
 
         # 2. Journals (اليوميات)
-        journal_obj = self.env['account.journal']
-        if not company.sales_journal_id:
-            sale_j = journal_obj.search([('type', '=', 'sale'), ('company_id', '=', company.id)], limit=1)
-            if sale_j:
-                company.sales_journal_id = sale_j
-
-        if not company.collection_journal_id:
-            bank_or_cash = journal_obj.search([('type', 'in', ('bank', 'cash')), ('company_id', '=', company.id)], limit=1)
-            if bank_or_cash:
-                company.collection_journal_id = bank_or_cash
-
-        if not company.writeoff_journal_id:
-            gen_j = journal_obj.search([('type', '=', 'general'), ('company_id', '=', company.id)], limit=1)
-            if gen_j:
-                company.writeoff_journal_id = gen_j
-
-        if not company.deposit_journal_id:
-            bank_j = journal_obj.search([('type', '=', 'bank'), ('company_id', '=', company.id)], limit=1) or journal_obj.search([('type', '=', 'general'), ('company_id', '=', company.id)], limit=1)
-            if bank_j:
-                company.deposit_journal_id = bank_j
-
-        if not company.settlement_journal_id:
-            gen_j = journal_obj.search([('type', '=', 'general'), ('company_id', '=', company.id)], limit=1)
-            if gen_j:
-                company.settlement_journal_id = gen_j
+        _get_or_create_journal('sales_journal_id', 'UBILL', 'يومية مبيعات الكهرباء (فواتير المشتركين)', 'sale', 'utility_core.journal_utility_sales')
+        _get_or_create_journal('collection_journal_id', 'CSH1', 'يومية التحصيل الافتراضية', 'cash')
+        _get_or_create_journal('opening_journal_id', 'UOPEN', 'يومية الأرصدة الافتتاحية', 'general', 'utility_core.journal_opening_balance')
+        _get_or_create_journal('writeoff_journal_id', 'WRT', 'يومية الإعفاءات والتسويات', 'general')
+        _get_or_create_journal('deposit_journal_id', 'DEP', 'يومية التأمينات والودائع', 'general')
+        _get_or_create_journal('settlement_journal_id', 'SETTL', 'يومية التسويات المالية', 'general')
 
         # 3. Accounts (الحسابات)
-        account_obj = self.env['account.account']
-        if not company.electricity_income_account_id:
-            inc_acc = account_obj.search([('account_type', '=', 'income'), ('company_id', '=', company.id)], limit=1)
-            if inc_acc:
-                company.electricity_income_account_id = inc_acc
-
-        if not company.fine_account_id:
-            fine_acc = account_obj.search([('account_type', '=', 'income'), ('company_id', '=', company.id)], limit=1)
-            if fine_acc:
-                company.fine_account_id = fine_acc
-
-        if not company.discount_account_id:
-            disc_acc = account_obj.search([('account_type', 'in', ('expense', 'income')), ('company_id', '=', company.id)], limit=1)
-            if disc_acc:
-                company.discount_account_id = disc_acc
-
-        if not company.deposit_account_id:
-            dep_acc = account_obj.search([('account_type', 'ilike', 'liability'), ('company_id', '=', company.id)], limit=1)
-            if dep_acc:
-                company.deposit_account_id = dep_acc
-
-        if not company.settlement_account_id:
-            settle_acc = account_obj.search([('company_id', '=', company.id)], limit=1)
-            if settle_acc:
-                company.settlement_account_id = settle_acc
-
-        if not company.writeoff_account_id:
-            writeoff_acc = account_obj.search([('account_type', '=', 'expense'), ('company_id', '=', company.id)], limit=1)
-            if writeoff_acc:
-                company.writeoff_account_id = writeoff_acc
+        _get_or_create_account('electricity_income_account_id', '400099', 'إيرادات مبيعات استهلاك الكهرباء', 'income', 'utility_core.account_income_electricity')
+        _get_or_create_account('fine_account_id', '410001', 'إيرادات الغرامات', 'income', 'utility_core.demo_account_fine')
+        _get_or_create_account('discount_account_id', '490099', 'خصومات وإعفاءات استهلاك الكهرباء', 'income', 'utility_core.account_discount_utility', search_domain=[('account_type', 'in', ('expense', 'income'))])
+        _get_or_create_account('deposit_account_id', '210001', 'حساب التأمينات والودائع', 'liability_current', 'utility_core.demo_account_deposit', search_domain=[('account_type', 'ilike', 'liability')])
+        _get_or_create_account('settlement_account_id', '410002', 'حساب التسويات المالية', 'income_other', 'utility_core.demo_account_settlement')
+        _get_or_create_account('writeoff_account_id', '420002', 'حساب الإعفاءات والديون المعدومة', 'expense', search_domain=[('account_type', '=', 'expense')])
+        _get_or_create_account('opening_clearing_account_id', '999999', 'حساب مقابلة الأرصدة الافتتاحية', 'equity', search_domain=[
+            '|', ('code', 'in', ('999999', '300000', '399999')),
+            '|', ('name', 'ilike', 'افتتاح'),
+            ('account_type', '=', 'equity')
+        ])
 
         # 4. Legacy Meter Models (موديلات العدادات)
-        model_obj = self.env['utility.meter.model']
         if not company.legacy_single_phase_meter_model_id:
             m1 = model_obj.search([('phase', '=', 'single')], limit=1)
             if not m1:
@@ -437,6 +438,24 @@ class ResConfigSettings(models.TransientModel):
                     'phase': 'three',
                 })
             company.legacy_three_phase_meter_model_id = m3
+
+        # 5. Sync populated values back to current in-memory settings view
+        fields_to_sync = [
+            'electricity_product_id', 'discount_product_id', 'penalty_product_id',
+            'mu_allim_product_id', 'cleaning_product_id', 'local_fee_product_id',
+            'private_transformer_fee_product_id',
+            'sales_journal_id', 'collection_journal_id', 'opening_journal_id',
+            'writeoff_journal_id', 'deposit_journal_id', 'settlement_journal_id',
+            'electricity_income_account_id', 'fine_account_id', 'discount_account_id',
+            'deposit_account_id', 'settlement_account_id', 'writeoff_account_id',
+            'opening_clearing_account_id',
+            'legacy_single_phase_meter_model_id', 'legacy_three_phase_meter_model_id',
+        ]
+        for fname in fields_to_sync:
+            if hasattr(self, fname) and hasattr(company, fname):
+                val = getattr(company, fname)
+                if val:
+                    self[fname] = val
 
         return {
             'type': 'ir.actions.client',

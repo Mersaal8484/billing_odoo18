@@ -358,7 +358,8 @@ class UtilityMigrationCustomer(models.Model):
             partner.sudo().with_company(company_id).write({'property_account_receivable_id': account_receivable.id})
 
         account_suspense = (
-            company.account_journal_suspense_account_id
+            company.opening_clearing_account_id
+            or company.account_journal_suspense_account_id
             or self.env['account.account'].search([
                 ('account_type', 'in', ('equity', 'equity_unaffected')),
                 ('company_id', '=', company_id)

@@ -165,6 +165,8 @@ class TestUtilityInfrastructureSettings(TransactionCase):
         # Clear settings to simulate empty company
         company.electricity_product_id = False
         company.discount_product_id = False
+        company.opening_journal_id = False
+        company.opening_clearing_account_id = False
         company.legacy_single_phase_meter_model_id = False
         company.legacy_three_phase_meter_model_id = False
 
@@ -175,6 +177,11 @@ class TestUtilityInfrastructureSettings(TransactionCase):
         self.assertEqual(res['tag'], 'display_notification')
         self.assertTrue(company.electricity_product_id)
         self.assertTrue(company.discount_product_id)
+        self.assertTrue(company.opening_journal_id)
+        self.assertEqual(company.opening_journal_id.type, 'general')
+        self.assertTrue(company.opening_clearing_account_id)
+        self.assertEqual(settings.opening_journal_id, company.opening_journal_id)
+        self.assertEqual(settings.opening_clearing_account_id, company.opening_clearing_account_id)
         self.assertTrue(company.legacy_single_phase_meter_model_id)
         self.assertTrue(company.legacy_three_phase_meter_model_id)
         self.assertEqual(company.legacy_single_phase_meter_model_id.phase, 'single')

@@ -120,6 +120,16 @@ class ResCompany(models.Model):
                 j_open = self.env.ref('utility_core.journal_opening_balance', raise_if_not_found=False)
                 if is_compat(j_open):
                     vals['opening_journal_id'] = j_open.id
+            if not company.opening_clearing_account_id:
+                acc_open = self.env['account.account'].search([
+                    ('company_id', 'in', (company.id, False)),
+                    ('deprecated', '=', False),
+                    '|', ('code', 'in', ('999999', '300000', '399999')),
+                    '|', ('name', 'ilike', 'افتتاح'),
+                    ('account_type', '=', 'equity')
+                ], limit=1)
+                if acc_open:
+                    vals['opening_clearing_account_id'] = acc_open.id
             if not company.sales_journal_id:
                 j_sale = self.env.ref('utility_core.journal_utility_sales', raise_if_not_found=False)
                 if is_compat(j_sale):
