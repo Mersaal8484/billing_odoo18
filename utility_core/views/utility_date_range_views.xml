@@ -135,50 +135,44 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <!-- === الدورة الموحدة: أزرار القراءة === -->
+                    <!-- مرحلة التخطيط: فتح الدورة ومزامنة المناطق فقط -->
                     <button name="action_open_period" type="object" string="فتح الدورة للعمليات" class="oe_highlight"
                             attrs="{'invisible': [('state', '!=', 'planned')]}"/>
-
-                    <!-- أزرار القراءة -->
-                    <button name="action_start_closing" type="object" string="بدء إغلاق القراءة" class="btn-warning"
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('reading_state', 'not in', ('open',))]}"/>
-                    <button name="action_close_reading" type="object" string="إغلاق القراءة" class="btn-danger"
-                            confirm="هل أنت متأكد من إغلاق القراءة؟ التحصيل سيبقى مفتوحاً."
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('reading_state', 'not in', ('open', 'closing'))]}"/>
-                    <button name="action_open_reading" type="object" string="إعادة فتح القراءة" class="btn-outline-warning"
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('reading_state', 'not in', ('closing', 'closed'))]}"/>
-
-                    <!-- أزرار التحصيل -->
-                    <button name="action_reconcile_collection" type="object" string="مطابقة التحصيل" class="btn-success"
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('collection_state', 'not in', ('open', 'closing'))]}"/>
-                    <button name="action_open_payment" type="object" string="إعادة فتح التحصيل" class="btn-outline-success"
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('collection_state', 'not in', ('closing', 'reconciled'))]}"/>
-
-                    <!-- التوافق العكسي: أزرار فترات payment التاريخية -->
-                    <button name="action_reconcile_payment" type="object" string="مطابقة التحصيل (تاريخي)" class="btn-success"
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'payment'), ('state', 'not in', ('open', 'closing', 'closed'))]}"/>
-                    <button name="action_close_payment" type="object" string="إغلاق التحصيل (تاريخي)" class="btn-danger"
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'payment'), ('state', 'not in', ('open',))]}"/>
-
-                    <!-- إقفال تاريخي ومعالج التعديل -->
-                    <button name="action_lock_period" type="object" string="إقفال تاريخي" class="btn-outline-dark"
-                            attrs="{'invisible': [('state', 'not in', ('closed', 'reconciled'))]}"/>
-                    <button name="%(action_utility_period_adjust_wizard)d" type="action"
-                            string="تعديل / تمديد الفترة" class="btn-secondary"
-                            context="{'default_period_id': active_id}"
-                            attrs="{'invisible': [('state', '=', 'locked')]}"/>
                     <button name="action_sync_regions_by_cadence" type="object"
-                            string="مزامنة المناطق حسب الدورية"
-                            class="btn-outline-info"
-                            icon="fa-refresh"
+                            string="مزامنة المناطق" class="btn-secondary" icon="fa-refresh"
                             attrs="{'invisible': [('state', '!=', 'planned')]}"
                             confirm="سيتم تحديث المناطق المشتركة في هذه الفترة بناءً على دوريتها. هل تريد المتابعة؟"/>
 
-                    <!-- شريط الحالة: دورة موحدة (reading) -->
+                    <!-- مرحلة العمليات: إغلاق القراءة ومطابقة التحصيل بعد الفتح -->
+                    <button name="action_close_reading" type="object" string="إغلاق القراءة" class="btn-danger"
+                            confirm="هل أنت متأكد من إغلاق القراءة؟ التحصيل سيبقى مفتوحاً."
+                            attrs="{'invisible': ['|', '|', ('period_role', '!=', 'reading'), ('state', 'not in', ('open', 'closing')), ('reading_state', 'not in', ('open', 'closing'))]}"/>
+                    <button name="action_open_reading" type="object" string="إعادة فتح القراءة" class="btn-outline-warning"
+                            attrs="{'invisible': ['|', '|', ('period_role', '!=', 'reading'), ('state', 'not in', ('open', 'closing')), ('reading_state', '!=', 'closed')]}"/>
+
+                    <button name="action_reconcile_collection" type="object" string="مطابقة التحصيل" class="btn-success"
+                            attrs="{'invisible': ['|', '|', ('period_role', '!=', 'reading'), ('state', 'not in', ('open', 'closing')), ('collection_state', 'not in', ('open', 'closing'))]}"/>
+                    <button name="action_open_payment" type="object" string="إعادة فتح التحصيل" class="btn-outline-success"
+                            attrs="{'invisible': ['|', '|', ('period_role', '!=', 'reading'), ('state', 'not in', ('open', 'closing', 'closed')), ('collection_state', '!=', 'reconciled')]}"/>
+
+                    <!-- التوافق العكسي: أزرار فترات payment التاريخية -->
+                    <button name="action_reconcile_payment" type="object" string="مطابقة التحصيل (تاريخي)" class="btn-success"
+                            attrs="{'invisible': ['|', ('period_role', '!=', 'payment'), ('state', 'not in', ('open', 'closing'))]}"/>
+                    <button name="action_close_payment" type="object" string="إغلاق التحصيل (تاريخي)" class="btn-danger"
+                            attrs="{'invisible': ['|', ('period_role', '!=', 'payment'), ('state', '!=', 'open')]}"/>
+
+                    <!-- مرحلة الإقفال النهائي -->
+                    <button name="action_lock_period" type="object" string="إقفال تاريخي نهائي" class="btn-outline-dark"
+                            attrs="{'invisible': [('state', 'not in', ('closed', 'reconciled'))]}"/>
+                    <button name="%(action_utility_period_adjust_wizard)d" type="action"
+                            string="تعديل / تمديد" class="btn-secondary"
+                            context="{'default_period_id': active_id}"
+                            attrs="{'invisible': [('state', 'in', ('planned', 'locked'))]}"/>
+
+                    <!-- شريط الحالة الرئيسي -->
                     <field name="state" widget="statusbar"
                            statusbar_visible="planned,open,closing,closed,locked"
                            attrs="{'invisible': [('period_role', '!=', 'reading')]}"/>
-                    <!-- شريط الحالة: فترة تحصيل تاريخية (payment) -->
                     <field name="state" widget="statusbar"
                            statusbar_visible="planned,open,closing,reconciled,locked"
                            attrs="{'invisible': [('period_role', '=', 'reading')]}"/>
@@ -186,6 +180,9 @@
 
                 <sheet>
                     <field name="company_id" invisible="1"/>
+                    <field name="period_role" invisible="1"/>
+
+                    <!-- أزرار الإحصائيات العلوية (Smart Buttons) -->
                     <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" icon="fa-tachometer">
                             <div class="o_field_widget o_stat_info">
@@ -213,137 +210,50 @@
                         </button>
                     </div>
 
+                    <!-- العنوان الرئيسي النظيف -->
                     <div class="oe_title">
-                        <label for="period_code" string="رمز الفترة الفريد"/>
-                        <h1><field name="period_code" placeholder="مثال: READ-SEMI-2026-08-H1"/></h1>
-                        <label for="name" string="اسم الفترة الوصفي"/>
-                        <h2><field name="name" placeholder="مثال: النصف الأول أغسطس 2026 (قراءة ومراجعة)"/></h2>
-                    </div>
-
-                    <!-- 2-Column Card Layout -->
-                    <div class="row">
-                        <div class="col-12 col-lg-6">
-                            <div class="card o_settings_card mb-3">
-                                <div class="card-header">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fa fa-tag fa-2x text-primary me-3" title="الدورة والنوع"/>
-                                        <div>
-                                            <h4 class="mb-0">نوع والدورية والتصنيف</h4>
-                                            <small class="text-muted">تحديد الدور ورمز الدورة والدورية الرئيسية</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="cycle_key" class="o_light_label"/>
-                                        <field name="cycle_key" placeholder="مثال: SEMI-2026-08-H1"/>
-                                    </div>
-                                    <div class="mb-3" attrs="{'invisible': [('period_role', '=', 'reading')]}">
-                                        <label for="period_role" class="o_light_label"/>
-                                        <field name="period_role" readonly="1"/>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="billing_cadence" class="o_light_label"/>
-                                        <field name="billing_cadence"
-                                               attrs="{'readonly': [('period_role', '=', 'payment')]}"/>
-                                        <small class="text-muted"
-                                               attrs="{'invisible': [('period_role', '!=', 'payment')]}"
-                                        >مشتقة من فترة القراءة المرتبطة</small>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="type_id" class="o_light_label"/>
-                                        <field name="type_id" options="{'no_create': True}"/>
-                                    </div>
-                                    <div class="mb-3" attrs="{'invisible': [('period_role', '!=', 'payment')]}">
-                                        <label for="reading_period_id" class="o_light_label"/>
-                                        <field name="reading_period_id" domain="[('period_role', '=', 'reading'), ('billing_cadence', '=', billing_cadence)]" options="{'no_create': True}"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-lg-6">
-                            <div class="card o_settings_card mb-3">
-                                <div class="card-header">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fa fa-calendar fa-2x text-success me-3" title="التواريخ والنوافذ"/>
-                                        <div>
-                                            <h4 class="mb-0">نطاقات القراءة والدفع</h4>
-                                            <small class="text-muted">نطاق القراءة (date_start/end) ونطاق الدفع (payment_start/end)</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <!-- نطاق القراءة -->
-                                    <div class="row mb-2">
-                                        <div class="col-12"><small class="text-muted fw-bold"><i class="fa fa-book"/> نطاق القراءة والفوترة</small></div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-6 mb-3">
-                                            <label for="date_start" class="o_light_label"/>
-                                            <field name="date_start"/>
-                                        </div>
-                                        <div class="col-6 mb-3">
-                                            <label for="date_end" class="o_light_label"/>
-                                            <field name="date_end"/>
-                                        </div>
-                                    </div>
-                                    <div class="row" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
-                                        <div class="col-6 mb-3">
-                                            <label for="consumption_start" class="o_light_label"/>
-                                            <field name="consumption_start"/>
-                                        </div>
-                                        <div class="col-6 mb-3">
-                                            <label for="consumption_end" class="o_light_label"/>
-                                            <field name="consumption_end"/>
-                                        </div>
-                                    </div>
-                                    <!-- نطاق الدفع (الدورة الموحدة) -->
-                                    <div class="row mb-2" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
-                                        <div class="col-12"><small class="text-muted fw-bold"><i class="fa fa-money"/> نطاق الدفع والتحصيل</small></div>
-                                    </div>
-                                    <div class="row" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
-                                        <div class="col-6 mb-3">
-                                            <label for="payment_start" class="o_light_label"/>
-                                            <field name="payment_start"/>
-                                        </div>
-                                        <div class="col-6 mb-3">
-                                            <label for="payment_end" class="o_light_label"/>
-                                            <field name="payment_end"/>
-                                        </div>
-                                    </div>
-                                    <!-- نوافذ القراءة التفصيلية -->
-                                    <div class="row" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
-                                        <div class="col-6 mb-3">
-                                            <label for="reading_window_start" class="o_light_label"/>
-                                            <field name="reading_window_start"/>
-                                        </div>
-                                        <div class="col-6 mb-3">
-                                            <label for="reading_window_end" class="o_light_label"/>
-                                            <field name="reading_window_end"/>
-                                        </div>
-                                    </div>
-                                    <!-- نوافذ التحصيل التاريخية -->
-                                    <div class="row" attrs="{'invisible': [('period_role', '!=', 'payment')]}">
-                                        <div class="col-6 mb-3">
-                                            <label for="payment_window_start" class="o_light_label"/>
-                                            <field name="payment_window_start"/>
-                                        </div>
-                                        <div class="col-6 mb-3">
-                                            <label for="payment_window_end" class="o_light_label"/>
-                                            <field name="payment_window_end"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <label for="name" class="oe_edit_only" string="اسم الدورة"/>
+                        <h1>
+                            <field name="name" placeholder="مثال: دورة النصف الأول أغسطس 2026"/>
+                        </h1>
+                        <div class="o_row">
+                            <span class="text-muted fw-bold">رمز الدورة:</span>
+                            <field name="cycle_key" placeholder="مثال: SEMI-2026-08-H1" class="oe_inline me-3"/>
+                            <span class="text-muted fw-bold">رمز الفترة:</span>
+                            <field name="period_code" placeholder="مثال: CYCLE-SEMI-2026-08-H1" class="oe_inline"/>
                         </div>
                     </div>
 
+                    <!-- الجسم الأساسي: مجموعات Odoo الأصلية الواضحة والمنظمة -->
+                    <group>
+                        <group string="بيانات الدورة والتهيئة">
+                            <field name="billing_cadence"/>
+                            <field name="type_id" options="{'no_create': True}"/>
+                            <field name="reading_period_id" attrs="{'invisible': [('period_role', '!=', 'payment')]}" options="{'no_create': True}"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                        <group string="النطاقات الزمنية للتشغيل">
+                            <label for="date_start" string="نطاق القراءة"/>
+                            <div class="o_row">
+                                <field name="date_start" widget="daterange" options="{'related_end_date': 'date_end'}" class="oe_inline"/>
+                                <span class="o_form_label mx-2">إلى</span>
+                                <field name="date_end" class="oe_inline"/>
+                            </div>
+                            <label for="payment_start" string="نطاق الدفع"/>
+                            <div class="o_row">
+                                <field name="payment_start" widget="daterange" options="{'related_end_date': 'payment_end'}" class="oe_inline"/>
+                                <span class="o_form_label mx-2">إلى</span>
+                                <field name="payment_end" class="oe_inline"/>
+                            </div>
+                        </group>
+                    </group>
+
+                    <!-- التبويبات المنظمة -->
                     <notebook>
-                        <!-- === تبويب القراءة (للدورات الموحدة) === -->
-                        <page string="حالة القراءة" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
+                        <!-- التبويب 1: متابعة العمليات والإحصائيات -->
+                        <page string="متابعة العمليات والإحصائيات" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
                             <group>
-                                <group string="نطاق القراءة">
+                                <group string="عمليات القراءة والفوترة">
                                     <field name="reading_state" widget="badge"
                                            decoration-success="reading_state == 'open'"
                                            decoration-info="reading_state == 'closing'"
@@ -351,23 +261,13 @@
                                            decoration-muted="reading_state == 'locked'"/>
                                     <field name="reading_closed_at" readonly="1"
                                            attrs="{'invisible': [('reading_closed_at', '=', False)]}"/>
+                                    <separator string="مؤشرات القراءات"/>
+                                    <field name="approved_readings" string="قراءات معتمدة"/>
+                                    <field name="pending_review" string="قيد المراجعة"/>
+                                    <field name="rejected_readings" string="قراءات مرفوضة"/>
+                                    <field name="missing_readings" string="قراءات مفقودة"/>
                                 </group>
-                                <group string="إحصائيات القراءة">
-                                    <field name="received_readings"/>
-                                    <field name="pending_review"/>
-                                    <field name="approved_readings"/>
-                                    <field name="rejected_readings"/>
-                                    <field name="missing_readings"/>
-                                </group>
-                            </group>
-                        </page>
-
-                        <!-- === تبويب التحصيل (للدورات الموحدة) === -->
-                        <page string="حالة التحصيل" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
-                            <group>
-                                <group string="نطاق الدفع">
-                                    <field name="payment_start"/>
-                                    <field name="payment_end"/>
+                                <group string="عمليات التحصيل والسداد">
                                     <field name="collection_state" widget="badge"
                                            decoration-success="collection_state == 'open'"
                                            decoration-info="collection_state == 'closing'"
@@ -375,27 +275,41 @@
                                            decoration-muted="collection_state == 'locked'"/>
                                     <field name="collection_reconciled_at" readonly="1"
                                            attrs="{'invisible': [('collection_reconciled_at', '=', False)]}"/>
-                                </group>
-                                <group string="إحصائيات التحصيل">
-                                    <field name="bills_generated"/>
-                                    <field name="billed_amount"/>
-                                    <field name="collected_in_window"/>
-                                    <field name="outstanding_amount"/>
-                                    <field name="collection_rate" widget="progressbar"/>
+                                    <separator string="مؤشرات التحصيل"/>
+                                    <field name="outstanding_amount" string="المبلغ المتبقي"/>
+                                    <field name="collection_rate" widget="progressbar" string="نسبة التحصيل"/>
                                 </group>
                             </group>
                         </page>
 
-                        <!-- === المناطق المشتركة === -->
-                        <page string="المناطق المشتركة">
-                            <field name="region_ids" widget="many2many_tags" options="{&#x27;no_create&#x27;: True}" readonly="1"/>
+                        <!-- التبويب 2: النوافذ التشغيلية التفصيلية -->
+                        <page string="النوافذ التشغيلية التفصيلية">
+                            <group>
+                                <group string="فترة الاستهلاك">
+                                    <field name="consumption_start"/>
+                                    <field name="consumption_end"/>
+                                </group>
+                                <group string="نافذة القراءة والرفع الميداني">
+                                    <field name="reading_window_start"/>
+                                    <field name="reading_window_end"/>
+                                </group>
+                                <group string="نافذة التحصيل بالساعة (دقيق)">
+                                    <field name="payment_window_start"/>
+                                    <field name="payment_window_end"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- التبويب 3: المناطق المشمولة -->
+                        <page string="المناطق المشمولة">
+                            <field name="region_ids" widget="many2many_tags" options="{'no_create': True}" readonly="1"/>
                             <div class="text-muted mt-2">
-                                <i class="fa fa-info-circle"/> المناطق snapshot مشتقة تلقائياً من الدورية، وتعديلها يدوياً غير مسموح.
+                                <i class="fa fa-info-circle"/> المناطق المشمولة تُشتق تلقائياً من دورية الفوترة المحددة.
                             </div>
                         </page>
 
-                        <!-- === فترات التحصيل التاريخية (للسجلات القديمة فقط) === -->
-                        <page string="فترات التحصيل المرتبطة (تاريخي)" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
+                        <!-- التبويب 4: فترات التحصيل التاريخية (للتوافق القديم فقط) -->
+                        <page string="فترات التحصيل المرتبطة (تاريخي)" attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('payment_period_ids', '=', [])]}">
                             <field name="payment_period_ids" readonly="1">
                                 <tree>
                                     <field name="period_code"/>
@@ -406,11 +320,9 @@
                                     <field name="collected_in_window"/>
                                 </tree>
                             </field>
-                            <div class="text-muted mt-2">
-                                <i class="fa fa-info-circle"/> هذه السجلات تاريخية. في الدورات الجديدة يُستخدم payment_start/end في نفس السجل.
-                            </div>
                         </page>
 
+                        <!-- التبويب 5: سجل التدقيق -->
                         <page string="سجل التدقيق والتغييرات">
                             <field name="log_ids" readonly="1">
                                 <tree>
