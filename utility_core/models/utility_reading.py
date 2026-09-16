@@ -807,8 +807,11 @@ class UtilityReading(models.Model):
             target_state = vals['state']
             has_transition_flag = bool(self.env.context.get('_reading_state_transition'))
 
+            # If all records already have the target state, allow idempotent write
+            if not any(r.state != target_state for r in self):
+                pass
             # Transition to 'approved' can ONLY occur through action_approve()
-            if target_state == 'approved':
+            elif target_state == 'approved':
                 if self.env.context.get('_internal_approval_action') is not _APPROVAL_ACTION_TOKEN:
                     raise ValidationError(_('لا يمكن اعتماد القراءة مباشرةً عبر تعديل الحالة. يجب استخدام زر وإجراء الاعتماد الرسمي (action_approve).'))
                 self._check_approval_access()
@@ -826,7 +829,7 @@ class UtilityReading(models.Model):
                             raise ValidationError(_('لا يمكن اعتماد قراءة باستهلاك سالب (%.2f). تحقق من صحة القراءة أو أنشئ تسوية.') % target_consumption)
             else:
                 transition_authorized = False
-                if has_transition_flag:
+                if has_transition_flag or has_bypass:
                     if is_su_or_admin or is_billing_mgr:
                         transition_authorized = True
                     elif is_supervisor or is_revenue_mgr:

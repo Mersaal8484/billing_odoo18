@@ -301,10 +301,11 @@ class UtilityMigrationTransformer(models.Model):
                             'state': 'billed',
                         }
 
+                        reading_ctx = {'_reading_state_transition': True, '_bypass_reading_protection': True}
                         if reading:
-                            reading.write(reading_vals)
+                            reading.with_context(**reading_ctx).write(reading_vals)
                         else:
-                            reading = self.env['utility.reading'].create(reading_vals)
+                            reading = self.env['utility.reading'].with_context(**reading_ctx).create(reading_vals)
 
                         rec.created_reading_id = reading.id
 
