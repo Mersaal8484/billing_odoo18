@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/providers.dart';
+import '../../../shared/widgets/info_row.dart';
 import '../../../shared/widgets/state_widgets.dart';
 import '../domain/entities.dart';
 
@@ -53,42 +54,60 @@ class CustomerDetailScreen extends ConsumerWidget {
                       Text(assignment.customer.address ?? '-',
                           style: Theme.of(context).textTheme.bodyMedium),
                       const Divider(height: 24),
-                      _InfoRow(
+                      InfoRow(
                           label: 'رقم المشترك',
-                          value: assignment.customer.customerNumber),
-                      _InfoRow(
+                          value: assignment.customer.customerNumber,
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          valueFontWeight: FontWeight.w700),
+                      InfoRow(
                           label: 'رقم الحساب',
-                          value: assignment.customer.accountNumber),
-                      _InfoRow(
+                          value: assignment.customer.accountNumber,
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          valueFontWeight: FontWeight.w700),
+                      InfoRow(
                           label: 'رقم العداد',
-                          value: assignment.meter.meterNumber),
-                      _InfoRow(
+                          value: assignment.meter.meterNumber,
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          valueFontWeight: FontWeight.w700),
+                      InfoRow(
                           label: 'الرقم التسلسلي',
-                          value: assignment.meter.serialNumber ?? '-'),
-                      _InfoRow(
+                          value: assignment.meter.serialNumber ?? '-',
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          valueFontWeight: FontWeight.w700),
+                      InfoRow(
                           label: 'نوع العداد',
-                          value: assignment.meter.meterType ?? '-'),
-                      _InfoRow(
+                          value: assignment.meter.meterType ?? '-',
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          valueFontWeight: FontWeight.w700),
+                      InfoRow(
                           label: 'حالة الاتصال',
                           value:
                               assignment.meter.connectionStatus == 'connected'
                                   ? 'متصل'
-                                  : 'مقطوع'),
-                      _InfoRow(
+                                  : 'مقطوع',
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          valueFontWeight: FontWeight.w700),
+                      InfoRow(
                           label: 'المنطقة',
                           value:
-                              '${assignment.customer.regionName} · ${assignment.customer.areaName}'),
-                      _InfoRow(
+                              '${assignment.customer.regionName} · ${assignment.customer.areaName}',
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          valueFontWeight: FontWeight.w700),
+                      InfoRow(
                         label: 'آخر قراءة',
                         value: assignment.customer.lastReadingValue != null
                             ? '${assignment.customer.lastReadingValue!.toStringAsFixed(0)} kWh'
                             : '-',
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        valueFontWeight: FontWeight.w700,
                       ),
-                      _InfoRow(
+                      InfoRow(
                         label: 'تاريخ آخر قراءة',
                         value: assignment.customer.lastReadingDate != null
                             ? _date(assignment.customer.lastReadingDate!)
                             : '-',
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        valueFontWeight: FontWeight.w700,
                       ),
                     ],
                   ),
@@ -116,7 +135,8 @@ class CustomerDetailScreen extends ConsumerWidget {
                   child: ListTile(
                     leading: Icon(Icons.lock_outline),
                     title: Text('القراءة مكتملة ولا يمكن إدخال قراءة أخرى'),
-                    subtitle: Text('تُفتح القراءة فقط عند إعادتها من المراجعة للتصحيح.'),
+                    subtitle: Text(
+                        'تُفتح القراءة فقط عند إعادتها من المراجعة للتصحيح.'),
                   ),
                 )
               else
@@ -127,7 +147,8 @@ class CustomerDetailScreen extends ConsumerWidget {
                   label: Text(assignment.status == AssignmentStatus.rejected
                       ? 'إعادة إدخال القراءة'
                       : 'إدخال قراءة جديدة'),
-                  onPressed: () => context.push('/readings/new/${assignment.id}'),
+                  onPressed: () =>
+                      context.push('/readings/new/${assignment.id}'),
                 ),
             ],
           );
@@ -166,32 +187,6 @@ class CustomerDetailScreen extends ConsumerWidget {
         AssignmentStatus.escalated => Colors.deepPurple,
         AssignmentStatus.skipped => Colors.grey,
       };
-}
-
-class _InfoRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _InfoRow({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label,
-              style: TextStyle(color: Theme.of(context).colorScheme.outline)),
-          Flexible(
-            child: Text(value,
-                textAlign: TextAlign.end,
-                style: const TextStyle(fontWeight: FontWeight.w700)),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _HistoryTile extends StatelessWidget {

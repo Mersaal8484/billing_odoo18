@@ -12,6 +12,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/network/odoo_api_client.dart';
+import '../../../shared/widgets/state_widgets.dart';
 import '../../customers/data/mock_assignment_repository.dart';
 import '../../customers/domain/entities.dart';
 import '../domain/reading.dart';
@@ -345,7 +346,7 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
       body: _loadingMeter
           ? const Center(child: CircularProgressIndicator())
           : _loadError != null
-              ? _ErrorState(
+              ? ErrorState(
                   message: _loadError!, onRetry: _loadAssignmentAndMeter)
               : _buildForm(scheme),
     );
@@ -946,34 +947,6 @@ class _OverlayPainter extends CustomPainter {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // خطأ
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _ErrorState extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-  const _ErrorState({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.error_outline, size: 48, color: Colors.red),
-          const SizedBox(height: 12),
-          Text(message),
-          const SizedBox(height: 16),
-          FilledButton(
-              onPressed: onRetry,
-              child: const Text('إعادة المحاولة')),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// بيانات العداد من Odoo
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _MeterInfo {

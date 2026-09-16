@@ -231,7 +231,7 @@ class _AssignmentTile extends StatelessWidget {
       child: ListTile(
         onTap: () => context.push('/customers/${assignment.id}'),
         leading: CircleAvatar(
-          backgroundColor: status.color.withOpacity(0.14),
+          backgroundColor: status.color.withValues(alpha: 0.14),
           child: Icon(status.icon, color: status.color),
         ),
         title: Text(assignment.customer.name,
@@ -255,27 +255,19 @@ class _AssignmentTile extends StatelessWidget {
     );
   }
 
-  _StatusInfo _statusInfo(BuildContext context, AssignmentStatus status) =>
+  StatusVisual _statusInfo(BuildContext context, AssignmentStatus status) =>
       switch (status) {
         AssignmentStatus.pending =>
-          const _StatusInfo('متبقي', Icons.speed_rounded, Colors.orange),
+          const StatusVisual('متبقي', Icons.speed_rounded, Colors.orange),
         AssignmentStatus.pendingDecision =>
-          const _StatusInfo('قرار', Icons.rule_rounded, Colors.blue),
-        AssignmentStatus.read => _StatusInfo('مكتمل', Icons.check_rounded,
+          const StatusVisual('قرار', Icons.rule_rounded, Colors.blue),
+        AssignmentStatus.read => StatusVisual('مكتمل', Icons.check_rounded,
             Theme.of(context).colorScheme.primary),
-        AssignmentStatus.rejected => _StatusInfo(
+        AssignmentStatus.rejected => StatusVisual(
             'مرفوض', Icons.close_rounded, Theme.of(context).colorScheme.error),
         AssignmentStatus.escalated =>
-          const _StatusInfo('مصعد', Icons.build_outlined, Colors.deepPurple),
+          const StatusVisual('مصعد', Icons.build_outlined, Colors.deepPurple),
         AssignmentStatus.skipped =>
-          const _StatusInfo('متجاوز', Icons.skip_next_rounded, Colors.grey),
+          const StatusVisual('متجاوز', Icons.skip_next_rounded, Colors.grey),
       };
-}
-
-class _StatusInfo {
-  final String label;
-  final IconData icon;
-  final Color color;
-
-  const _StatusInfo(this.label, this.icon, this.color);
 }

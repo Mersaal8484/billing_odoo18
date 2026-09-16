@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
+import '../../../shared/widgets/metric_card.dart';
 
 class CollectionHistoryScreen extends ConsumerWidget {
   const CollectionHistoryScreen({super.key});
@@ -20,19 +21,26 @@ class CollectionHistoryScreen extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                  child: _MetricCard(
+                  child: MetricCard(
                       label: 'الإجمالي',
                       value:
-                          '${summary.collectedAmount.toStringAsFixed(0)} ﷼')),
+                          '${summary.collectedAmount.toStringAsFixed(0)} ﷼',
+                      valueStyle:
+                          const TextStyle(fontWeight: FontWeight.w800))),
               const SizedBox(width: 8),
               Expanded(
-                  child: _MetricCard(
-                      label: 'العمليات', value: '${summary.operationCount}')),
+                  child: MetricCard(
+                      label: 'العمليات',
+                      value: '${summary.operationCount}',
+                      valueStyle:
+                          const TextStyle(fontWeight: FontWeight.w800))),
               const SizedBox(width: 8),
               Expanded(
-                  child: _MetricCard(
+                  child: MetricCard(
                       label: 'حسابات معلقة',
-                      value: '${summary.pendingAccounts}')),
+                      value: '${summary.pendingAccounts}',
+                      valueStyle:
+                          const TextStyle(fontWeight: FontWeight.w800))),
             ],
           ),
           const SizedBox(height: 16),
@@ -69,25 +77,3 @@ class CollectionHistoryScreen extends ConsumerWidget {
   }
 }
 
-class _MetricCard extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _MetricCard({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            Text(label, style: Theme.of(context).textTheme.bodySmall),
-            const SizedBox(height: 4),
-            Text(value, style: const TextStyle(fontWeight: FontWeight.w800)),
-          ],
-        ),
-      ),
-    );
-  }
-}

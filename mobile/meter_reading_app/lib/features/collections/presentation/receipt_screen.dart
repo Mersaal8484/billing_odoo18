@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../app/providers.dart';
+import '../../../shared/widgets/info_row.dart';
 import '../domain/collection_models.dart';
 
 /// شاشة السند — تعرض تفاصيل العملية وتدعم الطباعة الحرارية
@@ -14,8 +15,7 @@ class ReceiptScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
-    final dateStr =
-        DateFormat('yyyy-MM-dd HH:mm:ss').format(receipt.paidAt);
+    final dateStr = DateFormat('yyyy-MM-dd HH:mm:ss').format(receipt.paidAt);
 
     return Scaffold(
       appBar: AppBar(
@@ -33,7 +33,7 @@ class ReceiptScreen extends ConsumerWidget {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.green.withOpacity(0.15),
+                color: Colors.green.withValues(alpha: 0.15),
               ),
               child: const Icon(Icons.check_circle_outline,
                   size: 52, color: Colors.green),
@@ -42,8 +42,7 @@ class ReceiptScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           const Center(
             child: Text('تم التحصيل بنجاح',
-                style: TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 4),
           Center(
@@ -55,29 +54,38 @@ class ReceiptScreen extends ConsumerWidget {
           // تفاصيل السند
           _ReceiptCard(
             children: [
-              _ReceiptRow(
+              InfoRow(
                   label: 'رقم السند',
                   value: receipt.displayName.isNotEmpty
                       ? receipt.displayName
                       : receipt.reference,
-                  isBold: true),
-              _ReceiptRow(
-                  label: 'المشترك', value: receipt.account.customer.name),
-              _ReceiptRow(
+                  labelFontSize: 13,
+                  valueFontWeight: FontWeight.bold,
+                  valueFontSize: 15),
+              InfoRow(
+                  label: 'المشترك',
+                  value: receipt.account.customer.name,
+                  labelFontSize: 13),
+              InfoRow(
                   label: 'رقم الحساب',
-                  value: receipt.account.customer.accountNumber),
-              _ReceiptRow(
+                  value: receipt.account.customer.accountNumber,
+                  labelFontSize: 13),
+              InfoRow(
                   label: 'رقم العداد',
-                  value: receipt.account.meter.meterNumber),
-              _ReceiptRow(
+                  value: receipt.account.meter.meterNumber,
+                  labelFontSize: 13),
+              InfoRow(
                   label: 'المبلغ المحصّل',
                   value: '${receipt.amount.toStringAsFixed(0)} ﷼',
-                  isBold: true,
-                  valueColor: Colors.green),
-              _ReceiptRow(
+                  labelFontSize: 13,
+                  valueFontWeight: FontWeight.bold,
+                  valueColor: Colors.green,
+                  valueFontSize: 15),
+              InfoRow(
                   label: 'طريقة الدفع',
-                  value: _methodLabel(receipt.method)),
-              _ReceiptRow(label: 'التاريخ', value: dateStr),
+                  value: _methodLabel(receipt.method),
+                  labelFontSize: 13),
+              InfoRow(label: 'التاريخ', value: dateStr, labelFontSize: 13),
             ],
           ),
           const SizedBox(height: 24),
@@ -97,8 +105,8 @@ class ReceiptScreen extends ConsumerWidget {
             onPressed: () => context.go('/collector'),
             icon: const Icon(Icons.home_outlined),
             label: const Text('العودة للقائمة'),
-            style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(48)),
+            style:
+                FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
           ),
           const SizedBox(height: 32),
         ],
@@ -153,50 +161,11 @@ class _ReceiptCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          children: children
-              .expand((w) => [w, const Divider(height: 16)])
-              .toList()
-            ..removeLast(),
+          children:
+              children.expand((w) => [w, const Divider(height: 16)]).toList()
+                ..removeLast(),
         ),
       ),
-    );
-  }
-}
-
-class _ReceiptRow extends StatelessWidget {
-  final String label;
-  final String value;
-  final bool isBold;
-  final Color? valueColor;
-
-  const _ReceiptRow({
-    required this.label,
-    required this.value,
-    this.isBold = false,
-    this.valueColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label,
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.outline,
-                fontSize: 13)),
-        Flexible(
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            style: TextStyle(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: valueColor,
-              fontSize: isBold ? 15 : 13,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
