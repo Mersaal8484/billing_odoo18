@@ -120,7 +120,7 @@ class UtilityRegion(models.Model):
                 raise ValidationError(_('يمكن ربط المحول بكيان جغرافي من نوع Zone فقط.'))
             if transformer.company_id != region.company_id:
                 raise ValidationError(_('شركة المحول المرتبط يجب أن تطابق شركة الـZone.'))
-            if transformer.zone_region_id != region:
+            if transformer.zone_region_id and transformer.zone_region_id != region:
                 raise ValidationError(
                     _('يجب أن يشير المحول المرتبط إلى الـZone نفسه لضمان العلاقة واحد-لواحد.')
                 )

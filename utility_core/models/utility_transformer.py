@@ -241,15 +241,22 @@ class UtilityTransformer(models.Model):
             if not rec.zone_region_id:
                 parent_id = passed_parents[idx]
                 parent_region = self.env['utility.region'].browse(parent_id) if parent_id else False
-                zone = self.env['utility.region'].create({
+                recurring_type = parent_region.recurring_rule_type if parent_region and parent_region.recurring_rule_type else False
+                if not recurring_type and parent_region:
+                    root = parent_region
+                    while root.parent_id:
+                        root = root.parent_id
+                    recurring_type = root.recurring_rule_type
+                zone_vals = {
                     'name': rec.name,
                     'code': rec.code,
                     'type': 'zone',
                     'parent_id': parent_id if parent_id else False,
                     'company_id': rec.company_id.id,
-                    'transformer_origin_id': rec.id,
-                    'recurring_rule_type': parent_region.recurring_rule_type if parent_region else False,
-                })
+                }
+                if recurring_type:
+                    zone_vals['recurring_rule_type'] = recurring_type
+                zone = self.env['utility.region'].create(zone_vals)
                 rec.zone_region_id = zone.id
             rec.zone_region_id.write({'transformer_origin_id': rec.id})
         return records
