@@ -45,6 +45,42 @@ class TestGeographicRouteAndNetwork(TransactionCase):
         with self.assertRaises(ValidationError):
             other_zone.write({'private_transformer_id': transformer.id})
 
+    def test_general_transformer_requires_region_and_area_under_region(self):
+        """المحول العام يجب أن يكون مربوطًا بمنطقة وفرع تابع لها؛ الخاص مستثنى."""
+        region = self.Region.create({'name': 'منطقة إلزامية', 'code': 'REQ-R', 'type': 'region'})
+        area = self.Region.create({'name': 'فرع إلزامي', 'code': 'REQ-A', 'type': 'area', 'parent_id': region.id})
+        other_area = self.Region.create({'name': 'فرع تابع لمنطقة أخرى', 'code': 'REQ-A2', 'type': 'area'})
+
+        with self.assertRaises(ValidationError):
+            self.Transformer.create({'name': 'محول بدون ربط جغرافي', 'code': 'REQ-T1'})
+        with self.assertRaises(ValidationError):
+            self.Transformer.create({
+                'name': 'محول بدون فرع', 'code': 'REQ-T2', 'region_id': region.id,
+            })
+        with self.assertRaises(ValidationError):
+            self.Transformer.create({
+                'name': 'فرع خارج المنطقة', 'code': 'REQ-T3',
+                'region_id': region.id, 'area_id': other_area.id,
+            })
+
+        private = self.Transformer.create({
+            'name': 'محول خاص معفى', 'code': 'REQ-PRV1', 'is_private': True,
+        })
+        self.assertTrue(private.is_private)
+
+        valid = self.Transformer.create({
+            'name': 'محول سليم', 'code': 'REQ-T4',
+            'region_id': region.id, 'area_id': area.id,
+        })
+        self.assertEqual(valid.region_id, region)
+        self.assertEqual(valid.area_id, area)
+        self.assertTrue(valid.zone_region_id)
+        self.assertEqual(valid.zone_region_id.parent_id, area)
+        self.assertEqual(valid.zone_region_id.parent_id.parent_id, region)
+
+        with self.assertRaises(ValidationError):
+            valid.write({'zone_region_id': False})
+
     def test_transformer_and_zone_have_a_bidirectional_one_to_one_link(self):
         region = self.Region.create({'name': 'منطقة 1:1', 'code': 'ONE-R', 'type': 'region'})
         area = self.Region.create({'name': 'فرع 1:1', 'code': 'ONE-A', 'type': 'area', 'parent_id': region.id})

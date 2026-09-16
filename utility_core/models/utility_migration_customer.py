@@ -24,6 +24,9 @@ class UtilityMigrationCustomer(models.Model):
     meter_number = fields.Char('رقم العداد')
     last_reading = fields.Float('اخر قراءة مسجلة', digits=(12, 3))
     has_last_reading = fields.Boolean('تم إدخال آخر قراءة مسجلة')
+    current_reading = fields.Float('القراءة الحالية للعداد', digits=(12, 3))
+    has_current_reading = fields.Boolean('تم إدخال القراءة الحالية')
+    last_reading_date = fields.Date('تاريخ آخر قراءة')
 
     char_code = fields.Char('رقم الحرف')
     subscriber_no = fields.Char('الرقم الجديد')
@@ -36,12 +39,17 @@ class UtilityMigrationCustomer(models.Model):
     legacy_category = fields.Char('رمز الفئة')
     legacy_subscriber_type = fields.Char('رمز نوع المشترك')
     legacy_contract = fields.Char('رمز قالب العقد')
+    legacy_transformer_code = fields.Char('رمز المحول')
 
     region_id = fields.Many2one('utility.region', string='المنطقة (Odoo)', domain="[('type', '=', 'region')]")
     area_id = fields.Many2one('utility.region', string='الفرع (Odoo)', domain="[('type', '=', 'area')]")
     category_id = fields.Many2one('utility.subscriber.category', string='الفئة (Odoo)')
     subscriber_type_id = fields.Many2one('utility.subscriber', string='نوع المشترك (Odoo)')
     contract_template_id = fields.Many2one('utility.contract.template', string="قالب العقد (النظام)")
+    transformer_id = fields.Many2one(
+        'utility.transformer', string='المحول (Odoo)',
+        help='المحول المرتبط بالعميل عبر رمز المحول؛ يجب أن يكون مرفوعاً مسبقاً في شاشة المحولات.')
+    route_id = fields.Many2one('utility.route', string='المسار (Odoo)')
 
     phase = fields.Selection([
         ('single', '1 Phase'),
@@ -81,6 +89,8 @@ class UtilityMigrationCustomer(models.Model):
         for vals in vals_list:
             if 'last_reading' in vals and vals['last_reading'] is not False and vals['last_reading'] is not None:
                 vals['has_last_reading'] = True
+            if 'current_reading' in vals and vals['current_reading'] is not False and vals['current_reading'] is not None:
+                vals['has_current_reading'] = True
             if 'opening_reading' in vals and vals['opening_reading'] is not False and vals['opening_reading'] is not None:
                 vals['has_opening_reading'] = True
         return super().create(vals_list)
@@ -88,6 +98,8 @@ class UtilityMigrationCustomer(models.Model):
     def write(self, vals):
         if 'last_reading' in vals and vals['last_reading'] is not False and vals['last_reading'] is not None:
             vals['has_last_reading'] = True
+        if 'current_reading' in vals and vals['current_reading'] is not False and vals['current_reading'] is not None:
+            vals['has_current_reading'] = True
         if 'opening_reading' in vals and vals['opening_reading'] is not False and vals['opening_reading'] is not None:
             vals['has_opening_reading'] = True
         return super().write(vals)
@@ -200,6 +212,18 @@ class UtilityMigrationCustomer(models.Model):
                     rec.contract_template_id = val.id
                 else:
                     missing.append(f"MISSING_CONTRACT_MAPPING: لم يتم العثور على ترميز قالب العقد ({rec.legacy_contract})")
+
+            if rec.legacy_transformer_code:
+                transformers = self.env['utility.transformer'].search([
+                    ('company_id', '=', company_id),
+                    ('code', '=', rec.legacy_transformer_code.strip()),
+                ])
+                if len(transformers) > 1:
+                    raise ValidationError(_('AMBIGUOUS_TRANSFORMER_IDENTITY: تعددت المحولات بنفس الرمز (%s) داخل الشركة.') % rec.legacy_transformer_code)
+                if transformers:
+                    rec.transformer_id = transformers[0].id
+                else:
+                    missing.append(f"MISSING_TRANSFORMER_CODE: لم يتم العثور على محول بالرمز ({rec.legacy_transformer_code})؛ يجب رفع بيانات المحول قبل ربط العميل به.")
 
             if missing:
                 has_missing = True
@@ -541,8 +565,29 @@ class UtilityMigrationCustomer(models.Model):
 
         company_id = self.company_id.id or self.env.company.id
 
-        # 0. Private Transformer
-        transformer = self._get_or_create_private_transformer(partner)
+        # 0. Transformer resolution:
+        #    - عند إدخال رمز المحول يجب أن يكون المحول مرفوعاً مسبقاً؛ يُربط العميل
+        #      بالمسار التابع للمحول (يُنشأ المسار الافتراضي تلقائياً عند عدم وجوده).
+        #    - عند تفعيل خيار المحول الخاص دون رمز يُنشأ محول خاص تلقائياً (PRV-...).
+        transformer = False
+        if self.legacy_transformer_code:
+            transformer = self.transformer_id
+            if not transformer:
+                transformers = self.env['utility.transformer'].search([
+                    ('company_id', '=', company_id),
+                    ('code', '=', self.legacy_transformer_code.strip()),
+                ])
+                if len(transformers) > 1:
+                    raise ValidationError(_('AMBIGUOUS_TRANSFORMER_IDENTITY: تعددت المحولات بنفس الرمز (%s) داخل الشركة.') % self.legacy_transformer_code)
+                transformer = transformers[:1]
+            if not transformer:
+                raise ValidationError(_(
+                    'MISSING_TRANSFORMER_CODE: لم يتم العثور على محول بالرمز (%s) للعميل %s. '
+                    'يجب رفع بيانات المحول أولاً قبل ربط العميل به.'
+                ) % (self.legacy_transformer_code, self.customer_number))
+            self.transformer_id = transformer.id
+        elif self.is_private_transformer:
+            transformer = self._get_or_create_private_transformer(partner)
 
         # 1. Create or update utility.customer (Check created_customer_id first)
         customer = self.created_customer_id
@@ -560,14 +605,15 @@ class UtilityMigrationCustomer(models.Model):
             'partner_id': partner.id,
             'category_id': self.category_id.id,
             'subscriber_id': self.subscriber_type_id.id,
-            'state': 'draft',
             'contract_template_id': self.contract_template_id.id,
             'company_id': company_id,
         }
         if transformer:
             customer_vals['transformer_id'] = transformer.id
-            if transformer.feeder_id:
-                customer_vals['cell_id'] = transformer.feeder_id.id
+            if self.legacy_transformer_code:
+                route = transformer._get_or_create_default_route()
+                customer_vals['route_id'] = route.id
+                self.route_id = route.id
 
         if customer:
             if customer.partner_id != partner:
@@ -578,6 +624,7 @@ class UtilityMigrationCustomer(models.Model):
                 allow_utility_account_partner_change=True,
             ).write(customer_vals)
         else:
+            customer_vals['state'] = 'draft'
             customer = self.env['utility.customer'].with_context(skip_opening_entry=True).create(customer_vals)
 
         self.created_customer_id = customer.id
@@ -619,7 +666,11 @@ class UtilityMigrationCustomer(models.Model):
         self.created_meter_id = meter.id
         customer.with_context(lifecycle_operation=True).write({'meter_id': meter.id})
 
-        if transformer and meter:
+        # عداد المشترك ليس عداد ربط المحول؛ لا يُسجَّل كعداد ربط إلا إذا كان
+        # عداد محول مرتبطًا بهذا المحول فعلاً (مطابقة قاعدة _check_network_chain_consistency).
+        if (transformer and meter
+                and meter.connection_type == 'transformer'
+                and meter.linked_transformer_id == transformer):
             transformer.write({'coupling_meter_id': meter.id})
 
         # 3. Create opening reading (Zero reading is VALID!)
@@ -651,8 +702,19 @@ class UtilityMigrationCustomer(models.Model):
 
             self.created_reading_id = existing_reading.id
 
+        # 3.5 Apply the migrated current reading / last reading date onto the meter and account.
+        if self.has_current_reading:
+            current_value = float(self.current_reading)
+            meter.write({'last_reading_value': current_value})
+            customer.write({'last_reading_value': current_value})
+        if self.last_reading_date:
+            last_reading_dt = fields.Datetime.to_datetime(self.last_reading_date)
+            meter.write({'last_read_date': last_reading_dt})
+            customer.write({'last_reading_date': last_reading_dt})
+
         # 4. Create opening balance journal entry
-        customer.action_activate()
+        if customer.state == 'draft':
+            customer.action_activate()
         self._create_opening_balance_entry(account_partner, customer)
 
     # -------------------------------------------------------------------------

@@ -8,15 +8,30 @@ class TestTransformerLossHistoricalSnapshot(common.TransactionCase):
         super().setUpClass()
         # Setup basic data
         cls.company = cls.env.user.company_id
-        
+
+        # Geography (Region -> Area) required for general transformers
+        cls.loss_region = cls.env['utility.region'].create({
+            'name': 'منطقة الفقد', 'code': 'LOSS-REG',
+            'type': 'region', 'company_id': cls.company.id,
+        })
+        cls.loss_area = cls.env['utility.region'].create({
+            'name': 'فرع الفقد', 'code': 'LOSS-AREA',
+            'type': 'area', 'parent_id': cls.loss_region.id,
+            'company_id': cls.company.id,
+        })
+
         # Transformers
         cls.transformer_A = cls.env['utility.transformer'].create({
             'name': 'Transformer A',
-            'code': 'TR-A-001'
+            'code': 'TR-A-001',
+            'region_id': cls.loss_region.id,
+            'area_id': cls.loss_area.id,
         })
         cls.transformer_B = cls.env['utility.transformer'].create({
             'name': 'Transformer B',
-            'code': 'TR-B-001'
+            'code': 'TR-B-001',
+            'region_id': cls.loss_region.id,
+            'area_id': cls.loss_area.id,
         })
 
         # Customer and Meter linked to Transformer A initially

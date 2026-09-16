@@ -132,6 +132,35 @@ class UtilityTransformer(models.Model):
             if meter and (meter.connection_type != 'transformer' or meter.linked_transformer_id != transformer):
                 raise ValidationError(_('عداد الربط يجب أن يكون عداد محول مرتبطًا بهذا المحول نفسه.'))
 
+    def _check_general_transformer_geography(self):
+        """فرض ربط المحول العام (غير الخاص) بمنطقة وفرع تابع لها؛ المحول الخاص مستثنى."""
+        for transformer in self.filtered(lambda rec: not rec.is_private):
+            region = transformer.region_id
+            area = transformer.area_id
+            if not region:
+                raise ValidationError(
+                    _('يجب ربط المحول "%s" بمنطقة (Region).') % transformer.display_name
+                )
+            if region.type != 'region':
+                raise ValidationError(
+                    _('الرابط الجغرافي للمحول "%s" يجب أن يكون منطقة (Region) صحيحة.')
+                    % transformer.display_name
+                )
+            if not area:
+                raise ValidationError(
+                    _('يجب ربط المحول "%s" بفرع (Area) تابع للمنطقة.') % transformer.display_name
+                )
+            if area.type != 'area':
+                raise ValidationError(
+                    _('يجب ربط المحول "%s" بفرع (Area) تابع للمنطقة، وليس منطقة أو منطقة تفصيلية.')
+                    % transformer.display_name
+                )
+            if area.parent_id != region:
+                raise ValidationError(
+                    _('الفرع "%s" المرتبط بالمحول "%s" لا يتبع المنطقة "%s".')
+                    % (area.display_name, transformer.display_name, region.display_name)
+                )
+
     # ===== Compute =====
     @api.depends('route_ids')
     def _compute_route_count(self):
@@ -146,6 +175,22 @@ class UtilityTransformer(models.Model):
             rec.customer_count = len(customers)
 
     # ===== Actions =====
+    def _get_or_create_default_route(self):
+        """إرجاع المسار الافتراضي للمحول مع إنشائه عند غيابه (مسار واحد لكل محول)."""
+        self.ensure_one()
+        route = self.env['utility.route'].search([
+            ('company_id', '=', self.company_id.id),
+            ('transformer_id', '=', self.id),
+        ], limit=1)
+        if route:
+            return route
+        return self.env['utility.route'].create({
+            'name': _('مسار - %s') % self.name,
+            'code': self.code,
+            'company_id': self.company_id.id,
+            'transformer_id': self.id,
+        })
+
     def action_view_customers(self):
         self.ensure_one()
         return {
@@ -259,6 +304,7 @@ class UtilityTransformer(models.Model):
                 zone = self.env['utility.region'].create(zone_vals)
                 rec.zone_region_id = zone.id
             rec.zone_region_id.write({'transformer_origin_id': rec.id})
+        records._check_general_transformer_geography()
         return records
 
     def write(self, vals):
@@ -296,6 +342,7 @@ class UtilityTransformer(models.Model):
                         zone_vals['parent_id'] = parent.id if parent else False
                     if zone_vals:
                         rec.zone_region_id.write(zone_vals)
+        self._check_general_transformer_geography()
         return res
 
     def unlink(self):

@@ -102,9 +102,9 @@
                                         <field name="transformer_name"/>
                                         <field name="is_active"/>
                                         <field name="legacy_region"/>
-                                        <field name="region_id"/>
+                                        <field name="region_id" required="1"/>
                                         <field name="legacy_area"/>
-                                        <field name="area_id"/>
+                                        <field name="area_id" required="1"/>
                                         <field name="cell_meter_number"/>
                                         <field name="cell_meter_multiplier"/>
                                         <field name="feeder_id"/>

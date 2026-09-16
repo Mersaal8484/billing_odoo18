@@ -27,6 +27,12 @@ class TestUtilityReadingReview(TransactionCase):
             'code': 'REV-REG-01',
             'type': 'region',
         })
+        self.test_area = self.Region.create({
+            'name': 'فرع اختبار المراجعة',
+            'code': 'REV-AREA-01',
+            'type': 'area',
+            'parent_id': self.test_region.id,
+        })
 
         self.test_category = self.Category.create({
             'name': 'فئة اختبار المراجعة',
@@ -296,6 +302,7 @@ class TestUtilityReadingReview(TransactionCase):
 
         trans_pub = self.env['utility.transformer'].create({
             'name': 'محول عام شبكي', 'code': 'TR-PUB-01', 'is_private': False,
+            'region_id': self.test_region.id, 'area_id': self.test_area.id,
         })
         meter_trans = self.Meter.create({
             'meter_number': 'MTR-TR-01', 'linked_transformer_id': trans_pub.id,
@@ -314,6 +321,7 @@ class TestUtilityReadingReview(TransactionCase):
             'name': 'محول عام لاختبار الطابور',
             'code': 'TR-QUEUE-NB',
             'is_private': False,
+            'region_id': self.test_region.id, 'area_id': self.test_area.id,
         })
         meter = self.Meter.create({
             'meter_number': 'MTR-QUEUE-NB',
@@ -388,6 +396,7 @@ class TestUtilityReadingReview(TransactionCase):
         """8. Non-billable network reading visible in Network review queue."""
         trans_pub = self.env['utility.transformer'].create({
             'name': 'محول عام شبكي 2', 'code': 'TR-PUB-02', 'is_private': False,
+            'region_id': self.test_region.id, 'area_id': self.test_area.id,
         })
         meter_net = self.Meter.create({
             'meter_number': 'MTR-NET-01', 'linked_transformer_id': trans_pub.id,
@@ -482,6 +491,18 @@ class TestUtilityReadingReview(TransactionCase):
             'code': 'REP-B',
             'type': 'region',
         })
+        area_a = self.Region.create({
+            'name': 'فرع استبدال A',
+            'code': 'REP-AREA-A',
+            'type': 'area',
+            'parent_id': region_a.id,
+        })
+        area_b = self.Region.create({
+            'name': 'فرع استبدال B',
+            'code': 'REP-AREA-B',
+            'type': 'area',
+            'parent_id': region_b.id,
+        })
         customer_a = self._create_customer_for_region('REP-A', region_a)
         customer_b = self._create_customer_for_region('REP-B', region_b)
         feeder_a = self.env['utility.feeder'].create({
@@ -498,11 +519,13 @@ class TestUtilityReadingReview(TransactionCase):
             'name': 'محول استبدال A',
             'code': 'TR-REP-A',
             'region_id': region_a.id,
+            'area_id': area_a.id,
         })
         transformer_b = self.env['utility.transformer'].create({
             'name': 'محول استبدال B',
             'code': 'TR-REP-B',
             'region_id': region_b.id,
+            'area_id': area_b.id,
         })
         self.Replacement.create([
             {
@@ -612,6 +635,7 @@ class TestUtilityReadingReview(TransactionCase):
 
         trans_pub = self.env['utility.transformer'].create({
             'name': 'محول عام 4', 'code': 'TR-PUB-04', 'is_private': False,
+            'region_id': self.test_region.id, 'area_id': self.test_area.id,
         })
         meter_net = self.Meter.create({
             'meter_number': 'MTR-NET-03', 'linked_transformer_id': trans_pub.id,
@@ -1001,6 +1025,7 @@ class TestUtilityReadingReview(TransactionCase):
             'name': 'محول اختبار المراجعة',
             'code': 'TR-REV-01',
             'is_private': False,
+            'region_id': self.test_region.id, 'area_id': self.test_area.id,
         })
         net_meter = self.Meter.create({
             'meter_number': 'MTR-NET-TR-01',

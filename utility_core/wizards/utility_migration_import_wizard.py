@@ -17,7 +17,7 @@ class UtilityMigrationImportWizard(models.TransientModel):
     _name = 'utility.migration.import.wizard'
     _description = 'معالج استيراد بيانات التهيئة والميجريشن'
 
-    TEMPLATE_VERSIONS = {'customer': 4, 'feeder': 3, 'transformer': 3}
+    TEMPLATE_VERSIONS = {'customer': 6, 'feeder': 3, 'transformer': 3}
     CONTRACTS = {
         'customer': {
             'required': ('name', 'customer_number', 'meter_number'),
@@ -25,9 +25,11 @@ class UtilityMigrationImportWizard(models.TransientModel):
                 'name', 'mobile', 'national_id', 'customer_number',
                 'subscriber_no', 'char_code', 'is_active', 'legacy_region',
                 'legacy_area', 'legacy_category', 'legacy_subscriber_type',
-                'legacy_contract', 'meter_number', 'meter_reading',
-                'opening_reading', 'previous_balance', 'current_balance',
-                'phase', 'is_private_transformer', 'owner_reference',
+                'legacy_contract', 'legacy_transformer_code', 'meter_number',
+                'meter_reading', 'opening_reading', 'current_reading',
+                'last_reading_date', 'previous_balance',
+                'current_balance', 'phase', 'is_private_transformer',
+                'owner_reference',
             ),
         },
         'feeder': {
@@ -63,9 +65,11 @@ class UtilityMigrationImportWizard(models.TransientModel):
         'legacy_category': ('legacy_category', 'رمز الفئة'),
         'legacy_subscriber_type': ('legacy_subscriber_type', 'رمز نوع المشترك'),
         'legacy_contract': ('legacy_contract', 'رمز قالب العقد', 'رمز قالب العقد *'),
+        'legacy_transformer_code': ('legacy_transformer_code', 'رمز المحول المرتبط'),
         'meter_number': ('meter_number', 'رقم العداد', 'رقم العداد *', 'رقم عداد رصد المحول', 'رقم العداد (عداد الفيدر)'),
         'meter_reading': ('meter_reading', 'قراءة العداد في النظام', 'قراءة العداد في النظام القديم'),
         'opening_reading': ('opening_reading', 'قراءة الافتتاح', 'قراءة بداية الاشتراك', 'قراءة عند تفعيل العقد', 'القراءة عند تفعيل العقد'),
+        'last_reading_date': ('last_reading_date', 'تاريخ آخر قراءة'),
         'previous_balance': ('previous_balance', 'الرصيد السابق قبل (الخط الساخن)', 'الرصيد السابق (الخط الساخن)'),
         'current_balance': ('current_balance', 'الرصيد الحالي (الافتتاحي)'),
         'phase': ('phase', 'نوع الفاز', 'نوع الفاز (single/three)', 'الطور'),
@@ -144,6 +148,17 @@ class UtilityMigrationImportWizard(models.TransientModel):
         if not result.is_integer():
             raise self._error('INVALID_INTEGER_VALUE', row or '?', field_name, value)
         return int(result)
+
+    def parse_date(self, value, field_name='date', row=None):
+        if not self._has_cell_value(value):
+            return None
+        try:
+            result = fields.Date.to_date(value)
+        except (ValueError, TypeError, AttributeError):
+            raise self._error('INVALID_DATE_VALUE', row or '?', field_name, value)
+        if not result:
+            raise self._error('INVALID_DATE_VALUE', row or '?', field_name, value)
+        return result
 
     def parse_bool(self, value, default=True, field_name='boolean', row=None):
         if not self._has_cell_value(value):
@@ -276,6 +291,7 @@ class UtilityMigrationImportWizard(models.TransientModel):
                 'current_balance': self.parse_float(self._cell(row, header_map, 'current_balance'), 'current_balance', row_number) or 0.0,
                 'phase': self.parse_phase(self._cell(row, header_map, 'phase'), row_number),
                 'is_private_transformer': self.parse_bool(self._cell(row, header_map, 'is_private_transformer'), False, 'is_private_transformer', row_number),
+                'legacy_transformer_code': str(self._cell(row, header_map, 'legacy_transformer_code') or '').strip(),
                 'owner_reference': str(self._cell(row, header_map, 'owner_reference') or '').strip(),
                 'company_id': company_id,
                 'state': 'error' if is_dup else 'draft',
@@ -288,6 +304,14 @@ class UtilityMigrationImportWizard(models.TransientModel):
             canonical_reading = opening_reading if opening_reading is not None else meter_reading
             if canonical_reading is not None:
                 values.update(last_reading=canonical_reading, opening_reading=canonical_reading)
+            current_reading = self.parse_reading(
+                self._cell(row, header_map, 'current_reading'), 'current_reading', row_number)
+            if current_reading is not None:
+                values['current_reading'] = current_reading
+            last_reading_date = self.parse_date(
+                self._cell(row, header_map, 'last_reading_date'), 'last_reading_date', row_number)
+            if last_reading_date:
+                values['last_reading_date'] = last_reading_date
             if is_dup:
                 record = model.create(values)
             else:

@@ -37,9 +37,14 @@
                 <field name="mobile"/>
                 <field name="region_id"/>
                 <field name="area_id"/>
+                <field name="legacy_transformer_code"/>
+                <field name="transformer_id"/>
+                <field name="route_id"/>
                 <field name="is_active"/>
                 <field name="current_balance"/>
                 <field name="meter_reading"/>
+                <field name="current_reading"/>
+                <field name="last_reading_date"/>
                 <field name="phase"/>
                 <field name="last_batch_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
@@ -134,9 +139,16 @@
                             <field name="region_id" attrs="{'readonly': True}"/>
                             <field name="legacy_area"/>
                             <field name="area_id" attrs="{'readonly': True}"/>
+                            <field name="legacy_transformer_code"/>
+                            <field name="transformer_id" attrs="{'readonly': True}"/>
+                            <field name="route_id" attrs="{'readonly': True}"/>
                             <field name="meter_number"
                                    attrs="{'invisible': [('is_active', '=', False)]}"/>
                             <field name="last_reading"
+                                   attrs="{'invisible': [('is_active', '=', False)]}"/>
+                            <field name="current_reading"
+                                   attrs="{'invisible': [('is_active', '=', False)]}"/>
+                            <field name="last_reading_date"
                                    attrs="{'invisible': [('is_active', '=', False)]}"/>
                             <field name="meter_reading"
                                    attrs="{'invisible': [('is_active', '=', False)]}"/>
@@ -189,6 +201,10 @@
                 <field name="name"/>
                 <field name="mobile"/>
                 <field name="national_id"/>
+                <field name="legacy_transformer_code"/>
+                <field name="transformer_id"/>
+                <field name="route_id"/>
+                <field name="last_reading_date"/>
                 <field name="last_batch_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <filter string="العملاء الفعالين"    name="filter_active"   domain="[('is_active', '=', True)]"/>
@@ -205,6 +221,8 @@
                     <filter string="الحالة"  name="group_by_state"  context="{'group_by': 'state'}"/>
                     <filter string="الدفعة الأخيرة" name="group_by_batch" context="{'group_by': 'last_batch_id'}"/>
                     <filter string="المنطقة" name="group_by_region" context="{'group_by': 'region_id'}"/>
+                    <filter string="المحول" name="group_by_transformer" context="{'group_by': 'transformer_id'}"/>
+                    <filter string="المسار" name="group_by_route" context="{'group_by': 'route_id'}"/>
                     <filter string="هل فعال؟" name="group_by_active" context="{'group_by': 'is_active'}"/>
                     <filter string="الشركة" name="group_by_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
                 </group>

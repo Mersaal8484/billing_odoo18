@@ -157,6 +157,9 @@ class UtilityMeterTransformerWizard(models.TransientModel):
     ], string='الطور')
     serial_number = fields.Char('الرقم التسلسلي')
     feeder_id = fields.Many2one('utility.feeder', 'الفيدر / الخلية')
+    region_id = fields.Many2one('utility.region', 'المنطقة', domain="[('type', '=', 'region')]")
+    area_id = fields.Many2one('utility.region', 'الفرع',
+                              domain="[('type', '=', 'area'), ('parent_id', '=', region_id)]")
 
     def action_create(self):
         self.ensure_one()
@@ -171,6 +174,8 @@ class UtilityMeterTransformerWizard(models.TransientModel):
             'phase': self.phase or False,
             'serial_number': self.serial_number or False,
             'is_private': False,
+            'region_id': self.region_id.id or False,
+            'area_id': self.area_id.id or False,
         })
         meter.write({
             'connection_type': 'transformer',

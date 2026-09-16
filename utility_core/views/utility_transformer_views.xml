@@ -71,8 +71,12 @@
                         </group>
                         <group string="الموقع الجغرافي">
                             <field name="zone_region_id" readonly="1"/>
-                            <field name="area_id" readonly="1"/>
-                            <field name="region_id" readonly="1"/>
+                            <field name="is_private" invisible="1"/>
+                            <field name="region_id" options="{'no_create': True}"
+                                   attrs="{'readonly': [('is_private', '=', True)], 'required': [('is_private', '=', False)]}"/>
+                            <field name="area_id" options="{'no_create': True}"
+                                   domain="[('type', '=', 'area'), ('parent_id', '=', region_id)]"
+                                   attrs="{'readonly': [('is_private', '=', True)], 'required': [('is_private', '=', False)]}"/>
                             <field name="address"/>
                         </group>
                     </group>

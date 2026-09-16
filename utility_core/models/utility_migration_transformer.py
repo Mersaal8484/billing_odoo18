@@ -175,6 +175,15 @@ class UtilityMigrationTransformer(models.Model):
                 if feeder:
                     rec.feeder_id = feeder.id
 
+            if not rec.region_id:
+                missing.append("MISSING_REGION_MAPPING: المحول العام يلزم ربطه بمنطقة (Region).")
+            if not rec.area_id:
+                missing.append("MISSING_AREA_MAPPING: المحول العام يلزم ربطه بفرع (Area).")
+            elif rec.region_id and rec.area_id.parent_id != rec.region_id:
+                missing.append(
+                    f"AREA_NOT_IN_REGION: الفرع ({rec.area_id.display_name}) لا يتبع المنطقة ({rec.region_id.display_name})."
+                )
+
             if missing:
                 has_missing = True
                 err = "\n".join(missing)
@@ -239,6 +248,10 @@ class UtilityMigrationTransformer(models.Model):
                         transformer = self.env['utility.transformer'].create(trans_vals)
 
                     rec.created_transformer_id = transformer.id
+
+                    # 1.5 Ensure a default route (مسار افتراضي) for every general transformer
+                    if transformer and not transformer.is_private:
+                        transformer._get_or_create_default_route()
 
                     # 2. Search or create meter as a Coupling Meter (Company-Scoped)
                     meter_num = (rec.meter_number or code).strip()

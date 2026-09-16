@@ -1,4 +1,5 @@
 import base64
+from odoo import fields
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import ValidationError, UserError
 
@@ -218,6 +219,101 @@ class TestMigrationHardening(TransactionCase):
             ('company_id', '=', self.company.id), ('meter_number', '=', staging.meter_number),
         ]), 1)
 
+    def test_customer_migration_links_transformer_and_default_route(self):
+        """ربط العميل بمحول مرفوع مسبقاً عبر رمز المحول وإنشاء المسار الافتراضي للمحول."""
+        transformer = self.env['utility.transformer'].create({
+            'name': 'محول حي النور',
+            'code': 'TR-NOOR-01',
+            'company_id': self.company.id,
+            'area_id': self.area.id,
+        })
+        self.assertFalse(transformer.route_ids)
+
+        staging = self.env['utility.migration.customer'].create({
+            'name': 'عميل مرتبط بمحول',
+            'customer_number': 'CUST-TR-001',
+            'meter_number': 'MTR-TR-001',
+            'phase': 'single',
+            'region_id': self.region.id,
+            'area_id': self.area.id,
+            'legacy_transformer_code': 'TR-NOOR-01',
+            'category_id': self.category.id,
+            'subscriber_type_id': self.subscriber_type.id,
+            'contract_template_id': self.contract_template.id,
+            'company_id': self.company.id,
+        })
+
+        staging.action_import_data()
+        self.assertEqual(staging.state, 'imported', staging.error_message)
+        self.assertEqual(staging.transformer_id, transformer)
+        self.assertEqual(staging.created_customer_id.transformer_id, transformer)
+        route = staging.created_customer_id.route_id
+        self.assertTrue(route, 'يجب ربط العميل بالمسار التابع للمحول.')
+        self.assertEqual(route.transformer_id, transformer)
+        self.assertEqual(staging.route_id, route)
+
+        # Idempotency: re-import must not create a duplicate route
+        route_id = route.id
+        staging.state = 'draft'
+        staging.action_import_data()
+        self.assertEqual(staging.state, 'imported', staging.error_message)
+        self.assertEqual(staging.created_customer_id.route_id.id, route_id)
+        self.assertEqual(self.env['utility.route'].search_count([
+            ('transformer_id', '=', transformer.id),
+        ]), 1)
+
+    def test_customer_migration_applies_current_reading_and_date(self):
+        """القراءة الحالية وتاريخ آخر قراءة يُسجَّلان على العداد وعلى الحساب بعد التوريد."""
+        staging = self.env['utility.migration.customer'].create({
+            'name': 'عميل بقراءة حالية',
+            'customer_number': 'CUST-CUR-001',
+            'meter_number': 'MTR-CUR-001',
+            'phase': 'single',
+            'region_id': self.region.id,
+            'area_id': self.area.id,
+            'current_reading': 1234.5,
+            'last_reading_date': '2024-05-31',
+            'category_id': self.category.id,
+            'subscriber_type_id': self.subscriber_type.id,
+            'contract_template_id': self.contract_template.id,
+            'company_id': self.company.id,
+        })
+        self.assertTrue(staging.has_current_reading)
+
+        staging.action_import_data()
+        self.assertEqual(staging.state, 'imported', staging.error_message)
+
+        expected_date = fields.Datetime.to_datetime('2024-05-31')
+        customer = staging.created_customer_id
+        meter = staging.created_meter_id
+        self.assertEqual(customer.last_reading_value, 1234.5)
+        self.assertEqual(meter.last_reading_value, 1234.5)
+        self.assertEqual(customer.last_reading_date, expected_date)
+        self.assertEqual(meter.last_read_date, expected_date)
+
+    def test_customer_migration_missing_transformer_code_is_explicit(self):
+        """رمز محول غير مرفوع مسبقاً يوقف المطابقة والتوريد برسالة صريحة."""
+        staging = self.env['utility.migration.customer'].create({
+            'name': 'عميل برمز محول مفقود',
+            'customer_number': 'CUST-TR-MISSING',
+            'meter_number': 'MTR-TR-MISSING',
+            'phase': 'single',
+            'region_id': self.region.id,
+            'area_id': self.area.id,
+            'legacy_transformer_code': 'TR-DOES-NOT-EXIST',
+            'category_id': self.category.id,
+            'subscriber_type_id': self.subscriber_type.id,
+            'contract_template_id': self.contract_template.id,
+            'company_id': self.company.id,
+        })
+
+        staging.action_map_codes(strict=False)
+        self.assertIn('MISSING_TRANSFORMER_CODE', staging.error_message)
+
+        staging.action_import_data()
+        self.assertEqual(staging.state, 'error')
+        self.assertIn('MISSING_TRANSFORMER_CODE', staging.error_message)
+
     def test_customer_migration_uses_configured_default_not_phase_search(self):
         """الموديلات الأخرى ذات الطور نفسه لا تسبب غموضًا."""
         other_model = self.env['utility.meter.model'].create({
@@ -330,12 +426,18 @@ class TestMigrationHardening(TransactionCase):
             'meter_number': 'MTR-TR-001',
             'cell_meter_number': 'MTR-CELL-001',
             'opening_reading': 150.5,
+            'region_id': self.region.id,
+            'area_id': self.area.id,
             'company_id': self.company.id,
         })
 
         staging_trans.action_import_data()
         self.assertEqual(staging_trans.state, 'imported')
         self.assertTrue(staging_trans.created_transformer_id)
+        self.assertTrue(
+            staging_trans.created_transformer_id.route_ids,
+            'يجب إنشاء مسار افتراضي لكل محول عام عند التهيئة.',
+        )
         self.assertEqual(staging_trans.created_transformer_id.feeder_id, staging_feeder.created_feeder_id)
         self.assertEqual(staging_trans.created_meter_id.meter_number, 'MTR-TR-001')
         self.assertEqual(staging_trans.created_meter_id.operational_number, 'MTR-TR-001')

@@ -98,6 +98,8 @@
                     <group string="الموقع في الشبكة">
                         <field name="substation_id" options="{'no_create': True}"/>
                         <field name="feeder_id" options="{'no_create': True}"/>
+                        <field name="region_id" required="1"/>
+                        <field name="area_id" required="1"/>
                     </group>
                 </group>
                 <footer>
