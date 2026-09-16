@@ -707,4 +707,71 @@
         <field name="area_id" ref="area_region_jawf"/>
     </record>
 
+    <!-- ============================================================ -->
+    <!-- 5. ترميزات قوالب العقود والأسماء الشائعة للمشتركين           -->
+    <!-- ============================================================ -->
+    <record id="mapping_region_alias_region1" model="utility.migration.mapping">
+        <field name="mapping_type">region</field>
+        <field name="legacy_code">REGION_1</field>
+        <field name="region_id" ref="region_first"/>
+    </record>
+    <record id="mapping_area_alias_area1" model="utility.migration.mapping">
+        <field name="mapping_type">area</field>
+        <field name="legacy_code">AREA_1</field>
+        <field name="area_id" ref="area_region_first"/>
+    </record>
+
+    <record id="mapping_category_alias_owner" model="utility.migration.mapping">
+        <field name="mapping_type">category</field>
+        <field name="legacy_code">مالك</field>
+        <field name="category_id" ref="cat_public"/>
+    </record>
+    <record id="mapping_category_alias_public_ar" model="utility.migration.mapping">
+        <field name="mapping_type">category</field>
+        <field name="legacy_code">أهالي</field>
+        <field name="category_id" ref="cat_public"/>
+    </record>
+    <record id="mapping_category_alias_large_ar" model="utility.migration.mapping">
+        <field name="mapping_type">category</field>
+        <field name="legacy_code">كبار مستهلكين</field>
+        <field name="category_id" ref="cat_large"/>
+    </record>
+    <record id="mapping_category_alias_gov_ar" model="utility.migration.mapping">
+        <field name="mapping_type">category</field>
+        <field name="legacy_code">حكومي</field>
+        <field name="category_id" ref="cat_government"/>
+    </record>
+
+    <record id="mapping_subscriber_alias_owner_ar" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">اهالي ملاك</field>
+        <field name="subscriber_type_id" ref="sub_category_public"/>
+    </record>
+    <record id="mapping_subscriber_alias_gov_ar" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">حكومي</field>
+        <field name="subscriber_type_id" ref="sub_gov_a"/>
+    </record>
+    <record id="mapping_subscriber_alias_large_ar" model="utility.migration.mapping">
+        <field name="mapping_type">subscriber</field>
+        <field name="legacy_code">كبار مستهلكين</field>
+        <field name="subscriber_type_id" ref="sub_telecom"/>
+    </record>
+
+    <record id="mapping_contract_tmpl_general_bi" model="utility.migration.mapping">
+        <field name="mapping_type">contract</field>
+        <field name="legacy_code">TMPL_GENERAL_BI</field>
+        <field name="contract_template_id" ref="demo_tmpl_general_biweekly"/>
+    </record>
+    <record id="mapping_contract_tmpl_general_ct" model="utility.migration.mapping">
+        <field name="mapping_type">contract</field>
+        <field name="legacy_code">TMPL_GENERAL_CT_SPECIAL</field>
+        <field name="contract_template_id" ref="demo_tmpl_general_biweekly"/>
+    </record>
+    <record id="mapping_contract_tmpl_tm1" model="utility.migration.mapping">
+        <field name="mapping_type">contract</field>
+        <field name="legacy_code">TM1</field>
+        <field name="contract_template_id" ref="demo_tmpl_general_biweekly"/>
+    </record>
+
 </odoo>
