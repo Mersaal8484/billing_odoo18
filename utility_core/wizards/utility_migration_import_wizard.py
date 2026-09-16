@@ -367,7 +367,11 @@ class UtilityMigrationImportWizard(models.TransientModel):
                 if not any(self._has_cell_value(v) for v in row):
                     continue
                 raise self._error('MISSING_TRANSFORMER_IDENTITY', row_number, 'reference/transformer_code/legacy_analytic_id', identity)
-            dup_source_row = self._identity_guard(seen, identity, row_number)
+            transformer_name = str(self._cell(row, header_map, 'transformer_name') or identity).strip()
+            meter_number = str(self._cell(row, header_map, 'meter_number') or '').strip()
+            # يسمح بتكرار رمز المحول على ألا يتكرر العداد والاسم لنفس الرمز معاً
+            guard_identity = (identity, meter_number, transformer_name)
+            dup_source_row = self._identity_guard(seen, guard_identity, row_number)
             is_dup = dup_source_row is not None
             values = {
                 'name': str(self._cell(row, header_map, 'transformer_name') or identity).strip(),
@@ -388,7 +392,7 @@ class UtilityMigrationImportWizard(models.TransientModel):
                 'source_row_number': row_number,
             }
             if is_dup:
-                values['error_message'] = _('تكرار هوية في ملف الإكسل: الصف %s مكرر مع الصف %s (الهوية: %s)') % (row_number, dup_source_row, identity)
+                values['error_message'] = _('تكرار هوية في ملف الإكسل: الصف %s مكرر مع الصف %s (الرمز: %s، العداد: %s، الاسم: %s)') % (row_number, dup_source_row, identity, meter_number or '-', transformer_name)
             current = self.parse_reading(self._cell(row, header_map, 'current_reading'), 'current_reading', row_number)
             opening = self.parse_reading(self._cell(row, header_map, 'opening_reading'), 'opening_reading', row_number)
             if current is not None:
@@ -411,9 +415,9 @@ class UtilityMigrationImportWizard(models.TransientModel):
         if not self._has_cell_value(value):
             return 1.0
         result = self.parse_float(value, field, row)
-        if result is None or result <= 0:
+        if result is None or result == 0:
             raise self._error('INVALID_METER_MULTIPLIER', row, field, value)
-        return result
+        return abs(result)
 
     def _show_success_notification(self, count):
         return {'type': 'ir.actions.act_window_close', 'tag': 'display_notification', 'params': {
