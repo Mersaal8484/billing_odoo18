@@ -838,9 +838,7 @@ class UtilityReaderAPI(http.Controller):
                     'date_range_id': period_id,
                     'state': 'under_review',  # إرسالها للمراجعة مباشرة
                     'reading_source': 'mobile_app',
-                    'notes': params.get('notes', ''),
-                    'gps_lat': params.get('gps_lat'),
-                    'gps_lng': params.get('gps_lng'),
+                    'remarks': params.get('notes', ''),
                 }
                 
                 reading = request.env['utility.reading'].create(reading_vals)
@@ -850,16 +848,19 @@ class UtilityReaderAPI(http.Controller):
                 if image_b64:
                     try:
                         decoded = base64.b64decode(image_b64, validate=True)
-                        request.env['utility.media.service'].sudo().store_media(
-                            file_data=decoded,
-                            filename=f"reading_{reading.id}.jpg",
-                            mimetype='image/jpeg',
-                            reading_id=reading.id,
-                            asset_type='meter_reading'
-                        )
-                        reading.image_state = 'clear'
-                    except Exception as e:
-                        _logger.error("Failed to save image for reading %s: %s", reading.id, e)
+                    except (ValueError, binascii.Error):
+                        return self._error('INVALID_BASE64', 'بيانات الصورة غير صالحة (Base64 Decode Error)')
+                    media_asset = request.env['utility.media.service'].sudo().store_media(
+                        file_data=decoded,
+                        filename=f"reading_{reading.id}.jpg",
+                        mimetype='image/jpeg',
+                        reading_id=reading.id,
+                        asset_type='meter_reading'
+                    )
+                    reading.with_context(_bypass_reading_protection=True).write({
+                        'image_asset_id': media_asset.id,
+                        'image_state': 'pending',
+                    })
 
                 return {
                     'success': True,

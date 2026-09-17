@@ -3,6 +3,8 @@ from odoo.tests.common import TransactionCase
 from odoo.exceptions import ValidationError
 from odoo import fields
 from odoo.addons.utility_core.models.utility_date_range import normalize_billing_cadence
+import base64
+import io
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -96,6 +98,7 @@ class TestUtilityPeriodManagement(TransactionCase):
 
         # حسابات ومشتركين
         self.partner = self.env['res.partner'].create({'name': 'مشترك اختبار 1'})
+        self.partner_s = self.env['res.partner'].create({'name': 'مشترك اختبار 2'})
         self.customer_m = self.Customer.create({
             'partner_id': self.partner.id,
             'region_id': self.region_monthly.id,
@@ -104,7 +107,7 @@ class TestUtilityPeriodManagement(TransactionCase):
             'contract_template_id': self.template_monthly.id,
         })
         self.customer_s = self.Customer.create({
-            'partner_id': self.partner.id,
+            'partner_id': self.partner_s.id,
             'region_id': self.region_semi.id,
             'category_id': self.category.id,
             'subscriber_id': self.subscriber_type.id,
@@ -258,6 +261,69 @@ class TestUtilityPeriodManagement(TransactionCase):
             'reading_purpose': 'periodic',
         })
         self.assertTrue(reading)
+
+    def test_06a_reading_image_upload_fields_allowed_in_draft_and_under_review(self):
+        """رفع صورة العداد مسموح في حالة draft و under_review (حقل الرفع واسم الملف)."""
+        from PIL import Image
+
+        def jpeg_payload():
+            buf = io.BytesIO()
+            Image.new('RGB', (40, 40), (200, 30, 30)).save(buf, 'JPEG')
+            return base64.b64encode(buf.getvalue())
+
+        reading = self.Reading.create({
+            'meter_id': self.meter_s.id,
+            'account_id': self.customer_s.id,
+            'reading_value': 150.0,
+            'reading_date': datetime(2026, 8, 17, 10, 0, 0),
+            'reading_purpose': 'opening',
+        })
+        self.assertEqual(reading.state, 'draft')
+
+        reading.write({
+            'meter_image_upload': jpeg_payload(),
+            'meter_image_filename': 'reading_draft.jpg',
+        })
+        self.assertTrue(reading.meter_image_upload)
+        self.assertEqual(reading.meter_image_filename, 'reading_draft.jpg')
+
+        reading.with_context(
+            _reading_state_transition=True, _bypass_reading_protection=True,
+        ).write({'state': 'under_review'})
+        self.assertEqual(reading.state, 'under_review')
+
+        reading.write({
+            'meter_image_upload': jpeg_payload(),
+            'meter_image_filename': 'reading_review.jpg',
+        })
+        self.assertEqual(reading.meter_image_filename, 'reading_review.jpg')
+
+    def test_06b_reading_image_upload_onchange_persists_media_asset(self):
+        """رفع صورة عبر onchange يجب أن ينشئ أصل وسائط جاهزاً ويظهر رابط المعاينة."""
+        from PIL import Image
+
+        reading = self.Reading.create({
+            'meter_id': self.meter_s.id,
+            'account_id': self.customer_s.id,
+            'reading_value': 151.0,
+            'reading_date': datetime(2026, 8, 29, 10, 0, 0),
+            'reading_purpose': 'opening',
+        })
+
+        buf = io.BytesIO()
+        Image.new('RGB', (40, 40), (10, 120, 40)).save(buf, 'JPEG')
+        reading.meter_image_upload = base64.b64encode(buf.getvalue())
+        reading._onchange_meter_image_upload()
+
+        self.assertTrue(reading.image_asset_id, 'يجب إنشاء أصل وسائط للصورة المرفوعة')
+        self.assertEqual(reading.image_asset_id.state, 'ready')
+        self.assertEqual(reading.image_asset_id.reading_id, reading)
+        self.assertTrue(reading.image_asset_id.original_attachment_id)
+        self.assertTrue(reading.meter_image_url, 'يجب توليد رابط معاينة للصورة المخزنة')
+        self.assertTrue(reading.meter_image)
+        self.assertFalse(
+            reading.meter_image_upload,
+            'حقل الرفع المؤقت يجب أن يُفرَّغ بعد تخزين الصورة في أصل الوسائط')
 
     def test_07_reading_outside_window_rejected(self):
         """7. رفض القراءة المأخوذة خارج نافذة القراءة المسموحة"""
@@ -565,7 +631,7 @@ class TestUtilityPeriodManagement(TransactionCase):
 
         payment = self.env['account.payment'].create({
             'utility_sale_order_id': order.id,
-            'partner_id': self.partner.id,
+            'partner_id': self.customer_s.partner_id.id,
             'amount': order.amount_total,
             'payment_type': 'inbound',
             'partner_type': 'customer',

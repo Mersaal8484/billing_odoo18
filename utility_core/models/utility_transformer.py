@@ -312,6 +312,14 @@ class UtilityTransformer(models.Model):
         if vals.get('feeder_id') and 'substation_id' not in vals:
             vals['substation_id'] = self.env['utility.feeder'].browse(
                 vals['feeder_id']).substation_id.id
+        # region_id/area_id are stored related fields with an automatic inverse
+        # (zone_region_id.parent_id[.parent_id]); writing them directly cascades
+        # parent_id updates onto utility.region inside super().write() and
+        # re-enters the region hierarchy checks mid-write. Route them through
+        # the explicit zone synchronisation below instead.
+        new_area_id = vals.pop('area_id', None)
+        new_region_id = vals.pop('region_id', None)
+        geography_changed = new_area_id is not None or new_region_id is not None
         previous_zones = {record.id: record.zone_region_id for record in self}
         if 'zone_region_id' in vals and vals['zone_region_id']:
             target_zone = self.env['utility.region'].browse(vals['zone_region_id'])
@@ -329,7 +337,7 @@ class UtilityTransformer(models.Model):
                     previous_zone.write({'transformer_origin_id': False})
                 if rec.zone_region_id:
                     rec.zone_region_id.write({'transformer_origin_id': rec.id})
-        if 'name' in vals or 'code' in vals or 'area_id' in vals or 'region_id' in vals:
+        if 'name' in vals or 'code' in vals or geography_changed:
             for rec in self:
                 if rec.zone_region_id:
                     zone_vals = {}
@@ -337,9 +345,12 @@ class UtilityTransformer(models.Model):
                         zone_vals['name'] = rec.name
                     if 'code' in vals:
                         zone_vals['code'] = rec.code
-                    if 'area_id' in vals or 'region_id' in vals:
-                        parent = rec.area_id or rec.region_id
-                        zone_vals['parent_id'] = parent.id if parent else False
+                    if geography_changed:
+                        if new_area_id is not None:
+                            parent = new_area_id
+                        else:
+                            parent = new_region_id
+                        zone_vals['parent_id'] = parent
                     if zone_vals:
                         rec.zone_region_id.write(zone_vals)
         self._check_general_transformer_geography()

@@ -170,21 +170,21 @@
         <record id="utility_customer_org_scope_rule" model="ir.rule">
             <field name="name">Customer Unified Organizational Scope Rule</field>
             <field name="model_id" ref="utility_core.model_utility_customer"/>
-            <field name="domain_force">[(1, '=', 1)] if user._is_global_utility_scope() else (['|', ('area_id', 'in', user._get_effective_branch_ids()), ('region_id', 'in', user._get_effective_region_ids())] if (user._get_effective_branch_ids() or user._get_effective_region_ids()) else [('id', '=', False)])</field>
+            <field name="domain_force">[(1, '=', 1)] if user._is_global_utility_scope() else (['|', '|', ('area_id', 'in', user._get_effective_branch_ids()), ('region_id', 'in', user._get_effective_region_ids()), ('route_id', 'in', user.assigned_route_ids.ids)] if (user._get_effective_branch_ids() or user._get_effective_region_ids() or user.assigned_route_ids) else [('id', '=', False)])</field>
             <field name="global" eval="True"/>
         </record>
 
         <record id="utility_reading_org_scope_rule" model="ir.rule">
             <field name="name">Reading Unified Organizational Scope Rule</field>
             <field name="model_id" ref="utility_core.model_utility_reading"/>
-            <field name="domain_force">[(1, '=', 1)] if user._is_global_utility_scope() else (['|', ('account_id.area_id', 'in', user._get_effective_branch_ids()), ('account_id.region_id', 'in', user._get_effective_region_ids())] if (user._get_effective_branch_ids() or user._get_effective_region_ids()) else [('id', '=', False)])</field>
+            <field name="domain_force">[(1, '=', 1)] if user._is_global_utility_scope() else (['|', '|', ('account_id.area_id', 'in', user._get_effective_branch_ids()), ('account_id.region_id', 'in', user._get_effective_region_ids()), ('account_id.route_id', 'in', user.assigned_route_ids.ids)] if (user._get_effective_branch_ids() or user._get_effective_region_ids() or user.assigned_route_ids) else [('id', '=', False)])</field>
             <field name="global" eval="True"/>
         </record>
 
         <record id="utility_meter_org_scope_rule" model="ir.rule">
             <field name="name">Meter Unified Organizational Scope Rule</field>
             <field name="model_id" ref="utility_core.model_utility_meter"/>
-            <field name="domain_force">[(1, '=', 1)] if user._is_global_utility_scope() else (['|', ('area_id', 'in', user._get_effective_branch_ids()), ('region_id', 'in', user._get_effective_region_ids())] if (user._get_effective_branch_ids() or user._get_effective_region_ids()) else [('id', '=', False)])</field>
+            <field name="domain_force">[(1, '=', 1)] if user._is_global_utility_scope() else (['|', '|', ('area_id', 'in', user._get_effective_branch_ids()), ('region_id', 'in', user._get_effective_region_ids()), ('route_id', 'in', user.assigned_route_ids.ids)] if (user._get_effective_branch_ids() or user._get_effective_region_ids() or user.assigned_route_ids) else [('id', '=', False)])</field>
             <field name="global" eval="True"/>
         </record>
 

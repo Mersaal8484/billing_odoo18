@@ -1,3 +1,5 @@
+import base64
+import io
 import json
 from odoo.tests.common import HttpCase, tagged
 
@@ -65,6 +67,8 @@ class TestUtilityReaderAPI(HttpCase):
             'category_id': cls.category.id,
             'subscriber_id': cls.subscriber.id,
         })
+
+        cls.meter.customer_id = cls.customer.id
         
         cls.period_type = cls.env['date.range.type'].create({
             'name': 'Monthly Reading',
@@ -135,6 +139,36 @@ class TestUtilityReaderAPI(HttpCase):
         result = response.json().get('result', {})
         self.assertFalse(result.get('success', True))
         self.assertEqual(result.get('code'), 'PERIOD_CLOSED')
+
+    def test_submit_reading_saves_image_and_links_media_asset(self):
+        """(ب2) رفع صورة مع القراءة الفردية يجب أن يربط أصل الوسائط بالقراءة فعلياً."""
+        from PIL import Image
+
+        buf = io.BytesIO()
+        Image.new('RGB', (60, 60), (30, 140, 80)).save(buf, 'JPEG')
+
+        self.authenticate('test_reader', 'password')
+        response = self.url_open(
+            '/api/v1/utility/reader/reading/submit',
+            data=json.dumps({
+                'params': {
+                    'meter_id': self.meter.id,
+                    'period_id': self.route_period.id,
+                    'reading_value': 120.0,
+                    'image_b64': base64.b64encode(buf.getvalue()).decode('utf-8'),
+                }
+            }),
+            headers={'Content-Type': 'application/json'},
+        )
+        result = response.json().get('result', {})
+        self.assertTrue(result.get('success'), result)
+
+        reading = self.env['utility.reading'].browse(result['reading_id'])
+        self.assertTrue(reading.image_asset_id, 'يجب ربط أصل الوسائط بالقراءة عند رفع الصورة')
+        self.assertEqual(reading.image_asset_id.state, 'ready')
+        self.assertEqual(reading.image_asset_id.reading_id, reading)
+        self.assertEqual(reading.image_state, 'pending', 'الصورة المرفوعة تنتظر مراجعة المشرف')
+        self.assertTrue(reading.meter_image_url, 'يجب توليد رابط معاينة للصورة المخزنة')
 
     def test_create_batch_from_assigned_route_without_region_assignment(self):
         """A route-assigned reader can create only their own reading batch."""
