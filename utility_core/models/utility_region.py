@@ -130,3 +130,25 @@ class UtilityRegion(models.Model):
         biweekly_regions = self.search([('recurring_rule_type', '=', 'biweekly')])
         biweekly_regions.write({'recurring_rule_type': 'semi_monthly'})
         return len(biweekly_regions)
+
+    def action_view_areas(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('المناطق الفرعية لـ %s') % self.name,
+            'res_model': 'utility.region',
+            'domain': [('parent_id', '=', self.id), ('type', '=', 'area')],
+            'context': {'default_parent_id': self.id, 'default_type': 'area'},
+            'views': [(False, 'tree'), (False, 'form')],
+        }
+
+    def action_view_zones(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('المناطق التفصيلية لـ %s') % self.name,
+            'res_model': 'utility.region',
+            'domain': [('parent_id', '=', self.id), ('type', '=', 'zone')],
+            'context': {'default_parent_id': self.id, 'default_type': 'zone'},
+            'views': [(False, 'tree'), (False, 'form')],
+        }

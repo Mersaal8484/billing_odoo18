@@ -7,7 +7,6 @@
             <tree>
                 <field name="name"/>
                 <field name="code"/>
-                <field name="zone_id"/>
                 <field name="voltage_level"/>
                 <field name="capacity_kva"/>
                 <field name="status"/>
@@ -27,9 +26,6 @@
                     <group>
                         <group>
                             <field name="code"/>
-                            <field name="zone_id"/>
-                            <field name="area_id"/>
-                            <field name="region_id"/>
                             <field name="status"/>
                             <field name="active"/>
                             <field name="company_id" groups="base.group_multi_company"/>
@@ -74,12 +70,10 @@
             <search>
                 <field name="name"/>
                 <field name="code"/>
-                <field name="zone_id"/>
                 <field name="status"/>
                 <filter name="active" string="Active" domain="[('active','=',True)]"/>
                 <group expand="0" string="Group By">
                     <filter name="group_status" string="Status" context="{'group_by':'status'}"/>
-                    <filter name="group_zone" string="Zone" context="{'group_by':'zone_id'}"/>
                 </group>
             </search>
         </field>

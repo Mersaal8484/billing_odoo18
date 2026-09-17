@@ -1,78 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- ==================== Tree: Region (المناطق الرئيسية) ==================== -->
     <record id="view_utility_region_tree" model="ir.ui.view">
-        <field name="name">utility.region.tree</field>
+        <field name="name">utility.region.tree.region</field>
         <field name="model">utility.region</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree string="المناطق الرئيسية">
                 <field name="name"/>
                 <field name="code"/>
-                <field name="type"/>
-                <field name="parent_id" string="Parent"/>
+                <field name="recurring_rule_type"/>
+                <field name="area_count"/>
+                <field name="financial_manager_id"/>
                 <field name="active"/>
             </tree>
         </field>
     </record>
 
+    <!-- ==================== Tree: Area (المناطق الفرعية) ==================== -->
+    <record id="view_utility_area_tree" model="ir.ui.view">
+        <field name="name">utility.region.tree.area</field>
+        <field name="model">utility.region</field>
+        <field name="arch" type="xml">
+            <tree string="المناطق الفرعية">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="parent_id" string="المنطقة الرئيسية"/>
+                <field name="recurring_rule_type"/>
+                <field name="zone_count"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ==================== Tree: Zone (المناطق التفصيلية) ==================== -->
+    <record id="view_utility_zone_tree" model="ir.ui.view">
+        <field name="name">utility.region.tree.zone</field>
+        <field name="model">utility.region</field>
+        <field name="arch" type="xml">
+            <tree string="المناطق التفصيلية">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="parent_id" string="المنطقة الفرعية"/>
+                <field name="transformer_origin_id" string="المحول المرتبط"/>
+                <field name="private_transformer_id" string="المحول الخاص"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ==================== Form: Region (المنطقة الرئيسية) ==================== -->
     <record id="view_utility_region_form" model="ir.ui.view">
-        <field name="name">utility.region.form</field>
+        <field name="name">utility.region.form.region</field>
         <field name="model">utility.region</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_areas"
+                                icon="fa-sitemap">
+                            <div class="o_stat_info">
+                                <field name="area_count" class="o_stat_value"/>
+                                <span class="o_stat_text">منطقة فرعية</span>
+                            </div>
+                        </button>
+                    </div>
+                    <field name="type" widget="statusbar"
+                           statusbar_visible="region,area,zone"/>
                     <div class="oe_title">
-                        <label for="name" string="Name"/>
+                        <label for="name"/>
                         <h1><field name="name"/></h1>
                     </div>
                     <group>
-                        <group>
-                            <field name="code"
-                                   attrs="{'readonly': [('transformer_origin_id', '!=', False)]}"/>
-                            <field name="type"
-                                   attrs="{'readonly': [('transformer_origin_id', '!=', False)]}"/>
-                            <field name="transformer_origin_id"
-                                   attrs="{'invisible': [('transformer_origin_id', '=', False)]}"/>
-                            <field name="recurring_rule_type" 
-                                   attrs="{'invisible': [('type', '!=', 'region')], 'required': [('type', '=', 'region')]}"/>
-                            <field name="parent_id" string="Parent Location" 
-                                   domain="[('type', 'in', ['region', 'area'])]"
-                                   attrs="{'invisible': [('type', '=', 'region')], 'required': [('type', '!=', 'region')], 'readonly': [('transformer_origin_id', '!=', False)]}"/>
-                            <field name="private_transformer_id"
-                                   domain="[('is_private', '=', True)]"
-                                   attrs="{'invisible': [('type', '!=', 'zone')]}"/>
+                        <group string="البيانات الأساسية">
+                            <field name="code"/>
+                            <field name="recurring_rule_type"/>
                             <field name="active"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
-                        <group string="المالية" attrs="{'invisible': [('type', '!=', 'region')]}">
+                        <group string="المالية">
                             <field name="cash_journal_id"/>
+                            <field name="bank_journal_ids" widget="many2many_tags"/>
                             <field name="financial_manager_id" widget="many2one_avatar_user"/>
                         </group>
                     </group>
                     <notebook>
-                        <page name="areas" string="Areas" attrs="{'invisible': [('type', '!=', 'region')]}">
+                        <page name="areas" string="المناطق الفرعية">
                             <field name="area_ids">
                                 <tree>
                                     <field name="name"/>
                                     <field name="code"/>
                                     <field name="zone_count"/>
+                                    <field name="active"/>
                                 </tree>
                             </field>
                         </page>
-                        <page name="zones" string="Zones" attrs="{'invisible': [('type', '!=', 'area')]}">
-                            <field name="zone_ids">
+                        <page name="zones" string="المناطق التفصيلية">
+                            <field name="zone_ids" readonly="1">
                                 <tree>
                                     <field name="name"/>
                                     <field name="code"/>
-                                </tree>
-                            </field>
-                        </page>
-                        <page name="banks" string="الحسابات البنكية" attrs="{'invisible': [('type', '!=', 'region')]}">
-                            <field name="bank_journal_ids">
-                                <tree>
-                                    <field name="name"/>
-                                    <field name="code"/>
-                                    <field name="bank_account_id"/>
-                                    <field name="company_id" groups="base.group_multi_company"/>
+                                    <field name="parent_id" string="المنطقة الفرعية"/>
                                 </tree>
                             </field>
                         </page>
@@ -82,6 +110,98 @@
         </field>
     </record>
 
+    <!-- ==================== Form: Area (المنطقة الفرعية) ==================== -->
+    <record id="view_utility_area_form" model="ir.ui.view">
+        <field name="name">utility.region.form.area</field>
+        <field name="model">utility.region</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_zones"
+                                icon="fa-map-marker">
+                            <div class="o_stat_info">
+                                <field name="zone_count" class="o_stat_value"/>
+                                <span class="o_stat_text">منطقة تفصيلية</span>
+                            </div>
+                        </button>
+                    </div>
+                    <field name="type" widget="statusbar"
+                           statusbar_visible="region,area,zone"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="البيانات الأساسية">
+                            <field name="code"/>
+                            <field name="parent_id"
+                                   string="المنطقة الرئيسية"
+                                   domain="[('type', '=', 'region')]"
+                                   required="1"/>
+                            <field name="recurring_rule_type" readonly="1"
+                                   help="موروث تلقائياً من المنطقة الرئيسية"/>
+                            <field name="active"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="zones" string="المناطق التفصيلية">
+                            <field name="zone_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="transformer_origin_id" string="المحول المرتبط"/>
+                                    <field name="active"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ==================== Form: Zone (المنطقة التفصيلية) ==================== -->
+    <record id="view_utility_zone_form" model="ir.ui.view">
+        <field name="name">utility.region.form.zone</field>
+        <field name="model">utility.region</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="type" widget="statusbar"
+                           statusbar_visible="region,area,zone"
+                           attrs="{'readonly': [('transformer_origin_id', '!=', False)]}"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="البيانات الأساسية">
+                            <field name="code"
+                                   attrs="{'readonly': [('transformer_origin_id', '!=', False)]}"/>
+                            <field name="parent_id"
+                                   string="المنطقة الفرعية"
+                                   domain="[('type', '=', 'area')]"
+                                   required="1"/>
+                            <field name="active"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group string="ربط المحول">
+                            <field name="transformer_origin_id"
+                                   attrs="{'invisible': [('transformer_origin_id', '=', False)]}"/>
+                            <field name="private_transformer_id"
+                                   domain="[('is_private', '=', True), ('company_id', '=', company_id)]"
+                                   attrs="{'invisible': [('private_transformer_id', '=', False)]}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ==================== Search View ==================== -->
     <record id="view_utility_region_search" model="ir.ui.view">
         <field name="name">utility.region.search</field>
         <field name="model">utility.region</field>
@@ -91,24 +211,26 @@
                 <field name="code"/>
                 <field name="parent_id"/>
                 <field name="recurring_rule_type"/>
-                <filter name="active" string="Active" domain="[('active','=',True)]"/>
-                <filter name="inactive" string="Inactive" domain="[('active','=',False)]"/>
-                <filter name="type_region" string="Regions" domain="[('type','=','region')]"/>
-                <filter name="type_area" string="Areas" domain="[('type','=','area')]"/>
-                <filter name="type_zone" string="Zones" domain="[('type','=','zone')]"/>
+                <filter name="active" string="نشط" domain="[('active','=',True)]"/>
+                <filter name="inactive" string="غير نشط" domain="[('active','=',False)]"/>
+                <separator/>
+                <filter name="type_region" string="المناطق الرئيسية" domain="[('type','=','region')]"/>
+                <filter name="type_area" string="المناطق الفرعية" domain="[('type','=','area')]"/>
+                <filter name="type_zone" string="المناطق التفصيلية" domain="[('type','=','zone')]"/>
                 <separator/>
                 <filter name="cadence_monthly" string="شهري" domain="[('recurring_rule_type','=','monthly')]"/>
                 <filter name="cadence_semi_monthly" string="نصف شهري" domain="[('recurring_rule_type','=','semi_monthly')]"/>
-                <group expand="0" string="Group By">
-                    <filter name="group_type" string="Type" context="{'group_by':'type'}"/>
-                    <filter name="group_parent" string="Parent" context="{'group_by':'parent_id'}"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_type" string="النوع" context="{'group_by':'type'}"/>
+                    <filter name="group_parent" string="المنطقة الأب" context="{'group_by':'parent_id'}"/>
                     <filter name="group_cadence" string="دورية الفوترة" context="{'group_by':'recurring_rule_type'}"/>
-                    <filter name="group_company" string="Company" context="{'group_by':'company_id'}"/>
+                    <filter name="group_company" string="الشركة" context="{'group_by':'company_id'}"/>
                 </group>
             </search>
         </field>
     </record>
 
+    <!-- ==================== Actions ==================== -->
     <record id="action_utility_region" model="ir.actions.act_window">
         <field name="name">المناطق الرئيسية</field>
         <field name="res_model">utility.region</field>
@@ -116,6 +238,11 @@
         <field name="domain">[('type', '=', 'region')]</field>
         <field name="context">{'default_type': 'region'}</field>
         <field name="search_view_id" ref="view_utility_region_search"/>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_utility_region_tree')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_utility_region_form')})
+        ]"/>
     </record>
 
     <record id="action_utility_area" model="ir.actions.act_window">
@@ -125,6 +252,11 @@
         <field name="domain">[('type', '=', 'area')]</field>
         <field name="context">{'default_type': 'area'}</field>
         <field name="search_view_id" ref="view_utility_region_search"/>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_utility_area_tree')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_utility_area_form')})
+        ]"/>
     </record>
 
     <record id="action_utility_zone" model="ir.actions.act_window">
@@ -134,5 +266,10 @@
         <field name="domain">[('type', '=', 'zone')]</field>
         <field name="context">{'default_type': 'zone'}</field>
         <field name="search_view_id" ref="view_utility_region_search"/>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_utility_zone_tree')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_utility_zone_form')})
+        ]"/>
     </record>
 </odoo>

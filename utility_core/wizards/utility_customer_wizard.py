@@ -231,8 +231,10 @@ class UtilityCustomerWizard(models.TransientModel):
     @api.onchange('transformer_feeder_id')
     def _onchange_transformer_feeder_id(self):
         substation = self.transformer_feeder_id.substation_id
-        if substation and substation.zone_id:
-            self.transformer_zone_id = substation.zone_id
+        if substation:
+            transformer = self.transformer_feeder_id.transformer_ids[:1]
+            if transformer and transformer.zone_region_id:
+                self.transformer_zone_id = transformer.zone_region_id
 
     @api.constrains('contract_template_id', 'category_id', 'subscriber_id', 'utility_region_id', 'utility_area_id')
     def _check_wizard_contract_template_compatibility(self):

@@ -10,9 +10,6 @@ class UtilitySubstation(models.Model):
     company_id = fields.Many2one('res.company', 'الشركة', default=lambda self: self.env.company)
     name = fields.Char('اسم المحطة', required=True)
     code = fields.Char('رمز المحطة', required=True)
-    zone_id = fields.Many2one('utility.region', 'المنطقة التفصيلية', domain="[('type', '=', 'zone')]")
-    area_id = fields.Many2one('utility.region', 'المنطقة الفرعية', related='zone_id.parent_id', store=True)
-    region_id = fields.Many2one('utility.region', 'المنطقة', related='zone_id.parent_id.parent_id', store=True)
     voltage_level = fields.Selection([
         ('lv', 'جهد منخفض'),
         ('mv', 'جهد متوسط'),
@@ -30,5 +27,5 @@ class UtilitySubstation(models.Model):
     transformer_ids = fields.One2many('utility.transformer', 'substation_id', string='المحولات')
 
     _sql_constraints = [
-        ('unique_substation_code_zone', 'unique(code, zone_id)', 'رمز المحطة يجب أن يكون فريداً لكل منطقة!'),
+        ('unique_substation_code_company', 'unique(code, company_id)', 'رمز المحطة يجب أن يكون فريداً لكل شركة!'),
     ]

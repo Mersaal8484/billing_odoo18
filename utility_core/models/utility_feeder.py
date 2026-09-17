@@ -80,10 +80,7 @@ class UtilityFeeder(models.Model):
     @api.onchange('substation_id')
     def _onchange_substation_id(self):
         if self.substation_id:
-            if self.substation_id.area_id:
-                self.area_id = self.substation_id.area_id
-            if self.substation_id.region_id:
-                self.region_id = self.substation_id.region_id
+            self.company_id = self.substation_id.company_id
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -91,29 +88,23 @@ class UtilityFeeder(models.Model):
             station_id = vals.get('substation_id')
             if station_id:
                 station = self.env['utility.substation'].browse(station_id)
-                vals.setdefault('area_id', station.area_id.id)
-                vals.setdefault('region_id', station.region_id.id)
+                vals.setdefault('company_id', station.company_id.id)
         return super().create(vals_list)
 
     def write(self, vals):
         vals = dict(vals)
-        if vals.get('substation_id') and 'area_id' not in vals and 'region_id' not in vals:
+        if vals.get('substation_id'):
             station = self.env['utility.substation'].browse(vals['substation_id'])
-            vals['area_id'] = station.area_id.id
-            vals['region_id'] = station.region_id.id
+            vals['company_id'] = station.company_id.id
         return super().write(vals)
 
-    @api.constrains('substation_id', 'region_id', 'area_id', 'company_id', 'coupling_meter_id')
+    @api.constrains('substation_id', 'company_id', 'coupling_meter_id')
     def _check_network_consistency(self):
         for feeder in self:
             station = feeder.substation_id
             if station:
                 if station.company_id != feeder.company_id:
                     raise ValidationError(_('شركة الفيدر يجب أن تطابق شركة المحطة.'))
-                if feeder.area_id and station.area_id and feeder.area_id != station.area_id:
-                    raise ValidationError(_('الفرع المحدد للفيدر لا يطابق فرع المحطة.'))
-                if feeder.region_id and station.region_id and feeder.region_id != station.region_id:
-                    raise ValidationError(_('المنطقة المحددة للفيدر لا تطابق منطقة المحطة.'))
             meter = feeder.coupling_meter_id
             if meter and (meter.connection_type != 'feeder' or meter.linked_feeder_id != feeder):
                 raise ValidationError(_('عداد الربط يجب أن يكون عداد فيدر مرتبطًا بهذا الفيدر نفسه.'))
