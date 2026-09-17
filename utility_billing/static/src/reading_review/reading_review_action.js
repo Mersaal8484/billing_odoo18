@@ -245,6 +245,9 @@ export class ReadingReviewWorkspaceAction extends Component {
             } else {
                 this.notification.add(res.message || _t("تعذر تحديث حالة الصورة"), { type: "warning" });
             }
+            if (this.state.activeLightboxReading && this.state.activeLightboxReading.id === reading.id) {
+                this.onCloseLightbox();
+            }
         } catch (e) {
             this.notification.add(e.message || _t("خطأ أثناء تحديث حالة الصورة"), { type: "danger" });
         }

@@ -9,9 +9,9 @@
                   decoration-warning="state in ('suspended', 'disconnected')" 
                   decoration-success="state == 'active'">
                 <field name="customer_number"/>
-                <field name="external_qr_reference" optional="show"/>
+                <field name="external_qr_reference" optional="hide"/>
                 <field name="partner_id"/>
-                <field name="category_id"/>
+                <field name="category_id" optional="hide"/>
                 <field name="subscriber_id"/>
                 <field name="state" widget="badge" decoration-success="state == 'active'" decoration-warning="state in ('suspended', 'disconnected')" decoration-danger="state == 'closed'"/>
                 <field name="region_id"/>
@@ -22,7 +22,7 @@
                 <field name="opening_balance" optional="show" sum="Total Opening"/>
                 <field name="accounting_balance" optional="show" sum="Total Balance" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
                 <field name="current_balance" optional="show" sum="Total Current"/>
-                <field name="active" widget="boolean_toggle"/>
+                <field name="active" optional="hide"/>
             </tree>
         </field>
     </record>

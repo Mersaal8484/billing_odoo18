@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="utility_billing.ReadingImageLightbox" owl="1">
-        <div class="modal d-block position-fixed top-0 start-0 w-100 h-100 o_utility_lightbox_backdrop" tabindex="-1" style="background: rgba(0, 0, 0, 0.85); z-index: 1050; direction: rtl;">
+        <div class="modal d-block position-fixed top-0 start-0 w-100 h-100 o_utility_lightbox_backdrop" tabindex="-1" t-ref="modalRoot" t-on-click="onBackdropClick" style="background: rgba(0, 0, 0, 0.85); z-index: 1050; direction: rtl;">
             <div class="modal-dialog modal-xl modal-dialog-centered h-100 my-0">
                 <div class="modal-content h-90 bg-dark text-white border-0 shadow-lg" style="max-height: 90vh;">
                     <!-- Lightbox Header -->
@@ -252,10 +252,10 @@
                                     <i class="fa fa-check-circle me-1"/> صورة معتمدة
                                 </span>
                             </t>
-                            <button type="button" class="btn btn-danger btn-sm me-2 px-3" t-on-click="() => props.onReject(props.reading)">
+                            <button type="button" class="btn btn-danger btn-sm me-2 px-3" t-on-click="onReject">
                                 <i class="fa fa-times me-1"/> رفض (R)
                             </button>
-                            <button type="button" class="btn btn-success btn-sm px-4 font-weight-bold" t-on-click="() => props.onApprove(props.reading)">
+                            <button type="button" class="btn btn-success btn-sm px-4 font-weight-bold" t-on-click="onApprove">
                                 <i class="fa fa-check me-1"/> اعتماد (A)
                             </button>
                         </div>

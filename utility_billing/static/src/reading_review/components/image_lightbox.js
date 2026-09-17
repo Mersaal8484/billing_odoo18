@@ -1,9 +1,10 @@
 /** @odoo-module **/
 
-import { Component, useState, onMounted, onWillUnmount, onWillUpdateProps } from "@odoo/owl";
+import { Component, useState, useRef, onMounted, onWillUnmount, onWillUpdateProps } from "@odoo/owl";
 
 export class ReadingImageLightbox extends Component {
     setup() {
+        this.modalRef = useRef("modalRoot");
         this.state = useState({
             zoom: 1.0,
             rotation: 0,
@@ -12,15 +13,19 @@ export class ReadingImageLightbox extends Component {
         });
 
         this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.onBackdropClick = this.onBackdropClick.bind(this);
+        this.onApprove = this.onApprove.bind(this);
+        this.onReject = this.onReject.bind(this);
         this._prefetched = new Set();
 
         onMounted(() => {
-            window.addEventListener("keydown", this.handleKeyDown);
+            window.addEventListener("keydown", this.handleKeyDown, true);
+            this.modalRef.el?.focus();
             this.prefetchNeighborImages(this.props);
         });
 
         onWillUnmount(() => {
-            window.removeEventListener("keydown", this.handleKeyDown);
+            window.removeEventListener("keydown", this.handleKeyDown, true);
         });
 
         onWillUpdateProps((nextProps) => {
@@ -29,13 +34,18 @@ export class ReadingImageLightbox extends Component {
     }
 
     handleKeyDown(ev) {
+        if (ev.key === "Escape") {
+            ev.preventDefault();
+            ev.stopPropagation();
+            this.props.onClose();
+            return;
+        }
+
         if (ev.target.tagName === "INPUT" || ev.target.tagName === "TEXTAREA" || ev.target.tagName === "SELECT") {
             return;
         }
 
-        if (ev.key === "Escape") {
-            this.props.onClose();
-        } else if (ev.key === "ArrowLeft") {
+        if (ev.key === "ArrowLeft") {
             this.props.onNext();
         } else if (ev.key === "ArrowRight") {
             this.props.onPrevious();
@@ -44,13 +54,29 @@ export class ReadingImageLightbox extends Component {
         } else if (ev.key === "-") {
             this.zoomOut();
         } else if (ev.key === "a" || ev.key === "A") {
-            this.props.onApprove(this.props.reading);
+            this.onApprove();
         } else if (ev.key === "r" || ev.key === "R") {
-            this.props.onReject(this.props.reading);
+            this.onReject();
         } else if (ev.key === "c" || ev.key === "C") {
             if (this.isImageClear()) return;
             this.onMarkImageClear();
         }
+    }
+
+    onBackdropClick(ev) {
+        if (ev.target === ev.currentTarget) {
+            this.props.onClose();
+        }
+    }
+
+    onApprove() {
+        this.props.onClose();
+        this.props.onApprove(this.props.reading);
+    }
+
+    onReject() {
+        this.props.onClose();
+        this.props.onReject(this.props.reading);
     }
 
     zoomIn() {
@@ -149,6 +175,7 @@ export class ReadingImageLightbox extends Component {
             }
         } finally {
             this.state.markingClear = false;
+            this.props.onClose();
         }
     }
 }
