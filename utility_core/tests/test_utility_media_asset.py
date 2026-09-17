@@ -139,6 +139,128 @@ class TestUtilityMediaAsset(TransactionCase):
         reading.action_submit_review()
         self.assertEqual(reading.state, 'under_review')
 
+    def test_03c_reading_create_with_meter_image_upload_creates_asset(self):
+        """3c. إنشاء قراءة مع meter_image_upload ينشئ أصل وسائط ويربطه تلقائياً"""
+        customer = self.Customer.create({
+            'name': 'مشترك رفع الصورة إنشاء',
+            'customer_number': 'CUST-CREATE-IMG',
+            'region_id': self.region.id,
+        })
+        meter = self.Meter.create({
+            'meter_number': 'MTR-CREATE-IMG',
+            'customer_id': customer.id,
+        })
+
+        reading = self.env['utility.reading'].create({
+            'meter_id': meter.id,
+            'account_id': customer.id,
+            'reading_value': 55.0,
+            'meter_image_upload': self.sample_base64,
+            'meter_image_filename': 'test_upload.png',
+        })
+
+        self.assertTrue(reading.image_asset_id, 'يجب إنشاء image_asset_id تلقائياً عند الإنشاء مع meter_image_upload')
+        self.assertEqual(reading.image_state, 'pending')
+        self.assertTrue(reading.meter_image_url)
+        self.assertEqual(reading.image_asset_id.reading_id, reading)
+
+    def test_03d_reading_write_with_meter_image_upload_creates_asset(self):
+        """3d. كتابة meter_image_upload عبر write على قراءة مسودة تنشئ أصل وسائط وتربطه"""
+        customer = self.Customer.create({
+            'name': 'مشترك رفع الصورة كتابة',
+            'customer_number': 'CUST-WRITE-IMG',
+            'region_id': self.region.id,
+        })
+        meter = self.Meter.create({
+            'meter_number': 'MTR-WRITE-IMG',
+            'customer_id': customer.id,
+        })
+
+        reading = self.env['utility.reading'].create({
+            'meter_id': meter.id,
+            'account_id': customer.id,
+            'reading_value': 70.0,
+            'state': 'draft',
+        })
+        self.assertFalse(reading.image_asset_id)
+
+        reading.write({
+            'meter_image_upload': self.sample_base64,
+            'meter_image_filename': 'test_write.png',
+        })
+
+        self.assertTrue(reading.image_asset_id, 'يجب إنشاء image_asset_id عند كتابة meter_image_upload')
+        self.assertEqual(reading.image_state, 'pending')
+        self.assertTrue(reading.meter_image_url)
+
+    def test_03e_reading_newid_onchange_meter_image_upload(self):
+        """3e. استدعاء onchange على سجل افتراضي NewId لا يرمي خطأ ويجهز image_asset_id"""
+        customer = self.Customer.create({
+            'name': 'مشترك أونشينج افتراضي',
+            'customer_number': 'CUST-NEWID-IMG',
+            'region_id': self.region.id,
+        })
+        meter = self.Meter.create({
+            'meter_number': 'MTR-NEWID-IMG',
+            'customer_id': customer.id,
+        })
+
+        # محاكاة فتح شاشة الإدخال قبل الحفظ (سجل NewId)
+        new_reading = self.env['utility.reading'].new({
+            'meter_id': meter.id,
+            'account_id': customer.id,
+            'reading_value': 80.0,
+            'state': 'draft',
+            'meter_image_upload': self.sample_base64,
+        })
+        new_reading._onchange_meter_image_upload()
+
+        self.assertTrue(new_reading.image_asset_id, 'يجب تعبئة image_asset_id في الذاكرة أثناء onchange')
+        self.assertEqual(new_reading.image_state, 'pending')
+        self.assertFalse(new_reading.meter_image_upload)
+
+    def test_03f_existing_reading_onchange_and_save_persists_image(self):
+        """3f. رفع صورة عبر onchange على قراءة موجودة وحفظها يضمن بقاء الصورة وعدم اختفائها"""
+        customer = self.Customer.create({
+            'name': 'مشترك فحص حفظ الصورة',
+            'customer_number': 'CUST-SAVE-IMG',
+            'region_id': self.region.id,
+        })
+        meter = self.Meter.create({
+            'meter_number': 'MTR-SAVE-IMG',
+            'customer_id': customer.id,
+        })
+        reading = self.env['utility.reading'].create({
+            'meter_id': meter.id,
+            'account_id': customer.id,
+            'reading_value': 120.0,
+            'state': 'draft',
+        })
+        self.assertFalse(reading.image_asset_id)
+        self.assertEqual(reading.meter_image_url, '')
+
+        # محاكاة إرسال الفورم في الواجهة: تعديل الحقل ثم تشغيل onchange
+        reading.meter_image_upload = self.sample_base64
+        reading._onchange_meter_image_upload()
+
+        # التحقق من أن الصورة جهزت ورابط المعاينة فعال
+        self.assertTrue(reading.image_asset_id)
+        self.assertTrue(reading.meter_image_url)
+        self.assertIn(reading.image_asset_id.asset_uuid, reading.meter_image_url)
+
+        # محاكاة نقر المستخدم على زر الحفظ (Save): إرسال القيم المتبقية في الفورم
+        reading.write({
+            'image_asset_id': reading.image_asset_id.id,
+            'meter_image_upload': False,
+        })
+
+        # إعادة قراءة السجل من قاعدة البيانات للتأكد التام من استقرار الصورة وعدم اختفائها
+        reading.invalidate_recordset()
+        reloaded = self.env['utility.reading'].browse(reading.id)
+        self.assertTrue(reloaded.image_asset_id, 'يجب أن يبقى الأصل الرقمي مربوطاً بعد الحفظ')
+        self.assertTrue(reloaded.meter_image_url, 'يجب أن يبقى رابط المعاينة فعالاً بعد الحفظ')
+        self.assertEqual(reloaded.image_asset_id.reading_id, reloaded)
+
     def test_04_decoupled_batch_processing_retry_and_under_review_state(self):
         """4. اختبار معالجة الدفعة وحماية التكرار والصور المصحوبة تحت المراجعة (under_review)"""
         period = self.DateRange.create({

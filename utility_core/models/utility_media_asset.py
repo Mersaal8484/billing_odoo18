@@ -64,9 +64,9 @@ class UtilityMediaAsset(models.Model):
     error_message = fields.Text('رسالة الخطأ')
 
     # ===== روابط للعرض السريع في الواجهات (URL Helpers) =====
-    original_url = fields.Char('رابط الصورة الأصلية', compute='_compute_urls')
-    review_url = fields.Char('رابط صورة المعاينة المكبرة', compute='_compute_urls')
-    thumbnail_url = fields.Char('رابط المصغر للتداول والسجلات', compute='_compute_urls')
+    original_url = fields.Char('رابط الصورة الأصلية', compute='_compute_urls', compute_sudo=True)
+    review_url = fields.Char('رابط صورة المعاينة المكبرة', compute='_compute_urls', compute_sudo=True)
+    thumbnail_url = fields.Char('رابط المصغر للتداول والسجلات', compute='_compute_urls', compute_sudo=True)
 
     _sql_constraints = [
         ('unique_asset_uuid', 'unique(asset_uuid)', 'رمز المعرف الفريد للأصل (Asset UUID) يجب أن يكون فريداً!'),
@@ -107,7 +107,7 @@ class UtilityMediaAsset(models.Model):
 
         Admin فقط unrestricted. كل الأدوار الأخرى تخضع لـ assigned_region_ids.
         Default-Deny: مستخدم بدون مناطق لا يصل لوسائط القراءات المرتبطة.
-        يدعم: قراءة مشترك → account_id.region_id
+        يدعم: قراءة مشترك → account_id.region_id → account_id.area_id → meter_id.route_id
                قراءة شبكية  → meter_id.transformer_id.region_id / feeder_id.region_id
         """
         self.ensure_one()
@@ -116,27 +116,57 @@ class UtilityMediaAsset(models.Model):
         if user.has_group('utility_core.group_utility_admin'):
             return True
 
-        regions = user.assigned_region_ids
         reading = self.reading_id
         if not reading:
             return True
 
-        if not regions:
-            raise AccessError(_("عذراً، ليس لديك مناطق جغرافية محددة للوصول لوسائط القراءات."))
-
-        # تحديد المنطقة: مشترك → شبكي
+        # تحديد المنطقة: سلسلة بحث متعددة للمحافظة على التوافق
         region = False
+
+        # 1. حساب المشترك مباشرة
         if reading.account_id and reading.account_id.region_id:
             region = reading.account_id.region_id
-        elif reading.meter_id:
+
+        # 2. المنطقة المشتقة من الفرع/المنطقة الفرعية للعميل
+        if not region and reading.account_id and reading.account_id.area_id:
+            parent = reading.account_id.area_id.parent_id
+            if parent and parent.type == 'region':
+                region = parent
+
+        # 3. من العداد مباشرة: المحول → الفيدر
+        if not region and reading.meter_id:
             if reading.meter_id.transformer_id and hasattr(reading.meter_id.transformer_id, 'region_id'):
                 region = reading.meter_id.transformer_id.region_id
             elif reading.meter_id.feeder_id and hasattr(reading.meter_id.feeder_id, 'region_id'):
                 region = reading.meter_id.feeder_id.region_id
 
+        # 4. من مسار العداد: route.area_id.parent → region
+        if not region and reading.meter_id and reading.meter_id.route_id:
+            route_area = reading.meter_id.route_id.area_id
+            if route_area:
+                parent = route_area.parent_id
+                if parent and parent.type == 'region':
+                    region = parent
+
+        # التحقق من صلاحية المستخدم: مناطق أو مسارات
+        regions = user.assigned_region_ids
+        route_match = False
+        if not regions and user.assigned_route_ids:
+            # قارئ مسار فقط: تحقق من تطابق المسار مع مسار القراءة
+            if reading.meter_id and reading.meter_id.route_id:
+                route_match = reading.meter_id.route_id in user.assigned_route_ids
+            # أو من الفرع المشتق من المسارات
+            effective_branches = user._get_effective_branch_ids()
+            if not region and effective_branches and reading.account_id and reading.account_id.area_id:
+                if reading.account_id.area_id.id in effective_branches:
+                    route_match = True
+
+        if not regions and not route_match:
+            raise AccessError(_("عذراً، ليس لديك مناطق جغرافية أو مسارات مخصصة للوصول لوسائط القراءات."))
+
         if not region:
             raise AccessError(_("عذراً، تعذّر تحديد المنطقة التشغيلية لهذا الأصل الرقمي."))
 
-        if region not in regions:
+        if regions and region not in regions:
             raise AccessError(_("عذراً، ليس لديك صلاحية للوصول لوسائط المنطقة التشغيلية المحددة."))
         return True

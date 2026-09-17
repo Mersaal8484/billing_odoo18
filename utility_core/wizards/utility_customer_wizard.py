@@ -62,10 +62,12 @@ class UtilityCustomerWizard(models.TransientModel):
 
     utility_region_id = fields.Many2one('utility.region', string="المنطقة التشغيلية", domain="[('type', '=', 'region')]")
     available_area_ids = fields.Many2many('utility.region', compute='_compute_available_area_ids')
-    utility_area_id = fields.Many2one('utility.region', string="الفرع التشغيلي")
-    
+    utility_area_id = fields.Many2one('utility.region', string="الفرع التشغيلي",
+                                      domain="[('type', '=', 'area')]")
+
     available_zone_ids = fields.Many2many('utility.region', compute='_compute_available_zone_ids')
-    transformer_zone_id = fields.Many2one('utility.region', string="نطاق المحول")
+    transformer_zone_id = fields.Many2one('utility.region', string="نطاق المحول",
+                                          domain="[('type', '=', 'zone')]")
 
     # Private Transformer Fields
     use_private_transformer = fields.Boolean(

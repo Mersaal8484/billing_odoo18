@@ -64,7 +64,7 @@ export class ReadingReviewWorkspaceAction extends Component {
         try {
             const [periods, regions, batches] = await Promise.all([
                 this.orm.searchRead("date.range", [["work_type", "=", "readings"]], ["id", "name"], { limit: 50, order: "date_start desc" }),
-                this.orm.searchRead("utility.region", [], ["id", "name"], { limit: 100 }),
+                this.orm.searchRead("utility.region", [["type", "=", "region"]], ["id", "name"], { limit: 100, order: "name asc" }),
                 this.orm.searchRead("utility.reading.batch", [["state", "!=", "draft"]], ["id", "name"], { limit: 100, order: "id desc" }),
             ]);
 
@@ -165,9 +165,9 @@ export class ReadingReviewWorkspaceAction extends Component {
                 this.state.stats.approved += 1;
                 if (this.state.stats.pending > 0) this.state.stats.pending -= 1;
 
-                // Auto advance if lightbox open
+                // Close lightbox if open
                 if (this.state.activeLightboxReading && this.state.activeLightboxReading.id === reading.id) {
-                    this.onNextLightboxReading();
+                    this.onCloseLightbox();
                 }
             } else {
                 this.notification.add(res.message || _t("تعذر الاعتماد"), { type: "warning" });
@@ -179,6 +179,9 @@ export class ReadingReviewWorkspaceAction extends Component {
 
     onRejectRow(reading) {
         this.state.activeRejectionReading = reading;
+        if (this.state.activeLightboxReading && this.state.activeLightboxReading.id === reading.id) {
+            this.onCloseLightbox();
+        }
     }
 
     async onConfirmRejection(data) {
@@ -203,7 +206,7 @@ export class ReadingReviewWorkspaceAction extends Component {
                 this.state.activeRejectionReading = null;
 
                 if (this.state.activeLightboxReading && this.state.activeLightboxReading.id === reading.id) {
-                    this.onNextLightboxReading();
+                    this.onCloseLightbox();
                 }
             } else {
                 this.notification.add(res.message || _t("تعذر الرفض"), { type: "danger" });

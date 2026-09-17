@@ -16,23 +16,6 @@ class UtilityReading(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'utility.dropdown.mixin']
     _order = 'reading_date desc'
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        records = super().create(vals_list)
-        # تحديث آخر قراءة في العداد تلقائياً
-        meters = records.mapped('meter_id')
-        if meters:
-            meters._update_last_reading()
-        return records
-
-    def write(self, vals):
-        result = super().write(vals)
-        if 'reading_value' in vals or 'reading_date' in vals:
-            meters = self.mapped('meter_id')
-            if meters:
-                meters._update_last_reading()
-        return result
-
 
     active = fields.Boolean('نشط', default=True)
     company_id = fields.Many2one('res.company', 'الشركة', default=lambda self: self.env.company)
@@ -156,40 +139,84 @@ class UtilityReading(models.Model):
         elif not self.is_estimated and self.reading_type == 'estimated':
             self.reading_type = 'manual'
 
-    @api.onchange('meter_image_upload')
-    def _onchange_meter_image_upload(self):
-        if not self.meter_image_upload:
-            return
-        raw = self.meter_image_upload
+    @api.model
+    def _decode_image_payload(self, raw):
+        """Safely decode image payload from base64 string, data-uri, or bytes."""
+        if not raw:
+            return b''
         if isinstance(raw, str):
+            if ',' in raw and raw.startswith('data:'):
+                raw = raw.split(',', 1)[1]
             try:
-                raw = base64.b64decode(raw, validate=True)
+                return base64.b64decode(raw, validate=False)
             except Exception:
-                return
-        if isinstance(raw, bytes) and raw[:4] in (b'\xff\xd8\xff\xe0', b'\xff\xd8\xff\xe1', b'\xff\xd8\xff\xdb', b'\x89PNG', b'RIFF'):
-            pass
-        else:
+                return b''
+        if isinstance(raw, (bytes, bytearray)):
+            raw_bytes = bytes(raw)
+            if (raw_bytes.startswith(b'\xff\xd8') or
+                raw_bytes.startswith(b'\x89PNG') or
+                raw_bytes.startswith(b'GIF') or
+                raw_bytes.startswith(b'RIFF') or
+                raw_bytes.startswith(b'BM')):
+                return raw_bytes
             try:
-                raw_decoded = base64.b64decode(raw, validate=True)
-                if raw_decoded[:4] in (b'\xff\xd8\xff\xe0', b'\xff\xd8\xff\xe1', b'\xff\xd8\xff\xdb', b'\x89PNG', b'RIFF'):
-                    raw = raw_decoded
+                decoded = base64.b64decode(raw_bytes, validate=False)
+                return decoded
             except Exception:
-                pass
-        old_asset = self.image_asset_id
+                return raw_bytes
+        return b''
+
+    def _store_reading_image(self, raw_data, filename=None):
+        """Helper to store image data into canonical utility.media.asset and link it."""
+        raw_bytes = self._decode_image_payload(raw_data)
+        if not raw_bytes:
+            return False
+        old_asset = self.image_asset_id if len(self) == 1 else False
+        real_id = False
+        if len(self) == 1:
+            if isinstance(self.id, int):
+                real_id = self.id
+            elif hasattr(self, '_origin') and self._origin and isinstance(self._origin.id, int):
+                real_id = self._origin.id
+        target_filename = filename or (f"reading_{real_id or 'new'}.jpg")
         new_asset = self.env['utility.media.service'].sudo().store_media(
-            file_data=raw,
-            filename=f"reading_{self.id or 'legacy'}.jpg",
+            file_data=raw_bytes,
+            filename=target_filename,
             mimetype='image/jpeg',
-            reading_id=self.id if isinstance(self.id, int) else False,
+            reading_id=real_id,
             asset_type='meter_reading'
         )
         if old_asset and old_asset != new_asset:
             new_asset.sudo().write({'revision': (old_asset.revision or 1) + 1})
-        self.with_context(_bypass_reading_protection=True).write({
-            'image_asset_id': new_asset.id,
-            'meter_image_upload': False,
-            'image_state': 'pending' if self.image_state == 'none' else self.image_state,
-        })
+        return new_asset
+
+    @api.onchange('meter_image_upload')
+    def _onchange_meter_image_upload(self):
+        if not self.meter_image_upload:
+            return
+        reading_origin = self._origin if getattr(self, '_origin', False) else self
+        target_id = reading_origin.id if (reading_origin and isinstance(reading_origin.id, int)) else (self.id if isinstance(self.id, int) else False)
+        new_asset = reading_origin._store_reading_image(
+            self.meter_image_upload,
+            filename=self.meter_image_filename or (f"reading_{target_id}.jpg" if target_id else "reading_new.jpg")
+        )
+        if new_asset:
+            self.image_asset_id = new_asset.id
+            self.meter_image_upload = False
+            self.meter_image_url = (
+                new_asset.review_url
+                or new_asset.thumbnail_url
+                or new_asset.original_url
+                or (f"/utility/media/{new_asset.asset_uuid}/review" if new_asset.asset_uuid else '')
+            )
+            if self.image_state == 'none':
+                self.image_state = 'pending'
+            if target_id:
+                reading_origin.sudo().with_context(_bypass_reading_protection=True).write({
+                    'image_asset_id': new_asset.id,
+                    'meter_image_upload': False,
+                    'image_state': self.image_state,
+                })
 
     @api.depends('image_asset_id', 'image_asset_id.state', 'attachment_id')
     def _compute_meter_image(self):
@@ -204,15 +231,20 @@ class UtilityReading(models.Model):
             if r.attachment_id and r.attachment_id.datas:
                 r.meter_image = r.attachment_id.datas
 
-    @api.depends('image_asset_id', 'image_asset_id.state', 'image_asset_id.review_url', 'attachment_id')
+    @api.depends('image_asset_id', 'image_asset_id.state', 'image_asset_id.review_url', 'attachment_id', 'meter_image_upload')
     def _compute_meter_image_url(self):
         for r in self:
             asset = r.image_asset_id.sudo() if r.image_asset_id else False
             attachment = r.attachment_id.sudo() if r.attachment_id else False
-            if asset and asset.state == 'ready':
-                r.meter_image_url = asset.review_url or asset.thumbnail_url or asset.original_url or ''
+            if asset:
+                url = asset.review_url or asset.thumbnail_url or asset.original_url
+                if not url and asset.asset_uuid:
+                    url = f"/utility/media/{asset.asset_uuid}/review"
+                r.meter_image_url = url or ''
             elif attachment:
                 r.meter_image_url = f"/web/image/{attachment.id}"
+            elif r.meter_image_upload and isinstance(r.id, int):
+                r.meter_image_url = f"/web/image?model=utility.reading&id={r.id}&field=meter_image_upload"
             else:
                 r.meter_image_url = ''
 
@@ -224,35 +256,20 @@ class UtilityReading(models.Model):
         for r in self:
             if not r.meter_image:
                 continue
-            raw = r.meter_image
-            if isinstance(raw, str):
-                try:
-                    raw = base64.b64decode(raw, validate=True)
-                except Exception:
-                    pass
-            if isinstance(raw, bytes) and raw[:4] in (b'\xff\xd8\xff\xe0', b'\xff\xd8\xff\xe1', b'\xff\xd8\xff\xdb', b'\x89PNG', b'RIFF'):
-                pass
-            else:
-                try:
-                    raw_decoded = base64.b64decode(raw, validate=True)
-                    if raw_decoded[:4] in (b'\xff\xd8\xff\xe0', b'\xff\xd8\xff\xe1', b'\xff\xd8\xff\xdb', b'\x89PNG', b'RIFF'):
-                        raw = raw_decoded
-                except Exception:
-                    pass
-            old_asset = r.image_asset_id
-            new_asset = self.env['utility.media.service'].sudo().store_media(
-                file_data=raw,
-                filename=f"reading_{r.id or 'legacy'}.jpg",
-                mimetype='image/jpeg',
-                reading_id=r.id if isinstance(r.id, int) else False,
-                asset_type='meter_reading'
+            new_asset = r._store_reading_image(
+                r.meter_image,
+                filename=f"reading_{r.id or 'legacy'}.jpg"
             )
-            if old_asset and old_asset != new_asset:
-                new_asset.sudo().write({'revision': (old_asset.revision or 1) + 1})
-            r.with_context(_bypass_reading_protection=True).write({
-                'image_asset_id': new_asset.id,
-                'image_state': 'pending' if r.image_state == 'none' else r.image_state,
-            })
+            if new_asset:
+                r.with_context(_bypass_reading_protection=True).write({
+                    'image_asset_id': new_asset.id,
+                    'image_state': 'pending' if r.image_state == 'none' else r.image_state,
+                })
+
+    def action_save_image(self):
+        """حفظ الصورة وإغلاق النافذة المنبثقة."""
+        self.ensure_one()
+        return {'type': 'ir.actions.act_window_close'}
 
     def _requires_billing_review(self):
         """Return whether commercial validation rules apply to the reading.
@@ -786,6 +803,27 @@ class UtilityReading(models.Model):
         elif vals.get('reading_type') in ('manual', 'ami') and 'is_estimated' not in vals:
             vals['is_estimated'] = False
 
+        # Process uploaded meter image into canonical media asset
+        if vals.get('meter_image_upload'):
+            first_rec = self[:1]
+            new_asset = first_rec._store_reading_image(
+                vals['meter_image_upload'],
+                filename=vals.get('meter_image_filename')
+            )
+            if new_asset:
+                vals['image_asset_id'] = new_asset.id
+                vals['meter_image_upload'] = False
+                if vals.get('image_state', 'none') == 'none':
+                    vals['image_state'] = 'pending'
+                if first_rec.id and not new_asset.reading_id:
+                    new_asset.sudo().write({'reading_id': first_rec.id})
+
+        if vals.get('image_asset_id'):
+            for r in self:
+                asset = self.env['utility.media.asset'].sudo().browse(vals['image_asset_id'])
+                if asset.exists() and not asset.reading_id and r.id:
+                    asset.write({'reading_id': r.id})
+
         # P0 Guard: state cannot be directly mutated outside controlled transitions
         is_su_or_admin = bool(self.env.su or self.env.user.has_group('utility_core.group_utility_admin'))
         is_billing_mgr = bool(is_su_or_admin or self.env.user.has_group('utility_core.group_utility_billing_manager'))
@@ -883,6 +921,21 @@ class UtilityReading(models.Model):
                 vals['is_estimated'] = True
             elif vals.get('is_estimated'):
                 vals['reading_type'] = 'estimated'
+
+            # Process meter image upload into canonical media asset
+            if vals.get('meter_image_upload') and not vals.get('image_asset_id'):
+                raw_bytes = self._decode_image_payload(vals['meter_image_upload'])
+                if raw_bytes:
+                    target_filename = vals.get('meter_image_filename') or 'reading_new.jpg'
+                    new_asset = self.env['utility.media.service'].sudo().store_media(
+                        file_data=raw_bytes,
+                        filename=target_filename,
+                        mimetype='image/jpeg',
+                        asset_type='meter_reading'
+                    )
+                    vals['image_asset_id'] = new_asset.id
+                    if vals.get('image_state', 'none') == 'none':
+                        vals['image_state'] = 'pending'
 
             purpose = vals.get('reading_purpose')
             if vals.get('is_initial_reading'):

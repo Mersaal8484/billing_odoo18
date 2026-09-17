@@ -7,6 +7,8 @@
         <field name="arch" type="xml">
             <form string="صور العداد">
                 <field name="state" invisible="1"/>
+                <field name="image_asset_id" invisible="1"/>
+                <field name="meter_image_filename" invisible="1"/>
                 <sheet>
                     <div class="o_utility_image_section p-4">
                         <div class="row g-4 align-items-stretch">
@@ -29,6 +31,7 @@
                     </div>
                 </sheet>
                 <footer>
+                    <button name="action_save_image" string="حفظ" type="object" class="btn-primary"/>
                     <button string="إغلاق" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
@@ -83,6 +86,8 @@
             <form>
                 <field name="available_meter_ids" invisible="1"/>
                 <field name="company_id" invisible="1"/>
+                <field name="image_asset_id" invisible="1"/>
+                <field name="meter_image_filename" invisible="1"/>
                 <header>
                     <!-- أزرار حسب الحالة -->
                     <button name="action_submit_review" type="object"
