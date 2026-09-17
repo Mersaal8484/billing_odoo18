@@ -181,6 +181,9 @@
                         <group string="البيانات الأساسية">
                             <field name="code"
                                    attrs="{'readonly': [('transformer_origin_id', '!=', False)]}"/>
+                            <field name="filter_region_id"
+                                   string="المنطقة الرئيسية"
+                                   attrs="{'invisible': [('type', '!=', 'zone')]}"/>
                             <field name="parent_id"
                                    string="المنطقة الفرعية"
                                    domain="[('type', '=', 'area')]"

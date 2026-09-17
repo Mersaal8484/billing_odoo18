@@ -57,6 +57,12 @@ class UtilityRegion(models.Model):
         ondelete='restrict',
         help='ربط جغرافي وصفي لا ينقل ملكية الحساب الكهربائي.')
 
+    filter_region_id = fields.Many2one(
+        'utility.region', 'المنطقة الرئيسية',
+        domain="[('type', '=', 'region')]",
+        compute='_compute_filter_region_id', inverse='_inverse_filter_region_id',
+        help='حقل مساعد لتصفية المناطق الفرعية')
+
     _sql_constraints = [
         ('unique_code_parent_company', 'unique(code, parent_id, company_id)', 'الرمز يجب أن يكون فريداً لكل عنصر أب/شركة!'),
         ('unique_zone_transformer_origin', 'unique(transformer_origin_id)',
@@ -73,6 +79,20 @@ class UtilityRegion(models.Model):
         for r in self:
             r.zone_count = len(r.zone_ids)
 
+    @api.depends('parent_id', 'parent_id.parent_id')
+    def _compute_filter_region_id(self):
+        for rec in self:
+            if rec.type == 'zone' and rec.parent_id and rec.parent_id.type == 'area':
+                rec.filter_region_id = rec.parent_id.parent_id
+            else:
+                rec.filter_region_id = False
+
+    def _inverse_filter_region_id(self):
+        for rec in self:
+            if rec.type == 'zone' and rec.filter_region_id:
+                if not rec.parent_id or rec.parent_id.parent_id != rec.filter_region_id:
+                    rec.parent_id = False
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -86,6 +106,14 @@ class UtilityRegion(models.Model):
     def _onchange_parent_id_inherit_cadence(self):
         if self.parent_id and self.parent_id.recurring_rule_type:
             self.recurring_rule_type = normalize_billing_cadence(self.parent_id.recurring_rule_type)
+
+    @api.onchange('filter_region_id')
+    def _onchange_filter_region_id(self):
+        if self.type == 'zone':
+            if self.filter_region_id:
+                return {'domain': {'parent_id': [('type', '=', 'area'), ('parent_id', '=', self.filter_region_id.id)]}}
+            else:
+                return {'domain': {'parent_id': [('type', '=', 'area')]}}
 
     @api.constrains('parent_id', 'recurring_rule_type')
     def _check_parent_cadence_consistency(self):

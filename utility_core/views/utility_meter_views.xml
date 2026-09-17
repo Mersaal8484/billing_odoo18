@@ -6,21 +6,21 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="meter_number"/>
-                <field name="operational_number" optional="show"/>
+                <field name="operational_number" />
                 <field name="connection_type" widget="badge" decoration-info="connection_type == 'subscriber'"
                         decoration-success="connection_type == 'feeder'"
                         decoration-warning="connection_type in ('private_transformer', 'transformer')"/>
-                <field name="meter_type_id"/>
+                <field name="meter_type_id" optional="hide"/>
                 <field name="is_coupling_meter"/>
                 <field name="status_id"/>
                 <field name="phase"/>
-                <field name="account_id"/>
-                <field name="customer_id"/>
+                    <field name="account_id" optional="hide"/>
+                <field name="customer_id" optional="hide"/>
                 <field name="reading_count"/>
                 <field name="last_reading_value"/>
                 <field name="last_read_date"/>
                 <field name="multiplier"/>
-                <field name="installation_date"/>
+                <field name="installation_date" optional="hide"/>
                 <field name="active"/>
             </tree>
         </field>
