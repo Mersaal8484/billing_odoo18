@@ -272,19 +272,73 @@ class UtilityStaff(models.Model):
                             'لا يمكن إزالة دور المحصل لوجود تسويات عهدة نقدية مفتوحة للموظف %s.'
                         ) % record.display_name)
 
-    def _auto_create_collector_journal(self):
-        """No-op: automatic collector journal provisioning has been removed.
+    def _ensure_collector_cash_journal(self):
+        """Auto-provision a dedicated Cash Journal for this collector.
 
-        Rationale (Phase 5, P0): creating account.account and account.journal
-        records silently during staff.create() or staff.write() violates the
-        production invariant that no Chart-of-Accounts mutation may occur at
-        runtime without explicit administrator action.
+        Called via ``sudo()`` from the mobile API when a collector attempts
+        to sync invoices without a pre-configured journal.  This avoids
+        forcing the collector to contact an administrator before first use.
 
-        To provision a collector journal, use the explicit admin action:
-            utility.staff form view → button 'إنشاء يومية التحصيل'
-            (action_create_cash_journal) — protected by Admin/Accounting Manager.
+        Idempotent: returns the existing journal if already assigned.
+        Must be called on a single record (``ensure_one``).
         """
-        pass
+        self.ensure_one()
+        if self.collection_journal_id:
+            return self.collection_journal_id
+        if not self.user_id or not self.user_id.has_group(
+                'utility_core.group_utility_collector'):
+            return self.env['account.journal']
+        company = self.company_id
+        code_suffix = str(self.id or self.employee_code or '001')[-4:]
+        code = ('C%s' % code_suffix).upper()[:5]
+        journal_name = 'يومية تحصيل - %s' % self.name
+
+        existing_journal = self.env['account.journal'].search([
+            ('company_id', '=', company.id),
+            ('type', '=', 'cash'),
+            '|', ('code', '=', code), ('name', '=', journal_name),
+        ], limit=1)
+
+        if not existing_journal:
+            acc_name = 'حساب صندوق - %s' % self.name
+            cash_acc = self.env['account.account'].search([
+                ('name', '=', acc_name),
+                ('company_id', '=', company.id),
+            ], limit=1)
+            if not cash_acc:
+                code_num = str(self.id or 1).zfill(3)
+                cash_acc = self.env['account.account'].create({
+                    'name': acc_name,
+                    'code': '101%s' % code_num[-3:],
+                    'account_type': 'asset_cash',
+                    'company_id': company.id,
+                })
+            existing_journal = self.env['account.journal'].create({
+                'name': journal_name,
+                'code': code,
+                'type': 'cash',
+                'company_id': company.id,
+                'default_account_id': cash_acc.id,
+            })
+
+        self.collection_journal_id = existing_journal.id
+
+        collector_cash_account = (
+            existing_journal.default_account_id
+            or company.account_journal_payment_debit_account_id
+        )
+        if collector_cash_account:
+            for line in existing_journal.inbound_payment_method_line_ids:
+                if line.payment_account_id != collector_cash_account:
+                    line.sudo().write({
+                        'payment_account_id': collector_cash_account.id,
+                    })
+
+        _logger.info(
+            'Auto-provisioned cash journal %s for collector %s (user %s)',
+            existing_journal.name, self.name, self.user_id.login,
+        )
+        return existing_journal
 
     def action_create_cash_journal(self):
 
@@ -360,15 +414,15 @@ class UtilityStaff(models.Model):
         # ── تعيين حساب المقبوضات المعلقة على طريقة الدفع "Manual" ──────────────
         # Odoo 16 يرفض إنشاء مدفوعات بدون هذا الحساب على سطر طريقة الدفع.
         # نُعيّن الحساب من إعدادات الشركة إن وُجد، وإلا من الحساب الافتراضي لليومية.
-        company_outstanding = (
-            company.account_journal_payment_debit_account_id
-            or existing_journal.default_account_id
+        collector_cash_account = (
+            existing_journal.default_account_id
+            or company.account_journal_payment_debit_account_id
         )
-        if company_outstanding:
+        if collector_cash_account:
             for line in existing_journal.inbound_payment_method_line_ids:
-                if not line.payment_account_id:
+                if line.payment_account_id != collector_cash_account:
                     line.sudo().write({
-                        'payment_account_id': company_outstanding.id,
+                        'payment_account_id': collector_cash_account.id,
                     })
 
         self.message_post(body=_(

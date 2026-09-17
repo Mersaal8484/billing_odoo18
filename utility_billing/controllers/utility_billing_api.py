@@ -1,4 +1,4 @@
-﻿from odoo import fields, http
+from odoo import fields, http
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.http import request
 import hmac
@@ -192,10 +192,12 @@ class UtilityBillingAPI(http.Controller):
                 'No active field-collector profile is configured for this user.',
             )
         if not collector.collection_journal_id:
-            return False, self._error(
-                'COLLECTOR_CASH_JOURNAL_MISSING',
-                'A dedicated cash journal must be configured for this collector.',
-            )
+            journal = collector.sudo()._ensure_collector_cash_journal()
+            if not journal:
+                return False, self._error(
+                    'COLLECTOR_CASH_JOURNAL_MISSING',
+                    'A dedicated cash journal must be configured for this collector.',
+                )
         return collector, False
 
     def _get_collector_scope_accounts(self):
@@ -362,6 +364,22 @@ class UtilityBillingAPI(http.Controller):
                 )
             collection = request.env['utility.collection'].sudo().search(
                 [('payment_id', '=', existing.id)], limit=1)
+            if existing.state != 'posted':
+                try:
+                    existing.action_post()
+                except (AccessError, UserError, ValidationError):
+                    return self._error(
+                        'COLLECTION_IN_PROGRESS',
+                        'The original collection request is still being processed.',
+                    )
+                collection = request.env['utility.collection'].sudo().search(
+                    [('payment_id', '=', existing.id)], limit=1)
+            if not collection:
+                allocation = request.env['utility.payment.allocation'].sudo().allocate_payment(existing)
+                if existing.utility_sale_order_id and allocation:
+                    existing._create_field_collection_from_allocation(allocation)
+                collection = request.env['utility.collection'].sudo().search(
+                    [('payment_id', '=', existing.id)], limit=1)
             if not collection or existing.state != 'posted':
                 return self._error(
                     'COLLECTION_IN_PROGRESS',
@@ -375,6 +393,9 @@ class UtilityBillingAPI(http.Controller):
                 'COLLECTOR_PAYMENT_METHOD_MISSING',
                 'No inbound payment method is configured on the collector cash journal.',
             )
+        cash_account = collector.collection_journal_id.default_account_id
+        if cash_account and method_line.payment_account_id != cash_account:
+            method_line.sudo().write({'payment_account_id': cash_account.id})
         if amount > invoice.amount_residual:
             return self._error(
                 'AMOUNT_EXCEEDS_RESIDUAL',
@@ -388,6 +409,7 @@ class UtilityBillingAPI(http.Controller):
                     'partner_type': 'customer',
                     'amount': amount,
                     'currency_id': invoice.currency_id.id,
+                    'journal_id': collector.collection_journal_id.id,
                     'utility_sale_order_id': order.id,
                     'utility_invoice_id': invoice.id,
                     'utility_payment_method': 'cash',
@@ -408,6 +430,19 @@ class UtilityBillingAPI(http.Controller):
                 raise
             collection = request.env['utility.collection'].sudo().search(
                 [('payment_id', '=', payment.id)], limit=1)
+            if payment.state != 'posted':
+                try:
+                    payment.action_post()
+                except (AccessError, UserError, ValidationError):
+                    return self._error('COLLECTION_IN_PROGRESS', 'The original request is still being processed.')
+                collection = request.env['utility.collection'].sudo().search(
+                    [('payment_id', '=', payment.id)], limit=1)
+            if not collection:
+                allocation = request.env['utility.payment.allocation'].sudo().allocate_payment(payment)
+                if payment.utility_sale_order_id and allocation:
+                    payment._create_field_collection_from_allocation(allocation)
+                collection = request.env['utility.collection'].sudo().search(
+                    [('payment_id', '=', payment.id)], limit=1)
             if payment.state == 'posted' and collection:
                 return self._collection_receipt_payload(payment, collection, duplicate=True)
             return self._error('COLLECTION_IN_PROGRESS', 'The original request is still being processed.')
@@ -756,10 +791,15 @@ class UtilityBillingAPI(http.Controller):
             return self._error('VALIDATION_ERROR', 'offset must be numeric')
 
         period = request.env['date.range'].search([
-            ('period_role', '=', 'payment'),
-            ('state', '=', 'open'),
+            ('collection_state', 'in', ('open', 'closing')),
             '|', ('company_id', '=', False), ('company_id', '=', request.env.company.id)
         ], order='date_start desc', limit=1)
+        if not period:
+            period = request.env['date.range'].search([
+                ('period_role', '=', 'payment'),
+                ('state', '=', 'open'),
+                '|', ('company_id', '=', False), ('company_id', '=', request.env.company.id)
+            ], order='date_start desc', limit=1)
 
         if not period:
             return {'success': True, 'period': None, 'invoices': []}

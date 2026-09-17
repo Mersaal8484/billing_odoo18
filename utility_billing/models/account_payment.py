@@ -90,6 +90,16 @@ class AccountPayment(models.Model):
         for payment in self:
             payment.allocation_count = len(payment.allocation_ids)
 
+    @api.depends('journal_id', 'payment_type', 'payment_method_line_id', 'collector_id', 'utility_payment_method')
+    def _compute_outstanding_account_id(self):
+        super()._compute_outstanding_account_id()
+        for pay in self:
+            if pay.utility_payment_method == 'cash':
+                collector = pay.collector_id or pay._current_collector_profile(pay.company_id)
+                cash_account = collector.collection_journal_id.default_account_id if collector and collector.collection_journal_id else False
+                if cash_account:
+                    pay.outstanding_account_id = cash_account
+
     @api.depends(
         'utility_sale_order_id', 'utility_sale_order_id.customer_id',
         'opening_customer_id', 'utility_opening_move_id',
@@ -245,7 +255,16 @@ class AccountPayment(models.Model):
                     'دفعة التحصيل يجب أن تستخدم اليومية الخاصة بالمتحصل المحدد.'
                 ))
             cash_account = collector.collection_journal_id.default_account_id
-            if not cash_account or self.outstanding_account_id != cash_account:
+            if not cash_account:
+                raise ValidationError(_(
+                    'يجب إعداد حساب صندوق نقدي مستقل في يومية التحصيل للمتحصل.'
+                ))
+            if self.outstanding_account_id != cash_account:
+                for line in collector.collection_journal_id.inbound_payment_method_line_ids:
+                    if line.payment_account_id != cash_account:
+                        line.sudo().write({'payment_account_id': cash_account.id})
+                self.outstanding_account_id = cash_account
+            if self.outstanding_account_id != cash_account:
                 raise ValidationError(_(
                     'حساب سيولة دفعة المتحصل يجب أن يكون حساب صندوق المتحصل المستقل.'
                 ))
@@ -290,11 +309,17 @@ class AccountPayment(models.Model):
             ))
         if collector.company_id != order.company_id:
             raise ValidationError(_('المتحصل واليومية يجب أن ينتميا إلى شركة الفاتورة.'))
+        journal = collector.collection_journal_id
         journal_id = vals.get('journal_id')
-        if journal_id and journal_id != collector.collection_journal_id.id:
+        if journal_id and journal_id != journal.id:
             raise ValidationError(_('لا يمكن تسجيل دفعة المتحصل في يومية متحصل آخر.'))
         vals['collector_id'] = collector.id
-        vals['journal_id'] = collector.collection_journal_id.id
+        vals['journal_id'] = journal.id
+        cash_account = journal.default_account_id
+        if cash_account:
+            for line in journal.inbound_payment_method_line_ids:
+                if line.payment_account_id != cash_account:
+                    line.sudo().write({'payment_account_id': cash_account.id})
 
     @api.model_create_multi
     def create(self, vals_list):
