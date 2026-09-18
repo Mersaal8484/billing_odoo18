@@ -38,7 +38,6 @@ class TestContractTemplateVersioningAndPricingSnapshot(TransactionCase):
             'name': 'Test Citizen Customer',
         })
         cls.customer = cls.env['utility.customer'].create({
-            'name': 'Citizen Account 001',
             'customer_number': 'CUST-TEST-001',
             'partner_id': cls.partner.id,
             'category_id': cls.category.id,
@@ -176,10 +175,9 @@ class TestContractTemplateVersioningAndPricingSnapshot(TransactionCase):
         ])
 
         cust_block = self.env['utility.customer'].create({
-            'name': 'Block Account',
             'customer_number': 'CUST-BLOCK-001',
             'partner_id': self.partner.id,
-            'subscriber_category_id': self.category.id,
+            'category_id': self.category.id,
             'subscriber_id': self.subscriber.id,
             'contract_template_id': template_block.id,
         })
@@ -225,10 +223,9 @@ class TestContractTemplateVersioningAndPricingSnapshot(TransactionCase):
         ])
 
         cust_tier = self.env['utility.customer'].create({
-            'name': 'Tier Account',
             'customer_number': 'CUST-TIER-001',
             'partner_id': self.partner.id,
-            'subscriber_category_id': self.category.id,
+            'category_id': self.category.id,
             'subscriber_id': self.subscriber.id,
             'contract_template_id': template_tier.id,
         })
@@ -315,10 +312,9 @@ class TestContractTemplateVersioningAndPricingSnapshot(TransactionCase):
         self.assertEqual(v1.version_number, 1)
 
         cust_block = self.env['utility.customer'].create({
-            'name': 'Block Customer',
             'customer_number': 'CUST-BLK-001',
             'partner_id': self.partner.id,
-            'subscriber_category_id': self.category.id,
+            'category_id': self.category.id,
             'subscriber_id': self.subscriber.id,
             'contract_template_id': template_block.id,
         })

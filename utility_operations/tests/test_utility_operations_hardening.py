@@ -17,10 +17,10 @@ class TestUtilityOperationsHardening(TransactionCase):
             'category_id': self.category.id,
         })
         self.customer = self.env['utility.customer'].create({
-            'name': 'عميل العمليات',
             'customer_number': 'CUST-OPS-001',
-            'subscriber_category_id': self.category.id,
+            'category_id': self.category.id,
             'subscriber_id': self.subscriber_type.id,
+            'partner_id': self.env['res.partner'].create({'name': 'شريك اختبار العمليات'}).id,
             'company_id': self.company.id,
         })
         self.meter_model = self.env['utility.meter.model'].create({
@@ -28,10 +28,21 @@ class TestUtilityOperationsHardening(TransactionCase):
             'code': 'MDL-OPS-001',
             'phase': 'single',
         })
+        self.product = self.env['product.product'].create({
+            'name': 'منتج عداد العمليات',
+            'type': 'product',
+            'tracking': 'serial',
+        })
+        self.lot = self.env['stock.lot'].create({
+            'name': 'SN-OPS-001',
+            'product_id': self.product.id,
+            'company_id': self.company.id,
+        })
         self.meter = self.env['utility.meter'].create({
-            'name': 'عداد العمليات',
             'meter_number': 'MTR-OPS-001',
             'model_id': self.meter_model.id,
+            'product_id': self.product.id,
+            'lot_id': self.lot.id,
             'company_id': self.company.id,
             'customer_id': self.customer.id,
         })

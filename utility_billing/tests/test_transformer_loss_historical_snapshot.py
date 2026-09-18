@@ -35,8 +35,23 @@ class TestTransformerLossHistoricalSnapshot(common.TransactionCase):
         })
 
         # Customer and Meter linked to Transformer A initially
+        cls.category = cls.env['utility.subscriber.category'].create({
+            'name': 'فئة الاختبار',
+            'code': 'CAT-LOSS-TEST',
+        })
+        cls.subscriber_type = cls.env['utility.subscriber'].create({
+            'name': 'مشترك الاختبار',
+            'code': 'SUB-LOSS-TEST',
+            'category_id': cls.category.id,
+        })
+        cls.partner = cls.env['res.partner'].create({
+            'name': 'شريك اختبار فقد',
+        })
         cls.customer = cls.env['utility.customer'].create({
-            'name': 'Test Customer',
+            'customer_number': 'CUST-LOSS-TEST-001',
+            'partner_id': cls.partner.id,
+            'category_id': cls.category.id,
+            'subscriber_id': cls.subscriber_type.id,
             'transformer_id': cls.transformer_A.id,
         })
         cls.meter = cls.env['utility.meter'].create({

@@ -48,16 +48,28 @@ class TestOrganizationalScopeOperations(TransactionCase):
             'company_id': self.company.id,
         })
 
+        self.category = self.env['utility.subscriber.category'].create({
+            'name': 'فئة اختبار العمليات',
+            'code': 'OPS-CAT-01',
+        })
+        self.subscriber = self.env['utility.subscriber'].create({
+            'name': 'نوع اختبار العمليات',
+            'code': 'OPS-SUB-01',
+            'category_id': self.category.id,
+        })
+
         self.customer_sanaa = self.env['utility.customer'].create({
-            'name': 'حساب السبعين 01',
             'partner_id': self.partner_sanaa.id,
             'customer_number': 'CUST_SABEEN_01',
+            'category_id': self.category.id,
+            'subscriber_id': self.subscriber.id,
             'company_id': self.company.id,
         })
         self.customer_aden = self.env['utility.customer'].create({
-            'name': 'حساب المنصورة 01',
             'partner_id': self.partner_aden.id,
             'customer_number': 'CUST_MANSOURA_01',
+            'category_id': self.category.id,
+            'subscriber_id': self.subscriber.id,
             'company_id': self.company.id,
         })
 
@@ -65,12 +77,14 @@ class TestOrganizationalScopeOperations(TransactionCase):
             'customer_id': self.customer_sanaa.id,
             'service_type': 'new_connection',
             'description': 'توصيل صنعاء',
+            'order_number': 'SO-SANAA-TEST-001',
             'company_id': self.company.id,
         })
         self.service_order_aden = self.env['utility.service.order'].create({
             'customer_id': self.customer_aden.id,
             'service_type': 'new_connection',
             'description': 'توصيل عدن',
+            'order_number': 'SO-ADEN-TEST-001',
             'company_id': self.company.id,
         })
 
@@ -136,14 +150,16 @@ class TestOrganizationalScopeOperations(TransactionCase):
             'region_id': self.region_sanaa.id,
             'area_id': self.branch_sanaa1.id,
             'alarm_type': 'tamper',
-            'severity': 'high',
+            'severity': 'critical',
+            'description': 'إنذار تلاعب صنعاء',
             'company_id': self.company.id,
         })
         alarm_aden = self.env['utility.alarm'].create({
             'region_id': self.region_aden.id,
             'area_id': self.branch_aden1.id,
             'alarm_type': 'tamper',
-            'severity': 'high',
+            'severity': 'critical',
+            'description': 'إنذار تلاعب عدن',
             'company_id': self.company.id,
         })
         alarms = self.env['utility.alarm'].with_user(self.user_sanaa).search([])

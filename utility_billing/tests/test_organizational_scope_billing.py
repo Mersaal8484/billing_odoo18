@@ -48,16 +48,27 @@ class TestOrganizationalScopeBilling(TransactionCase):
             'company_id': self.company.id,
         })
 
+        self.category = self.env['utility.subscriber.category'].create({
+            'name': 'فئة الفوترة',
+            'code': 'CAT-BILL-01',
+        })
+        self.subscriber_type = self.env['utility.subscriber'].create({
+            'name': 'مشترك الفوترة',
+            'code': 'SUB-BILL-01',
+            'category_id': self.category.id,
+        })
         self.customer_sanaa = self.env['utility.customer'].create({
-            'name': 'حساب صنعاء 02',
             'partner_id': self.partner_sanaa.id,
             'customer_number': 'CUST_SANAA_BILL_02',
+            'category_id': self.category.id,
+            'subscriber_id': self.subscriber_type.id,
             'company_id': self.company.id,
         })
         self.customer_aden = self.env['utility.customer'].create({
-            'name': 'حساب عدن 02',
             'partner_id': self.partner_aden.id,
             'customer_number': 'CUST_ADEN_BILL_02',
+            'category_id': self.category.id,
+            'subscriber_id': self.subscriber_type.id,
             'company_id': self.company.id,
         })
 

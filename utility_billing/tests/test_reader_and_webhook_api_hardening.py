@@ -50,10 +50,10 @@ class TestReaderAndWebhookAPIHardening(TransactionCase):
             'category_id': self.category.id,
         })
         self.customer = self.env['utility.customer'].create({
-            'name': 'عميل API',
             'customer_number': 'CUST-API-001',
-            'subscriber_category_id': self.category.id,
+            'category_id': self.category.id,
             'subscriber_id': self.subscriber_type.id,
+            'partner_id': self.env['res.partner'].create({'name': 'شريك عميل API'}).id,
             'company_id': self.company.id,
         })
 
@@ -116,9 +116,8 @@ class TestReaderAndWebhookAPIHttp(HttpCase):
             'company_id': self.company.id,
         })
         self.customer = self.env['utility.customer'].create({
-            'name': 'عميل HTTP',
             'customer_number': 'CUST-HTTP-001',
-            'subscriber_category_id': self.category.id,
+            'category_id': self.category.id,
             'subscriber_id': self.subscriber_type.id,
             'partner_id': self.partner.id,
             'company_id': self.company.id,

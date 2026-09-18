@@ -47,16 +47,27 @@ class TestOrganizationalScopeAPI(TransactionCase):
             'company_id': self.company.id,
         })
 
+        self.category = self.env['utility.subscriber.category'].create({
+            'name': 'فئة API',
+            'code': 'CAT-API-01',
+        })
+        self.subscriber_type = self.env['utility.subscriber'].create({
+            'name': 'مشترك API',
+            'code': 'SUB-API-01',
+            'category_id': self.category.id,
+        })
         self.customer_sanaa = self.env['utility.customer'].create({
-            'name': 'حساب صنعاء API 01',
             'partner_id': self.partner_sanaa.id,
             'customer_number': 'CUST_SANAA_API_01',
+            'category_id': self.category.id,
+            'subscriber_id': self.subscriber_type.id,
             'company_id': self.company.id,
         })
         self.customer_aden = self.env['utility.customer'].create({
-            'name': 'حساب عدن API 01',
             'partner_id': self.partner_aden.id,
             'customer_number': 'CUST_ADEN_API_01',
+            'category_id': self.category.id,
+            'subscriber_id': self.subscriber_type.id,
             'company_id': self.company.id,
         })
 
