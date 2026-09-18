@@ -2,10 +2,10 @@
 
 **Platform:** Odoo 16 Community
 **Architecture Baseline:** `UTILITY_ERP_MASTER_ARCHITECTURE_V2.md`
-**Last Verified Implementation SHA:** `bf951a05a6031e94192e692dacbeb9dd01ca035e`
+**Last Verified Implementation SHA:** `b97bea78aaba6b91575dd9b8cd2c14d685c64fd5`
 **Target Scale:** Up to 1,000,000 subscribers (capacity-planning baseline)
-**Documentation Version:** 3.2
-**Last Verified Date:** 2026-08-24
+**Documentation Version:** 3.3
+**Last Verified Date:** 2026-09-18
 **Status:** Current V1 (Including Implemented Organizational Region/Branch Data Isolation)
 
 **Document Type:** User Acceptance Test Plan
@@ -102,17 +102,28 @@ periodic → one bill → accounting invoice.
 ### UAT-007 Replacement
 old closing + new opening + next periodic → combined one bill.
 
-### UAT-008 Multiple Replacements
-multiple components same cycle.
+### UAT-008 Multiple Replacements & Progressive Aggregation
+multiple components same cycle:
+- old meter closing reading + new meter periodic reading in same period;
+- verify exactly ONE `sale.order` bill is generated with multiple `utility.bill.reading.component` records;
+- verify total combined consumption is calculated across progressive tariff blocks (`block`) seamlessly;
+- verify posted `account.move` reflects combined energy charge and valid pricing snapshot.
 
-### UAT-009 Tariff Modes
-flat/tier/block/discount/min/max.
+### UAT-009 Tariff Modes & Block Discounts with Sponsor Fund
+flat/tier/block/discount/min/max:
+- multi-tier progressive block tariffs (e.g. 0-100 @ 10, 100-300 @ 20, 300+ @ 30);
+- tiered block discount relief with sponsor partner tracing to `partner_sponsor_fund` ("الصندوق");
+- verify zero consumption maintains fixed service charges without division-by-zero errors;
+- verify meter multiplier scaling applies accurately before block tiering.
 
-### UAT-010 Payment Full
-explicit allocation/reconciliation.
+### UAT-010 Payment Full & Targeted Allocation
+explicit allocation/reconciliation:
+- targeted allocation to specific invoice;
+- verify overpayment exceeding invoice residual is blocked (`ValidationError`);
+- verify cancelling an allocation cleanly un-reconciles entries and restores invoice residual without cross-invoice debt leakage.
 
 ### UAT-011 Payment Partial
-correct residual.
+correct residual isolation.
 
 ### UAT-012 Concurrent Payment
 no over-allocation.
@@ -135,8 +146,16 @@ collector settlement and bank deposit:
 - attempt a duplicate company-scoped settlement key and verify rejection;
 - verify no bank statement line or later bank-matching action is required.
 
-### UAT-016 Writeoff/Settlement
-approval and accounting.
+### UAT-016 Writeoff/Settlement & Immutability
+approval and accounting:
+- draft → approved → applied lifecycle;
+- generates exactly one Credit Note (`out_refund`) and reconciles against target invoice;
+- immutability: verify applying or reverting applied write-off twice is strictly blocked.
+
+### UAT-016B Meter Lifecycle & Replacement Integrity
+- verify replacing a meter with itself is strictly rejected (`ValidationError`);
+- verify replacement closing reading lower than last invoiced reading is blocked;
+- verify continuous `utility.meter.assignment` history recording.
 
 ### UAT-017 Reading Correction
 original immutable; debit/credit correction.

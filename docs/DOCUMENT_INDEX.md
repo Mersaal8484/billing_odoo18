@@ -5,9 +5,9 @@
 **Platform:** Odoo 16 Community\
 **Repository:** `AbdulrhmanBashammmakh/utility_erp`\
 **Branch:** `development`\
-**Last verified implementation SHA:** `bf951a05a6031e94192e692dacbeb9dd01ca035e`\
-**Documentation version:** `3.2`\
-**Reviewed Date:** `2026-08-24`\
+**Last verified implementation SHA:** `b97bea78aaba6b91575dd9b8cd2c14d685c64fd5`\
+**Documentation version:** `3.3`\
+**Reviewed Date:** `2026-09-18`\
 **Status:** Current V1 + Target V2
 
 اقرأ هذا الفهرس أولًا، ثم اتبع مسار المجال المطلوب فقط. هذه الصفحة تنظّم الوصول إلى الوثائق ولا تعيد كتابة مواصفاتها.

@@ -2,10 +2,10 @@
 
 **Platform:** Odoo 16 Community
 **Architecture Baseline:** `UTILITY_ERP_MASTER_ARCHITECTURE_V2.md`
-**Last Verified Implementation SHA:** `bf951a05a6031e94192e692dacbeb9dd01ca035e`
+**Last Verified Implementation SHA:** `b97bea78aaba6b91575dd9b8cd2c14d685c64fd5`
 **Target Scale:** Up to 1,000,000 subscribers (capacity-planning baseline)
-**Documentation Version:** 3.2
-**Last Verified Date:** 2026-08-24
+**Documentation Version:** 3.3
+**Last Verified Date:** 2026-09-18
 **Status:** Current V1 + Target V2
 
 **Document Type:** Billing Domain & Execution Specification
@@ -218,6 +218,20 @@ No taxes.
   - **الفواتير، القراءات، لقطات التسعير، وتعيينات المشتركين**: استنساخ القالب لا يُعيّن المشتركين تلقائياً ولا يستنسخ أي حركات مالية سابقة.
 - **تتبع الاستنساخ (Clone Provenance)**:
   - توثيق المصدر عبر حقول إرشادية غير ملزمة (`cloned_from_template_id`, `cloned_at`, `cloned_by`).
+
+### 7.2 الخصومات بحسب الشرائح والجهة الداعمة (Block Discounts & Sponsor Fund)
+
+يدعم محرك الفوترة منظومة خصومات ودعم مرنة ترتبط بشرائح الاستهلاك والجهات الراعية:
+
+- **الخصم بحسب الشرائح (`utility.discount.block`)**:
+  - إمكانية تعريف شرائح خصم متعددة لكل نوع مشترك (مثلاً الشريحة الأولى 0-100 kWh بخصم محدد، والشريحة الثانية 100-200 kWh).
+  - احتساب مبلغ الخصم بدقة لكل شريحة وتوثيقه في أسطر لقطة التسعير (`utility.bill.pricing.block`) مع ضبط علامة `is_discount = True`.
+  - التحقق الصارم من عدم تجاوز وحدات الخصم لاستهلاك الشريحة الفعلي.
+
+- **تكامل الجهة الداعمة (`sponsor_id`)**:
+  - ربط سجل الجهة الداعمة بشريك مستقل في النظام `res.partner` (المعرف القياسي: `partner_sponsor_fund` - باسم **"الصندوق"**).
+  - تحديد الجهة الراعية في تصنيفات المشتركين المستحقين للدعم (`sub_category_public`، `sub_public_tenant`).
+  - توثيق مبالغ الدعم في الفاتورة ولقطة التسعير بما يتيح تسوية مطالبات الدعم مع الجهة الراعية محاسبياً بصورة منفصلة.
 
 ---
 

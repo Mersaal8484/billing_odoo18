@@ -2,10 +2,10 @@
 
 **Repository:** `AbdulrhmanBashammmakh/utility_erp`
 **Branch:** `development`
-**Reviewed SHA:** `bf951a05a6031e94192e692dacbeb9dd01ca035e`
-**Commit:** `bf951a0 dev ++ ----------- +1`
-**Reviewed Date:** 2026-08-24
-**Documentation Version:** 3.2
+**Reviewed SHA:** `b97bea78aaba6b91575dd9b8cd2c14d685c64fd5`
+**Commit:** `b97bea7 dev ++ ----------- + connect security +2 uint test 3`
+**Reviewed Date:** 2026-09-18
+**Documentation Version:** 3.3
 **Status:** CURRENT V1 implementation truth (Including Organizational Region/Branch Isolation)
 
 This document answers: **what is actually implemented now?** It does not describe speculative V2 scale infrastructure.
@@ -69,7 +69,10 @@ The current operational UI exposes `total_readings`, `processed_count`, `error_c
 
 ### Billing and accounting
 
-The commercial Bill is represented by `sale.order`; an Accounting Invoice is `account.move`. The current Bill form provides direct navigation to related accounting invoices, payments, and billing adjustments. Payment allocation is explicit to the selected utility invoice; partner-wide arbitrary reconciliation is rejected.
+The commercial Bill is represented by `sale.order`; an Accounting Invoice is `account.move`. The current Bill form provides direct navigation to related accounting invoices, payments, and billing adjustments.
+- **Progressive Billing & Multi-Meter Replacement:** Multiple meter replacements within the same billing cycle produce a single `sale.order` bill. Each meter contributes an immutable `utility.bill.reading.component` tracking its segment consumption and dates, while total consumption is calculated across progressive tariff blocks (`block`) seamlessly.
+- **Targeted Payment Allocation:** Payments are strictly allocated to the selected invoice. Partner-wide arbitrary reconciliation is rejected. Overpayments exceeding the invoice residual raise `ValidationError`. Cancelling an allocation cleanly un-reconciles entries and restores the original invoice residual without cross-invoice contamination.
+- **Block Discounts & Sponsor Fund Integration:** Multi-tier block discounts calculate energy relief per tier. Supported subscriber categories (`sub_category_public`, `sub_public_tenant`) are linked to `partner_sponsor_fund` ("الصندوق"), enabling precise tracing of subsidized energy units and amounts on the bill and accounting entries.
 
 ### Contract template versioning, clone wizard, and immutable pricing snapshot
 
@@ -79,6 +82,12 @@ The commercial Bill is represented by `sale.order`; an Accounting Invoice is `ac
 - **`utility.bill.pricing.snapshot` & `utility.bill.pricing.block`**: Immutable pricing and formula calculation evidence recorded on each `sale.order` bill by `utility_billing`. Captures energy, service, local fee, discount, and private transformer amounts, along with exact applied pricing block breakdown. Once the bill is confirmed, pricing snapshots and their block lines are locked against direct mutation.
 - **Audit Chain**: `Customer -> Contract Template -> Contract Version -> Reading -> Reading Snapshot (Component) -> Pricing Snapshot -> Sale Order -> Invoice -> Accounting`.
 - **Pricing Modes**: `flat`, `tier` (single tier), and `block` (progressive tier) are fully supported. `seasonal` and `tou` modes are explicitly unsupported in V1 and blocked with `ValidationError`.
+
+### Settings and UI Streamlining
+- Redundant and inactive settings cards have been pruned from the operational settings forms:
+  * Removed "الإنذارات والتنبيهات" (Alerts and Notifications) from `utility_core`.
+  * Removed "الغرامات والتأخير" (Penalties and Late Fees) and "الفصل التلقائي" (Automatic Disconnection) cards from `utility_billing`.
+  * All underlying model fields and backend `ir.config_parameter` hooks are preserved with deterministic defaults (e.g. 1.5% penalty rate, 30% max penalty, 90 days disconnection threshold) ensuring zero runtime disruption.
 
 ### Payment gateway
 
@@ -146,7 +155,14 @@ Verified billing and Reader API hardening uses this normalized error envelope on
 
 ## 6. Evidence and limits
 
-Regression test files exist for core/billing ownership, Reader/API hardening, gateway idempotency, payment allocation, financial lifecycle, write-off, sensitive wizard permissions, structured `ir.attachment` storage, and reading-batch concurrency. This document records test existence only; it does not claim that a full runtime suite, CI, concurrency proof, upgrade rehearsal, or production load test passed at this SHA.
+- **Test Suite Inventory:** 6 modules, **76 test files**, and **542 test methods**, with **100% test discovery** verified across `date_range`, `utility_core`, `utility_inventory`, `utility_operations`, `utility_billing`, and `utility_prepaid`.
+- **Verified Business Logic Test Suites:**
+  * Progressive billing & multi-meter replacement: `test_billing_progressive_and_replacement_business_logic.py`
+  * Targeted payment allocation, unreconciliation & write-off: `test_accounting_payment_and_settlement_business_logic.py`
+  * Meter replacement lifecycle & validation constraints: `test_operations_meter_lifecycle_business_logic.py`
+  * Multi-tier block discounts & sponsor fund tracing: `test_block_discount_business_logic.py`
+  * Core infrastructure settings: `test_utility_infrastructure_settings.py`
+- This document records verified implementation and test suite coverage at commit `b97bea7`. It distinguishes static code evidence and unit test inventory from end-to-end production load validation.
 
 **DEFERRED:** runtime/CI proof, production-scale load validation, and `stock.quant` N+1 optimization until profiling confirms meaningful impact.
 
