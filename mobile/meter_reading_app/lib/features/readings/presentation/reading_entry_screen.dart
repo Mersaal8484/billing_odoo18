@@ -186,6 +186,7 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
       return;
     }
     if (!mounted) return;
+    await Future<void>.delayed(Duration.zero); // تأكد من اكتمال أي dispose معلق للماسح قبل فتح الكاميرا
     final result = await Navigator.of(context).push<File>(
       MaterialPageRoute(builder: (_) => _CameraScreen(camera: cameras.first)),
     );
