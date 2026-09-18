@@ -38,3 +38,6 @@ from . import test_payment_integrity_regression
 from . import test_utility_reader_api
 
 from . import test_transformer_loss_historical_snapshot
+from . import test_billing_progressive_and_replacement_business_logic
+from . import test_accounting_payment_and_settlement_business_logic
+from . import test_block_discount_business_logic

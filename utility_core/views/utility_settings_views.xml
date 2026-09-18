@@ -63,46 +63,6 @@
                     </div>
 
 
-                    <h2>الإنذارات والتنبيهات</h2>
-                    <div class="row mt16 o_settings_container" id="utility_alerts">
-                        <div class="col-12 col-lg-6 o_setting_box">
-                            <div class="o_setting_right_pane">
-                                <div class="text-muted">
-                                    الحد الأدنى للرصيد الذي يطلق إنذار
-                                </div>
-                                <div class="content-group">
-                                    <div class="mt16">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-6 o_setting_box">
-                            <div class="o_setting_right_pane">
-                                <label for="high_consumption_threshold"/>
-                                <div class="text-muted">
-                                    حد الاستهلاك العالي
-                                </div>
-                                <div class="content-group">
-                                    <div class="mt16">
-                                        <field name="high_consumption_threshold" class="o_light_label"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-6 o_setting_box">
-                            <div class="o_setting_right_pane">
-                                <label for="consumption_variation_alert_percentage"/>
-                                <div class="text-muted">
-                                    نسبة التغير المنبهة للاستهلاك
-                                </div>
-                                <div class="content-group">
-                                    <div class="mt16">
-                                        <field name="consumption_variation_alert_percentage" class="o_light_label"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <h2>إشعارات SMS</h2>
                     <div class="row mt16 o_settings_container" id="utility_sms">

@@ -19,6 +19,13 @@
         <field name="sequence">25</field>
     </record>
 
+    <!-- ====== الجهة الداعمة (الصندوق) ====== -->
+    <record id="partner_sponsor_fund" model="res.partner">
+        <field name="name">الصندوق</field>
+        <field name="is_company" eval="True"/>
+        <field name="comment">الجهة الداعمة لخصم الاستهلاك المدعوم</field>
+    </record>
+
     <!-- ====== المشتركين للفئات الجديدة ====== -->
     <!-- أهالي ملاك -->
     <record id="sub_category_public" model="utility.subscriber">
@@ -29,6 +36,7 @@
         <field name="subsidized_enabled" eval="True"/>
         <field name="subsidized_max_units">100</field>
         <field name="subsidized_percentage">100</field>
+        <field name="sponsor_id" ref="partner_sponsor_fund"/>
     </record>
 
     <!-- اهالي مستاجر -->
@@ -40,6 +48,7 @@
         <field name="subsidized_enabled" eval="True"/>
         <field name="subsidized_max_units">100</field>
         <field name="subsidized_percentage">100</field>
+        <field name="sponsor_id" ref="partner_sponsor_fund"/>
     </record>
 
     <!-- تجاري -->
