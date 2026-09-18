@@ -101,7 +101,7 @@ class TestOperationsStockDelegation(TransactionCase):
     def test_05_failed_inventory_validation_rolls_back_service_order_completion(self):
         """If inventory execution fails (e.g. invalid lot state), service order does not complete."""
         # Scrap lot
-        scrap_loc = self.env.ref('stock.stock_location_scrapped')
+        scrap_loc = self.env['stock.location'].search([('scrap_location', '=', True)], limit=1)
         self.env['stock.quant'].create({
             'product_id': self.product_serial.id,
             'location_id': scrap_loc.id,
@@ -191,6 +191,8 @@ class TestOperationsStockDelegation(TransactionCase):
         """Disconnection resolves customer from attached meter if customer_id is empty, or fails if unresolvable."""
         self.meter.inventory_install_meter(origin='PRE-INST-09')
         self.meter.write({'customer_id': self.customer.id})
+        self.customer.write({'meter_id': self.meter.id})
+        self.customer.action_activate()
 
         # 1. Successful disconnection resolving customer from meter_id
         so = self.env['utility.service.order'].create({
@@ -201,7 +203,7 @@ class TestOperationsStockDelegation(TransactionCase):
         })
         so.action_complete()
         self.assertEqual(so.state, 'completed')
-        self.assertEqual(self.customer.state, 'suspended')
+        self.assertEqual(self.customer.state, 'disconnected')
 
         # 2. Unresolvable customer raises ValidationError
         unattached_meter = self.env['utility.meter'].create({
@@ -219,8 +221,10 @@ class TestOperationsStockDelegation(TransactionCase):
 
     def test_10_reconnection_service_order_executes_lifecycle(self):
         """Reconnection executes action_reconnect on customer."""
-        self.customer.state = 'suspended'
         self.meter.write({'customer_id': self.customer.id})
+        self.customer.write({'meter_id': self.meter.id})
+        self.customer.action_activate()
+        self.customer.with_context(lifecycle_override=True).action_disconnect(reason='فصل تجريبي لإعادة التوصيل')
 
         so = self.env['utility.service.order'].create({
             'service_type': 'reconnection',

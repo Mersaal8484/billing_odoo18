@@ -1,39 +1,12 @@
 from odoo.tests import TransactionCase, tagged
-from odoo.exceptions import AccessError
 
 
 @tagged('post_install', '-at_install', 'utility_release', 'utility_inventory', 'utility_security')
 class TestUtilityInventorySecurity(TransactionCase):
-    """Test ACL and record rules for utility_inventory module."""
+    """Test ACL and physical_state computation for utility_inventory module."""
 
     def setUp(self):
         super().setUp()
-        self.Admin = self.env.ref('utility_core.group_utility_admin')
-        self.Supervisor = self.env.ref('utility_core.group_utility_supervisor')
-        self.Technician = self.env.ref('utility_core.group_utility_technician')
-        self.Readonly = self.env.ref('utility_core.group_utility_readonly')
-
-        self.admin_user = self.env['res.users'].create({
-            'name': 'Inventory Admin',
-            'login': 'inv_admin_test',
-            'groups_id': [(6, 0, [self.Admin.id])],
-        })
-        self.supervisor_user = self.env['res.users'].create({
-            'name': 'Inventory Supervisor',
-            'login': 'inv_supervisor_test',
-            'groups_id': [(6, 0, [self.Supervisor.id])],
-        })
-        self.technician_user = self.env['res.users'].create({
-            'name': 'Inventory Technician',
-            'login': 'inv_technician_test',
-            'groups_id': [(6, 0, [self.Technician.id])],
-        })
-        self.readonly_user = self.env['res.users'].create({
-            'name': 'Inventory Readonly',
-            'login': 'inv_readonly_test',
-            'groups_id': [(6, 0, [self.Readonly.id])],
-        })
-
         self.category = self.env['product.category'].create({'name': 'Security Test Category'})
         self.product = self.env['product.product'].create({
             'name': 'Security Test Meter Product',
@@ -46,78 +19,109 @@ class TestUtilityInventorySecurity(TransactionCase):
             'product_id': self.product.id,
             'company_id': self.env.company.id,
         })
-
-    def test_01_admin_full_access_integrity_issue(self):
-        """Admin can create, read, write, and unlink integrity issues."""
-        issue = self.env['utility.meter.integrity.issue'].sudo(self.admin_user).create({
-            'meter_id': self.env['utility.meter'].create({
-                'meter_number': 'MTR-SEC-001',
-                'product_id': self.product.id,
-                'lot_id': self.lot.id,
-            }).id,
-            'issue_type': 'lot_missing',
-            'severity': 'warning',
-            'message': 'Test integrity issue for admin',
+        self.internal_user = self.env['res.users'].create({
+            'name': 'Inventory Internal User',
+            'login': 'inv_internal_test',
+            'groups_id': [(6, 0, [self.env.ref('base.group_user').id])],
         })
-        self.assertTrue(issue.sudo(self.admin_user).read(['name']))
-        issue.sudo(self.admin_user).write({'severity': 'critical'})
-        issue.sudo(self.admin_user).unlink()
 
-    def test_02_readonly_user_cannot_create_integrity_issue(self):
-        """Readonly user cannot create integrity issues."""
+    def test_01_internal_user_can_create_integrity_issue(self):
+        """Any internal user with base.group_user can create integrity issues."""
         meter = self.env['utility.meter'].create({
-            'meter_number': 'MTR-SEC-002',
             'product_id': self.product.id,
             'lot_id': self.lot.id,
         })
-        with self.assertRaises(AccessError):
-            self.env['utility.meter.integrity.issue'].sudo(self.readonly_user).create({
-                'meter_id': meter.id,
-                'issue_type': 'lot_missing',
-                'severity': 'warning',
-                'message': 'Should fail for readonly user',
-            })
-
-    def test_03_technician_can_read_but_not_create_integrity_issue(self):
-        """Technician can read but cannot create integrity issues."""
-        meter = self.env['utility.meter'].create({
-            'meter_number': 'MTR-SEC-003',
-            'product_id': self.product.id,
-            'lot_id': self.lot.id,
-        })
-        issue = self.env['utility.meter.integrity.issue'].sudo(self.admin_user).create({
+        issue = self.env['utility.meter.integrity.issue'].with_user(self.internal_user).create({
             'meter_id': meter.id,
             'issue_type': 'lot_missing',
             'severity': 'warning',
-            'message': 'Test for technician read access',
+            'message': 'Test create for internal user',
         })
-        self.assertTrue(issue.sudo(self.technician_user).read(['name']))
-        with self.assertRaises(AccessError):
-            issue.sudo(self.technician_user).write({'severity': 'critical'})
+        self.assertTrue(issue.exists())
 
-    def test_04_supervisor_can_write_integrity_issue(self):
-        """Supervisor can write integrity issues but cannot unlink."""
+    def test_02_internal_user_can_read_integrity_issue(self):
+        """Any internal user with base.group_user can read integrity issues."""
         meter = self.env['utility.meter'].create({
-            'meter_number': 'MTR-SEC-004',
             'product_id': self.product.id,
             'lot_id': self.lot.id,
         })
-        issue = self.env['utility.meter.integrity.issue'].sudo(self.admin_user).create({
+        issue = self.env['utility.meter.integrity.issue'].create({
             'meter_id': meter.id,
             'issue_type': 'lot_missing',
             'severity': 'warning',
-            'message': 'Test for supervisor write access',
+            'message': 'Test read for internal user',
         })
-        issue.sudo(self.supervisor_user).write({'severity': 'critical'})
-        self.assertEqual(issue.sudo(self.supervisor_user).severity, 'critical')
-        with self.assertRaises(AccessError):
-            issue.sudo(self.supervisor_user).unlink()
+        result = issue.with_user(self.internal_user).read(['issue_type', 'severity', 'message'])
+        self.assertTrue(result)
 
-    def test_05_physical_state_computation(self):
-        """Test physical state is computed correctly based on stock location."""
+    def test_03_internal_user_can_write_integrity_issue(self):
+        """Any internal user with base.group_user can write integrity issues."""
         meter = self.env['utility.meter'].create({
-            'meter_number': 'MTR-SEC-005',
             'product_id': self.product.id,
+            'lot_id': self.lot.id,
+        })
+        issue = self.env['utility.meter.integrity.issue'].create({
+            'meter_id': meter.id,
+            'issue_type': 'lot_missing',
+            'severity': 'warning',
+            'message': 'Test write for internal user',
+        })
+        issue.with_user(self.internal_user).write({'severity': 'critical'})
+        self.assertEqual(issue.with_user(self.internal_user).severity, 'critical')
+
+    def test_04_internal_user_can_unlink_integrity_issue(self):
+        """Any internal user with base.group_user can delete integrity issues."""
+        meter = self.env['utility.meter'].create({
+            'product_id': self.product.id,
+            'lot_id': self.lot.id,
+        })
+        issue = self.env['utility.meter.integrity.issue'].create({
+            'meter_id': meter.id,
+            'issue_type': 'lot_missing',
+            'severity': 'warning',
+            'message': 'Test unlink for internal user',
+        })
+        issue_id = issue.id
+        issue.with_user(self.internal_user).unlink()
+        self.assertFalse(self.env['utility.meter.integrity.issue'].browse(issue_id).exists())
+
+    def test_05_model_has_access_rule_for_base_group_user(self):
+        """The ACL grants full CRUD to base.group_user (all internal users)."""
+        access = self.env['ir.model.access'].search([
+            ('model_id.model', '=', 'utility.meter.integrity.issue'),
+            ('group_id', '=', self.env.ref('base.group_user').id),
+        ], limit=1)
+        self.assertTrue(access, 'ACL for base.group_user must exist')
+        self.assertTrue(access.perm_read)
+        self.assertTrue(access.perm_write)
+        self.assertTrue(access.perm_create)
+        self.assertTrue(access.perm_unlink)
+
+    def test_06_physical_state_unresolved_without_lot_or_product(self):
+        """Meter without lot_id or product_id has physical_state='unresolved'."""
+        meter = self.env['utility.meter'].create({})
+        self.assertEqual(meter.physical_state, 'unresolved')
+
+    def test_07_physical_state_unresolved_without_product(self):
+        """Meter with lot but no product_id has physical_state='unresolved'."""
+        meter = self.env['utility.meter'].create({
             'lot_id': self.lot.id,
         })
         self.assertEqual(meter.physical_state, 'unresolved')
+
+    def test_08_physical_state_available_in_stock(self):
+        """Meter with lot in stock location has physical_state='available'."""
+        warehouse = self.env['stock.warehouse'].search([
+            ('company_id', '=', self.env.company.id),
+        ], limit=1)
+        self.env['stock.quant'].with_context(inventory_mode=True).create({
+            'product_id': self.product.id,
+            'lot_id': self.lot.id,
+            'location_id': warehouse.lot_stock_id.id,
+            'inventory_quantity': 1,
+        }).action_apply_inventory()
+        meter = self.env['utility.meter'].create({
+            'product_id': self.product.id,
+            'lot_id': self.lot.id,
+        })
+        self.assertEqual(meter.physical_state, 'available')

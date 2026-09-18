@@ -27,7 +27,14 @@ class TestMeterStockExecution(TransactionCase):
 
         self.stock_location = self.env.ref('stock.stock_location_stock')
         self.customer_location = self.env.ref('stock.stock_location_customers')
-        self.scrap_location = self.env.ref('stock.stock_location_scrapped')
+        self.scrap_location = self.env['stock.location'].search([('scrap_location', '=', True)], limit=1)
+        if not self.scrap_location:
+            self.scrap_location = self.env['stock.location'].create({
+                'name': 'مخزن الخردة',
+                'scrap_location': True,
+                'usage': 'inventory',
+                'company_id': self.env.company.id,
+            })
         self.inspection_location = self.env['utility.meter']._resolve_meter_inspection_location(self.env.company)
 
         self.env['stock.quant'].create({
@@ -57,7 +64,7 @@ class TestMeterStockExecution(TransactionCase):
         self.assertEqual(self.meter.physical_state, 'installed')
 
     def test_02_installation_rejects_scrap_serial(self):
-        """Test installation fails if serial lot is in scrap location."""
+        """Test that creating a meter with a lot in scrap location is rejected at create time."""
         scrap_lot = self.env['stock.lot'].create({
             'name': 'SN-SCRAP-99',
             'product_id': self.product_serial.id,
@@ -69,13 +76,12 @@ class TestMeterStockExecution(TransactionCase):
             'lot_id': scrap_lot.id,
             'quantity': 1.0,
         })
-        scrap_meter = self.env['utility.meter'].create({
-            'meter_number': 'MTR-SCRAP-01',
-            'product_id': self.product_serial.id,
-            'lot_id': scrap_lot.id,
-        })
         with self.assertRaises(ValidationError):
-            scrap_meter.inventory_install_meter(origin='SO-SCRAP')
+            self.env['utility.meter'].create({
+                'meter_number': 'MTR-SCRAP-01',
+                'product_id': self.product_serial.id,
+                'lot_id': scrap_lot.id,
+            })
 
     def test_03_installation_rejects_product_lot_mismatch(self):
         """Test installation rejects invalid lot/product combo."""
@@ -162,6 +168,12 @@ class TestMeterStockExecution(TransactionCase):
     def test_08_idempotency_prevents_duplicate_pickings(self):
         """Test that calling inventory_install_meter twice with same operation_ref returns existing picking."""
         p1 = self.meter.inventory_install_meter(origin='SO-IDEM', operation_ref='IDEM-KEY-001')
+        self.env['stock.quant'].create({
+            'product_id': self.product_serial.id,
+            'location_id': self.stock_location.id,
+            'lot_id': self.lot_stock.id,
+            'quantity': 1.0,
+        })
         p2 = self.meter.inventory_install_meter(origin='SO-IDEM', operation_ref='IDEM-KEY-001')
         self.assertEqual(p1.id, p2.id)
 
@@ -210,18 +222,22 @@ class TestMeterStockExecution(TransactionCase):
             'company_id': self.env.company.id,
         })
         self.assertTrue(wh.meter_inspection_location_id)
-        self.assertIn('WH-PERF', wh.meter_inspection_location_id.name)
+        self.assertIn(wh.code, wh.meter_inspection_location_id.name)
         resolved_loc = self.meter._resolve_meter_inspection_location(warehouse=wh)
         self.assertEqual(resolved_loc, wh.meter_inspection_location_id)
 
     def test_12_strict_picking_type_resolution_rejects_missing_direction(self):
-        """Test strict picking type resolution raises ValidationError if direction code is missing."""
+        """Test strict picking type resolution raises ValidationError if warehouse has no picking types."""
         dummy_company = self.env['res.company'].create({'name': 'شركة اختبار بدون حركات'})
+        dummy_loc = self.env['stock.location'].create({
+            'name': 'موقع اختبار',
+            'usage': 'internal',
+            'company_id': dummy_company.id,
+        })
         with self.assertRaises(ValidationError):
             self.meter._resolve_meter_picking_type(
-                source_loc=self.stock_location,
+                source_loc=dummy_loc,
                 dest_loc=self.customer_location,
-                company=dummy_company,
             )
 
     def test_13_physical_state_is_unstored_live_projection(self):
@@ -278,6 +294,18 @@ class TestMeterStockExecution(TransactionCase):
         })
 
         meter_old = self.meter
+        lot_a = self.env['stock.lot'].create({
+            'name': 'SN-WHA-OLD',
+            'product_id': self.product_serial.id,
+            'company_id': self.env.company.id,
+        })
+        self.env['stock.quant'].create({
+            'product_id': self.product_serial.id,
+            'location_id': wh_a.lot_stock_id.id,
+            'lot_id': lot_a.id,
+            'quantity': 1.0,
+        })
+        meter_old.write({'lot_id': lot_a.id})
         meter_old.inventory_install_meter(warehouse=wh_a, origin='SO-OLD-INST')
 
         lot_b = self.env['stock.lot'].create({

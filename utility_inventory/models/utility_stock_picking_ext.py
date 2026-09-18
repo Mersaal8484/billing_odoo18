@@ -9,6 +9,7 @@ class StockPickingUtility(models.Model):
         ('remove', 'إزالة عداد'),
         ('return', 'إعادة للمخزون'),
         ('scrap', 'تكهين عداد'),
+        ('repair', 'صيانة عداد'),
         ('replace_remove', 'إزالة عداد للاستبدال'),
         ('replace_install', 'تركيب عداد للاستبدال'),
     ], string='نوع عملية العداد المخزنية', index=True)

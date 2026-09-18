@@ -33,25 +33,22 @@ class TestMeterReplacementIdempotency(TransactionCase):
             'code': 'REP-SUB',
             'category_id': cls.category.id,
         })
+        cls.old_meter = cls.Meter.create({
+            'meter_number': 'MTR-OLD-001',
+            'company_id': cls.env.company.id,
+        })
+
         cls.customer = cls.Customer.create({
             'customer_number': 'REP-CUST-001',
             'partner_id': cls.partner.id,
             'category_id': cls.category.id,
             'subscriber_id': cls.subscriber.id,
+            'meter_id': cls.old_meter.id,
         })
-
-        cls.old_meter = cls.Meter.create({
-            'meter_number': 'MTR-OLD-001',
-            'customer_id': cls.customer.id,
-            'company_id': cls.env.company.id,
-            'state': 'active',
-        })
-        cls.customer.meter_id = cls.old_meter.id
 
         cls.new_meter = cls.Meter.create({
             'meter_number': 'MTR-NEW-001',
             'company_id': cls.env.company.id,
-            'state': 'in_stock',
         })
 
     def test_meter_replacement_lifecycle(self):

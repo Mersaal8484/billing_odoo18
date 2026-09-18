@@ -54,6 +54,12 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'company_id': cls.env.company.id,
         })
 
+        cls.approver_user = cls.env['res.users'].create({
+            'name': 'Settlement Approver',
+            'login': 'settlement_approver',
+            'groups_id': [(4, cls.env.ref('base.group_user').id)],
+        })
+
     def _make_billed_reading(self, value=10000.0, suffix=''):
         """Create a reading and force it to 'billed' state for testing."""
         reading = self.Reading.create({
@@ -91,11 +97,11 @@ class TestReadingSettlementWorkflow(TransactionCase):
                          'القيمة الأصلية يجب أن تُحفظ عند التقديم.')
 
         # action_technically_approve — must use a different user
-        settlement.sudo().action_technically_approve()
+        settlement.sudo(self.approver_user).action_technically_approve()
         self.assertEqual(settlement.state, 'technically_approved')
 
         # action_process
-        settlement.sudo().action_process()
+        settlement.sudo(self.approver_user).action_process()
         self.assertEqual(settlement.state, 'processed')
 
         # CRITICAL: reading_value must NOT have changed
@@ -130,8 +136,8 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'reason': 'اختبار عدم التعديل',
         })
         settlement.action_submit()
-        settlement.sudo().action_technically_approve()
-        settlement.sudo().action_process()
+        settlement.sudo(self.approver_user).action_technically_approve()
+        settlement.sudo(self.approver_user).action_process()
 
         # Re-read from DB
         reading.invalidate_recordset()
@@ -158,8 +164,8 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'reason': 'اختبار منع إلغاء processed',
         })
         settlement.action_submit()
-        settlement.sudo().action_technically_approve()
-        settlement.sudo().action_process()
+        settlement.sudo(self.approver_user).action_technically_approve()
+        settlement.sudo(self.approver_user).action_process()
 
         with self.assertRaises(ValidationError):
             settlement.action_cancel()
@@ -174,7 +180,7 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'reason': 'اختبار hook الإحالة',
         })
         settlement.action_submit()
-        settlement.sudo().action_technically_approve()
+        settlement.sudo(self.approver_user).action_technically_approve()
 
         hook_called = []
         original_hook = type(settlement)._on_settlement_processed
@@ -184,7 +190,7 @@ class TestReadingSettlementWorkflow(TransactionCase):
             return original_hook(self_record)
 
         with patch.object(type(settlement), '_on_settlement_processed', spy_hook):
-            settlement.sudo().action_process()
+            settlement.sudo(self.approver_user).action_process()
 
         self.assertTrue(hook_called, 'Hook _on_settlement_processed لم يُستدعَ.')
 
@@ -198,7 +204,7 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'reason': 'اختبار الـbaseline الفعّال',
         })
         settlement.action_submit()
-        settlement.sudo().action_technically_approve()
+        settlement.sudo(self.approver_user).action_technically_approve()
 
         effective = reading._get_effective_previous_reading()
         self.assertAlmostEqual(effective, 9800.0,
@@ -254,7 +260,7 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'reason': 'تصحيح خطأ قراءة يناير',
         })
         settlement.action_submit()
-        settlement.sudo().action_technically_approve()
+        settlement.sudo(self.approver_user).action_technically_approve()
 
         # 3. February reading at 10,500
         feb_reading = self.Reading.create({
