@@ -157,6 +157,11 @@ class _CollectorHomeScreenState extends ConsumerState<CollectorHomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('المتحصل'),
+        leading: IconButton(
+          tooltip: 'الرئيسية',
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/dashboard'),
+        ),
         actions: [
           IconButton(
             tooltip: 'تقارير التحصيل',

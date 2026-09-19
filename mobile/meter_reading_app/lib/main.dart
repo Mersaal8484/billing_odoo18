@@ -120,6 +120,10 @@ void main() {
 
           // ✅ تمرير AuthService بعد استعادة بيانات الجلسة
           authServiceProvider.overrideWithValue(authService),
+
+          // ✅ تمرير بيانات المستخدم (الاسم والأدوار) المُستعادة من التخزين المحلي
+          // بدونها يبقى currentUserProvider فارغاً وتختفي بطاقات الكاشف/المتحصل/المشرف
+          currentUserProvider.overrideWith((ref) => authService.currentUser),
         ],
         child: const MeterReadingApp(),
       ),

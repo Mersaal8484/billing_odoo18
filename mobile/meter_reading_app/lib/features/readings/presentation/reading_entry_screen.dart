@@ -58,14 +58,16 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
       _loadError = null;
     });
 
+    ReadingAssignment? resolvedAssignment;
     try {
       final repo = ref.read(assignmentRepositoryProvider);
 
       // استخدام getById أولاً، ثم البحث برقم العداد أو QR
-      final assignment =
+      resolvedAssignment =
           await repo.getById(widget.assignmentId) ??
           await repo.lookupByMeterNumber(widget.assignmentId) ??
           await repo.resolveQr(widget.assignmentId);
+      final assignment = resolvedAssignment;
 
       if (assignment == null) {
         setState(() => _loadError = 'لم يُعثر على التكليف');
@@ -76,7 +78,7 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
       try {
         meterInfo = await _fetchMeterInfoFromOdoo(assignment.meter.meterNumber);
       } catch (_) {
-        meterInfo = _MeterInfo.offline();
+        meterInfo = _MeterInfo.offline(assignment.customer);
       }
 
       setState(() {
@@ -115,7 +117,8 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
     } catch (e) {
       setState(() {
         _loadingMeter = false;
-        _meterInfo = _MeterInfo.offline();
+        _meterInfo = _MeterInfo.offline(resolvedAssignment?.customer);
+        _assignment ??= resolvedAssignment;
       });
     }
   }
@@ -200,53 +203,125 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
     final original = img.decodeImage(bytes);
     if (original == null) return imageFile;
 
+    // ── 1. اقتصاص لمنطقة الإطار التوجيهي على الشاشة (_FrameOverlay:
+    //        عرض 85% × ارتفاع 25% من الشاشة، ممركز) + شريط إضافي أسفله
+    //        لاستيعاب سطري التاريخ ورقم المشترك اللذين سنرسمهما بعد قليل.
+    //        يُحكم الاقتصاص لاحقاً (خطوة 3) ليتوقف مباشرة أسفل رقم
+    //        المشترك بهامش صغير فقط، بدل الاعتماد على تقدير ثابت.
+    //
+    //  ⚠️ هذا التطابق (نسبة على الشاشة = نفس النسبة في الصورة الملتقطة)
+    //  صحيح هنا تحديداً لأن _CameraScreen يضع CameraPreview مباشرة داخل
+    //  SizedBox.expand بدون AspectRatio/Transform.scale، فتُمدَّد المعاينة
+    //  لتملأ الشاشة دون أي قص/إزاحة أثناء العرض. لو تغيّر أسلوب المعاينة
+    //  مستقبلاً، يجب إعادة حساب هذه النسب.
+    const frameLeftFrac = 0.075; // (1 - 0.85) / 2
+    const frameTopFrac = 0.375; // (1 - 0.25) / 2
+    const frameWidthFrac = 0.85;
+    const frameHeightFrac = 0.25;
+    const reserveBelowFrac = 0.20; // شريط سخي؛ يُحكم لاحقاً بعد رسم النص
+
+    final w = original.width;
+    final h = original.height;
+    final cropX = (w * frameLeftFrac).round().clamp(0, w - 1);
+    final cropY = (h * frameTopFrac).round().clamp(0, h - 1);
+    final cropW = (w * frameWidthFrac).round().clamp(1, w - cropX);
+    final rawCropHFrac =
+        (frameHeightFrac + reserveBelowFrac).clamp(0.0, 1.0 - frameTopFrac);
+    final cropH = (h * rawCropHFrac).round().clamp(1, h - cropY);
+
+    img.Image working =
+        img.copyCrop(original, x: cropX, y: cropY, width: cropW, height: cropH);
+
+    // ── 2. التاريخ (كبير) ثم رقم المشترك (أصغر) — نفس الأحمر، مباشرة أسفل
+    //        منطقة الإطار داخل الصورة المقتصَّة.
     final now = DateTime.now();
-    // التاريخ بصيغة yyyy-MM-dd — أحمر كبير مثل الصور
     final dateStr = DateFormat('yyyy-MM-dd').format(now);
+    final subscriberNumber = _assignment?.customer.customerNumber ?? '';
 
-    // حجم الخط نسبة لعرض الصورة
-    final fontSize = (original.width * 0.10).round().clamp(40, 200);
+    final frameBottomY =
+        (working.height * (frameHeightFrac / rawCropHFrac)).round();
+    const linePadding = 8;
+    final dateY = frameBottomY + linePadding;
+    final textX = (working.width * 0.04).round();
 
-    // رسم ظل أبيض/أسود للوضوح على أي خلفية
+    // ظل أسود للوضوح خلف التاريخ
     for (final dx in [-2, 0, 2]) {
       for (final dy in [-2, 0, 2]) {
         if (dx == 0 && dy == 0) continue;
         img.drawString(
-          original,
+          working,
           dateStr,
           font: img.arial48,
-          x: (original.width * 0.04).round() + dx,
-          y: (original.height * 0.60).round() + dy,
+          x: textX + dx,
+          y: dateY + dy,
           color: img.ColorRgba8(0, 0, 0, 180),
         );
       }
     }
-
-    // النص الأحمر الرئيسي
+    // التاريخ — أحمر كبير كما كان
     img.drawString(
-      original,
+      working,
       dateStr,
       font: img.arial48,
-      x: (original.width * 0.04).round(),
-      y: (original.height * 0.60).round(),
+      x: textX,
+      y: dateY,
       color: img.ColorRgba8(220, 30, 30, 255),
     );
 
-    // ── Adaptive compression: must stay ≤ 95 KB to satisfy the 100 KB API limit ──
-    const int maxBytes = 95 * 1024; // 95 KB — leaves 5 KB headroom
+    var bottomUsed = dateY + img.arial48.lineHeight;
+
+    if (subscriberNumber.isNotEmpty) {
+      final numberY = bottomUsed + linePadding;
+      // ظل أسود أخف للوضوح خلف رقم المشترك
+      for (final dx in [-1, 0, 1]) {
+        for (final dy in [-1, 0, 1]) {
+          if (dx == 0 && dy == 0) continue;
+          img.drawString(
+            working,
+            subscriberNumber,
+            font: img.arial24,
+            x: textX + dx,
+            y: numberY + dy,
+            color: img.ColorRgba8(0, 0, 0, 160),
+          );
+        }
+      }
+      // رقم المشترك — نفس لون التاريخ، لكن بخط أصغر
+      img.drawString(
+        working,
+        subscriberNumber,
+        font: img.arial24,
+        x: textX,
+        y: numberY,
+        color: img.ColorRgba8(220, 30, 30, 255),
+      );
+      bottomUsed = numberY + img.arial24.lineHeight;
+    }
+
+    // ── 3. إحكام الاقتصاص ليتوقف مباشرة أسفل آخر سطر نص (هامش صغير)،
+    //        بدل الشريط السخي المُقدَّر في الخطوة 1.
+    const bottomMargin = 10;
+    final finalHeight = (bottomUsed + bottomMargin).clamp(1, working.height);
+    if (finalHeight < working.height) {
+      working = img.copyCrop(working,
+          x: 0, y: 0, width: working.width, height: finalHeight);
+    }
+
+    // ── 4. Adaptive compression: يجب ألا يتجاوز 65 KB (بعد أن كان 95 KB) ──
+    const int maxBytes = 65 * 1024; // 65 KB
 
     // Probe at quality=75 first
-    Uint8List compressed = Uint8List.fromList(img.encodeJpg(original, quality: 75));
+    Uint8List compressed = Uint8List.fromList(img.encodeJpg(working, quality: 75));
 
     if (compressed.lengthInBytes > maxBytes) {
       // Estimate quality needed: newQ ≈ 75 × (maxBytes / probeSize), clamped [30, 70]
       final ratio = maxBytes / compressed.lengthInBytes;
       final estQ = (75 * ratio).clamp(30.0, 70.0).toInt();
-      compressed = Uint8List.fromList(img.encodeJpg(original, quality: estQ));
+      compressed = Uint8List.fromList(img.encodeJpg(working, quality: estQ));
 
       if (compressed.lengthInBytes > maxBytes) {
         // Still over — shrink to 70% width and try again
-        final narrowed = img.copyResize(original, width: (original.width * 0.7).toInt());
+        final narrowed = img.copyResize(working, width: (working.width * 0.7).toInt());
         final attempt3 = Uint8List.fromList(img.encodeJpg(narrowed, quality: estQ));
         if (attempt3.lengthInBytes < compressed.lengthInBytes) {
           compressed = attempt3;
@@ -433,7 +508,7 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
                           ],
                         ),
                         if (meterInfo.isOffline)
-                          Text('⚠ وضع غير متصل',
+                          Text('⚠ تعذّر التحقق من التكرار — غير متصل',
                               style: TextStyle(
                                   color: scheme.error, fontSize: 11)),
                       ],
@@ -973,6 +1048,13 @@ class _MeterInfo {
     this.isOffline = false,
   });
 
-  factory _MeterInfo.offline() =>
-      const _MeterInfo(lastReadingValue: 0, isOffline: true);
+  /// isOffline يعني الآن تحديداً: "تعذّر الاتصال الحي لفحص الفترة الحالية/
+  /// التحقق من القراءة المكررة" — وليس "لا توجد قراءة سابقة معروفة".
+  /// القراءة السابقة تُؤخذ من الكاش المحلي (assignment.customer) حتى بدون
+  /// اتصال، فلا تظهر 0.0 وهمية لمشترك له قراءة سابقة حقيقية معروفة.
+  factory _MeterInfo.offline(Customer? customer) => _MeterInfo(
+        lastReadingValue: customer?.lastReadingValue ?? 0,
+        lastReadingDate: customer?.lastReadingDate?.toIso8601String(),
+        isOffline: true,
+      );
 }

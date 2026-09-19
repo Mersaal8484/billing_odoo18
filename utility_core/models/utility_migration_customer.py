@@ -1,5 +1,9 @@
+import logging
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+
+_logger = logging.getLogger(__name__)
 
 
 class UtilityMigrationCustomer(models.Model):
@@ -39,7 +43,8 @@ class UtilityMigrationCustomer(models.Model):
     legacy_category = fields.Char('رمز الفئة')
     legacy_subscriber_type = fields.Char('رمز نوع المشترك')
     legacy_contract = fields.Char('رمز قالب العقد')
-    legacy_transformer_code = fields.Char('رمز المحول')
+    legacy_transformer_code = fields.Char('رمز المحول (النظام القديم)',
+        help='رمز المحول في النظام القديم لمطابقة محول موجود فعلاً. إذا وُجد يُستخدم مباشرةً بدلاً من إنشاء محول خاص.')
 
     region_id = fields.Many2one('utility.region', string='المنطقة (Odoo)', domain="[('type', '=', 'region')]")
     area_id = fields.Many2one('utility.region', string='الفرع (Odoo)', domain="[('type', '=', 'area')]")

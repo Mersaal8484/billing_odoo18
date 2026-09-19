@@ -74,6 +74,7 @@ class UtilityMigrationImportWizard(models.TransientModel):
         'current_balance': ('current_balance', 'الرصيد الحالي (الافتتاحي)'),
         'phase': ('phase', 'نوع الفاز', 'نوع الفاز (single/three)', 'الطور'),
         'is_private_transformer': ('is_private_transformer', 'محول خاص?', 'محول خاص؟ (نعم/لا)'),
+        'legacy_transformer_code': ('legacy_transformer_code', 'رمز المحول (النظام القديم)'),
         'owner_reference': ('owner_reference', 'مرجع المالك القديم'),
         'feeder_code': ('feeder_code', 'رمز الفيدر / الخلية *', 'رمز الفيدر / الحساب التحليلي'),
         'feeder_name': ('feeder_name', 'اسم الفيدر / الخلية *', 'اسم الفيدر / الخلية'),
@@ -196,7 +197,12 @@ class UtilityMigrationImportWizard(models.TransientModel):
         return 1  # immediately previous templates had no metadata
 
     def _read_contract(self, workbook):
-        if self._metadata_version(workbook) not in (1, self.TEMPLATE_VERSIONS[self.import_type]):
+        detected = self._metadata_version(workbook)
+        accepted = {1, self.TEMPLATE_VERSIONS[self.import_type]}
+        # v4 customer templates are still accepted — the new optional column is simply absent
+        if self.import_type == 'customer':
+            accepted.add(4)
+        if detected not in accepted:
             raise UserError('UNSUPPORTED_MIGRATION_TEMPLATE_VERSION')
         contract = self.CONTRACTS[self.import_type]
         aliases = {}
@@ -291,7 +297,7 @@ class UtilityMigrationImportWizard(models.TransientModel):
                 'current_balance': self.parse_float(self._cell(row, header_map, 'current_balance'), 'current_balance', row_number) or 0.0,
                 'phase': self.parse_phase(self._cell(row, header_map, 'phase'), row_number),
                 'is_private_transformer': self.parse_bool(self._cell(row, header_map, 'is_private_transformer'), False, 'is_private_transformer', row_number),
-                'legacy_transformer_code': str(self._cell(row, header_map, 'legacy_transformer_code') or '').strip(),
+                'legacy_transformer_code': str(self._cell(row, header_map, 'legacy_transformer_code') or '').strip() or False,
                 'owner_reference': str(self._cell(row, header_map, 'owner_reference') or '').strip(),
                 'company_id': company_id,
                 'state': 'error' if is_dup else 'draft',

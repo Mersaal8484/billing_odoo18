@@ -175,8 +175,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ref.read(currentUserProvider.notifier).state = userInfo;
       ref.read(authStateProvider.notifier).state = true;
 
+      // ✅ جميع الأدوار تبدأ دائماً من الداشبورد الرئيسي.
+      // بطاقات الكاشف/المتحصل/المشرف تظهر بناءً على الصلاحيات هناك.
       if (mounted) {
-        _navigateByRole(userInfo.roles ?? {});
+        context.go('/dashboard');
       }
     } on OdooSessionExpiredException catch (error) {
       setState(() => _errorText = error.message);
@@ -209,19 +211,5 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } finally {
       if (mounted) setState(() => _clearingSession = false);
     }
-  }
-
-  void _navigateByRole(Map<String, bool> roles) {
-    if (!mounted) return;
-
-    if (roles['is_supervisor'] == true) {
-      context.go('/supervisor');
-      return;
-    }
-    if (roles['is_collector'] == true && roles['is_meter_reader'] != true) {
-      context.go('/collector');
-      return;
-    }
-    context.go('/dashboard');
   }
 }

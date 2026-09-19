@@ -5,6 +5,7 @@ plugins {
 }
 
 android {
+    // ✅ Namespace تم إرجاعه للأصلي
     namespace = "com.example.meter_reading_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
@@ -15,11 +16,11 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // ⚠️ تم الإبقاء على الـ ID الأصلي لتجنب كراش على الأجهزة المثبت عليها
+        // النسخة القديمة. غيّره إلى com.pec.meterreading فقط عند النشر الجديد
+        // على Google Play بعد حذف النسخة القديمة من الأجهزة.
         applicationId = "com.example.meter_reading_app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion  // CameraX requires minimum API 21
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -27,8 +28,11 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // ⚠️ قبل الرفع على Google Play يجب:
+            // 1. إنشاء keystore: keytool -genkey -v -keystore pec-release.jks ...
+            // 2. إضافة signingConfigs هنا بالبيانات الحقيقية
+            // 3. تغيير السطر التالي ليستخدم signingConfigs.getByName("release")
+            // حالياً يستخدم debug key للاختبار الداخلي فقط
             signingConfig = signingConfigs.getByName("debug")
         }
     }

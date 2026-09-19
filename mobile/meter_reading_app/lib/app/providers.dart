@@ -40,22 +40,18 @@ final userRolesProvider = Provider<Map<String, bool>>((ref) {
 /// هل المستخدم كاشف؟
 final isReaderProvider = Provider<bool>((ref) {
   final roles = ref.watch(userRolesProvider);
-  // إذا لم تُعرَّف أدوار، نفترض أنه كاشف (للتوافق)
-  if (roles.isEmpty) return true;
   return roles['is_meter_reader'] == true;
 });
 
 /// هل المستخدم محصل؟
 final isCollectorProvider = Provider<bool>((ref) {
   final roles = ref.watch(userRolesProvider);
-  if (roles.isEmpty) return true;
   return roles['is_collector'] == true;
 });
 
 /// هل المستخدم مشرف؟
 final isSupervisorProvider = Provider<bool>((ref) {
   final roles = ref.watch(userRolesProvider);
-  if (roles.isEmpty) return false;
   return roles['is_supervisor'] == true;
 });
 
@@ -81,10 +77,12 @@ final readingRepositoryProvider = Provider<DriftReadingRepository>((ref) {
   return DriftReadingRepository(ref.watch(databaseProvider));
 });
 
-/// ✅ يستخدم OdooAssignmentRepository الحقيقي
+/// ✅ يستخدم OdooAssignmentRepository الحقيقي (offline-first: كاش Drift +
+/// شبكة حية)
 final assignmentRepositoryProvider = Provider<AssignmentRepository>((ref) {
   final client = ref.watch(odooApiClientProvider);
-  final repo = OdooAssignmentRepository(client);
+  final db = ref.watch(databaseProvider);
+  final repo = OdooAssignmentRepository(client, db);
   ref.onDispose(repo.dispose);
   return repo;
 });

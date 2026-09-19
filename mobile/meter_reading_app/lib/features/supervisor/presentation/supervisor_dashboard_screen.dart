@@ -15,7 +15,17 @@ class SupervisorDashboardScreen extends ConsumerWidget {
     final collectionSummary = ref.watch(collectorDailySummaryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('لوحة المشرف')),
+      appBar: AppBar(
+        title: const Text('لوحة المشرف'),
+        // ✅ زر رجوع صريح — يعيد المستخدم للداشبورد الرئيسي
+        leading: Navigator.canPop(context)
+            ? null // go_router سيضيف زر رجوع تلقائياً إذا كان هناك stack
+            : IconButton(
+                tooltip: 'الرئيسية',
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).maybePop(),
+              ),
+      ),
       body: assignments.when(
         loading: () => const LoadingState(),
         error: (e, _) => ErrorState(message: 'تعذر تحميل لوحة المشرف: $e'),

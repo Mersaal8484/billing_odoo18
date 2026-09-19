@@ -80,6 +80,8 @@ class AuthService {
 
     await _storage.write(key: _dbKey, value: db);
     await _storage.write(key: _loginKey, value: login);
+    await _storage.write(key: 'odoo_user_name', value: result['name'] as String? ?? login);
+    await _storage.write(key: 'odoo_uid', value: uid.toString());
 
     Map<String, bool>? userRoles;
     try {
@@ -88,6 +90,12 @@ class AuthService {
         final r = roleResult['roles'] as Map<String, dynamic>?;
         if (r != null) {
           userRoles = r.map((k, v) => MapEntry(k, v == true));
+          // حفظ الأدوار محلياً كـ سلسلة مفصولة بفواصل
+          final rolesString = userRoles.entries
+              .where((e) => e.value)
+              .map((e) => e.key)
+              .join(',');
+          await _storage.write(key: 'odoo_roles', value: rolesString);
         }
       }
     } catch (_) {
@@ -113,6 +121,9 @@ class AuthService {
     await _client.clearSession();
     await _storage.delete(key: _dbKey);
     await _storage.delete(key: _loginKey);
+    await _storage.delete(key: 'odoo_user_name');
+    await _storage.delete(key: 'odoo_uid');
+    await _storage.delete(key: 'odoo_roles');
   }
 
   /// Clears all locally stored session data (cookie + saved db/login)
@@ -127,6 +138,9 @@ class AuthService {
     }
     await _storage.delete(key: _dbKey);
     await _storage.delete(key: _loginKey);
+    await _storage.delete(key: 'odoo_user_name');
+    await _storage.delete(key: 'odoo_uid');
+    await _storage.delete(key: 'odoo_roles');
     _currentUser = null;
   }
 
@@ -142,28 +156,47 @@ class AuthService {
     final login = await _storage.read(key: _loginKey);
     if (db == null || login == null) return false;
 
+    final storedName = await _storage.read(key: 'odoo_user_name') ?? login;
+    final storedUidStr = await _storage.read(key: 'odoo_uid');
+    final storedUid = storedUidStr != null ? int.tryParse(storedUidStr) ?? 0 : 0;
+    
+    // محاولة استعادة الأدوار المحفوظة محلياً مسبقاً أولاً لتكون موجودة حتى لو انقطع الاتصال
     Map<String, bool>? userRoles;
+    final storedRoles = await _storage.read(key: 'odoo_roles');
+    if (storedRoles != null && storedRoles.isNotEmpty) {
+      userRoles = {};
+      for (final role in storedRoles.split(',')) {
+        userRoles[role] = true;
+      }
+    }
+
     try {
       final roleResult = await _client.postJson('/api/v1/utility/auth/roles', {});
       if (roleResult['success'] == true) {
         final r = roleResult['roles'] as Map<String, dynamic>?;
         if (r != null) {
           userRoles = r.map((k, v) => MapEntry(k, v == true));
+          // تحديث الأدوار المحفوظة
+          final rolesString = userRoles.entries
+              .where((e) => e.value)
+              .map((e) => e.key)
+              .join(',');
+          await _storage.write(key: 'odoo_roles', value: rolesString);
         }
       }
     } on OdooApiException catch (e) {
       if (_looksLikeRawDbError(e.message)) {
-        // القاعدة المحفوظة محلياً لم تعد صالحة على السيرفر — امسح الجلسة
-        // تلقائياً بدل ما يعلق المستخدم على نفس الخطأ في كل تشغيل.
         await clearLocalSession();
         return false;
       }
-      // أي خطأ آخر (شبكة، صلاحيات...) — تجاهله وكمل بدون roles كالسابق.
-    } catch (_) {}
+      // في حالة الأخطاء الأخرى، سنعتمد على userRoles التي استعدناها من التخزين المحلي في الأعلى
+    } catch (_) {
+      // تجاهل أخطاء الشبكة واعتمد على التخزين المحلي
+    }
 
     _currentUser = OdooUserInfo(
-      uid: 0,
-      name: login,
+      uid: storedUid,
+      name: storedName,
       login: login,
       db: db,
       roles: userRoles,

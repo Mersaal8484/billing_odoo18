@@ -14,18 +14,46 @@ class QrScannerScreen extends ConsumerStatefulWidget {
   ConsumerState<QrScannerScreen> createState() => _QrScannerScreenState();
 }
 
-class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
-  final _controller = MobileScannerController(
+class _QrScannerScreenState extends ConsumerState<QrScannerScreen>
+    with WidgetsBindingObserver {
+  // MobileScanner 5.x يدير الصلاحيات داخلياً — لا نحتاج permission_handler
+  final MobileScannerController _controller = MobileScannerController(
     detectionSpeed: DetectionSpeed.noDuplicates,
     facing: CameraFacing.back,
+    torchEnabled: false,
   );
-  final _manualController = TextEditingController();
 
+  final _manualController = TextEditingController();
   bool _resolving = false;
   String? _message;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // يجب بدء الكاميرا عند التهيئة وإلا ستنهار مكتبة mobile_scanner في الأندرويد
+    _controller.start();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _controller.start();
+        break;
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+        _controller.stop();
+        break;
+      default:
+        break;
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _manualController.dispose();
     _controller.dispose();
     super.dispose();
@@ -49,6 +77,8 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
     });
 
     try {
+      await _controller.stop();
+
       if (widget.isReaderMode) {
         final repository = ref.read(assignmentRepositoryProvider);
         await repository.syncOpenPeriodAssignments();
@@ -133,7 +163,49 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
                           MobileScanner(
                             controller: _controller,
                             onDetect: _handleBarcode,
+                            errorBuilder: (context, error) {
+                              // نعرض نص الخطأ الفعلي لمساعدة التشخيص
+                              return ColoredBox(
+                                color: Colors.black,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.camera_alt_outlined,
+                                          color: Colors.white54, size: 48),
+                                      const SizedBox(height: 12),
+                                      const Text(
+                                        'تعذر تشغيل الكاميرا',
+                                        style:
+                                            TextStyle(color: Colors.white),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16),
+                                        child: Text(
+                                          error.errorDetails?.message ??
+                                              error.errorCode.name,
+                                          style: const TextStyle(
+                                              color: Colors.white54,
+                                              fontSize: 11),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      ElevatedButton(
+                                        onPressed: () =>
+                                            _controller.start(),
+                                        child: const Text('إعادة المحاولة'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
+                          // إطار الماسح
                           DecoratedBox(
                             decoration: BoxDecoration(
                               border:
@@ -146,8 +218,7 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
                               color: Colors.black45,
                               child: Center(
                                 child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
+                                    color: Colors.white),
                               ),
                             ),
                         ],
@@ -179,10 +250,8 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
                 decoration: InputDecoration(
                   hintText: 'إدخال يدوي للرمز أو رقم المشترك',
                   hintStyle: const TextStyle(color: Colors.white70),
-                  prefixIcon: const Icon(
-                    Icons.keyboard_alt_outlined,
-                    color: Colors.white70,
-                  ),
+                  prefixIcon: const Icon(Icons.keyboard_alt_outlined,
+                      color: Colors.white70),
                   suffixIcon: IconButton(
                     onPressed: _resolving ? null : _submitManualCode,
                     icon: const Icon(Icons.search_rounded),
