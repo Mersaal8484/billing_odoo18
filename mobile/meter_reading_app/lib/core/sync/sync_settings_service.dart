@@ -16,8 +16,8 @@ class SyncSettingsService {
 
   Future<SyncMode> getSyncMode() async {
     final modeStr = await _storage.read(key: _modeKey);
-    if (modeStr == SyncMode.immediate.name) {
-      return SyncMode.immediate;
+    if (modeStr == SyncMode.batch.name) {
+      return SyncMode.batch;
     }
     return SyncMode.immediate; // Default: do not leave field readings waiting.
   }

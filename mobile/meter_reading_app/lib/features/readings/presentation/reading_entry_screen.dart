@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,6 +17,153 @@ import '../../../shared/widgets/state_widgets.dart';
 import '../../customers/data/mock_assignment_repository.dart';
 import '../../customers/domain/entities.dart';
 import '../domain/reading.dart';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// معالجة الصورة داخل Isolate منفصل (compute) — لا تُلمس من الخيط الرئيسي
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// وسيطة قابلة للتسلسل عبر حدود الـ Isolate (يجب أن تكون بسيطة/serialisable).
+class _WatermarkArgs {
+  final Uint8List bytes;
+  final String subscriberNumber;
+  const _WatermarkArgs({required this.bytes, required this.subscriberNumber});
+}
+
+/// دالة top-level (شرط compute()): تنفّذ نفس منطق الاقتصاص + العلامة المائية
+/// + الضغط الذي كان سابقاً داخل _addWatermark مباشرة على الخيط الرئيسي.
+/// تُعاد null فقط إذا تعذّر فك تشفير الصورة الملتقطة.
+Uint8List? _watermarkInIsolate(_WatermarkArgs args) {
+  final original = img.decodeImage(args.bytes);
+  if (original == null) return null;
+
+  // ── 1. اقتصاص لمنطقة الإطار التوجيهي على الشاشة (_FrameOverlay:
+  //        عرض 85% × ارتفاع 25% من الشاشة، ممركز) + شريط إضافي أسفله
+  //        لاستيعاب سطري التاريخ ورقم المشترك اللذين سنرسمهما بعد قليل.
+  //        يُحكم الاقتصاص لاحقاً (خطوة 3) ليتوقف مباشرة أسفل رقم
+  //        المشترك بهامش صغير فقط، بدل الاعتماد على تقدير ثابت.
+  //
+  //  ⚠️ هذا التطابق (نسبة على الشاشة = نفس النسبة في الصورة الملتقطة)
+  //  صحيح هنا تحديداً لأن _CameraScreen يضع CameraPreview مباشرة داخل
+  //  SizedBox.expand بدون AspectRatio/Transform.scale، فتُمدَّد المعاينة
+  //  لتملأ الشاشة دون أي قص/إزاحة أثناء العرض. لو تغيّر أسلوب المعاينة
+  //  مستقبلاً، يجب إعادة حساب هذه النسب.
+  const frameLeftFrac = 0.075; // (1 - 0.85) / 2
+  const frameTopFrac = 0.375; // (1 - 0.25) / 2
+  const frameWidthFrac = 0.85;
+  const frameHeightFrac = 0.25;
+  const reserveBelowFrac = 0.20; // شريط سخي؛ يُحكم لاحقاً بعد رسم النص
+
+  final w = original.width;
+  final h = original.height;
+  final cropX = (w * frameLeftFrac).round().clamp(0, w - 1);
+  final cropY = (h * frameTopFrac).round().clamp(0, h - 1);
+  final cropW = (w * frameWidthFrac).round().clamp(1, w - cropX);
+  final rawCropHFrac =
+      (frameHeightFrac + reserveBelowFrac).clamp(0.0, 1.0 - frameTopFrac);
+  final cropH = (h * rawCropHFrac).round().clamp(1, h - cropY);
+
+  img.Image working =
+      img.copyCrop(original, x: cropX, y: cropY, width: cropW, height: cropH);
+
+  // ── 2. التاريخ (كبير) ثم رقم المشترك (أصغر) — نفس الأحمر، مباشرة أسفل
+  //        منطقة الإطار داخل الصورة المقتصَّة.
+  final now = DateTime.now();
+  final dateStr = DateFormat('yyyy-MM-dd').format(now);
+  final subscriberNumber = args.subscriberNumber;
+
+  final frameBottomY =
+      (working.height * (frameHeightFrac / rawCropHFrac)).round();
+  const linePadding = 8;
+  final dateY = frameBottomY + linePadding;
+  final textX = (working.width * 0.04).round();
+
+  // ظل أسود للوضوح خلف التاريخ
+  for (final dx in [-2, 0, 2]) {
+    for (final dy in [-2, 0, 2]) {
+      if (dx == 0 && dy == 0) continue;
+      img.drawString(
+        working,
+        dateStr,
+        font: img.arial48,
+        x: textX + dx,
+        y: dateY + dy,
+        color: img.ColorRgba8(0, 0, 0, 180),
+      );
+    }
+  }
+  // التاريخ — أحمر كبير كما كان
+  img.drawString(
+    working,
+    dateStr,
+    font: img.arial48,
+    x: textX,
+    y: dateY,
+    color: img.ColorRgba8(220, 30, 30, 255),
+  );
+
+  var bottomUsed = dateY + img.arial48.lineHeight;
+
+  if (subscriberNumber.isNotEmpty) {
+    final numberY = bottomUsed + linePadding;
+    // ظل أسود أخف للوضوح خلف رقم المشترك
+    for (final dx in [-1, 0, 1]) {
+      for (final dy in [-1, 0, 1]) {
+        if (dx == 0 && dy == 0) continue;
+        img.drawString(
+          working,
+          subscriberNumber,
+          font: img.arial24,
+          x: textX + dx,
+          y: numberY + dy,
+          color: img.ColorRgba8(0, 0, 0, 160),
+        );
+      }
+    }
+    // رقم المشترك — نفس لون التاريخ، لكن بخط أصغر
+    img.drawString(
+      working,
+      subscriberNumber,
+      font: img.arial24,
+      x: textX,
+      y: numberY,
+      color: img.ColorRgba8(220, 30, 30, 255),
+    );
+    bottomUsed = numberY + img.arial24.lineHeight;
+  }
+
+  // ── 3. إحكام الاقتصاص ليتوقف مباشرة أسفل آخر سطر نص (هامش صغير)،
+  //        بدل الشريط السخي المُقدَّر في الخطوة 1.
+  const bottomMargin = 10;
+  final finalHeight = (bottomUsed + bottomMargin).clamp(1, working.height);
+  if (finalHeight < working.height) {
+    working = img.copyCrop(working,
+        x: 0, y: 0, width: working.width, height: finalHeight);
+  }
+
+  // ── 4. Adaptive compression: يجب ألا يتجاوز 65 KB (بعد أن كان 95 KB) ──
+  const int maxBytes = 65 * 1024; // 65 KB
+
+  // Probe at quality=75 first
+  Uint8List compressed = Uint8List.fromList(img.encodeJpg(working, quality: 75));
+
+  if (compressed.lengthInBytes > maxBytes) {
+    // Estimate quality needed: newQ ≈ 75 × (maxBytes / probeSize), clamped [30, 70]
+    final ratio = maxBytes / compressed.lengthInBytes;
+    final estQ = (75 * ratio).clamp(30.0, 70.0).toInt();
+    compressed = Uint8List.fromList(img.encodeJpg(working, quality: estQ));
+
+    if (compressed.lengthInBytes > maxBytes) {
+      // Still over — shrink to 70% width and try again
+      final narrowed = img.copyResize(working, width: (working.width * 0.7).toInt());
+      final attempt3 = Uint8List.fromList(img.encodeJpg(narrowed, quality: estQ));
+      if (attempt3.lengthInBytes < compressed.lengthInBytes) {
+        compressed = attempt3;
+      }
+    }
+  }
+
+  return compressed;
+}
 
 class ReadingEntryScreen extends ConsumerStatefulWidget {
   final String assignmentId;
@@ -198,136 +346,19 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
     setState(() => _capturedImage = watermarked);
   }
 
+  /// يشغّل كل المعالجة الثقيلة (فك تشفير + اقتصاص + رسم نص + ضغط JPEG)
+  /// في Isolate منفصل عبر compute()، فلا تتجمّد الواجهة أثناء المعالجة —
+  /// وهو أمر مهم خاصة عند التقاط عشرات القراءات في جلسة ميدانية واحدة.
   Future<File> _addWatermark(File imageFile) async {
     final bytes = await imageFile.readAsBytes();
-    final original = img.decodeImage(bytes);
-    if (original == null) return imageFile;
-
-    // ── 1. اقتصاص لمنطقة الإطار التوجيهي على الشاشة (_FrameOverlay:
-    //        عرض 85% × ارتفاع 25% من الشاشة، ممركز) + شريط إضافي أسفله
-    //        لاستيعاب سطري التاريخ ورقم المشترك اللذين سنرسمهما بعد قليل.
-    //        يُحكم الاقتصاص لاحقاً (خطوة 3) ليتوقف مباشرة أسفل رقم
-    //        المشترك بهامش صغير فقط، بدل الاعتماد على تقدير ثابت.
-    //
-    //  ⚠️ هذا التطابق (نسبة على الشاشة = نفس النسبة في الصورة الملتقطة)
-    //  صحيح هنا تحديداً لأن _CameraScreen يضع CameraPreview مباشرة داخل
-    //  SizedBox.expand بدون AspectRatio/Transform.scale، فتُمدَّد المعاينة
-    //  لتملأ الشاشة دون أي قص/إزاحة أثناء العرض. لو تغيّر أسلوب المعاينة
-    //  مستقبلاً، يجب إعادة حساب هذه النسب.
-    const frameLeftFrac = 0.075; // (1 - 0.85) / 2
-    const frameTopFrac = 0.375; // (1 - 0.25) / 2
-    const frameWidthFrac = 0.85;
-    const frameHeightFrac = 0.25;
-    const reserveBelowFrac = 0.20; // شريط سخي؛ يُحكم لاحقاً بعد رسم النص
-
-    final w = original.width;
-    final h = original.height;
-    final cropX = (w * frameLeftFrac).round().clamp(0, w - 1);
-    final cropY = (h * frameTopFrac).round().clamp(0, h - 1);
-    final cropW = (w * frameWidthFrac).round().clamp(1, w - cropX);
-    final rawCropHFrac =
-        (frameHeightFrac + reserveBelowFrac).clamp(0.0, 1.0 - frameTopFrac);
-    final cropH = (h * rawCropHFrac).round().clamp(1, h - cropY);
-
-    img.Image working =
-        img.copyCrop(original, x: cropX, y: cropY, width: cropW, height: cropH);
-
-    // ── 2. التاريخ (كبير) ثم رقم المشترك (أصغر) — نفس الأحمر، مباشرة أسفل
-    //        منطقة الإطار داخل الصورة المقتصَّة.
-    final now = DateTime.now();
-    final dateStr = DateFormat('yyyy-MM-dd').format(now);
     final subscriberNumber = _assignment?.customer.customerNumber ?? '';
 
-    final frameBottomY =
-        (working.height * (frameHeightFrac / rawCropHFrac)).round();
-    const linePadding = 8;
-    final dateY = frameBottomY + linePadding;
-    final textX = (working.width * 0.04).round();
-
-    // ظل أسود للوضوح خلف التاريخ
-    for (final dx in [-2, 0, 2]) {
-      for (final dy in [-2, 0, 2]) {
-        if (dx == 0 && dy == 0) continue;
-        img.drawString(
-          working,
-          dateStr,
-          font: img.arial48,
-          x: textX + dx,
-          y: dateY + dy,
-          color: img.ColorRgba8(0, 0, 0, 180),
-        );
-      }
-    }
-    // التاريخ — أحمر كبير كما كان
-    img.drawString(
-      working,
-      dateStr,
-      font: img.arial48,
-      x: textX,
-      y: dateY,
-      color: img.ColorRgba8(220, 30, 30, 255),
+    final compressed = await compute(
+      _watermarkInIsolate,
+      _WatermarkArgs(bytes: bytes, subscriberNumber: subscriberNumber),
     );
 
-    var bottomUsed = dateY + img.arial48.lineHeight;
-
-    if (subscriberNumber.isNotEmpty) {
-      final numberY = bottomUsed + linePadding;
-      // ظل أسود أخف للوضوح خلف رقم المشترك
-      for (final dx in [-1, 0, 1]) {
-        for (final dy in [-1, 0, 1]) {
-          if (dx == 0 && dy == 0) continue;
-          img.drawString(
-            working,
-            subscriberNumber,
-            font: img.arial24,
-            x: textX + dx,
-            y: numberY + dy,
-            color: img.ColorRgba8(0, 0, 0, 160),
-          );
-        }
-      }
-      // رقم المشترك — نفس لون التاريخ، لكن بخط أصغر
-      img.drawString(
-        working,
-        subscriberNumber,
-        font: img.arial24,
-        x: textX,
-        y: numberY,
-        color: img.ColorRgba8(220, 30, 30, 255),
-      );
-      bottomUsed = numberY + img.arial24.lineHeight;
-    }
-
-    // ── 3. إحكام الاقتصاص ليتوقف مباشرة أسفل آخر سطر نص (هامش صغير)،
-    //        بدل الشريط السخي المُقدَّر في الخطوة 1.
-    const bottomMargin = 10;
-    final finalHeight = (bottomUsed + bottomMargin).clamp(1, working.height);
-    if (finalHeight < working.height) {
-      working = img.copyCrop(working,
-          x: 0, y: 0, width: working.width, height: finalHeight);
-    }
-
-    // ── 4. Adaptive compression: يجب ألا يتجاوز 65 KB (بعد أن كان 95 KB) ──
-    const int maxBytes = 65 * 1024; // 65 KB
-
-    // Probe at quality=75 first
-    Uint8List compressed = Uint8List.fromList(img.encodeJpg(working, quality: 75));
-
-    if (compressed.lengthInBytes > maxBytes) {
-      // Estimate quality needed: newQ ≈ 75 × (maxBytes / probeSize), clamped [30, 70]
-      final ratio = maxBytes / compressed.lengthInBytes;
-      final estQ = (75 * ratio).clamp(30.0, 70.0).toInt();
-      compressed = Uint8List.fromList(img.encodeJpg(working, quality: estQ));
-
-      if (compressed.lengthInBytes > maxBytes) {
-        // Still over — shrink to 70% width and try again
-        final narrowed = img.copyResize(working, width: (working.width * 0.7).toInt());
-        final attempt3 = Uint8List.fromList(img.encodeJpg(narrowed, quality: estQ));
-        if (attempt3.lengthInBytes < compressed.lengthInBytes) {
-          compressed = attempt3;
-        }
-      }
-    }
+    if (compressed == null) return imageFile; // تعذّر فك تشفير الصورة
 
     final dir = await getApplicationDocumentsDirectory();
     final path = '${dir.path}/reading_${const Uuid().v4()}.jpg';
