@@ -6,7 +6,8 @@
         <field name="model">utility.workflow.command</field>
         <field name="arch" type="xml">
             <tree string="أوامر مسارات العمل" decoration-info="state == 'pending'" decoration-warning="state == 'processing'" decoration-success="state == 'completed'" decoration-danger="state == 'failed'" decoration-muted="state in ('cancelled', 'dead')">
-                <field name="priority" widget="priority"/>
+                <!-- priority is an Integer used for queue ordering; the priority widget only supports Selection fields. -->
+                <field name="priority"/>
                 <field name="name"/>
                 <field name="workflow_type"/>
                 <field name="reference_model"/>

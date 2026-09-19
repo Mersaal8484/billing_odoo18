@@ -5,8 +5,8 @@
         <!-- ====== تحت قائمة Utility الرئيسية ====== -->
         <menuitem id="menu_utility_field_ops"
                   name="العمليات الميدانية"
-                  parent="utility_core.menu_utility_root"
-                  sequence="25"/>
+                  sequence="20"
+                  web_icon="utility_operations,static/description/icon.png"/>
 
         <!-- ====== أمور الخدمة ====== -->
         <menuitem id="menu_utility_service_orders"

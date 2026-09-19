@@ -91,6 +91,21 @@ class TestMultiRoleSecurityHardening(TransactionCase):
         self.assertTrue(self.user_multi.has_group('utility_core.group_utility_meter_reader'))
         self.assertTrue(staff.user_id)
 
+    def test_01b_requested_operational_roles_are_seeded(self):
+        """Requested role labels exist and reuse the canonical security groups."""
+        role_group_map = {
+            'role_reading_reviewer': 'group_utility_auditor',
+            'role_commercial_manager': 'group_utility_revenue_manager',
+            'role_area_accountant': 'group_utility_auditor',
+        }
+        for role_xmlid, group_xmlid in role_group_map.items():
+            role = self.env.ref('utility_core.%s' % role_xmlid)
+            group = self.env.ref('utility_core.%s' % group_xmlid)
+            self.assertIn(group, role.group_ids)
+
+        commercial_manager = self.env.ref('utility_core.role_commercial_manager')
+        self.assertIn('المنطقة أو الفرع', commercial_manager.description)
+
     def test_02_staff_roles_do_not_mutate_user_groups(self):
         """Changing legacy staff roles cannot grant or revoke Odoo access groups."""
         custom_group = self.env.ref('base.group_partner_manager')

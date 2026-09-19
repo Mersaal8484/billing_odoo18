@@ -6,7 +6,8 @@
             <field name="model_id" ref="model_utility_cron_execution"/>
             <field name="state">code</field>
             <field name="code">model.cron_cleanup_execution_history()</field>
-            <field name="interval_number">7</field>
+            <!-- Run frequently enough to drain high-volume execution history. -->
+            <field name="interval_number">1</field>
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
@@ -14,10 +15,10 @@
             <field name="utility_managed" eval="True"/>
             <field name="utility_code">cron_execution_history_cleanup</field>
             <field name="utility_category">maintenance</field>
-            <field name="utility_description">حذف سجلات تنفيذ المهام المجدولة القديمة الأقدم من 90 يوماً لترشيد مساحة قاعدة البيانات</field>
+            <field name="utility_description">تنظيف يومي لسجلات تنفيذ المهام المجدولة الأقدم من 90 يوماً، مع الاحتفاظ بالسجلات الجارية والحديثة</field>
             <field name="prevent_overlap" eval="True"/>
             <field name="allow_manual_run" eval="True"/>
-            <field name="batch_size">1000</field>
+            <field name="batch_size">5000</field>
         </record>
     </data>
 </odoo>

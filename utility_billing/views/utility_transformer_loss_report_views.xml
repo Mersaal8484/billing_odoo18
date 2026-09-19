@@ -111,8 +111,8 @@
 
     <menuitem id="menu_utility_billing_reports"
               name="التقارير"
-              parent="utility_core.menu_utility_root"
-              sequence="105"
+              sequence="30"
+              web_icon="utility_billing,static/description/icon.png"
               groups="base.group_system,utility_core.group_utility_admin,utility_core.group_utility_billing_manager,utility_core.group_utility_supervisor,utility_core.group_utility_revenue_manager,utility_core.group_utility_auditor"/>
 
     <menuitem id="menu_utility_transformer_loss_report"

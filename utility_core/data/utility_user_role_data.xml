@@ -42,5 +42,27 @@
             <field name="code">manager</field>
             <field name="group_ids" eval="[(4, ref('utility_core.group_utility_revenue_manager'))]"/>
         </record>
+
+        <!-- Additional organizational roles using the existing security groups. -->
+        <record id="role_reading_reviewer" model="utility.user.role">
+            <field name="name">مراجع قراءات</field>
+            <field name="code">reading_reviewer</field>
+            <field name="group_ids" eval="[(4, ref('utility_core.group_utility_auditor'))]"/>
+            <field name="description">مراجع القراءات والصور الرقمية ضمن النطاق الجغرافي المخصص له.</field>
+        </record>
+
+        <record id="role_commercial_manager" model="utility.user.role">
+            <field name="name">مدير تجاري</field>
+            <field name="code">commercial_manager</field>
+            <field name="group_ids" eval="[(4, ref('utility_core.group_utility_revenue_manager'))]"/>
+            <field name="description">إدارة العمليات التجارية والإيرادات على مستوى المنطقة أو الفرع المخصص للمستخدم، وفق صلاحيات مدير الإيرادات الحالية.</field>
+        </record>
+
+        <record id="role_area_accountant" model="utility.user.role">
+            <field name="name">محاسب منطقة</field>
+            <field name="code">area_accountant</field>
+            <field name="group_ids" eval="[(4, ref('utility_core.group_utility_auditor'))]"/>
+            <field name="description">متابعة السجلات والبيانات المحاسبية للمنطقة المخصصة بصلاحيات القراءة الحالية.</field>
+        </record>
     </data>
 </odoo>

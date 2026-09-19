@@ -378,6 +378,31 @@ class TestUtilityCronManagement(TransactionCase):
         self.assertFalse(old_log.exists(), "Old log past retention cutoff should be deleted.")
         self.assertTrue(recent_log.exists(), "Recent log within retention cutoff must be preserved.")
 
+    def test_12b_retention_cleanup_is_bounded_and_keeps_running_logs(self):
+        """Cleanup removes only the requested batch and never running executions."""
+        Execution = self.env['utility.cron.execution']
+        old_date = fields.Datetime.now() - timedelta(days=120)
+        old_logs = Execution.sudo().with_context(_cron_internal_write=True).create([
+            {
+                'cron_id': self.test_managed_cron.id,
+                'started_at': old_date,
+                'finished_at': old_date,
+                'status': 'success',
+            }
+            for _index in range(3)
+        ])
+        running_log = Execution.sudo().with_context(_cron_internal_write=True).create({
+            'cron_id': self.test_managed_cron.id,
+            'started_at': old_date,
+            'status': 'running',
+        })
+
+        result = Execution.cron_cleanup_execution_history(retention_days=90, batch_size=2)
+
+        self.assertEqual(result['processed'], 2)
+        self.assertEqual(len(old_logs.exists()), 1)
+        self.assertTrue(running_log.exists())
+
     def test_13_callback_scheduler_routing(self):
         """التحقق من أن استدعاء _callback بواسطة مجدول أودو يوجه المهمة المدارة بالـ job_id الصحيح."""
         cron = self.test_managed_cron

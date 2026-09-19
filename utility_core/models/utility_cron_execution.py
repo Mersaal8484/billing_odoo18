@@ -121,17 +121,28 @@ class UtilityCronExecution(models.Model):
         return super().unlink()
 
     @api.model
-    def cron_cleanup_execution_history(self, retention_days=90, batch_size=1000):
-        """حذف سجلات التنفيذ القديمة بناء على سياسة الاحتفاظ."""
+    def cron_cleanup_execution_history(self, retention_days=90, batch_size=5000):
+        """حذف دفعة محدودة من سجلات التنفيذ القديمة بناء على سياسة الاحتفاظ.
+
+        The scheduled job runs daily and removes a bounded batch so cleanup
+        cannot monopolize the Odoo worker. Running records are deliberately
+        excluded because they are still part of the execution audit trail.
+        """
         ICP = self.env['ir.config_parameter'].sudo()
         days = int(ICP.get_param('utility.cron_history_retention_days', retention_days))
+        batch_limit = int(ICP.get_param('utility.cron_history_cleanup_batch_size', batch_size))
+        days = max(days, 1)
+        batch_limit = max(batch_limit, 1)
         cutoff = fields.Datetime.now() - timedelta(days=days)
         records = self.search([
             ('started_at', '<', cutoff),
             ('status', '!=', 'running'),
-        ], limit=batch_size)
+        ], order='started_at asc, id asc', limit=batch_limit)
         count = len(records)
         if records:
             records.with_context(_cron_cleanup_mode=True).unlink()
-        _logger.info("Utility Cron Cleanup: removed %d execution records older than %d days", count, days)
+        _logger.info(
+            "Utility Cron Cleanup: removed %d execution records older than %d days (batch limit %d)",
+            count, days, batch_limit,
+        )
         return {'processed': count, 'success': count, 'failed': 0, 'skipped': 0}

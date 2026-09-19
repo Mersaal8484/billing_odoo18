@@ -35,6 +35,12 @@ class TestWorkflowCommandHardening(TransactionCase):
             'groups_id': [(6, 0, [self.env.ref('base.group_user').id])],
         })
 
+    def test_workflow_command_tree_keeps_integer_priority_renderable(self):
+        """The integer priority must not use Odoo's selection-only priority widget."""
+        view = self.env.ref('utility_core.view_utility_workflow_command_tree')
+        self.assertIn('<field name="priority"/>', view.arch_db)
+        self.assertNotIn('<field name="priority" widget="priority"', view.arch_db)
+
     # =========================================================================
     # 1. Transaction Atomicity
     # =========================================================================

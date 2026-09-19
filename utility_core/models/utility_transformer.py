@@ -56,6 +56,7 @@ class UtilityTransformer(models.Model):
         'utility.customer',
         string='عقود المشتركين',
         compute='_compute_customer_ids',
+        compute_sudo=True,
         help='عقود المشتركين المغذاة من هذا المحول عبر مسارات التوزيع المرتبطة به'
     )
     private_customer_id = fields.Many2one(
@@ -76,6 +77,7 @@ class UtilityTransformer(models.Model):
         'عدد العقود',
         compute='_compute_customer_ids',
         store=True,
+        compute_sudo=True,
     )
 
     notes = fields.Text('ملاحظات')
