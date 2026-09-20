@@ -7,14 +7,21 @@
         <field name="arch" type="xml">
             <notebook position="inside">
                 <page name="utility_collection" string="صلاحيات الكهرباء">
+                    <field name="has_collection_role" invisible="1"/>
                     <group string="الأدوار الوظيفية للكهرباء">
                         <field name="utility_role_ids" widget="many2many_tags"
                                options="{'no_create': True, 'no_create_edit': True}"
                                placeholder="اختر دورًا أو أكثر..."/>
                         <div class="text-muted">تُطبّق الصلاحيات تلقائيًا حسب الأدوار المختارة.</div>
                     </group>
-                    <group>
+                    <group attrs="{'invisible': [('has_collection_role', '=', False)]}">
                         <group string="إعدادات التحصيل النقدية">
+                            <button name="action_create_collection_journal"
+                                    type="object"
+                                    string="إنشاء يومية نقدية"
+                                    class="oe_highlight"
+                                    attrs="{'invisible': [('collection_journal_id', '!=', False)]}"
+                                    confirm="سيتم إنشاء يومية نقدية مستقلة وربطها بهذا المستخدم. هل تريد المتابعة؟"/>
                             <field name="collection_journal_id" options="{'no_create': True}" placeholder="اختر اليومية النقدية"/>
                             <field name="collector_block_code" placeholder="مثال: A, B, C..."/>
                         </group>

@@ -1,5 +1,5 @@
 from odoo import api, fields, models, _
-from odoo.exceptions import AccessError
+from odoo.exceptions import AccessError, UserError
 
 
 class ResUsers(models.Model):
@@ -11,6 +11,11 @@ class ResUsers(models.Model):
         string='الأدوار الوظيفية',
         help='الأدوار الوظيفية التي تمنح المستخدم صلاحيات نظام إدارة الكهرباء. '
              'تُحوّل الأدوار تلقائياً إلى مجموعات Odoo الداخلية.')
+
+    has_collection_role = fields.Boolean(
+        string='لديه صلاحيات تحصيل',
+        compute='_compute_has_collection_role',
+        help='يظهر إعداد اليومية النقدية فقط للمستخدم ذي دور المتحصل أو أمين الصندوق.')
 
     # Kept as a compatibility field so databases upgrading from versions that
     # exposed it in res.users views can rebuild the generated groups view.
@@ -58,6 +63,92 @@ class ResUsers(models.Model):
         ('global', 'وصول شامل على مستوى الشركة'),
     ], string='وضع النطاق التنظيمي', default='restricted', required=True,
        help='يحدد ما إذا كان المستخدم مقيداً بالتقسيمات الجغرافية المخصصة أو يملك وصولاً شاملاً.')
+
+    @api.depends('utility_role_ids', 'utility_role_ids.code', 'groups_id')
+    def _compute_has_collection_role(self):
+        collector_group = self.env.ref(
+            'utility_core.group_utility_collector', raise_if_not_found=False)
+        cashier_group = self.env.ref(
+            'utility_core.group_utility_cashier', raise_if_not_found=False)
+        for user in self:
+            role_codes = set(user.utility_role_ids.mapped('code'))
+            has_role = bool({'collector', 'cashier'} & role_codes)
+            if not has_role:
+                has_role = bool(
+                    (collector_group and collector_group in user.groups_id)
+                    or (cashier_group and cashier_group in user.groups_id)
+                )
+            user.has_collection_role = has_role
+
+    def action_create_collection_journal(self):
+        """Create and assign a dedicated cash journal for the current user."""
+        self.ensure_one()
+        if not (self.env.user.has_group('utility_core.group_utility_admin')
+                or self.env.user.has_group('base.group_account_manager')):
+            raise AccessError(_(
+                'إنشاء اليومية النقدية يستلزم صلاحية مدير النظام أو مدير المحاسبة.'
+            ))
+        if not self.has_collection_role:
+            raise UserError(_(
+                'لا يمكن إنشاء يومية نقدية إلا لمستخدم لديه دور متحصل ميداني أو أمين صندوق.'
+            ))
+        if self.collection_journal_id:
+            return self._collection_journal_notification()
+
+        company = self.company_id or self.env.company
+        Journal = self.env['account.journal'].sudo()
+        Account = self.env['account.account'].sudo()
+        code_base = 'UC%03d' % self.id
+        code = code_base[:5]
+        suffix = 1
+        while Journal.search([('company_id', '=', company.id), ('code', '=', code)], limit=1):
+            code = ('UC%02d%d' % (self.id % 100, suffix))[:5]
+            suffix += 1
+
+        journal_name = _('يومية تحصيل - %s') % self.name
+        cash_account = Account.search([
+            ('company_id', '=', company.id),
+            ('name', '=', _('حساب صندوق - %s') % self.name),
+        ], limit=1)
+        if not cash_account:
+            account_code = '101%03d' % self.id
+            account_code = account_code[-6:]
+            account_suffix = 1
+            while Account.search([
+                ('company_id', '=', company.id),
+                ('code', '=', account_code),
+            ], limit=1):
+                account_code = ('101%03d' % (self.id + account_suffix))[-6:]
+                account_suffix += 1
+            cash_account = Account.create({
+                'name': _('حساب صندوق - %s') % self.name,
+                'code': account_code,
+                'account_type': 'asset_cash',
+                'company_id': company.id,
+            })
+
+        journal = Journal.create({
+            'name': journal_name,
+            'code': code,
+            'type': 'cash',
+            'company_id': company.id,
+            'default_account_id': cash_account.id,
+        })
+        self.sudo().collection_journal_id = journal.id
+        return self._collection_journal_notification()
+
+    def _collection_journal_notification(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('نجاح'),
+                'message': _('تم ربط اليومية النقدية «%s» بالمستخدم.') % self.collection_journal_id.name,
+                'type': 'success',
+                'sticky': False,
+            },
+        }
 
     def _sync_utility_roles_to_groups(self):
         """Translate selected business roles to the underlying Odoo groups."""
