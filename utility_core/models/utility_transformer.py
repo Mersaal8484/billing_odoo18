@@ -103,7 +103,7 @@ class UtilityTransformer(models.Model):
                     % (zone.display_name, zone.transformer_origin_id.display_name)
                 )
 
-    @api.constrains('is_private', 'private_customer_id', 'customer_ids')
+    @api.constrains('is_private', 'private_customer_id', 'route_ids')
     def _check_private_transformer_owner(self):
         for transformer in self:
             if transformer.is_private and len(transformer.customer_ids) > 1:

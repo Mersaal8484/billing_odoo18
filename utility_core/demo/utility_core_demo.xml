@@ -79,6 +79,7 @@
             <field name="code">TRANS_2</field>
             <field name="feeder_id" ref="demo_feeder_2"/>
             <field name="substation_id" ref="demo_substation_2"/>
+            <field name="zone_region_id" ref="demo_zone_2"/>
             <field name="capacity">250.0</field>
             <field name="phase">three</field>
             <field name="status">active</field>
