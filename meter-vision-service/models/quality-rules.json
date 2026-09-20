@@ -1,0 +1,5 @@
+{
+  "name": "baseline-image-quality-rules",
+  "version": "0.1.0",
+  "notes": "Initial deterministic rules; calibrate with labelled production images."
+}

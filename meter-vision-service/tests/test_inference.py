@@ -24,6 +24,8 @@ class TestInference(unittest.TestCase):
         self.assertEqual(result.request_id, "MVR/2")
         self.assertIn(result.state, ("completed", "needs_review"))
         self.assertGreaterEqual(result.quality.score, 0.0)
+        self.assertFalse(result.auto_approval_eligible)
+        self.assertTrue(result.stages)
 
 
 if __name__ == "__main__":

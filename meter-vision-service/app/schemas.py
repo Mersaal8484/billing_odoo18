@@ -23,6 +23,13 @@ class QualityResult(BaseModel):
     height: int
 
 
+class PipelineStage(BaseModel):
+    name: str
+    state: str
+    confidence: float = 0.0
+    weights_status: str = "not_ready"
+
+
 class InferenceResponse(BaseModel):
     request_id: str
     state: str
@@ -33,4 +40,6 @@ class InferenceResponse(BaseModel):
     reading: ConfidenceValue = ConfidenceValue()
     raw_text: str = ""
     flags: list[str] = []
+    stages: list[PipelineStage] = []
+    auto_approval_eligible: bool = False
     error_message: Optional[str] = None

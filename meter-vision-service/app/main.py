@@ -3,6 +3,7 @@ import os
 from fastapi import Depends, FastAPI, Header, HTTPException
 
 from .inference import analyze
+from .model_registry import model_status
 from .schemas import InferenceRequest, InferenceResponse
 
 app = FastAPI(title="Meter Vision Service", version="0.1.0")
@@ -17,6 +18,11 @@ def verify_token(authorization: str | None = Header(default=None)):
 @app.get("/healthz")
 def healthz():
     return {"status": "ok", "service": "meter-vision-service", "model": os.getenv("METER_VISION_MODEL", "baseline-ocr")}
+
+
+@app.get("/v1/models")
+def models():
+    return {"models": model_status()}
 
 
 @app.post("/v1/inference", response_model=InferenceResponse, dependencies=[Depends(verify_token)])

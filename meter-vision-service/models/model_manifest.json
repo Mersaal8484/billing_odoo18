@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "models": [
+    {
+      "key": "image_quality",
+      "stage": "quality",
+      "framework": "rules",
+      "weights": "models/quality-rules.json",
+      "target": "الوضوح والإضاءة والانعكاس",
+      "ready_when": "quality score and validation set thresholds are accepted"
+    },
+    {
+      "key": "meter_detector",
+      "stage": "detection",
+      "framework": "yolo-onnx",
+      "weights": "models/meter_detector.onnx",
+      "target": "جسم العداد والشاشة والملصق",
+      "ready_when": "recall >= 0.95 and mAP50 >= 0.90"
+    },
+    {
+      "key": "meter_type_classifier",
+      "stage": "classification",
+      "framework": "onnx",
+      "weights": "models/meter_type_classifier.onnx",
+      "target": "نوع وفئة العداد",
+      "ready_when": "macro F1 >= 0.95 across all meter families"
+    },
+    {
+      "key": "reading_ocr",
+      "stage": "ocr",
+      "framework": "crnn-ctc",
+      "weights": "models/reading_ocr.onnx",
+      "target": "قراءة الشاشة ورقم العداد",
+      "ready_when": "full reading accuracy >= 0.98 and digit accuracy >= 0.995"
+    }
+  ],
+  "gates": {
+    "quality_auto_threshold": 0.75,
+    "detector_confidence_auto_threshold": 0.90,
+    "ocr_confidence_auto_threshold": 0.95,
+    "reading_previous_value_check": true,
+    "human_review_required_until_all_weights_ready": true
+  }
+}

@@ -8,6 +8,8 @@ from typing import Optional
 from PIL import Image, ImageEnhance, ImageOps
 
 from .schemas import ConfidenceValue, InferenceRequest, InferenceResponse, QualityResult
+from .model_registry import model_status
+from .pipeline import run_validation_gates
 
 MODEL_NAME = os.getenv("METER_VISION_MODEL", "baseline-ocr")
 MODEL_VERSION = os.getenv("METER_VISION_MODEL_VERSION", "0.1.0")
@@ -90,14 +92,27 @@ def analyze(request: InferenceRequest) -> InferenceResponse:
     raw_text, candidate, confidence, flags = _ocr(image, request.language_hint)
     if quality.state == "poor":
         flags.append("LOW_IMAGE_QUALITY")
-    state = "completed" if candidate and not flags else "needs_review"
+    decision = run_validation_gates(image, quality.score, confidence, flags)
+    statuses = {item["key"]: item for item in model_status()}
+    stages = [
+        {"name": "quality", "state": quality.state, "confidence": quality.score,
+         "weights_status": statuses["image_quality"]["status"]},
+        {"name": "meter_detection", "state": "not_ready", "confidence": 0.0,
+         "weights_status": statuses["meter_detector"]["status"]},
+        {"name": "meter_type", "state": "not_ready", "confidence": 0.0,
+         "weights_status": statuses["meter_type_classifier"]["status"]},
+        {"name": "reading_ocr", "state": "completed" if candidate else "needs_review",
+         "confidence": confidence, "weights_status": statuses["reading_ocr"]["status"]},
+    ]
     return InferenceResponse(
         request_id=request.request_id,
-        state=state,
+        state=decision.state,
         model=MODEL_NAME,
         model_version=MODEL_VERSION,
         quality=quality,
         reading=ConfidenceValue(value=candidate, confidence=confidence),
         raw_text=raw_text,
-        flags=flags,
+        flags=decision.flags,
+        stages=stages,
+        auto_approval_eligible=decision.auto_approval_eligible,
     )
