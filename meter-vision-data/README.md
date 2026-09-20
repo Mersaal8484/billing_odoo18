@@ -52,3 +52,13 @@ raw → validate → redact/normalize → annotate → quality gate
 
 راجع [dataset_manifest.schema.json](manifests/dataset_manifest.schema.json)
 و[annotation-spec.json](configs/annotation-spec.json) قبل رفع أي بيانات.
+
+## مصدر التدريب الأول: UFPR-AMR
+
+سيكون UFPR-AMR أول مصدر تدريب خارجي. وفق الصفحة الرسمية، يحتوي على 2,000
+صورة، مقسمة إلى 800 تدريب و400 تحقق و800 اختبار، مع مواضع العداد والأرقام
+والقراءة، وجميع العدادات فيه مكونة من خمسة أرقام. الصور ملتقطة بثلاث كاميرات
+وبدقة عالية، لذلك سيُستخدم كبداية لتدريب الكشف وOCR وليس كبديل عن صور عدادات
+المؤسسة اليمنية. استخدامه مقيد بالبحث الأكاديمي غير التجاري؛ يجب مراجعة الإذن
+قبل أي استخدام إنتاجي أو تجاري. تفاصيل المصدر والتكييف موجودة في
+[ufpr-amr-source.json](configs/ufpr-amr-source.json).

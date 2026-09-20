@@ -1,0 +1,28 @@
+{
+  "dataset_id": "UFPR-AMR",
+  "source_url": "https://web.inf.ufpr.br/vri/databases/ufpr-amr/",
+  "source_repository": "https://github.com/raysonlaroca/ufpr-amr-dataset",
+  "license_scope": "academic_research_only_non_commercial",
+  "citation": "R. Laroca et al., Convolutional Neural Networks for Automatic Meter Reading, Journal of Electronic Imaging, 28(1), 013023, 2019.",
+  "image_count": 2000,
+  "splits": {"train": 800, "val": 400, "test": 800},
+  "image_format": "jpg",
+  "resolution_range": [[2340, 4160], [3120, 4160]],
+  "cameras": ["LG G3 D855", "Samsung Galaxy J7 Prime", "iPhone 6s"],
+  "digits_per_meter": 5,
+  "annotation_fields": ["camera", "meter_bbox_xywh", "reading", "digit_bboxes"],
+  "adapter_mapping": {
+    "meter_bbox_xywh": "annotations/detection/meter",
+    "digit_bboxes": "annotations/detection/display_digits",
+    "reading": "annotations/ocr/reading",
+    "camera": "manifests/source_camera"
+  },
+  "target_use": ["meter_detection", "digit_detection", "ocr_baseline"],
+  "known_gaps_for_utility_erp": [
+    "Brazilian dataset with five digits per meter",
+    "does not represent Yemeni meter families and field conditions",
+    "not sufficient alone for Arabic labels, green displays, glare and night images",
+    "must not be used as a commercial production dataset without permission review"
+  ],
+  "status": "planned_import"
+}
