@@ -5,16 +5,14 @@
         <field name="model">res.users</field>
         <field name="inherit_id" ref="base.view_users_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='access_rights']" position="inside">
-                <group string="الأدوار الوظيفية لنظام إدارة الكهرباء">
-                    <field name="utility_role_ids" widget="many2many_tags"
-                           options="{'no_create': True, 'no_create_edit': True}"
-                           placeholder="اختر دورًا أو أكثر..."/>
-                    <div class="text-muted">تُطبّق الصلاحيات تلقائيًا حسب الأدوار المختارة.</div>
-                </group>
-            </xpath>
             <notebook position="inside">
-                <page name="utility_collection" string="إدارة تحصيل الكهرباء">
+                <page name="utility_collection" string="صلاحيات الكهرباء">
+                    <group string="الأدوار الوظيفية للكهرباء">
+                        <field name="utility_role_ids" widget="many2many_tags"
+                               options="{'no_create': True, 'no_create_edit': True}"
+                               placeholder="اختر دورًا أو أكثر..."/>
+                        <div class="text-muted">تُطبّق الصلاحيات تلقائيًا حسب الأدوار المختارة.</div>
+                    </group>
                     <group>
                         <group string="إعدادات التحصيل النقدية">
                             <field name="collection_journal_id" options="{'no_create': True}" placeholder="اختر اليومية النقدية"/>
