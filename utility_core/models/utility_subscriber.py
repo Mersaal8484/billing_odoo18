@@ -12,7 +12,10 @@ class UtilitySubscriber(models.Model):
 
     # الخصم المدعوم
     subsidized_enabled = fields.Boolean('تفعيل الخصم المدعوم', default=False)
-    sponsor_id = fields.Many2one('res.partner', string='الجهة الداعمة', help='الجهة التي سيتم تقييد قيمة الخصم كمديونية عليها')
+    sponsor_id = fields.Many2one(
+        'res.partner', string='الجهة الداعمة',
+        domain="[('utility_partner_type', '=', 'donor')]",
+        help='الجهة التي سيتم تقييد قيمة الخصم كمديونية عليها')
     subsidized_max_units = fields.Float('الحد الأقصى للوحدات المدعومة', default=100.0)
     subsidized_percentage = fields.Float('نسبة الدعم (%)', default=100.0)
     currency_id = fields.Many2one(

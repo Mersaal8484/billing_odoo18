@@ -119,7 +119,18 @@ class ResPartner(models.Model):
                 partner.utility_postpaid_balance = 0.0
 
     nickname = fields.Char(string="الاسم المختصر")
-    is_subscriber = fields.Boolean(string="مشترك كهرباء", default=False, tracking=True)
+    utility_partner_type = fields.Selection([
+        ('subscriber', 'مشترك كهرباء'),
+        ('employee', 'موظف / مستخدم'),
+        ('donor', 'جهة مانحة'),
+        ('supported_entity', 'جهة مدعومة'),
+        ('other', 'جهة أخرى'),
+    ], string='تصنيف الشريك', default='other', required=True, index=True,
+        tracking=True,
+        help='يحدد الغرض التشغيلي للشريك ويُستخدم لتقييد قوائم الاختيار في النظام.')
+    is_subscriber = fields.Boolean(
+        string="مشترك كهرباء", default=False, tracking=True,
+        help='حقل توافق قديم. التصنيف المعتمد هو تصنيف الشريك.')
     subscriber_status = fields.Selection([
         ('new', 'مشترك جديد'),
         ('old', 'مشترك قديم'),
@@ -159,6 +170,27 @@ class ResPartner(models.Model):
     subscriber_id = fields.Many2one('utility.subscriber', string="نوع المشترك", tracking=True)
     sector_id = fields.Many2one('res.partner.sector', string="القطاع", tracking=True)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Keep the legacy subscriber flag aligned with the partner role."""
+        for vals in vals_list:
+            role = vals.get('utility_partner_type')
+            if role == 'subscriber' or (role is None and vals.get('is_subscriber')):
+                vals['utility_partner_type'] = 'subscriber'
+                vals['is_subscriber'] = True
+            elif role and role != 'subscriber':
+                vals['is_subscriber'] = False
+        return super().create(vals_list)
+
+    def write(self, vals):
+        """Synchronize old callers that still write ``is_subscriber``."""
+        vals = dict(vals)
+        if 'utility_partner_type' in vals:
+            vals['is_subscriber'] = vals['utility_partner_type'] == 'subscriber'
+        elif 'is_subscriber' in vals:
+            vals['utility_partner_type'] = 'subscriber' if vals['is_subscriber'] else 'other'
+        return super().write(vals)
+
     def action_open_utility_customer_registration(self):
         """
         فتح حساب المشترك المرتبط أو تسجيل حساب جديد.
@@ -173,6 +205,8 @@ class ResPartner(models.Model):
         if len(self) != 1:
             raise UserError(_('يرجى اختيار شريك واحد فقط.'))
         self.ensure_one()
+        if self.utility_partner_type != 'subscriber':
+            raise UserError(_('لا يمكن تفعيل حساب كهرباء إلا لشريك مصنف كمشترك كهرباء.'))
 
         # 1. حساب مشترك موجود بالفعل
         customers = self.env['utility.customer'].search([

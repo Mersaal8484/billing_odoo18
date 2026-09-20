@@ -47,6 +47,10 @@ class AccountPayment(models.Model):
     collection_request_key = fields.Char(
         string='مفتاح طلب التحصيل الميداني', copy=False, index=True,
         help='معرف ثابت يرسله تطبيق المحصل لمنع تكرار نفس التحصيل عند إعادة المحاولة.')
+    collection_company_id = fields.Many2one(
+        'res.company', related='company_id', store=True, readonly=True, index=True,
+        string='شركة طلب التحصيل',
+        help='نسخة مخزنة من شركة الدفعة لاستخدام قيد التفرد على جدول account_payment.')
     collection_request_user_id = fields.Many2one(
         'res.users', string='مستخدم طلب التحصيل الميداني', readonly=True,
         copy=False, index=True)
@@ -80,7 +84,7 @@ class AccountPayment(models.Model):
     _sql_constraints = [
         (
             'utility_collection_request_key_company_uniq',
-            'unique(company_id, collection_request_key)',
+            'unique(collection_company_id, collection_request_key)',
             'مفتاح طلب التحصيل الميداني مستخدم مسبقاً في هذه الشركة.',
         ),
     ]

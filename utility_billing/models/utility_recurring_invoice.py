@@ -14,6 +14,8 @@ class UtilityContractTemplate(models.Model):
         consumption = reading.consumption
         lines = []
         for line in self.line_ids:
+            if line.meter_line_type == 'discount' and not template.subsidy_enabled:
+                continue
             qty = line.quantity
             price = line.specific_price or 0.0
             name = line.name or line.product_id.name

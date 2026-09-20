@@ -23,7 +23,30 @@
     <record id="partner_sponsor_fund" model="res.partner">
         <field name="name">الصندوق</field>
         <field name="is_company" eval="True"/>
+        <field name="utility_partner_type">donor</field>
         <field name="comment">الجهة الداعمة لخصم الاستهلاك المدعوم</field>
+    </record>
+
+    <!-- ====== الجهات المدعومة ====== -->
+    <record id="partner_supported_teacher" model="res.partner">
+        <field name="name">المعلم</field>
+        <field name="is_company" eval="True"/>
+        <field name="utility_partner_type">supported_entity</field>
+        <field name="comment">جهة مدعومة - رسوم المعلم</field>
+    </record>
+
+    <record id="partner_supported_cleaning" model="res.partner">
+        <field name="name">النظافة</field>
+        <field name="is_company" eval="True"/>
+        <field name="utility_partner_type">supported_entity</field>
+        <field name="comment">جهة مدعومة - رسوم النظافة</field>
+    </record>
+
+    <record id="partner_supported_local_administration" model="res.partner">
+        <field name="name">الإدارة المحلية</field>
+        <field name="is_company" eval="True"/>
+        <field name="utility_partner_type">supported_entity</field>
+        <field name="comment">جهة مدعومة - رسوم الإدارة المحلية</field>
     </record>
 
     <!-- ====== المشتركين للفئات الجديدة ====== -->

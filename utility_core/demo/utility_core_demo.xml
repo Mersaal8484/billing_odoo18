@@ -65,7 +65,6 @@
         <record id="demo_substation_2" model="utility.substation">
             <field name="name">محطة المنطقة الثانية</field>
             <field name="code">SUB_2</field>
-            <field name="area_id" ref="demo_area_2"/>
             <field name="voltage_level">mv</field>
         </record>
         <record id="demo_feeder_2" model="utility.feeder">

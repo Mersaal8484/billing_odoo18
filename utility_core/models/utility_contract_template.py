@@ -68,8 +68,15 @@ class UtilityContractTemplate(models.Model):
     )
 
     # إعدادات الحسابات والتعرفة
-    pricelist_id = fields.Many2one('product.pricelist', 'قائمة الأسعار')
-    journal_id = fields.Many2one('account.journal', 'اليومية', domain="[('type', 'in', ['sale', 'general'])]")
+    pricelist_id = fields.Many2one(
+        'product.pricelist', 'قائمة الأسعار',
+        default=lambda self: self.env.company.utility_default_pricelist_id,
+        help='تُحدد تلقائياً من الإعداد العام للشركة ولا تحتاج إلى اختيار داخل العقد.')
+    journal_id = fields.Many2one(
+        'account.journal', 'اليومية',
+        domain="[('type', 'in', ['sale', 'general'])]",
+        default=lambda self: self.env.company.sales_journal_id,
+        help='اليومية الافتراضية لفواتير هذا القالب؛ يتم ضبطها تلقائياً على يومية مبيعات الكهرباء.')
 
     # ── تسعير (دمج utility.tariff) ──────────────────────────────────────
     pricing_mode = fields.Selection([
@@ -106,7 +113,19 @@ class UtilityContractTemplate(models.Model):
     local_fee_cleaning = fields.Monetary('رسم النظافة لكل kWh', default=0.0, currency_field='currency_id')
 
     # خصم الدعم — أول N وحدة تُخصم على الجهة الداعمة
-    sponsor_id = fields.Many2one('res.partner', string='الجهة الداعمة', help='الجهة التي سيتم تقييد الخصم عليها')
+    subsidy_enabled = fields.Boolean(
+        string='يخضع لخصم الدعم',
+        default=False,
+        help='عند التفعيل يتم احتساب بند خصم الدعم للمشتركين المؤهلين فقط.')
+    sponsor_id = fields.Many2one(
+        'res.partner', string='الجهة الداعمة',
+        domain="[('utility_partner_type', '=', 'donor')]",
+        default=lambda self: self.env.company.utility_default_sponsor_id,
+        help='الجهة التي سيتم تقييد الخصم عليها')
+
+    def _get_effective_sponsor(self):
+        self.ensure_one()
+        return self.sponsor_id or self.company_id.utility_default_sponsor_id
     discount_formula_id = fields.Many2one('utility.formula', string='معادلة الخصم',
         help='معادلة ديناميكية لحساب كمية الخصم')
     discount_block_ids = fields.One2many('utility.contract.template.block', 'template_id',
@@ -441,8 +460,9 @@ class UtilityContractTemplate(models.Model):
             'local_fee_per_kwh': self.local_fee_per_kwh or 0.0,
             'local_fee_mu_allim': self.local_fee_mu_allim or 0.0,
             'local_fee_cleaning': self.local_fee_cleaning or 0.0,
-            'sponsor_id': self.sponsor_id.id if self.sponsor_id else False,
-            'sponsor_name': self.sponsor_id.name if self.sponsor_id else '',
+            'subsidy_enabled': self.subsidy_enabled,
+            'sponsor_id': self._get_effective_sponsor().id if self._get_effective_sponsor() else False,
+            'sponsor_name': self._get_effective_sponsor().name if self._get_effective_sponsor() else '',
             'discount_formula_id': self.discount_formula_id.id if self.discount_formula_id else False,
             'discount_formula_code': self.discount_formula_id.code if self.discount_formula_id else '',
             'discount_formula_name': self.discount_formula_id.name if self.discount_formula_id else '',
@@ -473,7 +493,7 @@ class UtilityContractTemplate(models.Model):
                 'local_fee_per_kwh': self.local_fee_per_kwh,
                 'local_fee_mu_allim': self.local_fee_mu_allim,
                 'local_fee_cleaning': self.local_fee_cleaning,
-                'sponsor_id': self.sponsor_id.id if self.sponsor_id else False,
+                'sponsor_id': self._get_effective_sponsor().id if self._get_effective_sponsor() else False,
                 'discount_formula_id': self.discount_formula_id.id if self.discount_formula_id else False,
                 'discount_formula_name': self.discount_formula_id.name if self.discount_formula_id else False,
                 'pricing_snapshot_json': snapshot_json,
@@ -489,7 +509,7 @@ class UtilityContractTemplate(models.Model):
             latest.local_fee_per_kwh != self.local_fee_per_kwh or
             latest.local_fee_mu_allim != self.local_fee_mu_allim or
             latest.local_fee_cleaning != self.local_fee_cleaning or
-            latest.sponsor_id != self.sponsor_id or
+            latest.sponsor_id != self._get_effective_sponsor() or
             latest.discount_formula_id != self.discount_formula_id or
             latest.pricing_snapshot_json != snapshot_json
         )
@@ -513,7 +533,7 @@ class UtilityContractTemplate(models.Model):
                 'local_fee_per_kwh': self.local_fee_per_kwh,
                 'local_fee_mu_allim': self.local_fee_mu_allim,
                 'local_fee_cleaning': self.local_fee_cleaning,
-                'sponsor_id': self.sponsor_id.id if self.sponsor_id else False,
+                'sponsor_id': self._get_effective_sponsor().id if self._get_effective_sponsor() else False,
                 'discount_formula_id': self.discount_formula_id.id if self.discount_formula_id else False,
                 'discount_formula_name': self.discount_formula_id.name if self.discount_formula_id else False,
                 'pricing_snapshot_json': snapshot_json,
@@ -529,7 +549,7 @@ class UtilityContractTemplate(models.Model):
                 'local_fee_per_kwh': self.local_fee_per_kwh,
                 'local_fee_mu_allim': self.local_fee_mu_allim,
                 'local_fee_cleaning': self.local_fee_cleaning,
-                'sponsor_id': self.sponsor_id.id if self.sponsor_id else False,
+                'sponsor_id': self._get_effective_sponsor().id if self._get_effective_sponsor() else False,
                 'discount_formula_id': self.discount_formula_id.id if self.discount_formula_id else False,
                 'discount_formula_name': self.discount_formula_id.name if self.discount_formula_id else False,
                 'pricing_snapshot_json': snapshot_json,
@@ -547,7 +567,7 @@ class UtilityContractTemplate(models.Model):
         """عند تغيير الأسعار أو التكوين التجاري، نسجل التاريخ ونحدث الإصدار التجاري."""
         commercial_fields = {
             'recurring_rule_type', 'pricing_mode', 'price_per_kwh', 'service_charge', 'min_charge', 'max_charge',
-            'local_fee_per_kwh', 'local_fee_mu_allim', 'local_fee_cleaning',
+            'local_fee_per_kwh', 'local_fee_mu_allim', 'local_fee_cleaning', 'subsidy_enabled',
             'sponsor_id', 'discount_formula_id', 'block_ids', 'discount_block_ids', 'line_ids'
         }
         needs_version_sync = bool(commercial_fields & set(vals))
@@ -681,7 +701,7 @@ class UtilityContractTemplate(models.Model):
                 })
 
             # الخصم المدعوم
-            if 'discount' not in existing_types and template.discount_formula_id:
+            if template.subsidy_enabled and 'discount' not in existing_types and template.discount_formula_id:
                 self.env['utility.contract.template.line'].create({
                     'template_id': template.id,
                     'sequence': 45,

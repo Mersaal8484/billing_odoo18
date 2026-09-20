@@ -78,7 +78,7 @@
                     <group>
                         <group string="معلومات الهوية والنوع">
                             <field name="external_qr_reference" placeholder="QR-..."/>
-                            <field name="partner_id"/>
+                            <field name="partner_id" domain="[('utility_partner_type', '=', 'subscriber')]"/>
                             <field name="category_id" options="{'no_create': True}"/>
                             <field name="subscriber_id" options="{'no_create': True}"/>
                             <field name="payment_type" widget="badge" decoration-info="payment_type == 'prepaid'" decoration-success="payment_type == 'postpaid'"/>
@@ -243,8 +243,8 @@
         <field name="name">عملاء المشتركين</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">tree,form,kanban</field>
-        <field name="domain">[('is_subscriber', '=', True)]</field>
-        <field name="context">{'default_is_subscriber': True, 'default_customer_rank': 1}</field>
+        <field name="domain">[('utility_partner_type', '=', 'subscriber')]</field>
+        <field name="context">{'default_utility_partner_type': 'subscriber', 'default_is_subscriber': True, 'default_customer_rank': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 لا يوجد مشتركون مسجّلون بعد

@@ -657,6 +657,7 @@ class UtilitySaleOrderLine(models.Model):
     sponsor_id = fields.Many2one(
         'res.partner',
         string='الجهة الداعمة',
+        domain="[('utility_partner_type', '=', 'donor')]",
     )
     meter_line_type = fields.Selection([
         ('consumption', 'استهلاك'),

@@ -1,6 +1,6 @@
 {
     'name': 'Utility Core',
-    'version': '16.0.1.9.0',
+    'version': '16.0.1.17.0',
     'category': 'Utility ERP',
     'summary': 'Core Master Data for Utility ERP Platform',
     'description': """
@@ -29,6 +29,8 @@ User Role.
         'data/utility_region_data.xml',
         'data/utility_config_data.xml',
         'data/utility_product_data.xml',
+        'data/utility_pricelist_data.xml',
+        'data/utility_contract_template_data.xml',
         'data/utility_sale_order_type_data.xml',
         'data/utility_migration_mapping_data.xml',
         'data/utility_meter_cron.xml',

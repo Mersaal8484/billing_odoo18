@@ -71,6 +71,16 @@ class ResCompany(models.Model):
         'product.product',
         string='منتج المجالس المحلية',
         check_company=True)
+    utility_default_sponsor_id = fields.Many2one(
+        'res.partner',
+        string='الجهة الداعمة الافتراضية',
+        domain="[('utility_partner_type', '=', 'donor')]",
+        help='الجهة المانحة العامة التي تستخدم تلقائياً في خصومات الدعم لجميع قوالب العقود.')
+    utility_default_pricelist_id = fields.Many2one(
+        'product.pricelist',
+        string='قائمة الأسعار الافتراضية',
+        domain="['|', ('company_id', '=', False), ('company_id', '=', id)]",
+        help='قائمة الأسعار العامة المستخدمة تلقائياً في قوالب العقود.')
 
     writeoff_account_id = fields.Many2one(
         'account.account',
@@ -162,6 +172,10 @@ class ResCompany(models.Model):
                 prod = self.env.ref('utility_core.utility_product_municipality', raise_if_not_found=False)
                 if is_compat(prod):
                     vals['local_fee_product_id'] = prod.id
+            if not company.utility_default_sponsor_id:
+                sponsor = self.env.ref('utility_core.partner_sponsor_fund', raise_if_not_found=False)
+                if sponsor and sponsor.utility_partner_type == 'donor':
+                    vals['utility_default_sponsor_id'] = sponsor.id
             if not company.private_transformer_fee_product_id:
                 prod = self.env.ref('utility_core.utility_product_private_transformer_fee', raise_if_not_found=False)
                 if is_compat(prod):

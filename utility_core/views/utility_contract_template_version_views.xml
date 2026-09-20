@@ -48,7 +48,7 @@
                             <field name="local_fee_per_kwh" readonly="1"/>
                             <field name="local_fee_mu_allim" readonly="1"/>
                             <field name="local_fee_cleaning" readonly="1"/>
-                            <field name="sponsor_id" readonly="1"/>
+                            <field name="sponsor_id" domain="[('utility_partner_type', '=', 'donor')]" readonly="1"/>
                             <field name="discount_formula_id" readonly="1"/>
                             <field name="is_used_in_billing" readonly="1"/>
                         </group>

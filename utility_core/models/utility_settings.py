@@ -175,6 +175,18 @@ class ResConfigSettings(models.TransientModel):
         related='company_id.local_fee_product_id',
         readonly=False,
         string='منتج المجالس المحلية')
+    utility_default_sponsor_id = fields.Many2one(
+        'res.partner',
+        related='company_id.utility_default_sponsor_id',
+        readonly=False,
+        string='الجهة الداعمة الافتراضية',
+        domain="[('utility_partner_type', '=', 'donor')]")
+    utility_default_pricelist_id = fields.Many2one(
+        'product.pricelist',
+        related='company_id.utility_default_pricelist_id',
+        readonly=False,
+        string='قائمة الأسعار الافتراضية',
+        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     writeoff_account_id = fields.Many2one(
         'account.account',
         related='company_id.writeoff_account_id',
@@ -449,6 +461,20 @@ class ResConfigSettings(models.TransientModel):
                 if not has_moves:
                     company.currency_id = yer_curr
 
+        # 6. Global defaults (الجهة المانحة وقائمة الأسعار الافتراضية)
+        # These values are intentionally initialized by the same button used to
+        # generate missing company defaults, so a freshly-created database gets
+        # the same setup as an upgraded database.
+        if not company.utility_default_sponsor_id:
+            sponsor = self.env.ref('utility_core.partner_sponsor_fund', raise_if_not_found=False)
+            if sponsor and sponsor.utility_partner_type == 'donor':
+                company.utility_default_sponsor_id = sponsor
+
+        if not company.utility_default_pricelist_id:
+            pricelist = self.env.ref('utility_core.utility_default_pricelist_yer', raise_if_not_found=False)
+            if pricelist and (not pricelist.company_id or pricelist.company_id == company):
+                company.utility_default_pricelist_id = pricelist
+
         country_ye = self.env.ref('base.ye', raise_if_not_found=False) or self.env['res.country'].search([('code', '=', 'YE')], limit=1)
         if country_ye and not company.country_id:
             company.country_id = country_ye
@@ -457,6 +483,8 @@ class ResConfigSettings(models.TransientModel):
         fields_to_sync = [
             'electricity_product_id', 'discount_product_id', 'penalty_product_id',
             'mu_allim_product_id', 'cleaning_product_id', 'local_fee_product_id',
+            'utility_default_sponsor_id',
+            'utility_default_pricelist_id',
             'private_transformer_fee_product_id',
             'sales_journal_id', 'collection_journal_id', 'opening_journal_id',
             'writeoff_journal_id', 'deposit_journal_id', 'settlement_journal_id',

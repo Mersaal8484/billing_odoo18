@@ -114,6 +114,28 @@
                     <div class="row mt16 o_settings_container" id="utility_accounts">
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_right_pane">
+                                <label for="utility_default_pricelist_id"/>
+                                <div class="text-muted">قائمة الأسعار الافتراضية لجميع قوالب العقود</div>
+                                <div class="content-group">
+                                    <div class="mt16">
+                                        <field name="utility_default_pricelist_id" class="o_light_label"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <label for="utility_default_sponsor_id"/>
+                                <div class="text-muted">الجهة المانحة الافتراضية لخصومات الدعم</div>
+                                <div class="content-group">
+                                    <div class="mt16">
+                                        <field name="utility_default_sponsor_id" class="o_light_label"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
                                 <label for="sales_journal_id"/>
                                 <div class="text-muted">يومية مبيعات الكهرباء (الفواتير)</div>
                                 <div class="content-group">

@@ -23,6 +23,7 @@ class UtilityCustomer(models.Model):
     partner_id = fields.Many2one(
         'res.partner', 'العميل / الشريك المحاسبي', required=True,
         index=True, ondelete='restrict',
+        domain="[('utility_partner_type', '=', 'subscriber')]",
         help='شريك مستقل ومخصص لهذا الحساب الكهربائي ويستخدم للهوية والفوترة والتحصيل والمحاسبة.')
 
     category_id = fields.Many2one('utility.subscriber.category', string='فئة المشترك الرئيسية', required=True)
@@ -172,9 +173,17 @@ class UtilityCustomer(models.Model):
             if not partner:
                 partner = self.env['res.partner'].create({
                     'name': vals['customer_number'],
-                    'is_subscriber': True,
+                    'utility_partner_type': 'subscriber',
                 })
                 vals['partner_id'] = partner.id
+            elif partner.utility_partner_type in ('employee', 'donor', 'supported_entity'):
+                labels = dict(partner._fields['utility_partner_type'].selection)
+                raise ValidationError(_(
+                    'لا يمكن استخدام الشريك %s كحساب كهرباء لأنه مصنف كـ %s.'
+                ) % (partner.display_name, labels.get(
+                    partner.utility_partner_type, partner.utility_partner_type)))
+            elif partner.utility_partner_type != 'subscriber':
+                partner.write({'utility_partner_type': 'subscriber'})
             duplicate = self.search([
                 ('partner_id', '=', partner.id),
             ], limit=1)
@@ -187,7 +196,7 @@ class UtilityCustomer(models.Model):
         for customer in customers:
             customer.partner_id.sudo().write({
                 'customer_rank': max(customer.partner_id.customer_rank, 1),
-                'is_subscriber': True,
+                'utility_partner_type': 'subscriber',
             })
             if customer.transformer_id and customer.transformer_id.is_private:
                 owner = customer.transformer_id.private_customer_id

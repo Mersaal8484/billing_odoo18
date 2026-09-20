@@ -39,7 +39,7 @@
                         <page string="الدعم والخصم">
                             <group>
                                 <field name="subsidized_enabled" widget="boolean_toggle"/>
-                                <field name="sponsor_id" attrs="{'invisible': [('subsidized_enabled', '=', False)], 'required': [('subsidized_enabled', '=', True)]}"/>
+                                <field name="sponsor_id" domain="[('utility_partner_type', '=', 'donor')]" attrs="{'invisible': [('subsidized_enabled', '=', False)], 'required': [('subsidized_enabled', '=', True)]}"/>
                                 <field name="subsidized_max_units" attrs="{'invisible': [('subsidized_enabled', '=', False)], 'required': [('subsidized_enabled', '=', True)]}"/>
                                 <field name="subsidized_percentage" attrs="{'invisible': [('subsidized_enabled', '=', False)], 'required': [('subsidized_enabled', '=', True)]}"/>
                                 <field name="subsidized_price_per_kwh" attrs="{'invisible': [('subsidized_enabled', '=', False)]}"/>

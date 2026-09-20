@@ -19,7 +19,7 @@
                 <header>
                     <button name="action_open_utility_customer_registration" type="object" 
                             string="تفعيل كمشترك كهرباء" class="oe_highlight" 
-                            attrs="{'invisible': [('has_utility_customer', '=', True)]}"/>
+                            attrs="{'invisible': ['|', ('utility_partner_type', '!=', 'subscriber'), ('has_utility_customer', '=', True)]}"/>
                 </header>
             </xpath>
             <xpath expr="//field[@name='vat']" position="after">
@@ -28,16 +28,17 @@
                 <field name="national_id" placeholder="الهوية الوطنية"/>
                 <field name="char_code" placeholder="الرمز التعريفي"/>
                 <field name="subscriber_no" placeholder="الرقم الجديد"/>
-                <field name="is_subscriber"/>
-                <field name="subscriber_status" attrs="{'invisible': [('is_subscriber', '=', False)]}" widget="radio" options="{'horizontal': true}"/>
-                <field name="subscriber_active_status" attrs="{'invisible': [('is_subscriber', '=', False)]}" widget="radio" options="{'horizontal': true}"/>
-                <field name="subscriber_id" attrs="{'invisible': [('is_subscriber', '=', False)]}" options="{'no_create': True}"/>
-                <field name="sector_id" attrs="{'invisible': [('is_subscriber', '=', False)]}" options="{'no_create': True}"/>
+                <field name="utility_partner_type"/>
+                <field name="is_subscriber" invisible="1"/>
+                <field name="subscriber_status" attrs="{'invisible': [('utility_partner_type', '!=', 'subscriber')]}" widget="radio" options="{'horizontal': true}"/>
+                <field name="subscriber_active_status" attrs="{'invisible': [('utility_partner_type', '!=', 'subscriber')]}" widget="radio" options="{'horizontal': true}"/>
+                <field name="subscriber_id" attrs="{'invisible': [('utility_partner_type', '!=', 'subscriber')]}" options="{'no_create': True}"/>
+                <field name="sector_id" attrs="{'invisible': [('utility_partner_type', '!=', 'subscriber')]}" options="{'no_create': True}"/>
                 <field name="sale_type" options="{'no_create': True}"/>
             </xpath>
 
             <notebook position="inside">
-                <page name="utility_technical_details" string="البيانات الفنية للكهرباء" attrs="{'invisible': [('is_subscriber', '=', False)]}">
+                <page name="utility_technical_details" string="البيانات الفنية للكهرباء" attrs="{'invisible': [('utility_partner_type', '!=', 'subscriber')]}">
                     <group>
                         <group string="التسلسل الجغرافي للشبكة (NUTS)">
                             <field name="utility_region_id" options="{'no_create': True}"/>
@@ -119,6 +120,7 @@
         <field name="inherit_id" ref="base.view_res_partner_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
+                <field name="utility_partner_type"/>
                 <field name="subscriber_status"/>
                 <field name="subscriber_active_status"/>
                 <field name="meter_number"/>
@@ -126,7 +128,10 @@
             </xpath>
             <xpath expr="//filter[@name='type_person']" position="after">
                 <separator/>
-                <filter string="مشترك كهرباء" name="filter_is_subscriber" domain="[('is_subscriber', '=', True)]"/>
+                <filter string="مشترك كهرباء" name="filter_is_subscriber" domain="[('utility_partner_type', '=', 'subscriber')]"/>
+                <filter string="موظف / مستخدم" name="filter_utility_employee" domain="[('utility_partner_type', '=', 'employee')]"/>
+                <filter string="جهة مانحة" name="filter_utility_donor" domain="[('utility_partner_type', '=', 'donor')]"/>
+                <filter string="جهة مدعومة" name="filter_utility_supported_entity" domain="[('utility_partner_type', '=', 'supported_entity')]"/>
                 <filter string="مشترك جديد" name="filter_subscriber_new" domain="[('subscriber_status', '=', 'new')]"/>
                 <filter string="مشترك قديم" name="filter_subscriber_old" domain="[('subscriber_status', '=', 'old')]"/>
                 <separator/>
@@ -136,6 +141,7 @@
             <xpath expr="//group[@name='group_by']" position="inside">
                 <filter string="نوع الاشتراك" name="group_by_subscriber_status" context="{'group_by': 'subscriber_status'}"/>
                 <filter string="حالة التفعيل" name="group_by_active_status" context="{'group_by': 'subscriber_active_status'}"/>
+                <filter string="تصنيف الشريك" name="group_by_utility_partner_type" context="{'group_by': 'utility_partner_type'}"/>
             </xpath>
         </field>
     </record>

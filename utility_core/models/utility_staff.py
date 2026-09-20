@@ -21,7 +21,10 @@ class UtilityStaff(models.Model):
     user_id = fields.Many2one('res.users', 'المستخدم', tracking=True)
     employee_code = fields.Char('رمز الموظف', tracking=True)
     name = fields.Char('الاسم', required=True, tracking=True)
-    partner_id = fields.Many2one('res.partner', 'الشريك المحاسبي للمحصل', check_company=True, tracking=True)
+    partner_id = fields.Many2one(
+        'res.partner', 'الشريك المحاسبي للمحصل',
+        domain="[('utility_partner_type', '=', 'employee')]",
+        check_company=True, tracking=True)
     team_id = fields.Many2one('utility.team', 'الفريق', tracking=True)
     role_ids = fields.Many2many(
         'utility.user.role',

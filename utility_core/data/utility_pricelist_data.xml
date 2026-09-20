@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="utility_default_pricelist_yer" model="product.pricelist">
+        <field name="name">القائمة الافتراضية</field>
+        <field name="currency_id" ref="base.YER"/>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

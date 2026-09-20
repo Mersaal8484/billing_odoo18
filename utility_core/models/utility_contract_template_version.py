@@ -113,6 +113,7 @@ class UtilityContractTemplateVersion(models.Model):
     sponsor_id = fields.Many2one(
         'res.partner',
         string='الجهة الداعمة',
+        domain="[('utility_partner_type', '=', 'donor')]",
     )
     discount_formula_id = fields.Many2one(
         'utility.formula',

@@ -88,6 +88,8 @@ class UtilitySaleOrderBilling(models.Model):
 
         if template:
             for line in template.line_ids.sorted('sequence'):
+                if line.meter_line_type == 'discount' and not template.subsidy_enabled:
+                    continue
                 if pricing_mode in ('block', 'tier') and line.meter_line_type == 'consumption':
                     continue
 
@@ -118,7 +120,8 @@ class UtilitySaleOrderBilling(models.Model):
                             line=line,
                         )
                     discount_units = max(discount_units or 0.0, 0.0)
-                    sponsor_id = template.sponsor_id.id if template.sponsor_id else False
+                    sponsor = template._get_effective_sponsor() if template else False
+                    sponsor_id = sponsor.id if sponsor else False
                     discount_data = {
                         'units': discount_units,
                         'formula_id': formula_used.id if formula_used else False,
@@ -656,7 +659,9 @@ class UtilitySaleOrderBilling(models.Model):
                 )
 
             discount_units = max(discount_units or 0.0, 0.0)
-            sponsor = version.sponsor_id if (version and version.sponsor_id) else (template.sponsor_id if template else False)
+            sponsor = version.sponsor_id if (version and version.sponsor_id) else (
+                template._get_effective_sponsor() if template else False
+            )
             sponsor_id = sponsor.id if sponsor else False
             if discount_units > 0 and line.specific_price:
                 qty = discount_units
