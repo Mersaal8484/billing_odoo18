@@ -141,3 +141,10 @@ def post_init_hook(cr, registry):
 
     _enlarge_sequences(cr)
     _ensure_extra_sequences(cr)
+
+    # Odoo temporarily stores a minimal placeholder for the generated user
+    # permissions view while modules are being installed. Rebuild it after
+    # utility_core is fully installed so the standard permissions return in
+    # their normal application/category layout.
+    env = api.Environment(cr, SUPERUSER_ID, {})
+    env['res.groups'].with_context(lang=None)._update_user_groups_view()

@@ -30,4 +30,8 @@ def migrate(cr, version):
             """,
             rows,
         )
+
+    # Recreate Odoo's categorized permissions view after the module upgrade.
+    # During loading Odoo may leave base.user_groups_view as a placeholder.
+    env['res.groups'].with_context(lang=None)._update_user_groups_view()
     _logger.info('utility_core 16.0.1.19.0: backfilled %s user-role links', len(rows))
