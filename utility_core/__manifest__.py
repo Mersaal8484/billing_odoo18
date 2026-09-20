@@ -1,6 +1,6 @@
 {
     'name': 'Utility Core',
-    'version': '16.0.1.17.0',
+    'version': '16.0.1.18.0',
     'category': 'Utility ERP',
     'summary': 'Core Master Data for Utility ERP Platform',
     'description': """
@@ -106,9 +106,6 @@ User Role.
         'report/utility_meter_qr_report.xml',
         'report/utility_meter_qr_bulk_report.xml',
         'views/dashboard_views.xml',
-    ],
-    'demo': [
-        'demo/utility_core_demo.xml',
     ],
     'installable': True,
     'application': True,
