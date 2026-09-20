@@ -1,0 +1,232 @@
+{
+  "engine": "easyocr-1.7.2",
+  "records": 28,
+  "exact": 0,
+  "exact_accuracy": 0.0,
+  "results": [
+    {
+      "image_id": "datameter/account.analytic.meter(129).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "123846",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (31).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "00205.8",
+      "predicted": "100205.8",
+      "confidence": 0.7135361795700844,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (32).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "001577",
+      "predicted": "00157.7",
+      "confidence": 0.5224479754358367,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (33).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "000641",
+      "predicted": "0.006407",
+      "confidence": 0.37153086379468736,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (47).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "06867",
+      "predicted": "8.67",
+      "confidence": 0.6499664052861037,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (48).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "19924.8",
+      "predicted": "99",
+      "confidence": 0.9999575162410229,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (50).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "13536",
+      "predicted": "353",
+      "confidence": 0.996776282787323,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (55).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "000487",
+      "predicted": "1000.4",
+      "confidence": 0.5435033790579784,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (56).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "002522",
+      "predicted": "100.25221",
+      "confidence": 0.8662919614044645,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (57).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "001101",
+      "predicted": "10.0",
+      "confidence": 0.4567927251550769,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (58).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "28456.8",
+      "predicted": "2845.6",
+      "confidence": 0.5444429924345493,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (59).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "05160.4",
+      "predicted": "10541.6",
+      "confidence": 0.23115934651108816,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (60).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "05233.0",
+      "predicted": "05233",
+      "confidence": 0.8816549512273893,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (61).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "28183.9",
+      "predicted": "218418319",
+      "confidence": 0.25168052311131506,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (62).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "10706.4",
+      "predicted": "17062",
+      "confidence": 0.3021834579474006,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (63).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "26304.3",
+      "predicted": "2683043",
+      "confidence": 0.3357700329438216,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (64).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "007421",
+      "predicted": "10",
+      "confidence": 0.25788092105876537,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (65).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "14436.5",
+      "predicted": "136",
+      "confidence": 0.23940507692546528,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (66).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "25509",
+      "predicted": "2.5509",
+      "confidence": 0.8087289109164969,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (68).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "00265",
+      "predicted": "10.0",
+      "confidence": 0.4913571689481954,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (70).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "006233",
+      "predicted": "1070623.3",
+      "confidence": 0.16568450756879385,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (79).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "000160",
+      "predicted": "0160",
+      "confidence": 0.19712078714246012,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (80).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "000231",
+      "predicted": "10.0",
+      "confidence": 0.19851853845815667,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (81).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "000243",
+      "predicted": "100.0244",
+      "confidence": 0.4957300792054338,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (82).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "000145",
+      "predicted": "00",
+      "confidence": 0.9991191602403826,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (83).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "000278",
+      "predicted": "00.02",
+      "confidence": 0.34440788632171176,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (84).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "000391",
+      "predicted": "00690",
+      "confidence": 0.10917692684710864,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (85).jpg",
+      "meter_family": "mechanical_roller",
+      "expected": "000067",
+      "predicted": "00.00678",
+      "confidence": 0.34850810786773456,
+      "exact": false
+    }
+  ]
+}

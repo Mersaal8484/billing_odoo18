@@ -11,7 +11,8 @@ from PIL import Image, ImageEnhance, ImageOps
 from .schemas import ConfidenceValue, DisplayBBox, InferenceRequest, InferenceResponse, QualityResult
 from .model_registry import model_status
 from .pipeline import run_validation_gates
-from .image_enhancement import prepare_for_vision
+from .image_enhancement import correct_display_perspective, prepare_for_vision, professional_display_preprocess
+from .roller_ocr import recognize as recognize_roller
 from .seven_segment_ocr import recognize as recognize_seven_segment
 
 MODEL_NAME = os.getenv("METER_VISION_MODEL", "baseline-ocr")
@@ -46,10 +47,19 @@ def _load_image(raw: bytes) -> Image.Image:
     return image
 
 
-def _prepare_image(raw: bytes, display_bbox: Optional[DisplayBBox]) -> tuple[Image.Image, tuple[int, int], bool, bool]:
+def _prepare_image(raw: bytes, display_bbox: Optional[DisplayBBox], display_quad: Optional[list[int]]) -> tuple[Image.Image, tuple[int, int], bool, bool, list[str]]:
+    if display_bbox and display_quad:
+        raise ValueError("send either display_bbox or display_quad, not both")
     image = _load_image(raw)
     source_size = image.size
     crop_applied = False
+    preprocessing = ["EXIF_ORIENTATION_NORMALIZED"]
+    if display_quad:
+        if any(value < 0 for value in display_quad):
+            raise ValueError("display_quad coordinates must be non-negative")
+        image = correct_display_perspective(image, display_quad)
+        crop_applied = True
+        preprocessing.append("PERSPECTIVE_CORRECTED")
     if display_bbox:
         left = display_bbox.x
         top = display_bbox.y
@@ -59,8 +69,12 @@ def _prepare_image(raw: bytes, display_bbox: Optional[DisplayBBox]) -> tuple[Ima
             raise ValueError("display_bbox is outside the source image")
         image = image.crop((left, top, right, bottom))
         crop_applied = True
+        preprocessing.append("DISPLAY_CROPPED")
+    image, display_steps = professional_display_preprocess(image)
     prepared, _, low_resolution = prepare_for_vision(image)
-    return prepared, source_size, low_resolution, crop_applied
+    preprocessing.extend(display_steps)
+    preprocessing.append("CONTRAST_SHARPEN_DENOISE")
+    return prepared, source_size, low_resolution, crop_applied, preprocessing
 
 
 def _quality(image: Image.Image, source_size: tuple[int, int], low_resolution: bool) -> QualityResult:
@@ -134,17 +148,29 @@ def _ocr(image: Image.Image, language: str) -> tuple[str, Optional[str], float, 
 
 def analyze(request: InferenceRequest) -> InferenceResponse:
     try:
-        image, source_size, low_resolution, crop_applied = _prepare_image(
-            _decode_image(request.image_base64), request.display_bbox
+        image, source_size, low_resolution, crop_applied, preprocessing = _prepare_image(
+            _decode_image(request.image_base64), request.display_bbox, request.display_quad
         )
     except ValueError as error:
         raise ValueError(str(error)) from error
     quality = _quality(image, source_size, low_resolution)
     if crop_applied:
-        candidate, confidence, flags = recognize_seven_segment(image, request.expected_digits)
+        experimental_crnn = bool(os.getenv("METER_VISION_EXPERIMENTAL_CRNN", "").strip())
+        if experimental_crnn:
+            from .experimental_crnn import recognize as recognize_experimental_crnn
+            candidate, confidence, flags = recognize_experimental_crnn(image)
+            preprocessing.append("EXPERIMENTAL_CRNN_INPUT")
+        elif request.meter_type_hint in {"mechanical_roller", "mechanical_round"}:
+            candidate, confidence, flags = recognize_roller(image, request.expected_digits)
+        else:
+            candidate, confidence, flags = recognize_seven_segment(image, request.expected_digits)
         raw_text = candidate or ""
         if candidate:
-            flags.append("SPECIALIZED_SEVEN_SEGMENT_OCR")
+            if not experimental_crnn:
+                flags.append(
+                    "SPECIALIZED_ROLLER_OCR" if request.meter_type_hint in {"mechanical_roller", "mechanical_round"}
+                    else "SPECIALIZED_SEVEN_SEGMENT_OCR"
+                )
     else:
         raw_text, candidate, confidence, flags = "", None, 0.0, ["DISPLAY_CROP_REQUIRED"]
     if not crop_applied:
@@ -162,6 +188,8 @@ def analyze(request: InferenceRequest) -> InferenceResponse:
          "weights_status": statuses["meter_detector"]["status"]},
         {"name": "meter_type", "state": "not_ready", "confidence": 0.0,
          "weights_status": statuses["meter_type_classifier"]["status"]},
+        {"name": "digit_segmentation", "state": "completed" if "DIGIT_CONTOURS_SEGMENTED" in flags else "needs_review",
+         "confidence": 1.0 if "DIGIT_CONTOURS_SEGMENTED" in flags else 0.0, "weights_status": "rules"},
         {"name": "reading_ocr", "state": "completed" if candidate else "needs_review",
          "confidence": confidence, "weights_status": statuses["reading_ocr"]["status"]},
     ]
@@ -174,6 +202,7 @@ def analyze(request: InferenceRequest) -> InferenceResponse:
         reading=ConfidenceValue(value=candidate, confidence=confidence),
         raw_text=raw_text,
         flags=decision.flags,
+        preprocessing=preprocessing,
         stages=stages,
         auto_approval_eligible=decision.auto_approval_eligible,
     )

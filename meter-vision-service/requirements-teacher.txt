@@ -1,0 +1,2 @@
+# Teacher / benchmark only; do not load in the production API by default.
+easyocr>=1.7,<2.0

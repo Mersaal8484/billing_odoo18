@@ -12,6 +12,8 @@ class InferenceRequest(BaseModel):
     # Pixel coordinates on the original image.  The service intentionally
     # accepts a confirmed display crop instead of guessing on the whole photo.
     display_bbox: Optional["DisplayBBox"] = None
+    # Optional four corners in original-image coordinates: TL, TR, BR, BL.
+    display_quad: Optional[list[int]] = Field(default=None, min_length=8, max_length=8)
     expected_digits: Optional[int] = Field(default=None, ge=4, le=12)
 
 
@@ -54,6 +56,7 @@ class InferenceResponse(BaseModel):
     reading: ConfidenceValue = ConfidenceValue()
     raw_text: str = ""
     flags: list[str] = []
+    preprocessing: list[str] = []
     stages: list[PipelineStage] = []
     auto_approval_eligible: bool = False
     error_message: Optional[str] = None

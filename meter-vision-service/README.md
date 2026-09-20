@@ -44,10 +44,21 @@ python run_batch.py D:\datameter ..\meter-vision-data\reports\datameter-baseline
 تظل الصور ونتائج التحليل في Odoo/التخزين المعتمد.
 # Specialized digital-display OCR
 
-When `display_bbox` is supplied, the service uses the local seven-segment
-recognizer in `app/seven_segment_ocr.py`. It does not run generic OCR over the
-whole field photo. `expected_digits` can be supplied when the meter family has
-a fixed register width; uncertain patterns are returned as `needs_review`.
+When `display_bbox` is supplied, the service first normalizes the crop, removes
+small noise, improves contrast/sharpness, and evaluates multiple OCR variants.
+For slanted screens, `display_quad` can be supplied with eight coordinates in
+the order TL, TR, BR, BL; the service rectifies the screen before OCR. Send
+either `display_bbox` or `display_quad`, never both.
+
+Digital LCD screens use the local seven-segment recognizer in
+`app/seven_segment_ocr.py`. Mechanical roller displays must send
+`meter_type_hint: "mechanical_roller"` or `"mechanical_round"`, which selects
+the multi-variant roller OCR ensemble in `app/roller_ocr.py`. The ensemble
+returns a reading only when independent variants agree; otherwise the image
+stays `needs_review`.
+
+`expected_digits` can be supplied when the meter family has a fixed register
+width. It is a validation constraint, not a license to pad or invent digits.
 
 Example request fields:
 
@@ -64,3 +75,16 @@ Example request fields:
 This is the deterministic bootstrap for the project. It is not a trained
 production weight yet; the next stage is to fit meter-family-specific weights
 using approved original-resolution crops and double-reviewed readings.
+
+## Local CRNN bootstrap training
+
+The optional trainer is intentionally separate from runtime inference:
+
+```text
+python train_crnn.py ..\meter-vision-data\processed\ocr-single-review\manifest.jsonl --reading-format integer_6 --output ..\meter-vision-data\processed\ocr-single-review\reading_ocr.pt --epochs 40
+```
+
+The checkpoint is experimental until the held-out exact-reading accuracy gate
+is met. A failed gate must not be copied into `models/` or enabled in the API.
+Each checkpoint is trained for a single register layout; mixing integer and
+decimal displays, or different digit counts, produces unreliable OCR.

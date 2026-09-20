@@ -1,7 +1,7 @@
 {
   "version": "0.2.0",
   "detection_classes": ["meter", "display", "meter_number", "qr_code"],
-  "meter_families": ["digital_lcd", "digital_green", "mechanical", "three_phase", "unknown"],
+  "meter_families": ["digital_lcd", "digital_green", "mechanical_roller", "mechanical_round", "three_phase", "unknown"],
   "ocr_fields": [
     {"name": "reading", "required": true, "allow_decimal": true},
     {"name": "meter_number", "required": false, "allow_decimal": false}

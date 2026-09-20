@@ -1,0 +1,1691 @@
+{
+  "schema_version": "0.1.0",
+  "created_at": "2026-09-20T22:13:54.968Z",
+  "images": [
+    {
+      "image_id": "datameter/account.analytic.meter(129).jpg",
+      "source_path": "datameter/account.analytic.meter(129).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 476,
+        "y": 256,
+        "w": 657,
+        "h": 121
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "123846",
+          "display_bbox": {
+            "x": 476,
+            "y": 256,
+            "w": 657,
+            "h": 121
+          },
+          "reviewed_at": "2026-09-20T21:54:16.345Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "123846",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(13).jpg",
+      "source_path": "datameter/account.analytic.meter(13).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 118,
+        "y": 351,
+        "w": 585,
+        "h": 188
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "0000008.0",
+          "display_bbox": {
+            "x": 118,
+            "y": 351,
+            "w": 585,
+            "h": 188
+          },
+          "reviewed_at": "2026-09-20T21:54:49.450Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "0000008.0",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(132).jpg",
+      "source_path": "datameter/account.analytic.meter(132).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 596,
+        "y": 446,
+        "w": 474,
+        "h": 134
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "02916.4",
+          "display_bbox": {
+            "x": 596,
+            "y": 446,
+            "w": 474,
+            "h": 134
+          },
+          "reviewed_at": "2026-09-20T21:55:37.922Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "02916.4",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(14).jpg",
+      "source_path": "datameter/account.analytic.meter(14).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 148,
+        "y": 335,
+        "w": 524,
+        "h": 130
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "0000000.0",
+          "display_bbox": {
+            "x": 148,
+            "y": 335,
+            "w": 524,
+            "h": 130
+          },
+          "reviewed_at": "2026-09-20T21:56:16.699Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "0000000.0",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(18).jpg",
+      "source_path": "datameter/account.analytic.meter(18).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 5,
+        "y": 296,
+        "w": 581,
+        "h": 203
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "0516.6",
+          "display_bbox": {
+            "x": 5,
+            "y": 296,
+            "w": 581,
+            "h": 203
+          },
+          "reviewed_at": "2026-09-20T21:57:02.585Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "0516.6",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (31).jpg",
+      "source_path": "datameter/image (31).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 335,
+        "y": 343,
+        "w": 541,
+        "h": 145
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "00205.8",
+          "display_bbox": {
+            "x": 335,
+            "y": 343,
+            "w": 541,
+            "h": 145
+          },
+          "reviewed_at": "2026-09-20T21:58:21.946Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "00205.8",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (32).jpg",
+      "source_path": "datameter/image (32).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 117,
+        "y": 446,
+        "w": 433,
+        "h": 128
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "001577",
+          "display_bbox": {
+            "x": 117,
+            "y": 446,
+            "w": 433,
+            "h": 128
+          },
+          "reviewed_at": "2026-09-20T21:58:36.505Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "001577",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (33).jpg",
+      "source_path": "datameter/image (33).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 82,
+        "y": 440,
+        "w": 517,
+        "h": 111
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "000641",
+          "display_bbox": {
+            "x": 82,
+            "y": 440,
+            "w": 517,
+            "h": 111
+          },
+          "reviewed_at": "2026-09-20T21:58:50.809Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "000641",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (4).jpg",
+      "source_path": "datameter/image (4).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 227,
+        "y": 439,
+        "w": 278,
+        "h": 70
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "0000000.7",
+          "display_bbox": {
+            "x": 227,
+            "y": 439,
+            "w": 278,
+            "h": 70
+          },
+          "reviewed_at": "2026-09-20T21:59:19.138Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "0000000.7",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (46).jpg",
+      "source_path": "datameter/image (46).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 211,
+        "y": 299,
+        "w": 311,
+        "h": 84
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "12931",
+          "display_bbox": {
+            "x": 211,
+            "y": 299,
+            "w": 311,
+            "h": 84
+          },
+          "reviewed_at": "2026-09-20T21:59:47.009Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "12931",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (47).jpg",
+      "source_path": "datameter/image (47).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 328,
+        "y": 301,
+        "w": 513,
+        "h": 113
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "06867",
+          "display_bbox": {
+            "x": 328,
+            "y": 301,
+            "w": 513,
+            "h": 113
+          },
+          "reviewed_at": "2026-09-20T22:00:01.530Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "06867",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (48).jpg",
+      "source_path": "datameter/image (48).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 436,
+        "y": 309,
+        "w": 496,
+        "h": 163
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "19924.8",
+          "display_bbox": {
+            "x": 436,
+            "y": 309,
+            "w": 496,
+            "h": 163
+          },
+          "reviewed_at": "2026-09-20T22:00:39.241Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "19924.8",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (49).jpg",
+      "source_path": "datameter/image (49).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 282,
+        "y": 413,
+        "w": 601,
+        "h": 151
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "0000014.2",
+          "display_bbox": {
+            "x": 282,
+            "y": 413,
+            "w": 601,
+            "h": 151
+          },
+          "reviewed_at": "2026-09-20T22:00:58.392Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "0000014.2",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (5).jpg",
+      "source_path": "datameter/image (5).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 445,
+        "y": 122,
+        "w": 363,
+        "h": 93
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "0000010.8",
+          "display_bbox": {
+            "x": 445,
+            "y": 122,
+            "w": 363,
+            "h": 93
+          },
+          "reviewed_at": "2026-09-20T22:01:24.553Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "0000010.8",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (50).jpg",
+      "source_path": "datameter/image (50).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 394,
+        "y": 388,
+        "w": 581,
+        "h": 176
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "13536",
+          "display_bbox": {
+            "x": 394,
+            "y": 388,
+            "w": 581,
+            "h": 176
+          },
+          "reviewed_at": "2026-09-20T22:01:37.929Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "13536",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (51).jpg",
+      "source_path": "datameter/image (51).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 676,
+        "y": 808,
+        "w": 551,
+        "h": 131
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "08520.9",
+          "display_bbox": {
+            "x": 676,
+            "y": 808,
+            "w": 551,
+            "h": 131
+          },
+          "reviewed_at": "2026-09-20T22:01:59.298Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "08520.9",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (53).jpg",
+      "source_path": "datameter/image (53).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 231,
+        "y": 389,
+        "w": 616,
+        "h": 160
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "0000058.2",
+          "display_bbox": {
+            "x": 231,
+            "y": 389,
+            "w": 616,
+            "h": 160
+          },
+          "reviewed_at": "2026-09-20T22:02:42.834Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "0000058.2",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (54).jpg",
+      "source_path": "datameter/image (54).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 718,
+        "y": 555,
+        "w": 600,
+        "h": 129
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "23280.0",
+          "display_bbox": {
+            "x": 718,
+            "y": 555,
+            "w": 600,
+            "h": 129
+          },
+          "reviewed_at": "2026-09-20T22:03:01.057Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "23280.0",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (55).jpg",
+      "source_path": "datameter/image (55).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 216,
+        "y": 411,
+        "w": 544,
+        "h": 152
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "000487",
+          "display_bbox": {
+            "x": 216,
+            "y": 411,
+            "w": 544,
+            "h": 152
+          },
+          "reviewed_at": "2026-09-20T22:03:17.554Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "000487",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (56).jpg",
+      "source_path": "datameter/image (56).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 334,
+        "y": 377,
+        "w": 468,
+        "h": 94
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "002522",
+          "display_bbox": {
+            "x": 334,
+            "y": 377,
+            "w": 468,
+            "h": 94
+          },
+          "reviewed_at": "2026-09-20T22:03:31.048Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "002522",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (57).jpg",
+      "source_path": "datameter/image (57).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 504,
+        "y": 378,
+        "w": 429,
+        "h": 113
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "001101",
+          "display_bbox": {
+            "x": 504,
+            "y": 378,
+            "w": 429,
+            "h": 113
+          },
+          "reviewed_at": "2026-09-20T22:03:45.890Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "001101",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (58).jpg",
+      "source_path": "datameter/image (58).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 315,
+        "y": 312,
+        "w": 386,
+        "h": 123
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "28456.8",
+          "display_bbox": {
+            "x": 315,
+            "y": 312,
+            "w": 386,
+            "h": 123
+          },
+          "reviewed_at": "2026-09-20T22:04:07.633Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "28456.8",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (59).jpg",
+      "source_path": "datameter/image (59).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 314,
+        "y": 310,
+        "w": 410,
+        "h": 90
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "05160.4",
+          "display_bbox": {
+            "x": 314,
+            "y": 310,
+            "w": 410,
+            "h": 90
+          },
+          "reviewed_at": "2026-09-20T22:04:24.218Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "05160.4",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (60).jpg",
+      "source_path": "datameter/image (60).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 469,
+        "y": 467,
+        "w": 433,
+        "h": 93
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "05233.0",
+          "display_bbox": {
+            "x": 469,
+            "y": 467,
+            "w": 433,
+            "h": 93
+          },
+          "reviewed_at": "2026-09-20T22:04:41.897Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "05233.0",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (61).jpg",
+      "source_path": "datameter/image (61).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 438,
+        "y": 305,
+        "w": 518,
+        "h": 137
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "28183.9",
+          "display_bbox": {
+            "x": 438,
+            "y": 305,
+            "w": 518,
+            "h": 137
+          },
+          "reviewed_at": "2026-09-20T22:04:54.713Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "28183.9",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (62).jpg",
+      "source_path": "datameter/image (62).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 478,
+        "y": 266,
+        "w": 420,
+        "h": 106
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "10706.4",
+          "display_bbox": {
+            "x": 478,
+            "y": 266,
+            "w": 420,
+            "h": 106
+          },
+          "reviewed_at": "2026-09-20T22:05:09.937Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "10706.4",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (63).jpg",
+      "source_path": "datameter/image (63).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 364,
+        "y": 310,
+        "w": 534,
+        "h": 128
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "26304.3",
+          "display_bbox": {
+            "x": 364,
+            "y": 310,
+            "w": 534,
+            "h": 128
+          },
+          "reviewed_at": "2026-09-20T22:05:25.770Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "26304.3",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (64).jpg",
+      "source_path": "datameter/image (64).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 533,
+        "y": 716,
+        "w": 819,
+        "h": 194
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "007421",
+          "display_bbox": {
+            "x": 533,
+            "y": 716,
+            "w": 819,
+            "h": 194
+          },
+          "reviewed_at": "2026-09-20T22:05:51.281Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "007421",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (65).jpg",
+      "source_path": "datameter/image (65).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 364,
+        "y": 287,
+        "w": 413,
+        "h": 119
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "14436.5",
+          "display_bbox": {
+            "x": 364,
+            "y": 287,
+            "w": 413,
+            "h": 119
+          },
+          "reviewed_at": "2026-09-20T22:06:19.801Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "14436.5",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (66).jpg",
+      "source_path": "datameter/image (66).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 343,
+        "y": 329,
+        "w": 595,
+        "h": 120
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "25509",
+          "display_bbox": {
+            "x": 343,
+            "y": 329,
+            "w": 595,
+            "h": 120
+          },
+          "reviewed_at": "2026-09-20T22:06:33.346Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "25509",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (67).jpg",
+      "source_path": "datameter/image (67).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 689,
+        "y": 426,
+        "w": 295,
+        "h": 127
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "316471",
+          "display_bbox": {
+            "x": 689,
+            "y": 426,
+            "w": 295,
+            "h": 127
+          },
+          "reviewed_at": "2026-09-20T22:07:02.897Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "316471",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (68).jpg",
+      "source_path": "datameter/image (68).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 399,
+        "y": 397,
+        "w": 421,
+        "h": 128
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "00265",
+          "display_bbox": {
+            "x": 399,
+            "y": 397,
+            "w": 421,
+            "h": 128
+          },
+          "reviewed_at": "2026-09-20T22:07:17.337Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "00265",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (69).jpg",
+      "source_path": "datameter/image (69).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 408,
+        "y": 220,
+        "w": 230,
+        "h": 53
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "28866",
+          "display_bbox": {
+            "x": 408,
+            "y": 220,
+            "w": 230,
+            "h": 53
+          },
+          "reviewed_at": "2026-09-20T22:07:33.569Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "28866",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (7).jpg",
+      "source_path": "datameter/image (7).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 119,
+        "y": 312,
+        "w": 468,
+        "h": 110
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "00000376",
+          "display_bbox": {
+            "x": 119,
+            "y": 312,
+            "w": 468,
+            "h": 110
+          },
+          "reviewed_at": "2026-09-20T22:08:11.113Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "00000376",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (70).jpg",
+      "source_path": "datameter/image (70).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 424,
+        "y": 392,
+        "w": 476,
+        "h": 128
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "006233",
+          "display_bbox": {
+            "x": 424,
+            "y": 392,
+            "w": 476,
+            "h": 128
+          },
+          "reviewed_at": "2026-09-20T22:08:24.848Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "006233",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (71).jpg",
+      "source_path": "datameter/image (71).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 356,
+        "y": 245,
+        "w": 282,
+        "h": 68
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "24319",
+          "display_bbox": {
+            "x": 356,
+            "y": 245,
+            "w": 282,
+            "h": 68
+          },
+          "reviewed_at": "2026-09-20T22:08:41.914Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "24319",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (72).jpg",
+      "source_path": "datameter/image (72).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 484,
+        "y": 246,
+        "w": 270,
+        "h": 68
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "16491",
+          "display_bbox": {
+            "x": 484,
+            "y": 246,
+            "w": 270,
+            "h": 68
+          },
+          "reviewed_at": "2026-09-20T22:08:56.497Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "16491",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (73).jpg",
+      "source_path": "datameter/image (73).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 446,
+        "y": 304,
+        "w": 258,
+        "h": 63
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "29655",
+          "display_bbox": {
+            "x": 446,
+            "y": 304,
+            "w": 258,
+            "h": 63
+          },
+          "reviewed_at": "2026-09-20T22:09:09.354Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "29655",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (74).jpg",
+      "source_path": "datameter/image (74).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 391,
+        "y": 239,
+        "w": 318,
+        "h": 68
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "11881",
+          "display_bbox": {
+            "x": 391,
+            "y": 239,
+            "w": 318,
+            "h": 68
+          },
+          "reviewed_at": "2026-09-20T22:09:20.865Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "11881",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (75).jpg",
+      "source_path": "datameter/image (75).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 431,
+        "y": 210,
+        "w": 293,
+        "h": 60
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "09679",
+          "display_bbox": {
+            "x": 431,
+            "y": 210,
+            "w": 293,
+            "h": 60
+          },
+          "reviewed_at": "2026-09-20T22:09:36.985Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "09679",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (76).jpg",
+      "source_path": "datameter/image (76).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 416,
+        "y": 228,
+        "w": 306,
+        "h": 80
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "14630",
+          "display_bbox": {
+            "x": 416,
+            "y": 228,
+            "w": 306,
+            "h": 80
+          },
+          "reviewed_at": "2026-09-20T22:09:49.441Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "14630",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (77).jpg",
+      "source_path": "datameter/image (77).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 450,
+        "y": 245,
+        "w": 261,
+        "h": 71
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "20661",
+          "display_bbox": {
+            "x": 450,
+            "y": 245,
+            "w": 261,
+            "h": 71
+          },
+          "reviewed_at": "2026-09-20T22:10:04.729Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "20661",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (78).jpg",
+      "source_path": "datameter/image (78).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 471,
+        "y": 337,
+        "w": 312,
+        "h": 91
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "0000008.7",
+          "display_bbox": {
+            "x": 471,
+            "y": 337,
+            "w": 312,
+            "h": 91
+          },
+          "reviewed_at": "2026-09-20T22:10:23.370Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "0000008.7",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (79).jpg",
+      "source_path": "datameter/image (79).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 366,
+        "y": 183,
+        "w": 283,
+        "h": 63
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "000160",
+          "display_bbox": {
+            "x": 366,
+            "y": 183,
+            "w": 283,
+            "h": 63
+          },
+          "reviewed_at": "2026-09-20T22:10:54.113Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "000160",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (8).jpg",
+      "source_path": "datameter/image (8).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 95,
+        "y": 389,
+        "w": 472,
+        "h": 182
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "00001004",
+          "display_bbox": {
+            "x": 95,
+            "y": 389,
+            "w": 472,
+            "h": 182
+          },
+          "reviewed_at": "2026-09-20T22:11:22.937Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "00001004",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (80).jpg",
+      "source_path": "datameter/image (80).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 385,
+        "y": 292,
+        "w": 243,
+        "h": 54
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "000231",
+          "display_bbox": {
+            "x": 385,
+            "y": 292,
+            "w": 243,
+            "h": 54
+          },
+          "reviewed_at": "2026-09-20T22:11:46.761Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "000231",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (81).jpg",
+      "source_path": "datameter/image (81).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 397,
+        "y": 204,
+        "w": 305,
+        "h": 88
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "000243",
+          "display_bbox": {
+            "x": 397,
+            "y": 204,
+            "w": 305,
+            "h": 88
+          },
+          "reviewed_at": "2026-09-20T22:12:08.177Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "000243",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (82).jpg",
+      "source_path": "datameter/image (82).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 377,
+        "y": 210,
+        "w": 318,
+        "h": 94
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "000145",
+          "display_bbox": {
+            "x": 377,
+            "y": 210,
+            "w": 318,
+            "h": 94
+          },
+          "reviewed_at": "2026-09-20T22:12:32.970Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "000145",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (83).jpg",
+      "source_path": "datameter/image (83).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 321,
+        "y": 232,
+        "w": 292,
+        "h": 80
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "000278",
+          "display_bbox": {
+            "x": 321,
+            "y": 232,
+            "w": 292,
+            "h": 80
+          },
+          "reviewed_at": "2026-09-20T22:12:47.962Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "000278",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (84).jpg",
+      "source_path": "datameter/image (84).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 390,
+        "y": 286,
+        "w": 281,
+        "h": 101
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "000391",
+          "display_bbox": {
+            "x": 390,
+            "y": 286,
+            "w": 281,
+            "h": 101
+          },
+          "reviewed_at": "2026-09-20T22:13:10.418Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "000391",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    },
+    {
+      "image_id": "datameter/image (85).jpg",
+      "source_path": "datameter/image (85).jpg",
+      "meter_bbox": null,
+      "meter_number": "",
+      "group_id": "",
+      "image_quality": "good",
+      "capture_issue": "none",
+      "meter_family": "unknown",
+      "display_bbox": {
+        "x": 481,
+        "y": 228,
+        "w": 379,
+        "h": 78
+      },
+      "reviews": [
+        {
+          "reviewer": "1",
+          "reading": "000067",
+          "display_bbox": {
+            "x": 481,
+            "y": 228,
+            "w": 379,
+            "h": 78
+          },
+          "reviewed_at": "2026-09-20T22:13:28.977Z"
+        }
+      ],
+      "label_state": "single_review",
+      "training_eligible": true,
+      "reading": "000067",
+      "annotation_notes": "اعتماد مرحلي بمراجع واحد؛ يحتاج مراجعة ثانية قبل اعتماد gold."
+    }
+  ],
+  "review_policy": "single_reviewer_temporary",
+  "approved_count": 51
+}

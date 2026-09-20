@@ -1,0 +1,4 @@
+# Optional local training dependencies. Keep them outside the runtime image.
+torch>=2.0
+torchvision>=0.15
+numpy>=1.24
