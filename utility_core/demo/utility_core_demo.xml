@@ -95,7 +95,7 @@
         <!-- Sample Contract Template -->
         <record id="demo_tmpl_general_biweekly" model="utility.contract.template">
             <field name="name">تعرفة عامة - نصف شهري (شرائح استهلاكية)</field>
-            <field name="code">TMPL_GENERAL_BI</field>
+            <field name="code">DEMO_TMPL_GENERAL_BI</field>
             <field name="pricing_mode">tier</field>
             <field name="recurring_rule_type">semi_monthly</field>
             <field name="recurring_invoicing_type">postpaid</field>
