@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>أداة توسيم صور العدادات</title>
+  <style>
+    body { margin: 0; font-family: Tahoma, sans-serif; background: #f3f4f6; color: #172033; }
+    header { padding: 14px 20px; background: #312e81; color: white; }
+    main { display: grid; grid-template-columns: 320px 1fr; gap: 14px; padding: 14px; direction: ltr; }
+    aside, section { direction: rtl; background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 5px #0002; }
+    label { display: block; margin-top: 10px; font-size: 13px; }
+    input, select, button { width: 100%; box-sizing: border-box; padding: 8px; margin-top: 5px; border: 1px solid #cbd5e1; border-radius: 5px; }
+    button { cursor: pointer; background: #4f46e5; color: white; border: 0; margin-top: 12px; }
+    button.secondary { background: #64748b; }
+    #fileList { max-height: 350px; overflow: auto; margin-top: 12px; }
+    .file { padding: 7px; border-bottom: 1px solid #e5e7eb; cursor: pointer; font-size: 12px; }
+    .file.active { background: #e0e7ff; }
+    #canvasWrap { position: relative; overflow: auto; background: #111827; min-height: 600px; text-align: center; }
+    canvas { cursor: crosshair; max-width: 100%; height: auto; }
+    .hint { color: #64748b; font-size: 12px; line-height: 1.6; }
+    #status { margin-top: 10px; color: #166534; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header><strong>أداة توسيم صور العدادات</strong> — التوسيم محلي ولا يتم رفع الصور</header>
+  <main>
+    <aside>
+      <label>مجلد الصور</label>
+      <input id="folder" type="file" accept="image/*" multiple webkitdirectory>
+      <div class="hint">اختر مجلد D:\datameter ثم اضغط على صورة من القائمة.</div>
+      <div id="fileList"></div>
+      <label>نوع العداد</label>
+      <select id="meterFamily">
+        <option value="unknown">غير معروف</option><option value="digital_lcd">رقمي LCD</option>
+        <option value="digital_green">رقمي أخضر</option><option value="mechanical">ميكانيكي</option>
+        <option value="three_phase">ثلاثي الطور</option>
+      </select>
+      <label>القراءة الصحيحة</label><input id="reading" placeholder="مثال: 00000590">
+      <label>رقم العداد</label><input id="meterNumber" placeholder="اختياري">
+      <button id="save">حفظ توسيم الصورة</button>
+      <button id="export" class="secondary">تصدير annotation.json</button>
+      <div id="status"></div>
+    </aside>
+    <section>
+      <div class="hint">اسحب مستطيلاً حول شاشة القراءة. انقر واسحب مرة أخرى لتعديله. سيتم حفظ الإحداثيات بالنسبة للصورة الأصلية.</div>
+      <div id="canvasWrap"><canvas id="canvas"></canvas></div>
+    </section>
+  </main>
+<script>
+  const folder = document.getElementById('folder'), list = document.getElementById('fileList');
+  const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
+  let files = [], current = -1, image = null, box = null, drawing = false, start = null;
+  const annotations = {};
+  const $ = id => document.getElementById(id);
+  folder.onchange = () => { files = [...folder.files].filter(f => f.type.startsWith('image/')); list.innerHTML = ''; files.forEach((f, i) => { const d=document.createElement('div'); d.className='file'; d.textContent=f.webkitRelativePath || f.name; d.onclick=()=>show(i); d.id='file-'+i; list.appendChild(d); }); if(files.length) show(0); };
+  function show(i) { current=i; document.querySelectorAll('.file').forEach(x=>x.classList.remove('active')); $('file-'+i).classList.add('active'); const r=new FileReader(); r.onload=()=>{ image=new Image(); image.onload=()=>{ canvas.width=image.naturalWidth; canvas.height=image.naturalHeight; box=annotations[key()]?.display_bbox || null; draw(); loadFields(); }; image.src=r.result; }; r.readAsDataURL(files[i]); }
+  function key(){ return files[current]?.webkitRelativePath || files[current]?.name; }
+  function draw(){ if(!image)return; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(image,0,0); if(box){ctx.strokeStyle='#ef4444';ctx.lineWidth=Math.max(4,canvas.width/500);ctx.strokeRect(box.x,box.y,box.w,box.h);} }
+  function point(e){const r=canvas.getBoundingClientRect(); return {x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+  canvas.onmousedown=e=>{start=point(e);drawing=true;}; canvas.onmousemove=e=>{if(!drawing)return; const p=point(e); box={x:Math.round(Math.min(start.x,p.x)),y:Math.round(Math.min(start.y,p.y)),w:Math.round(Math.abs(p.x-start.x)),h:Math.round(Math.abs(p.y-start.y))};draw();}; canvas.onmouseup=()=>drawing=false;
+  function loadFields(){const a=annotations[key()]||{}; $('meterFamily').value=a.meter_family||'unknown'; $('reading').value=a.reading||''; $('meterNumber').value=a.meter_number||'';}
+  $('save').onclick=()=>{if(current<0||!box||box.w<3||box.h<3){$('status').textContent='حدد شاشة القراءة أولاً';return;} annotations[key()]={image_id:key(),display_bbox:box,meter_bbox:null,meter_family:$('meterFamily').value,reading:$('reading').value.trim(),meter_number:$('meterNumber').value.trim(),label_state:'single_review'}; $('status').textContent='تم حفظ توسيم '+(current+1)+' من '+files.length;};
+  $('export').onclick=()=>{const payload={schema_version:'0.1.0',created_at:new Date().toISOString(),images:Object.values(annotations)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='annotation.json';a.click();URL.revokeObjectURL(a.href);};
+</script>
+</body>
+</html>
