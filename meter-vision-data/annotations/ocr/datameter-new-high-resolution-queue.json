@@ -1,0 +1,1087 @@
+{
+  "schema_version": "0.2.0",
+  "created_at": "2026-09-20T23:07:15.745614+00:00",
+  "source": "D:\\datameter",
+  "images": [
+    {
+      "image_id": "31.jpg",
+      "source_path": "D:/datameter/31.jpg",
+      "image_size": {
+        "width": 960,
+        "height": 1280
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "32.jpg",
+      "source_path": "D:/datameter/32.jpg",
+      "image_size": {
+        "width": 960,
+        "height": 1280
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "33.jpg",
+      "source_path": "D:/datameter/33.jpg",
+      "image_size": {
+        "width": 810,
+        "height": 1080
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "34.jpg",
+      "source_path": "D:/datameter/34.jpg",
+      "image_size": {
+        "width": 720,
+        "height": 769
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "35.jpg",
+      "source_path": "D:/datameter/35.jpg",
+      "image_size": {
+        "width": 963,
+        "height": 1280
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "54.jpg",
+      "source_path": "D:/datameter/54.jpg",
+      "image_size": {
+        "width": 981,
+        "height": 1069
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "6.jpg",
+      "source_path": "D:/datameter/6.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "7.jpg",
+      "source_path": "D:/datameter/7.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(104).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(104).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(105).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(105).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(106).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(106).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(107).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(107).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(108).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(108).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(109).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(109).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(11).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(11).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(110).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(110).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(111).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(111).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(112).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(112).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(113).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(113).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(114).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(114).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(115).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(115).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(116).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(116).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(117).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(117).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(118).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(118).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(119).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(119).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(12).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(12).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(120).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(120).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(121).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(121).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(122).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(122).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(125).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(125).jpg",
+      "image_size": {
+        "width": 1818,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(126).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(126).jpg",
+      "image_size": {
+        "width": 1818,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(128).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(128).jpg",
+      "image_size": {
+        "width": 1818,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(129).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(129).jpg",
+      "image_size": {
+        "width": 1818,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(13).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(13).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(132).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(132).jpg",
+      "image_size": {
+        "width": 1818,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(14).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(14).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(18).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(18).jpg",
+      "image_size": {
+        "width": 1818,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(49).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(49).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1645
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(50).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(50).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1645
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(56).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(56).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1645
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(57).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(57).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1645
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(59).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(59).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1645
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(61).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(61).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1645
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(62).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(62).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1645
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(67).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(67).jpg",
+      "image_size": {
+        "width": 1818,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(70).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(70).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(71).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(71).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(72).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(72).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(74).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(74).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(75).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(75).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(76).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(76).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(77).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(77).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(78).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(78).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(79).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(79).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(80).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(80).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(81).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(81).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(82).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(82).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(83).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(83).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(84).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(84).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    },
+    {
+      "image_id": "account.analytic.meter(85).jpg",
+      "source_path": "D:/datameter/account.analytic.meter(85).jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "display_quad": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "group_id": null,
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "annotation_notes": "صورة جديدة عالية الدقة؛ حدد الشاشة واقرأ العداد قبل اعتمادها للتدريب."
+    }
+  ]
+}

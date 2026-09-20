@@ -1,0 +1,37 @@
+{
+  "records": 4,
+  "exact": 1,
+  "exact_accuracy": 0.25,
+  "digit_accuracy": 0.5833333333333334,
+  "label_quality": "single_review_weak_grid",
+  "results": [
+    {
+      "image_id": "datameter/account.analytic.meter(129).jpg",
+      "expected": "123846",
+      "predicted": "191000",
+      "confidence": 0.6192,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (33).jpg",
+      "expected": "000641",
+      "predicted": "000641",
+      "confidence": 0.9732,
+      "exact": true
+    },
+    {
+      "image_id": "datameter/image (58).jpg",
+      "expected": "284568",
+      "predicted": "464565",
+      "confidence": 0.759,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (79).jpg",
+      "expected": "000160",
+      "predicted": "000440",
+      "confidence": 0.8481,
+      "exact": false
+    }
+  ]
+}

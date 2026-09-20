@@ -156,17 +156,22 @@ def analyze(request: InferenceRequest) -> InferenceResponse:
     quality = _quality(image, source_size, low_resolution)
     if crop_applied:
         experimental_crnn = bool(os.getenv("METER_VISION_EXPERIMENTAL_CRNN", "").strip())
+        experimental_digit_cnn = bool(os.getenv("METER_VISION_EXPERIMENTAL_DIGIT_CNN", "").strip())
         if experimental_crnn:
             from .experimental_crnn import recognize as recognize_experimental_crnn
             candidate, confidence, flags = recognize_experimental_crnn(image)
             preprocessing.append("EXPERIMENTAL_CRNN_INPUT")
+        elif experimental_digit_cnn and request.meter_type_hint in {"mechanical_roller", "mechanical_round"}:
+            from .experimental_digit_cnn import recognize as recognize_experimental_digit_cnn
+            candidate, confidence, flags = recognize_experimental_digit_cnn(image, request.expected_digits)
+            preprocessing.append("EXPERIMENTAL_DIGIT_CNN_GRID_INPUT")
         elif request.meter_type_hint in {"mechanical_roller", "mechanical_round"}:
             candidate, confidence, flags = recognize_roller(image, request.expected_digits)
         else:
             candidate, confidence, flags = recognize_seven_segment(image, request.expected_digits)
         raw_text = candidate or ""
         if candidate:
-            if not experimental_crnn:
+            if not experimental_crnn and not experimental_digit_cnn:
                 flags.append(
                     "SPECIALIZED_ROLLER_OCR" if request.meter_type_hint in {"mechanical_roller", "mechanical_round"}
                     else "SPECIALIZED_SEVEN_SEGMENT_OCR"

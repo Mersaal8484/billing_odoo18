@@ -1,0 +1,23 @@
+{
+  "records": 2,
+  "exact": 0,
+  "exact_accuracy": 0.0,
+  "digit_accuracy": 0.6363636363636364,
+  "label_quality": "single_review_weak_grid",
+  "results": [
+    {
+      "image_id": "datameter/image (47).jpg",
+      "expected": "06867",
+      "predicted": "06667",
+      "confidence": 0.7595,
+      "exact": false
+    },
+    {
+      "image_id": "datameter/image (61).jpg",
+      "expected": "281839",
+      "predicted": "261633",
+      "confidence": 0.8282,
+      "exact": false
+    }
+  ]
+}

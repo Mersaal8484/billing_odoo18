@@ -29,7 +29,9 @@
     <aside>
       <label>مجلد الصور</label>
       <input id="folder" type="file" accept="image/*" multiple webkitdirectory>
-      <div class="hint">اختر مجلد D:\datameter ثم اضغط على صورة من القائمة.</div>
+      <label>قائمة مراجعة اختيارية</label>
+      <input id="reviewQueue" type="file" accept="application/json,.json">
+      <div class="hint">اختر مجلد D:\datameter. عند تحميل قائمة مراجعة، لا تظهر إلا صورها الأصلية عالية الدقة.</div>
       <div id="fileList"></div>
       <div id="resolutionNotice" class="hint">لم يتم اختيار صورة</div>
       <label>نوع العداد</label>
@@ -65,12 +67,14 @@
     </section>
   </main>
 <script>
-  const folder = document.getElementById('folder'), list = document.getElementById('fileList');
+  const folder = document.getElementById('folder'), queueInput = document.getElementById('reviewQueue'), list = document.getElementById('fileList');
   const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
-  let files = [], current = -1, image = null, box = null, drawing = false, start = null, zoom = 1;
+  let files = [], current = -1, image = null, box = null, drawing = false, start = null, zoom = 1, queueNames = null;
   const annotations = {};
   const $ = id => document.getElementById(id);
-  folder.onchange = () => { files = [...folder.files].filter(f => f.type.startsWith('image/')); list.innerHTML = ''; files.forEach((f, i) => { const d=document.createElement('div'); d.className='file'; d.textContent=f.webkitRelativePath || f.name; d.onclick=()=>show(i); d.id='file-'+i; list.appendChild(d); }); if(files.length) show(0); };
+  function renderFiles(){const all=[...folder.files].filter(f=>f.type.startsWith('image/')); files=queueNames?all.filter(f=>queueNames.has(f.name)):all; current=-1; list.innerHTML=''; files.forEach((f,i)=>{const d=document.createElement('div');d.className='file';d.textContent=f.webkitRelativePath||f.name;d.onclick=()=>show(i);d.id='file-'+i;list.appendChild(d);}); $('status').textContent=queueNames?'تم تحميل '+files.length+' صورة من قائمة المراجعة.':'تم تحميل '+files.length+' صورة.';if(files.length)show(0);}
+  folder.onchange = renderFiles;
+  queueInput.onchange=()=>{const file=queueInput.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const payload=JSON.parse(reader.result);const rows=payload.images||[];queueNames=new Set(rows.map(row=>String(row.image_id||'').split(/[\\/]/).pop()).filter(Boolean));renderFiles();}catch(error){queueNames=null;$('status').textContent='تعذر قراءة قائمة المراجعة JSON.';}};reader.readAsText(file);};
   function show(i) { current=i; document.querySelectorAll('.file').forEach(x=>x.classList.remove('active')); $('file-'+i).classList.add('active'); const r=new FileReader(); r.onload=()=>{ image=new Image(); image.onload=()=>{ canvas.width=image.naturalWidth; canvas.height=image.naturalHeight; box=annotations[key()]?.display_bbox || null; const small=Math.min(image.naturalWidth,image.naturalHeight)<600; $('resolutionNotice').className=small?'warning':'hint'; $('resolutionNotice').textContent=small?'هذه صورة مصغرة ('+image.naturalWidth+'×'+image.naturalHeight+')؛ للعرض فقط ولا تصلح للتدريب. اختر الأصل من القائمة.':'الأصل: '+image.naturalWidth+'×'+image.naturalHeight+' — الإحداثيات تحفظ على الصورة الأصلية.'; fitImage(); draw(); loadFields(); }; image.src=r.result; }; r.readAsDataURL(files[i]); }
   function key(){ return files[current]?.webkitRelativePath || files[current]?.name; }
   function updateZoom(){zoom=Number($('zoom').value)/100; $('zoomValue').textContent=$('zoom').value+'%'; canvas.style.width=(image.naturalWidth*zoom)+'px'; canvas.style.height=(image.naturalHeight*zoom)+'px';}
