@@ -27,6 +27,17 @@ class TestInference(unittest.TestCase):
         self.assertFalse(result.auto_approval_eligible)
         self.assertTrue(result.stages)
 
+    def test_thumbnail_is_upscaled_but_marked_low_resolution(self):
+        output = BytesIO()
+        Image.new("RGB", (250, 250), (100, 100, 100)).save(output, format="PNG")
+        result = analyze(InferenceRequest(
+            request_id="MVR/thumbnail",
+            image_base64=base64.b64encode(output.getvalue()).decode("ascii"),
+        ))
+        self.assertTrue(result.quality.low_resolution)
+        self.assertEqual(result.quality.source_width, 250)
+        self.assertIn("LOW_SOURCE_RESOLUTION_UPSCALED", result.flags)
+
 
 if __name__ == "__main__":
     unittest.main()

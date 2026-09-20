@@ -11,6 +11,7 @@ from PIL import Image, ImageEnhance, ImageOps
 from .schemas import ConfidenceValue, InferenceRequest, InferenceResponse, QualityResult
 from .model_registry import model_status
 from .pipeline import run_validation_gates
+from .image_enhancement import prepare_for_vision
 
 MODEL_NAME = os.getenv("METER_VISION_MODEL", "baseline-ocr")
 MODEL_VERSION = os.getenv("METER_VISION_MODEL_VERSION", "0.1.0")
@@ -35,32 +36,30 @@ def _decode_image(encoded: str) -> bytes:
     return raw
 
 
-def _prepare_image(raw: bytes) -> Image.Image:
+def _prepare_image(raw: bytes) -> tuple[Image.Image, tuple[int, int], bool]:
     try:
         image = Image.open(io.BytesIO(raw))
         image.load()
     except (OSError, ValueError) as error:
         raise ValueError("invalid image payload") from error
-    image = ImageOps.exif_transpose(image).convert("RGB")
-    if image.width < 240 or image.height < 160:
-        return image
-    scale = min(1600 / image.width, 1600 / image.height, 2.0)
-    if scale > 1:
-        image = image.resize((int(image.width * scale), int(image.height * scale)))
-    return image
+    return prepare_for_vision(image)
 
 
-def _quality(image: Image.Image) -> QualityResult:
+def _quality(image: Image.Image, source_size: tuple[int, int], low_resolution: bool) -> QualityResult:
     gray = ImageOps.grayscale(image)
     sample = gray.resize((1, 1)).getpixel((0, 0))
     score = 1.0
     if min(image.width, image.height) < 300:
         score -= 0.35
+    if low_resolution:
+        score -= 0.20
     if sample < 35 or sample > 235:
         score -= 0.25
     score = max(0.0, min(1.0, score))
     state = "good" if score >= 0.75 else "review" if score >= 0.45 else "poor"
-    return QualityResult(state=state, score=round(score, 4), width=image.width, height=image.height)
+    return QualityResult(state=state, score=round(score, 4), width=image.width, height=image.height,
+                         source_width=source_size[0], source_height=source_size[1],
+                         low_resolution=low_resolution)
 
 
 def _ocr(image: Image.Image, language: str) -> tuple[str, Optional[str], float, list[str]]:
@@ -93,14 +92,16 @@ def _ocr(image: Image.Image, language: str) -> tuple[str, Optional[str], float, 
 
 def analyze(request: InferenceRequest) -> InferenceResponse:
     try:
-        image = _prepare_image(_decode_image(request.image_base64))
+        image, source_size, low_resolution = _prepare_image(_decode_image(request.image_base64))
     except ValueError as error:
         raise ValueError(str(error)) from error
-    quality = _quality(image)
+    quality = _quality(image, source_size, low_resolution)
     raw_text, candidate, confidence, flags = _ocr(image, request.language_hint)
     if quality.state == "poor":
         flags.append("LOW_IMAGE_QUALITY")
     decision = run_validation_gates(image, quality.score, confidence, flags)
+    if low_resolution:
+        decision.flags.append("LOW_SOURCE_RESOLUTION_UPSCALED")
     statuses = {item["key"]: item for item in model_status()}
     stages = [
         {"name": "quality", "state": quality.state, "confidence": quality.score,

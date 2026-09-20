@@ -21,6 +21,9 @@ class QualityResult(BaseModel):
     score: float
     width: int
     height: int
+    source_width: int = 0
+    source_height: int = 0
+    low_resolution: bool = False
 
 
 class PipelineStage(BaseModel):
