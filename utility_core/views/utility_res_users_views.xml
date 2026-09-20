@@ -8,7 +8,24 @@
             <notebook position="inside">
                 <page name="utility_collection" string="صلاحيات الكهرباء">
                     <field name="has_collection_role" invisible="1"/>
-                    <group string="الأدوار الوظيفية للكهرباء">
+                    <group string="النطاق التنظيمي الجغرافي (Organizational Scope)" col="2">
+                        <field name="scope_mode" widget="radio"/>
+                        <group>
+                            <field name="assigned_region_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   placeholder="اختر المناطق..."
+                                   attrs="{'readonly': [('scope_mode', '=', 'global')]}"/>
+                            <field name="assigned_branch_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   placeholder="اختر الفروع..."
+                                   attrs="{'readonly': [('scope_mode', '=', 'global')]}"/>
+                            <field name="assigned_route_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   placeholder="اختر خطوط السير..."/>
+                        </group>
+                    </group>
+                    <separator string="الأدوار الوظيفية للكهرباء"/>
+                    <group>
                         <field name="utility_role_ids" widget="many2many_tags"
                                options="{'no_create': True, 'no_create_edit': True}"
                                placeholder="اختر دورًا أو أكثر..."/>
@@ -16,24 +33,22 @@
                     </group>
                     <group attrs="{'invisible': [('has_collection_role', '=', False)]}">
                         <group string="إعدادات التحصيل النقدية">
-                            <button name="action_create_collection_journal"
-                                    type="object"
-                                    string="إنشاء يومية نقدية"
-                                    class="oe_highlight"
-                                    attrs="{'invisible': [('collection_journal_id', '!=', False)]}"
-                                    confirm="سيتم إنشاء يومية نقدية مستقلة وربطها بهذا المستخدم. هل تريد المتابعة؟"/>
-                            <field name="collection_journal_id" options="{'no_create': True}" placeholder="اختر اليومية النقدية"/>
+                            <label for="collection_journal_id"/>
+                            <div class="o_row">
+                                <field name="collection_journal_id" options="{'no_create': True}"
+                                       placeholder="اختر اليومية النقدية" class="oe_inline"/>
+                                <button name="action_create_collection_journal"
+                                        type="object"
+                                        string="إنشاء يومية"
+                                        class="btn btn-primary oe_inline"
+                                        attrs="{'invisible': [('collection_journal_id', '!=', False)]}"
+                                        confirm="سيتم إنشاء يومية نقدية مستقلة وربطها بهذا المستخدم. هل تريد المتابعة؟"/>
+                            </div>
                             <field name="collector_block_code" placeholder="مثال: A, B, C..."/>
                         </group>
                         <group string="بيانات النظام القديم (PEC)">
                             <field name="legacy_user_code" placeholder="معرف النظام السابق"/>
                         </group>
-                    </group>
-                    <group string="النطاق التنظيمي الجغرافي (Organizational Scope)">
-                        <field name="scope_mode" widget="radio"/>
-                        <field name="assigned_region_ids" widget="many2many_tags" options="{'no_create': True}" placeholder="اختر المناطق (تتضمن فروعها تلقائياً)..." attrs="{'readonly': [('scope_mode', '=', 'global')]}"/>
-                        <field name="assigned_branch_ids" widget="many2many_tags" options="{'no_create': True}" placeholder="اختر الفروع الصريحة (دون ترفيع كامل المنطقة الأم)..." attrs="{'readonly': [('scope_mode', '=', 'global')]}"/>
-                        <field name="assigned_route_ids" widget="many2many_tags" options="{'no_create': True}" placeholder="اختر خطوط السير..."/>
                     </group>
                 </page>
             </notebook>
