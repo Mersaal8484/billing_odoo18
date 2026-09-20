@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_meter_vision_root" name="رؤية العدادات" parent="utility_core.menu_utility_meters"
+              sequence="80" groups="utility_meter_vision.group_meter_vision_reviewer"/>
+    <menuitem id="menu_meter_vision_requests" name="طلبات تحليل الصور" parent="menu_meter_vision_root"
+              action="action_meter_vision_request" sequence="10"/>
+</odoo>

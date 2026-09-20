@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_utility_meter_vision" model="ir.module.category">
+        <field name="name">تحليل صور العدادات</field>
+        <field name="description">صلاحيات خدمة الرؤية الحاسوبية للعدادات</field>
+        <field name="sequence">35</field>
+    </record>
+    <record id="group_meter_vision_reviewer" model="res.groups">
+        <field name="name">مراجع تحليل صور العدادات</field>
+        <field name="category_id" ref="module_category_utility_meter_vision"/>
+        <field name="implied_ids" eval="[(4, ref('utility_core.group_utility_readonly'))]"/>
+    </record>
+    <record id="group_meter_vision_manager" model="res.groups">
+        <field name="name">مدير تحليل صور العدادات</field>
+        <field name="category_id" ref="module_category_utility_meter_vision"/>
+        <field name="implied_ids" eval="[(4, ref('group_meter_vision_reviewer'))]"/>
+    </record>
+    <record id="utility_core.group_utility_admin" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_meter_vision_manager'))]"/>
+    </record>
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_meter_vision_manager'))]"/>
+    </record>
+    <record id="meter_vision_request_company_rule" model="ir.rule">
+        <field name="name">Meter Vision Request Multi-Company</field>
+        <field name="model_id" ref="model_utility_meter_vision_request"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+</odoo>

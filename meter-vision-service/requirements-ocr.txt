@@ -1,0 +1,2 @@
+# Optional OCR engine. Install the native Tesseract package separately on the host/container.
+pytesseract>=0.3.10,<1.0

@@ -1,0 +1,21 @@
+{
+    'name': 'Utility Meter Vision',
+    'version': '16.0.1.0.0',
+    'category': 'Utility ERP',
+    'summary': 'طلبات تحليل صور العدادات مع مراجعة بشرية',
+    'description': 'يسجل نتائج خدمة الرؤية الحاسوبية دون تعديل القراءة أو الفاتورة تلقائياً.',
+    'author': 'Utility ERP Platform',
+    'license': 'LGPL-3',
+    'depends': ['utility_core'],
+    'data': [
+        'security/utility_meter_vision_security.xml',
+        'security/ir.model.access.csv',
+        'data/utility_meter_vision_data.xml',
+        'views/utility_meter_vision_views.xml',
+        'views/utility_meter_vision_menu.xml',
+        'views/res_config_settings_views.xml',
+    ],
+    'installable': True,
+    'application': False,
+    'auto_install': False,
+}

@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_meter_vision_request_reviewer,meter.vision.request.reviewer,model_utility_meter_vision_request,group_meter_vision_reviewer,1,1,1,0
+access_meter_vision_request_manager,meter.vision.request.manager,model_utility_meter_vision_request,group_meter_vision_manager,1,1,1,1

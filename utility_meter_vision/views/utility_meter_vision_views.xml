@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_meter_vision_request_tree" model="ir.ui.view">
+        <field name="name">utility.meter.vision.request.tree</field>
+        <field name="model">utility.meter.vision.request</field>
+        <field name="arch" type="xml">
+            <tree string="طلبات تحليل صور العدادات">
+                <field name="name"/>
+                <field name="reading_id"/>
+                <field name="image_filename"/>
+                <field name="state" widget="badge"
+                       decoration-info="state in ('queued', 'processing')"
+                       decoration-warning="state == 'needs_review'"
+                       decoration-success="state == 'approved'"
+                       decoration-danger="state in ('failed', 'rejected')"/>
+                <field name="quality_state"/>
+                <field name="reading_candidate"/>
+                <field name="confidence"/>
+                <field name="reviewer_id"/>
+                <field name="create_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_meter_vision_request_search" model="ir.ui.view">
+        <field name="name">utility.meter.vision.request.search</field>
+        <field name="model">utility.meter.vision.request</field>
+        <field name="arch" type="xml">
+            <search string="طلبات تحليل الصور">
+                <field name="name"/>
+                <field name="reading_id"/>
+                <field name="meter_number_candidate"/>
+                <filter name="needs_review" string="تحتاج مراجعة" domain="[('state', '=', 'needs_review')]"/>
+                <filter name="failed" string="فشل" domain="[('state', '=', 'failed')]"/>
+                <filter name="approved" string="معتمدة" domain="[('state', '=', 'approved')]"/>
+                <group string="تجميع حسب">
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                    <filter name="group_quality" string="جودة الصورة" context="{'group_by': 'quality_state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_meter_vision_request_form" model="ir.ui.view">
+        <field name="name">utility.meter.vision.request.form</field>
+        <field name="model">utility.meter.vision.request</field>
+        <field name="arch" type="xml">
+            <form string="تحليل صورة عداد">
+                <header>
+                    <button name="action_queue" string="إرسال للتحليل" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('state', 'not in', ('draft', 'failed', 'rejected'))]}"/>
+                    <button name="action_process" string="تشغيل الآن" type="object"
+                            attrs="{'invisible': [('state', '!=', 'queued')]}"/>
+                    <button name="action_approve" string="اعتماد النتيجة" type="object" class="oe_highlight"
+                            groups="utility_meter_vision.group_meter_vision_reviewer"
+                            attrs="{'invisible': [('state', '!=', 'needs_review')]}"/>
+                    <button name="action_reject" string="رفض" type="object"
+                            attrs="{'invisible': [('state', '!=', 'needs_review')]}"/>
+                    <button name="action_retry" string="إعادة المحاولة" type="object"
+                            attrs="{'invisible': [('state', '!=', 'failed')]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,queued,processing,needs_review,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group string="مصدر الصورة">
+                            <field name="company_id" readonly="1"/>
+                            <field name="reading_id"/>
+                            <field name="media_asset_id"/>
+                            <field name="attachment_id" domain="[('mimetype', 'like', 'image/%')]"/>
+                            <field name="image_filename" readonly="1"/>
+                            <field name="image_url" widget="url" readonly="1"/>
+                        </group>
+                        <group string="نتيجة التحليل">
+                            <field name="model_name" readonly="1"/>
+                            <field name="model_version" readonly="1"/>
+                            <field name="quality_state" readonly="1"/>
+                            <field name="quality_score" readonly="1"/>
+                            <field name="meter_number_candidate"/>
+                            <field name="reading_candidate"/>
+                            <field name="confidence" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="المراجعة">
+                            <field name="review_notes" placeholder="اكتب سبب الاعتماد أو الرفض..."/>
+                            <field name="reviewer_id" readonly="1"/>
+                            <field name="reviewed_at" readonly="1"/>
+                        </page>
+                        <page string="تفاصيل الخدمة">
+                            <field name="raw_text" readonly="1"/>
+                            <field name="flags" readonly="1"/>
+                            <field name="error_message" readonly="1"/>
+                            <field name="response_json" readonly="1" widget="text" groups="utility_meter_vision.group_meter_vision_manager"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_meter_vision_request" model="ir.actions.act_window">
+        <field name="name">طلبات تحليل الصور</field>
+        <field name="res_model">utility.meter.vision.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_meter_vision_request_search"/>
+        <field name="help" type="html"><p>أنشئ طلباً لتحليل صورة عداد ثم راجع النتيجة قبل اعتمادها.</p></field>
+    </record>
+</odoo>

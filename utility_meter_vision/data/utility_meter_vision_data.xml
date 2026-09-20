@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sequence_meter_vision_request" model="ir.sequence">
+        <field name="name">Meter Vision Request</field>
+        <field name="code">utility.meter.vision.request</field>
+        <field name="prefix">MVR/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+    <record id="cron_meter_vision_process_queue" model="ir.cron">
+        <field name="name">تحليل صور العدادات المعلقة</field>
+        <field name="model_id" ref="model_utility_meter_vision_request"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_process_queue()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+</odoo>
