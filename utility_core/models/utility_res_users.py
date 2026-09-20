@@ -5,6 +5,13 @@ from odoo.exceptions import AccessError
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
+    utility_role_ids = fields.Many2many(
+        'utility.user.role', 'res_users_utility_role_rel',
+        'user_id', 'role_id',
+        string='الأدوار الوظيفية',
+        help='الأدوار الوظيفية التي تمنح المستخدم صلاحيات نظام إدارة الكهرباء. '
+             'تُحوّل الأدوار تلقائياً إلى مجموعات Odoo الداخلية.')
+
     # Kept as a compatibility field so databases upgrading from versions that
     # exposed it in res.users views can rebuild the generated groups view.
     # Installment-plan business logic has been removed from utility_billing.
@@ -52,12 +59,44 @@ class ResUsers(models.Model):
     ], string='وضع النطاق التنظيمي', default='restricted', required=True,
        help='يحدد ما إذا كان المستخدم مقيداً بالتقسيمات الجغرافية المخصصة أو يملك وصولاً شاملاً.')
 
+    def _sync_utility_roles_to_groups(self):
+        """Translate selected business roles to the underlying Odoo groups."""
+        utility_category = self.env.ref(
+            'utility_core.module_category_utility_erp', raise_if_not_found=False)
+        admin_group = self.env.ref(
+            'utility_core.group_utility_admin', raise_if_not_found=False)
+        if not utility_category:
+            return
+
+        utility_groups = self.env['res.groups'].search([
+            ('category_id', '=', utility_category.id),
+        ])
+        managed_groups = utility_groups - admin_group if admin_group else utility_groups
+        for user in self:
+            selected_groups = user.utility_role_ids.mapped('group_ids') & managed_groups
+            preserved_admin = admin_group if admin_group and admin_group in user.groups_id else self.env['res.groups']
+            desired_groups = (user.groups_id - managed_groups) | selected_groups | preserved_admin
+            if desired_groups != user.groups_id:
+                super(ResUsers, user.with_context(skip_utility_role_sync=True)).write({
+                    'groups_id': [(6, 0, desired_groups.ids)],
+                })
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        users = super().create(vals_list)
+        if any(vals.get('utility_role_ids') for vals in vals_list):
+            users._sync_utility_roles_to_groups()
+        return users
+
     def write(self, vals):
         scope_fields = {'scope_mode', 'assigned_region_ids', 'assigned_branch_ids'}
         if scope_fields.intersection(vals.keys()):
             if not (self.env.is_admin() or self.env.user.has_group('utility_core.group_utility_admin')):
                 raise AccessError(_("فقط مدير النظام (Utility Admin) يحق له تعديل النطاق التنظيمي وصلاحيات الوصول الجغرافي للمستخدمين."))
-        return super().write(vals)
+        res = super().write(vals)
+        if 'utility_role_ids' in vals and not self.env.context.get('skip_utility_role_sync'):
+            self._sync_utility_roles_to_groups()
+        return res
 
     def _is_global_utility_scope(self):
         """Returns True if the user has explicit GLOBAL scope or belongs to Utility Admin."""
@@ -122,3 +161,21 @@ class ResUsers(models.Model):
         if region and region.id in region_ids:
             return True
         raise AccessError(_("تعذر تحديد النطاق التنظيمي أو أن السجل يقع خارج نطاقك التنظيمي الجغرافي المخصص."))
+
+
+class UtilityGroupsView(models.Model):
+    """Keep electricity groups internal to the role selector."""
+
+    _inherit = 'res.groups'
+
+    @api.model
+    def get_groups_by_application(self):
+        groups_by_application = super().get_groups_by_application()
+        utility_category = self.env.ref(
+            'utility_core.module_category_utility_erp', raise_if_not_found=False)
+        if not utility_category:
+            return groups_by_application
+        return [
+            item for item in groups_by_application
+            if item[0] != utility_category
+        ]
