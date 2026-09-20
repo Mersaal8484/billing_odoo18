@@ -3,61 +3,61 @@
     <data noupdate="1">
         <!-- Sample Regions & Infrastructure -->
         <record id="demo_region_1" model="utility.region">
-            <field name="name">المنطقة الأولى</field>
-            <field name="code">REGION_1</field>
+            <field name="name">بيانات تجريبية - المنطقة الأولى</field>
+            <field name="code">DEMO-REG-01</field>
             <field name="type">region</field>
             <field name="recurring_rule_type">biweekly</field>
         </record>
         <record id="demo_region_2" model="utility.region">
-            <field name="name">المنطقة الثانية</field>
-            <field name="code">REGION_2</field>
+            <field name="name">بيانات تجريبية - المنطقة الثانية</field>
+            <field name="code">DEMO-REG-02</field>
             <field name="type">region</field>
             <field name="recurring_rule_type">biweekly</field>
         </record>
         <record id="demo_region_3" model="utility.region">
-            <field name="name">المنطقة الثالثة</field>
-            <field name="code">REGION_3</field>
+            <field name="name">بيانات تجريبية - المنطقة الثالثة</field>
+            <field name="code">DEMO-REG-03</field>
             <field name="type">region</field>
             <field name="recurring_rule_type">biweekly</field>
         </record>
         <record id="demo_region_4" model="utility.region">
-            <field name="name">المنطقة الرابعة</field>
-            <field name="code">REGION_4</field>
+            <field name="name">بيانات تجريبية - المنطقة الرابعة</field>
+            <field name="code">DEMO-REG-04</field>
             <field name="type">region</field>
             <field name="recurring_rule_type">biweekly</field>
         </record>
 
         <record id="demo_area_1" model="utility.region">
-            <field name="name">فرع المنطقة الأولى</field>
-            <field name="code">AREA_1</field>
+            <field name="name">بيانات تجريبية - فرع المنطقة الأولى</field>
+            <field name="code">DEMO-AREA-01</field>
             <field name="type">area</field>
             <field name="parent_id" ref="demo_region_1"/>
             <field name="recurring_rule_type">biweekly</field>
         </record>
         <record id="demo_area_2" model="utility.region">
-            <field name="name">فرع المنطقة الثانية</field>
-            <field name="code">AREA_2</field>
+            <field name="name">بيانات تجريبية - فرع المنطقة الثانية</field>
+            <field name="code">DEMO-AREA-02</field>
             <field name="type">area</field>
             <field name="parent_id" ref="demo_region_2"/>
             <field name="recurring_rule_type">biweekly</field>
         </record>
         <record id="demo_area_3" model="utility.region">
-            <field name="name">فرع المنطقة الثالثة</field>
-            <field name="code">AREA_3</field>
+            <field name="name">بيانات تجريبية - فرع المنطقة الثالثة</field>
+            <field name="code">DEMO-AREA-03</field>
             <field name="type">area</field>
             <field name="parent_id" ref="demo_region_3"/>
             <field name="recurring_rule_type">biweekly</field>
         </record>
         <record id="demo_area_4" model="utility.region">
-            <field name="name">فرع المنطقة الرابعة</field>
-            <field name="code">AREA_4</field>
+            <field name="name">بيانات تجريبية - فرع المنطقة الرابعة</field>
+            <field name="code">DEMO-AREA-04</field>
             <field name="type">area</field>
             <field name="parent_id" ref="demo_region_4"/>
             <field name="recurring_rule_type">biweekly</field>
         </record>
         <record id="demo_zone_2" model="utility.region">
-            <field name="name">نطاق المنطقة الثانية</field>
-            <field name="code">ZONE_2</field>
+            <field name="name">بيانات تجريبية - نطاق المنطقة الثانية</field>
+            <field name="code">DEMO-ZONE-02</field>
             <field name="type">zone</field>
             <field name="parent_id" ref="demo_area_2"/>
             <field name="recurring_rule_type">biweekly</field>
