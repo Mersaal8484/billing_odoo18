@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Meter Vision Dataset Manifest",
+  "type": "object",
+  "required": ["dataset_id", "version", "images", "splits", "privacy"],
+  "properties": {
+    "dataset_id": {"type": "string"},
+    "version": {"type": "string", "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "created_at": {"type": "string"},
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["image_id", "sha256", "meter_family", "label_state"],
+        "properties": {
+          "image_id": {"type": "string"},
+          "sha256": {"type": "string", "minLength": 64, "maxLength": 64},
+          "meter_family": {"type": "string"},
+          "source": {"type": "string"},
+          "label_state": {"enum": ["unlabelled", "single_review", "double_review", "gold"]},
+          "split": {"enum": ["train", "val", "test"]}
+        }
+      }
+    },
+    "splits": {
+      "type": "object",
+      "required": ["strategy", "group_key"],
+      "properties": {
+        "strategy": {"const": "grouped_by_meter_or_route"},
+        "group_key": {"enum": ["meter_family", "meter_id_hash", "route_hash"]}
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "required": ["pii_removed", "exif_removed", "consent_recorded"],
+      "properties": {
+        "pii_removed": {"type": "boolean"},
+        "exif_removed": {"type": "boolean"},
+        "consent_recorded": {"type": "boolean"}
+      }
+    }
+  }
+}

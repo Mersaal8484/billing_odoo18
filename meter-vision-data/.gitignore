@@ -1,0 +1,18 @@
+# لا تحفظ الصور أو الملفات الحساسة في المستودع.
+raw/*
+interim/*
+processed/images/*
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.tif
+*.tiff
+*.zip
+*.tar
+*.onnx
+*.pt
+*.pth
+*.parquet
+*.csv
+!.gitkeep
