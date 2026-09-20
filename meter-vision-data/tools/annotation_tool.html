@@ -38,7 +38,13 @@
       </select>
       <label>القراءة الصحيحة</label><input id="reading" placeholder="مثال: 00000590">
       <label>رقم العداد</label><input id="meterNumber" placeholder="اختياري">
-      <button id="save">حفظ توسيم الصورة</button>
+      <label>معرف مجموعة العداد</label><input id="groupId" placeholder="مثال: route-12-meter-004">
+      <label>جودة الصورة</label><select id="imageQuality"><option value="good">جيدة</option><option value="review">تحتاج مراجعة</option><option value="poor">سيئة</option></select>
+      <label>انعكاس/حجب</label><select id="captureIssue"><option value="none">لا يوجد</option><option value="glare">انعكاس</option><option value="occlusion">حجب جزئي</option><option value="blur">ضبابية</option><option value="tilt">ميل شديد</option></select>
+      <label>تكبير الصورة <span id="zoomValue">100%</span></label><input id="zoom" type="range" min="50" max="300" value="100" step="10">
+      <div id="boxCoordinates" class="hint">لا يوجد مربع محدد</div>
+      <div class="hint">لا تحفظ الصور المصغرة للتدريب. يجب أن تكون الصورة الأصلية واضحة، ويفضل أن يكون أصغر بُعد فيها 600 بكسل.</div>
+      <button id="save">حفظ توسيم للمراجعة</button>
       <button id="export" class="secondary">تصدير annotation.json</button>
       <div id="status"></div>
     </aside>
@@ -50,17 +56,19 @@
 <script>
   const folder = document.getElementById('folder'), list = document.getElementById('fileList');
   const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
-  let files = [], current = -1, image = null, box = null, drawing = false, start = null;
+  let files = [], current = -1, image = null, box = null, drawing = false, start = null, zoom = 1;
   const annotations = {};
   const $ = id => document.getElementById(id);
   folder.onchange = () => { files = [...folder.files].filter(f => f.type.startsWith('image/')); list.innerHTML = ''; files.forEach((f, i) => { const d=document.createElement('div'); d.className='file'; d.textContent=f.webkitRelativePath || f.name; d.onclick=()=>show(i); d.id='file-'+i; list.appendChild(d); }); if(files.length) show(0); };
-  function show(i) { current=i; document.querySelectorAll('.file').forEach(x=>x.classList.remove('active')); $('file-'+i).classList.add('active'); const r=new FileReader(); r.onload=()=>{ image=new Image(); image.onload=()=>{ canvas.width=image.naturalWidth; canvas.height=image.naturalHeight; box=annotations[key()]?.display_bbox || null; draw(); loadFields(); }; image.src=r.result; }; r.readAsDataURL(files[i]); }
+  function show(i) { current=i; document.querySelectorAll('.file').forEach(x=>x.classList.remove('active')); $('file-'+i).classList.add('active'); const r=new FileReader(); r.onload=()=>{ image=new Image(); image.onload=()=>{ canvas.width=image.naturalWidth; canvas.height=image.naturalHeight; box=annotations[key()]?.display_bbox || null; zoom=1; $('zoom').value=100; updateZoom(); draw(); loadFields(); }; image.src=r.result; }; r.readAsDataURL(files[i]); }
   function key(){ return files[current]?.webkitRelativePath || files[current]?.name; }
-  function draw(){ if(!image)return; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(image,0,0); if(box){ctx.strokeStyle='#ef4444';ctx.lineWidth=Math.max(4,canvas.width/500);ctx.strokeRect(box.x,box.y,box.w,box.h);} }
+  function updateZoom(){zoom=Number($('zoom').value)/100; $('zoomValue').textContent=$('zoom').value+'%'; canvas.style.width=(image.naturalWidth*zoom)+'px'; canvas.style.height=(image.naturalHeight*zoom)+'px';}
+  function draw(){ if(!image)return; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(image,0,0); if(box){ctx.strokeStyle='#ef4444';ctx.lineWidth=Math.max(4,canvas.width/500);ctx.strokeRect(box.x,box.y,box.w,box.h);$('boxCoordinates').textContent='x='+box.x+' y='+box.y+' w='+box.w+' h='+box.h;} else $('boxCoordinates').textContent='لا يوجد مربع محدد'; }
   function point(e){const r=canvas.getBoundingClientRect(); return {x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
   canvas.onmousedown=e=>{start=point(e);drawing=true;}; canvas.onmousemove=e=>{if(!drawing)return; const p=point(e); box={x:Math.round(Math.min(start.x,p.x)),y:Math.round(Math.min(start.y,p.y)),w:Math.round(Math.abs(p.x-start.x)),h:Math.round(Math.abs(p.y-start.y))};draw();}; canvas.onmouseup=()=>drawing=false;
-  function loadFields(){const a=annotations[key()]||{}; $('meterFamily').value=a.meter_family||'unknown'; $('reading').value=a.reading||''; $('meterNumber').value=a.meter_number||'';}
-  $('save').onclick=()=>{if(current<0||!box||box.w<3||box.h<3){$('status').textContent='حدد شاشة القراءة أولاً';return;} annotations[key()]={image_id:key(),display_bbox:box,meter_bbox:null,meter_family:$('meterFamily').value,reading:$('reading').value.trim(),meter_number:$('meterNumber').value.trim(),label_state:'single_review'}; $('status').textContent='تم حفظ توسيم '+(current+1)+' من '+files.length;};
+  $('zoom').oninput=()=>{updateZoom();};
+  function loadFields(){const a=annotations[key()]||{}; $('meterFamily').value=a.meter_family||'unknown'; $('reading').value=a.reading||''; $('meterNumber').value=a.meter_number||''; $('groupId').value=a.group_id||''; $('imageQuality').value=a.image_quality||'good'; $('captureIssue').value=a.capture_issue||'none';}
+  $('save').onclick=()=>{if(current<0||!box||box.w<3||box.h<3){$('status').textContent='حدد شاشة القراءة أولاً';return;} if(Math.min(image.naturalWidth,image.naturalHeight)<600){$('status').textContent='الصورة صغيرة؛ لا تصلح للتدريب';return;} annotations[key()]={image_id:key(),source_path:key(),display_bbox:box,meter_bbox:null,meter_family:$('meterFamily').value,reading:$('reading').value.trim(),meter_number:$('meterNumber').value.trim(),group_id:$('groupId').value.trim(),image_quality:$('imageQuality').value,capture_issue:$('captureIssue').value,label_state:'needs_review',training_eligible:false}; $('status').textContent='تم حفظ توسيم '+(current+1)+' من '+files.length;};
   $('export').onclick=()=>{const payload={schema_version:'0.1.0',created_at:new Date().toISOString(),images:Object.values(annotations)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='annotation.json';a.click();URL.revokeObjectURL(a.href);};
 </script>
 </body>

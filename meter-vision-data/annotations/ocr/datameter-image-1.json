@@ -3,12 +3,13 @@
   "image_id": "image (1).jpg",
   "source_path": "D:/datameter/image (1).jpg",
   "image_size": {"width": 960, "height": 1042},
-  "display_bbox": {"x": 355, "y": 323, "w": 430, "h": 115},
+  "display_bbox": {"x": 345, "y": 235, "w": 425, "h": 115},
   "meter_bbox": null,
   "meter_family": "digital_lcd",
   "phase": "three_phase",
   "reading": "00000590",
   "meter_number": "",
-  "label_state": "single_review",
-  "annotation_notes": "مربع القراءة الرئيسية فقط؛ تم استبعاد 15.80 ومؤشرات L1/L2/L3 ووحدة kW/h والباركود."
+  "label_state": "needs_review",
+  "training_eligible": false,
+  "annotation_notes": "توسيم مبدئي للمراجعة فقط؛ لا يدخل التدريب. تم استبعاد 15.80 ومؤشرات L1/L2/L3 ووحدة kW/h والباركود، لكن القراءة والصندوق لم يتم اعتمادهما بمراجعين اثنين."
 }

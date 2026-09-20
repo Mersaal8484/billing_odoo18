@@ -9,6 +9,17 @@ class InferenceRequest(BaseModel):
     meter_id: Optional[str] = None
     meter_type_hint: Optional[str] = None
     language_hint: str = "eng"
+    # Pixel coordinates on the original image.  The service intentionally
+    # accepts a confirmed display crop instead of guessing on the whole photo.
+    display_bbox: Optional["DisplayBBox"] = None
+    expected_digits: Optional[int] = Field(default=None, ge=4, le=12)
+
+
+class DisplayBBox(BaseModel):
+    x: int = Field(ge=0)
+    y: int = Field(ge=0)
+    w: int = Field(gt=0)
+    h: int = Field(gt=0)
 
 
 class ConfidenceValue(BaseModel):

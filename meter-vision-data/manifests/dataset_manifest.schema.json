@@ -17,7 +17,7 @@
           "sha256": {"type": "string", "minLength": 64, "maxLength": 64},
           "meter_family": {"type": "string"},
           "source": {"type": "string"},
-          "label_state": {"enum": ["unlabelled", "single_review", "double_review", "gold"]},
+          "label_state": {"enum": ["unlabelled", "needs_review", "single_review", "double_review", "gold"]},
           "split": {"enum": ["train", "val", "test"]}
         }
       }

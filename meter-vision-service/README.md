@@ -42,3 +42,25 @@ python run_batch.py D:\datameter ..\meter-vision-data\reports\datameter-baseline
 تُستبدل مراحل الكشف والتصنيف و`_ocr` تدريجياً بالأوزان المدربة لكل عائلة عدادات،
 ثم تُفعل قواعد التحقق مع القراءة السابقة. لا تُحفظ الصور داخل الخدمة؛
 تظل الصور ونتائج التحليل في Odoo/التخزين المعتمد.
+# Specialized digital-display OCR
+
+When `display_bbox` is supplied, the service uses the local seven-segment
+recognizer in `app/seven_segment_ocr.py`. It does not run generic OCR over the
+whole field photo. `expected_digits` can be supplied when the meter family has
+a fixed register width; uncertain patterns are returned as `needs_review`.
+
+Example request fields:
+
+```json
+{
+  "request_id": "field-001",
+  "image_base64": "...",
+  "display_bbox": {"x": 345, "y": 235, "w": 425, "h": 115},
+  "expected_digits": 8,
+  "meter_type_hint": "digital_lcd"
+}
+```
+
+This is the deterministic bootstrap for the project. It is not a trained
+production weight yet; the next stage is to fit meter-family-specific weights
+using approved original-resolution crops and double-reviewed readings.

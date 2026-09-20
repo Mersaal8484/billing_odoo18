@@ -1,0 +1,554 @@
+{
+  "schema_version": "0.1.0",
+  "source": "D:/datameter",
+  "provisional": true,
+  "images": [
+    {
+      "image_id": "image (1).jpg",
+      "source_path": "D:\\datameter\\image (1).jpg",
+      "image_size": {
+        "width": 960,
+        "height": 1042
+      },
+      "display_bbox": {
+        "x": 345,
+        "y": 235,
+        "w": 425,
+        "h": 115
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "phase": "three_phase",
+      "reading": "00000590",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "مربع أولي يحتاج مراجعة بشرية قبل التدريب"
+    },
+    {
+      "image_id": "image (10).jpg",
+      "source_path": "D:\\datameter\\image (10).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (11).jpg",
+      "source_path": "D:\\datameter\\image (11).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (12).jpg",
+      "source_path": "D:\\datameter\\image (12).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (13).jpg",
+      "source_path": "D:\\datameter\\image (13).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (14).jpg",
+      "source_path": "D:\\datameter\\image (14).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (15).jpg",
+      "source_path": "D:\\datameter\\image (15).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (16).jpg",
+      "source_path": "D:\\datameter\\image (16).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (17).jpg",
+      "source_path": "D:\\datameter\\image (17).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (18).jpg",
+      "source_path": "D:\\datameter\\image (18).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (19).jpg",
+      "source_path": "D:\\datameter\\image (19).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (2).jpg",
+      "source_path": "D:\\datameter\\image (2).jpg",
+      "image_size": {
+        "width": 720,
+        "height": 762
+      },
+      "display_bbox": {
+        "x": 100,
+        "y": 145,
+        "w": 405,
+        "h": 105
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "phase": "three_phase",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "مربع أولي يحتاج مراجعة بشرية قبل التدريب"
+    },
+    {
+      "image_id": "image (20).jpg",
+      "source_path": "D:\\datameter\\image (20).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (21).jpg",
+      "source_path": "D:\\datameter\\image (21).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (22).jpg",
+      "source_path": "D:\\datameter\\image (22).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (23).jpg",
+      "source_path": "D:\\datameter\\image (23).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (24).jpg",
+      "source_path": "D:\\datameter\\image (24).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (25).jpg",
+      "source_path": "D:\\datameter\\image (25).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (26).jpg",
+      "source_path": "D:\\datameter\\image (26).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (27).jpg",
+      "source_path": "D:\\datameter\\image (27).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (28).jpg",
+      "source_path": "D:\\datameter\\image (28).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (29).jpg",
+      "source_path": "D:\\datameter\\image (29).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (3).jpg",
+      "source_path": "D:\\datameter\\image (3).jpg",
+      "image_size": {
+        "width": 594,
+        "height": 759
+      },
+      "display_bbox": {
+        "x": 185,
+        "y": 310,
+        "w": 310,
+        "h": 78
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "phase": "three_phase",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "مربع أولي يحتاج مراجعة بشرية قبل التدريب"
+    },
+    {
+      "image_id": "image (30).jpg",
+      "source_path": "D:\\datameter\\image (30).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (4).jpg",
+      "source_path": "D:\\datameter\\image (4).jpg",
+      "image_size": {
+        "width": 608,
+        "height": 1080
+      },
+      "display_bbox": {
+        "x": 228,
+        "y": 425,
+        "w": 300,
+        "h": 82
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "phase": "three_phase",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "مربع أولي يحتاج مراجعة بشرية قبل التدريب"
+    },
+    {
+      "image_id": "image (5).jpg",
+      "source_path": "D:\\datameter\\image (5).jpg",
+      "image_size": {
+        "width": 1080,
+        "height": 1080
+      },
+      "display_bbox": {
+        "x": 435,
+        "y": 190,
+        "w": 430,
+        "h": 82
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "phase": "three_phase",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "مربع أولي يحتاج مراجعة بشرية قبل التدريب"
+    },
+    {
+      "image_id": "image (6).jpg",
+      "source_path": "D:\\datameter\\image (6).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image (7).jpg",
+      "source_path": "D:\\datameter\\image (7).jpg",
+      "image_size": {
+        "width": 1080,
+        "height": 717
+      },
+      "display_bbox": {
+        "x": 120,
+        "y": 295,
+        "w": 445,
+        "h": 98
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "phase": "three_phase",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "مربع أولي يحتاج مراجعة بشرية قبل التدريب"
+    },
+    {
+      "image_id": "image (8).jpg",
+      "source_path": "D:\\datameter\\image (8).jpg",
+      "image_size": {
+        "width": 775,
+        "height": 1080
+      },
+      "display_bbox": {
+        "x": 95,
+        "y": 610,
+        "w": 510,
+        "h": 92
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "phase": "three_phase",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "مربع أولي يحتاج مراجعة بشرية قبل التدريب"
+    },
+    {
+      "image_id": "image (9).jpg",
+      "source_path": "D:\\datameter\\image (9).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image.jpg",
+      "source_path": "D:\\datameter\\image.jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    },
+    {
+      "image_id": "image18.jpg",
+      "source_path": "D:\\datameter\\image18.jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "phase": "unknown",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "annotation_notes": "الصورة مصغرة؛ يلزم توفير الأصل عالي الدقة قبل التوسيم"
+    }
+  ]
+}

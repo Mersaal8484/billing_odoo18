@@ -10,7 +10,7 @@ OUTPUT = Path(__file__).resolve().parents[1] / "annotations" / "ocr" / "datamete
 # Coordinates are for the original high-resolution samples reviewed visually.
 # They are proposals and remain needs_review until a human confirms them.
 BOXES = {
-    "image (1).jpg": ({"x": 355, "y": 323, "w": 430, "h": 115}, "00000590"),
+    "image (1).jpg": ({"x": 345, "y": 235, "w": 425, "h": 115}, "00000590"),
     "image (2).jpg": ({"x": 100, "y": 145, "w": 405, "h": 105}, ""),
     "image (3).jpg": ({"x": 185, "y": 310, "w": 310, "h": 78}, ""),
     "image (4).jpg": ({"x": 228, "y": 425, "w": 300, "h": 82}, ""),

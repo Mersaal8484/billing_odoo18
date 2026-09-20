@@ -8,10 +8,11 @@ from typing import Optional
 
 from PIL import Image, ImageEnhance, ImageOps
 
-from .schemas import ConfidenceValue, InferenceRequest, InferenceResponse, QualityResult
+from .schemas import ConfidenceValue, DisplayBBox, InferenceRequest, InferenceResponse, QualityResult
 from .model_registry import model_status
 from .pipeline import run_validation_gates
 from .image_enhancement import prepare_for_vision
+from .seven_segment_ocr import recognize as recognize_seven_segment
 
 MODEL_NAME = os.getenv("METER_VISION_MODEL", "baseline-ocr")
 MODEL_VERSION = os.getenv("METER_VISION_MODEL_VERSION", "0.1.0")
@@ -36,13 +37,30 @@ def _decode_image(encoded: str) -> bytes:
     return raw
 
 
-def _prepare_image(raw: bytes) -> tuple[Image.Image, tuple[int, int], bool]:
+def _load_image(raw: bytes) -> Image.Image:
     try:
         image = Image.open(io.BytesIO(raw))
         image.load()
     except (OSError, ValueError) as error:
         raise ValueError("invalid image payload") from error
-    return prepare_for_vision(image)
+    return image
+
+
+def _prepare_image(raw: bytes, display_bbox: Optional[DisplayBBox]) -> tuple[Image.Image, tuple[int, int], bool, bool]:
+    image = _load_image(raw)
+    source_size = image.size
+    crop_applied = False
+    if display_bbox:
+        left = display_bbox.x
+        top = display_bbox.y
+        right = min(image.width, left + display_bbox.w)
+        bottom = min(image.height, top + display_bbox.h)
+        if left >= image.width or top >= image.height or right <= left or bottom <= top:
+            raise ValueError("display_bbox is outside the source image")
+        image = image.crop((left, top, right, bottom))
+        crop_applied = True
+    prepared, _, low_resolution = prepare_for_vision(image)
+    return prepared, source_size, low_resolution, crop_applied
 
 
 def _quality(image: Image.Image, source_size: tuple[int, int], low_resolution: bool) -> QualityResult:
@@ -75,28 +93,62 @@ def _ocr(image: Image.Image, language: str) -> tuple[str, Optional[str], float, 
     elif os.environ.get("TESSERACT_CMD"):
         pytesseract.pytesseract.tesseract_cmd = os.environ["TESSERACT_CMD"]
 
-    prepared = ImageEnhance.Contrast(ImageOps.grayscale(image)).enhance(1.5)
+    # A confirmed display crop is enlarged and evaluated through several
+    # seven-segment-friendly variants. Full-photo OCR is intentionally not
+    # treated as trustworthy because it tends to read barcodes and overlays.
+    gray = ImageOps.grayscale(image)
+    scale = max(2, min(5, 1400 // max(1, gray.width)))
+    gray = gray.resize((gray.width * scale, gray.height * scale), Image.Resampling.LANCZOS)
+    prepared = ImageEnhance.Contrast(gray).enhance(1.8)
+    variants = [
+        prepared,
+        prepared.point(lambda value: 255 if value > 145 else 0),
+        prepared.point(lambda value: 255 if value > 185 else 0),
+    ]
+    configs = ("--psm 7", "--psm 8", "--psm 13")
+    texts: list[str] = []
+    found: list[str] = []
     try:
-        text = pytesseract.image_to_string(prepared, lang=language or "eng", config="--psm 6")
+        for variant in variants:
+            for config in configs:
+                text = pytesseract.image_to_string(
+                    variant, lang=language or "eng", config=f"{config} -c tessedit_char_whitelist=0123456789.,"
+                )
+                texts.append(text)
+                normalized = text.translate(_DIGIT_TRANSLATION)
+                found.extend(match.replace(",", ".") for match in _NUMBER_RE.findall(normalized)
+                             if len(match.replace(".", "")) >= 3)
     except (OSError, RuntimeError):
         return "", None, 0.0, ["OCR_ENGINE_UNAVAILABLE"]
-    normalized = text.translate(_DIGIT_TRANSLATION)
-    candidates = [match.replace(",", ".") for match in _NUMBER_RE.findall(normalized)]
-    candidates = [candidate for candidate in candidates if len(candidate.replace(".", "")) >= 3]
-    if len(candidates) == 1:
-        return text, candidates[0], 0.65, []
-    if not candidates:
-        return text, None, 0.0, ["NO_READING_DETECTED"]
-    return text, None, 0.25, ["MULTIPLE_NUMERIC_CANDIDATES"]
+    if not found:
+        return "\n".join(texts), None, 0.0, ["NO_READING_DETECTED"]
+    counts = {}
+    for value in found:
+        counts[value] = counts.get(value, 0) + 1
+    candidate, votes = max(counts.items(), key=lambda item: item[1])
+    agreement = votes / max(1, len(found))
+    if agreement >= 0.5:
+        return "\n".join(texts), candidate, round(min(0.92, 0.45 + agreement * 0.45), 4), []
+    return "\n".join(texts), None, 0.2, ["OCR_CANDIDATES_DISAGREE"]
 
 
 def analyze(request: InferenceRequest) -> InferenceResponse:
     try:
-        image, source_size, low_resolution = _prepare_image(_decode_image(request.image_base64))
+        image, source_size, low_resolution, crop_applied = _prepare_image(
+            _decode_image(request.image_base64), request.display_bbox
+        )
     except ValueError as error:
         raise ValueError(str(error)) from error
     quality = _quality(image, source_size, low_resolution)
-    raw_text, candidate, confidence, flags = _ocr(image, request.language_hint)
+    if crop_applied:
+        candidate, confidence, flags = recognize_seven_segment(image, request.expected_digits)
+        raw_text = candidate or ""
+        if candidate:
+            flags.append("SPECIALIZED_SEVEN_SEGMENT_OCR")
+    else:
+        raw_text, candidate, confidence, flags = "", None, 0.0, ["DISPLAY_CROP_REQUIRED"]
+    if not crop_applied:
+        flags.append("DISPLAY_CROP_REQUIRED")
     if quality.state == "poor":
         flags.append("LOW_IMAGE_QUALITY")
     decision = run_validation_gates(image, quality.score, confidence, flags)
