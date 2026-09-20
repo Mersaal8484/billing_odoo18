@@ -15,4 +15,5 @@ processed/images/*
 *.pth
 *.parquet
 *.csv
+reports/datameter-*.json
 !.gitkeep

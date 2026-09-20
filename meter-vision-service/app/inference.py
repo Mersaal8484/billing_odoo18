@@ -3,6 +3,7 @@ import binascii
 import io
 import os
 import re
+from pathlib import Path
 from typing import Optional
 
 from PIL import Image, ImageEnhance, ImageOps
@@ -67,6 +68,13 @@ def _ocr(image: Image.Image, language: str) -> tuple[str, Optional[str], float, 
         import pytesseract
     except ImportError:
         return "", None, 0.0, ["OCR_ENGINE_UNAVAILABLE"]
+
+    if os.name == "nt" and not os.environ.get("TESSERACT_CMD"):
+        default_path = Path(r"C:\Program Files\Tesseract-OCR\tesseract.exe")
+        if default_path.exists():
+            pytesseract.pytesseract.tesseract_cmd = str(default_path)
+    elif os.environ.get("TESSERACT_CMD"):
+        pytesseract.pytesseract.tesseract_cmd = os.environ["TESSERACT_CMD"]
 
     prepared = ImageEnhance.Contrast(ImageOps.grayscale(image)).enhance(1.5)
     try:

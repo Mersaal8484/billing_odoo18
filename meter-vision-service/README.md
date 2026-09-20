@@ -12,6 +12,12 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 اختبار الصحة: `GET /healthz`
 
+تشغيل فحص دفعي على مجلد صور دون نقل الصور:
+
+```text
+python run_batch.py D:\datameter ..\meter-vision-data\reports\datameter-baseline.json
+```
+
 التحليل: `POST /v1/inference` مع `request_id` و`image_base64`. عند ضبط
 `METER_VISION_API_TOKEN` يجب إرسال `Authorization: Bearer ...`.
 
