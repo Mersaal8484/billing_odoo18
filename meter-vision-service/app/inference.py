@@ -14,6 +14,7 @@ from .pipeline import run_validation_gates
 from .image_enhancement import correct_display_perspective, prepare_for_vision, professional_display_preprocess
 from .roller_ocr import recognize as recognize_roller
 from .seven_segment_ocr import recognize as recognize_seven_segment
+from .display_detector import auto_detect_display
 
 MODEL_NAME = os.getenv("METER_VISION_MODEL", "baseline-ocr")
 MODEL_VERSION = os.getenv("METER_VISION_MODEL_VERSION", "0.1.0")
@@ -70,6 +71,18 @@ def _prepare_image(raw: bytes, display_bbox: Optional[DisplayBBox], display_quad
         image = image.crop((left, top, right, bottom))
         crop_applied = True
         preprocessing.append("DISPLAY_CROPPED")
+    # --- Auto-detection: attempt to locate the display when no crop was given ---
+    if not crop_applied and not display_quad:
+        detected = auto_detect_display(image)
+        if detected:
+            left = detected["x"]
+            top = detected["y"]
+            right = min(image.width, left + detected["w"])
+            bottom = min(image.height, top + detected["h"])
+            if right > left and bottom > top:
+                image = image.crop((left, top, right, bottom))
+                crop_applied = True
+                preprocessing.append("AUTO_DISPLAY_DETECTED")
     # Preserve the confirmed crop for mechanical roller OCR.  It is sometimes
     # more faithful than a thresholded or skew-corrected representation.
     original_display = image.copy()
@@ -127,21 +140,25 @@ def _ocr(image: Image.Image, language: str) -> tuple[str, Optional[str], float, 
     prepared = ImageEnhance.Contrast(gray).enhance(1.8)
     variants = [
         prepared,
-        prepared.point(lambda value: 255 if value > 145 else 0),
+        prepared.point(lambda value: 255 if value > 130 else 0),
+        prepared.point(lambda value: 255 if value > 160 else 0),
         prepared.point(lambda value: 255 if value > 185 else 0),
     ]
-    configs = ("--psm 7", "--psm 8", "--psm 13")
+    # PSM 6 (uniform block) added — works well for large segmented LCD digits
+    # OEM 3 requests the best available LSTM+Legacy engine
+    configs = ("--oem 3 --psm 6", "--oem 3 --psm 7", "--oem 3 --psm 8", "--oem 3 --psm 13")
     texts: list[str] = []
     found: list[str] = []
     try:
         for variant in variants:
             for config in configs:
                 text = pytesseract.image_to_string(
-                    variant, lang=language or "eng", config=f"{config} -c tessedit_char_whitelist=0123456789.,"
+                    variant, lang=language or "eng",
+                    config=f"{config} -c tessedit_char_whitelist=0123456789"
                 )
                 texts.append(text)
                 normalized = text.translate(_DIGIT_TRANSLATION)
-                found.extend(match.replace(",", ".") for match in _NUMBER_RE.findall(normalized)
+                found.extend(match for match in _NUMBER_RE.findall(normalized)
                              if len(match.replace(".", "")) >= 3)
     except (OSError, RuntimeError):
         return "", None, 0.0, ["OCR_ENGINE_UNAVAILABLE"]
@@ -152,7 +169,7 @@ def _ocr(image: Image.Image, language: str) -> tuple[str, Optional[str], float, 
         counts[value] = counts.get(value, 0) + 1
     candidate, votes = max(counts.items(), key=lambda item: item[1])
     agreement = votes / max(1, len(found))
-    if agreement >= 0.5:
+    if agreement >= 0.4:
         return "\n".join(texts), candidate, round(min(0.92, 0.45 + agreement * 0.45), 4), []
     return "\n".join(texts), None, 0.2, ["OCR_CANDIDATES_DISAGREE"]
 

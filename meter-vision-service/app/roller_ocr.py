@@ -32,9 +32,10 @@ def _direct_display_candidates(image: Image.Image, expected_digits: Optional[int
     sources: dict[str, set[int]] = {}
     for index, variant in enumerate(variants):
         scaled = variant.resize((variant.width * 4, variant.height * 4), Image.Resampling.LANCZOS)
-        for psm in (8, 13):
+        for psm in (6, 8, 13):
             text = pytesseract.image_to_string(
-                scaled, lang="eng", config=f"--psm {psm} -c tessedit_char_whitelist=0123456789"
+                scaled, lang="eng",
+                config=f"--oem 3 --psm {psm} -c tessedit_char_whitelist=0123456789"
             ).translate(_DIGIT_TRANSLATION)
             for candidate in _DIGITS.findall(text):
                 if not expected_digits or len(candidate) == expected_digits:
@@ -72,11 +73,11 @@ def recognize(image: Image.Image, expected_digits: Optional[int] = None,
                     confidence = min(0.92, 0.60 + votes / max(1, sum(direct.values())) * 0.32)
                     return candidate, round(confidence, 4), segmentation_flags + direct_flags + ["RAW_DISPLAY_OCR_ENSEMBLE"]
         for variant in build_ocr_variants(image):
-            for psm in (7, 8, 13):
+            for psm in (6, 7, 8, 13):
                 text = pytesseract.image_to_string(
                     variant,
                     lang="eng",
-                    config=f"--psm {psm} -c tessedit_char_whitelist=0123456789",
+                    config=f"--oem 3 --psm {psm} -c tessedit_char_whitelist=0123456789",
                 ).translate(_DIGIT_TRANSLATION)
                 for candidate in _DIGITS.findall(text):
                     if expected_digits and len(candidate) != expected_digits:

@@ -10,6 +10,8 @@ from typing import Optional
 
 from PIL import Image, ImageOps
 
+from .image_enhancement import extract_main_reading_row
+
 
 SEGMENTS = {
     "0": "ab cdef".replace(" ", ""), "1": "bc", "2": "abdeg",
@@ -86,8 +88,8 @@ def _classify(active: set[str]) -> tuple[Optional[str], float]:
     return (digit, round(1.0 - distance / 7.0, 4)) if distance <= 2 else (None, 0.0)
 
 
-def recognize(image: Image.Image, expected_digits: Optional[int] = None) -> tuple[Optional[str], float, list[str]]:
-    """Recognize a cropped seven-segment display, returning value/confidence/flags."""
+def _recognize_one(image: Image.Image, expected_digits: Optional[int]) -> list:
+    """Run the segment pattern loop on a single image, returning candidates list."""
     candidates = []
     for invert in (False, True):
         binary = _active_pixels(image, invert)
@@ -124,12 +126,39 @@ def recognize(image: Image.Image, expected_digits: Optional[int] = None) -> tupl
                 confidences.append(confidence)
             if len(value) == count:
                 candidates.append((sum(confidences) / count, "".join(value), invert, count))
+    return candidates
+
+
+def recognize(image: Image.Image, expected_digits: Optional[int] = None) -> tuple[Optional[str], float, list[str]]:
+    """Recognize a cropped seven-segment display, returning value/confidence/flags.
+
+    For dual-row displays (Holley DTSY541, ISKRA) the function first attempts
+    to isolate and read the main kWh register row.  If that yields a confident
+    result it is returned immediately.  Otherwise the full crop is tried.
+    """
+    extra_flags: list[str] = []
+
+    # --- Pass 1: isolated main reading row (handles dual-row LCD) ---
+    row_image, row_split = extract_main_reading_row(image)
+    if row_split:
+        row_candidates = _recognize_one(row_image, expected_digits)
+        if row_candidates:
+            row_candidates.sort(reverse=True)
+            best = row_candidates[0]
+            same_value = [item for item in row_candidates if item[1] == best[1]]
+            confidence = min(0.96, best[0] * (1.0 if len(same_value) > 1 else 0.85))
+            if confidence >= 0.66:
+                return best[1], round(confidence, 4), ["DUAL_ROW_SPLIT_APPLIED"]
+
+    # --- Pass 2: full crop ---
+    candidates = _recognize_one(image, expected_digits)
     if not candidates:
-        return None, 0.0, ["SEVEN_SEGMENT_PATTERN_NOT_FOUND"]
+        return None, 0.0, extra_flags + ["SEVEN_SEGMENT_PATTERN_NOT_FOUND"]
     candidates.sort(reverse=True)
     best = candidates[0]
     same_value = [item for item in candidates if item[1] == best[1]]
     confidence = min(0.96, best[0] * (1.0 if len(same_value) > 1 else 0.85))
-    if confidence < 0.72:
-        return None, round(confidence, 4), ["SEVEN_SEGMENT_LOW_CONFIDENCE"]
-    return best[1], round(confidence, 4), []
+    # Threshold lowered from 0.72 → 0.66 for large LCD digit formats
+    if confidence < 0.66:
+        return None, round(confidence, 4), extra_flags + ["SEVEN_SEGMENT_LOW_CONFIDENCE"]
+    return best[1], round(confidence, 4), extra_flags

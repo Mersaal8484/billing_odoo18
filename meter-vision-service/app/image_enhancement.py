@@ -60,7 +60,84 @@ def prepare_for_vision(image: Image.Image) -> tuple[Image.Image, tuple[int, int]
     return image, original_size, low_resolution
 
 
+def extract_main_reading_row(image: Image.Image) -> tuple[Image.Image, bool]:
+    """Isolate the dominant digit row from a dual-row LCD display.
+
+    Holley DTSY541, ISKRA, and similar meters show a small status row above
+    the large kWh register.  Reading both rows as one strip causes OCR to mix
+    digits from different contexts.
+
+    Strategy:
+    1. Project the binarised display onto the Y axis (row sums).
+    2. Find the valley between the two text rows.
+    3. Return the taller half (the main reading row) enlarged 2×.
+    4. If no clear valley is found, return the original (unchanged).
+    """
+    try:
+        import cv2
+        import numpy as np
+    except ImportError:
+        return image, False
+
+    gray = np.asarray(image.convert("L"))
+    height, width = gray.shape
+
+    # Need a minimum height to attempt splitting (at least 60px)
+    if height < 60 or width < 40:
+        return image, False
+
+    # Binarise: dark glyphs on bright LCD background → invert
+    blurred = cv2.GaussianBlur(gray, (3, 3), 0)
+    _, binary = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+    # Row projection (sum of dark pixels per row)
+    row_sums = binary.sum(axis=1).astype(np.float32)
+
+    # Smooth the projection to suppress noise between individual digit segments
+    smoothed = np.convolve(row_sums, np.ones(max(3, height // 20)) / max(3, height // 20),
+                           mode="same")
+
+    # Look for a local minimum (valley) in the central 40-70% vertical band
+    band_top = int(height * 0.30)
+    band_bot = int(height * 0.75)
+    band = smoothed[band_top:band_bot]
+    if len(band) < 4:
+        return image, False
+
+    valley_idx = int(np.argmin(band)) + band_top
+
+    # The valley must be significantly lower than peaks on both sides
+    top_peak = float(smoothed[:valley_idx].max()) if valley_idx > 0 else 0
+    bot_peak = float(smoothed[valley_idx:].max()) if valley_idx < height else 0
+    valley_val = float(smoothed[valley_idx])
+
+    if top_peak == 0 or bot_peak == 0:
+        return image, False
+
+    depth_top = (top_peak - valley_val) / max(1, top_peak)
+    depth_bot = (bot_peak - valley_val) / max(1, bot_peak)
+
+    # Require a meaningful dip on both sides (at least 25% drop)
+    if depth_top < 0.25 or depth_bot < 0.25:
+        return image, False
+
+    # Identify which half is taller (the main kWh reading)
+    top_half_height = valley_idx
+    bot_half_height = height - valley_idx
+
+    if bot_half_height >= top_half_height:
+        row_image = image.crop((0, valley_idx, width, height))
+    else:
+        row_image = image.crop((0, 0, width, valley_idx))
+
+    # Upscale the extracted row 2× for better OCR accuracy
+    scaled = row_image.resize((row_image.width * 2, row_image.height * 2),
+                              Image.Resampling.LANCZOS)
+    return scaled, True
+
+
 def correct_display_perspective(image: Image.Image, quad: list[int]) -> Image.Image:
+
     """Rectify a display from four source points: TL, TR, BR, BL.
 
     The annotation tool stores points in original-image pixel coordinates. PIL's
