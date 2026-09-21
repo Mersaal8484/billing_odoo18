@@ -15,6 +15,9 @@ class InferenceRequest(BaseModel):
     # Optional four corners in original-image coordinates: TL, TR, BR, BL.
     display_quad: Optional[list[int]] = Field(default=None, min_length=8, max_length=8)
     expected_digits: Optional[int] = Field(default=None, ge=4, le=12)
+    # Register scale belongs to the meter configuration.  A mechanical display
+    # may show six digits while the final digit represents tenths of kWh.
+    decimal_places: Optional[int] = Field(default=None, ge=0, le=3)
 
 
 class DisplayBBox(BaseModel):

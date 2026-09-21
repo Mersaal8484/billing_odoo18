@@ -119,3 +119,50 @@ def build_ocr_variants(image: Image.Image) -> list[Image.Image]:
     except ImportError:
         pass
     return variants
+
+
+def roller_register_variants(image: Image.Image) -> tuple[list[Image.Image], list[str]]:
+    """Return the original display and a tightly localized roller register.
+
+    The annotated display may contain units, separators, or a wide bright
+    margin.  Mechanical wheels typically form one dark, horizontally elongated
+    band.  Localizing that band gives OCR a second, independent image without
+    destroying the original crop when the detector is uncertain.
+    """
+    variants = [image]
+    try:
+        import cv2
+        import numpy as np
+    except ImportError:
+        return variants, ["ROLLER_WINDOW_LOCALIZATION_UNAVAILABLE"]
+
+    gray = np.asarray(image.convert("L"))
+    height, width = gray.shape
+    if width < 40 or height < 24:
+        return variants, ["ROLLER_WINDOW_TOO_SMALL"]
+    smooth = cv2.bilateralFilter(gray, 5, 35, 35)
+    _, dark = cv2.threshold(smooth, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (max(5, width // 18), max(2, height // 18)))
+    joined = cv2.morphologyEx(dark, cv2.MORPH_CLOSE, kernel)
+    result = cv2.findContours(joined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours = result[0] if len(result) == 2 else result[1]
+    candidates = []
+    for contour in contours:
+        x, y, candidate_width, candidate_height = cv2.boundingRect(contour)
+        if candidate_width < width * 0.38 or candidate_height < height * 0.20:
+            continue
+        if candidate_height > height * 0.92:
+            continue
+        density = float(dark[y:y + candidate_height, x:x + candidate_width].mean()) / 255.0
+        score = candidate_width * candidate_height * (0.6 + density)
+        candidates.append((score, x, y, candidate_width, candidate_height))
+    if not candidates:
+        return variants, ["ROLLER_WINDOW_NOT_LOCALIZED"]
+    _, x, y, candidate_width, candidate_height = max(candidates)
+    pad_x, pad_y = max(2, width // 80), max(2, height // 12)
+    left, top = max(0, x - pad_x), max(0, y - pad_y)
+    right, bottom = min(width, x + candidate_width + pad_x), min(height, y + candidate_height + pad_y)
+    if right - left < width * 0.35:
+        return variants, ["ROLLER_WINDOW_NOT_LOCALIZED"]
+    variants.append(image.crop((left, top, right, bottom)))
+    return variants, ["ROLLER_WINDOW_LOCALIZED"]

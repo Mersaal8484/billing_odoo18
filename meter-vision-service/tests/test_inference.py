@@ -4,13 +4,18 @@ from io import BytesIO
 
 from PIL import Image
 
-from app.inference import analyze
+from app.inference import _apply_decimal_places, analyze
 from app.schemas import DisplayBBox, InferenceRequest
 from app.seven_segment_ocr import _classify
 from app.digit_segmentation import segment_digits
 
 
 class TestInference(unittest.TestCase):
+    def test_decimal_places_formats_a_known_register_scale(self):
+        self.assertEqual(_apply_decimal_places("281839", 1), "28183.9")
+        self.assertEqual(_apply_decimal_places("25509", 0), "25509")
+        self.assertIsNone(_apply_decimal_places(None, 1))
+
     def test_specialized_ocr_digit_patterns_are_explicit(self):
         for expected, pattern in (("5", "acdfg"), ("9", "abcdfg"), ("0", "abcdef")):
             value, confidence = _classify(set(pattern))

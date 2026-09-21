@@ -47,7 +47,7 @@ def _load_image(raw: bytes) -> Image.Image:
     return image
 
 
-def _prepare_image(raw: bytes, display_bbox: Optional[DisplayBBox], display_quad: Optional[list[int]]) -> tuple[Image.Image, tuple[int, int], bool, bool, list[str]]:
+def _prepare_image(raw: bytes, display_bbox: Optional[DisplayBBox], display_quad: Optional[list[int]]) -> tuple[Image.Image, Image.Image, tuple[int, int], bool, bool, list[str]]:
     if display_bbox and display_quad:
         raise ValueError("send either display_bbox or display_quad, not both")
     image = _load_image(raw)
@@ -70,11 +70,22 @@ def _prepare_image(raw: bytes, display_bbox: Optional[DisplayBBox], display_quad
         image = image.crop((left, top, right, bottom))
         crop_applied = True
         preprocessing.append("DISPLAY_CROPPED")
+    # Preserve the confirmed crop for mechanical roller OCR.  It is sometimes
+    # more faithful than a thresholded or skew-corrected representation.
+    original_display = image.copy()
     image, display_steps = professional_display_preprocess(image)
     prepared, _, low_resolution = prepare_for_vision(image)
     preprocessing.extend(display_steps)
     preprocessing.append("CONTRAST_SHARPEN_DENOISE")
-    return prepared, source_size, low_resolution, crop_applied, preprocessing
+    return prepared, original_display, source_size, low_resolution, crop_applied, preprocessing
+
+
+def _apply_decimal_places(candidate: Optional[str], decimal_places: Optional[int]) -> Optional[str]:
+    if not candidate or decimal_places is None or decimal_places == 0:
+        return candidate
+    if len(candidate) <= decimal_places:
+        return candidate
+    return f"{candidate[:-decimal_places]}.{candidate[-decimal_places:]}"
 
 
 def _quality(image: Image.Image, source_size: tuple[int, int], low_resolution: bool) -> QualityResult:
@@ -148,7 +159,7 @@ def _ocr(image: Image.Image, language: str) -> tuple[str, Optional[str], float, 
 
 def analyze(request: InferenceRequest) -> InferenceResponse:
     try:
-        image, source_size, low_resolution, crop_applied, preprocessing = _prepare_image(
+        image, original_display, source_size, low_resolution, crop_applied, preprocessing = _prepare_image(
             _decode_image(request.image_base64), request.display_bbox, request.display_quad
         )
     except ValueError as error:
@@ -166,7 +177,7 @@ def analyze(request: InferenceRequest) -> InferenceResponse:
             candidate, confidence, flags = recognize_experimental_digit_cnn(image, request.expected_digits)
             preprocessing.append("EXPERIMENTAL_DIGIT_CNN_GRID_INPUT")
         elif request.meter_type_hint in {"mechanical_roller", "mechanical_round"}:
-            candidate, confidence, flags = recognize_roller(image, request.expected_digits)
+            candidate, confidence, flags = recognize_roller(image, request.expected_digits, original_display)
         else:
             candidate, confidence, flags = recognize_seven_segment(image, request.expected_digits)
         raw_text = candidate or ""
@@ -178,6 +189,7 @@ def analyze(request: InferenceRequest) -> InferenceResponse:
                 )
     else:
         raw_text, candidate, confidence, flags = "", None, 0.0, ["DISPLAY_CROP_REQUIRED"]
+    candidate = _apply_decimal_places(candidate, request.decimal_places)
     if not crop_applied:
         flags.append("DISPLAY_CROP_REQUIRED")
     if quality.state == "poor":

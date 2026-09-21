@@ -27,12 +27,14 @@ def main():
         if not source.exists():
             continue
         reading = item["reading"]
+        decimal_places = len(reading.split(".", 1)[1]) if "." in reading else 0
         result = analyze(InferenceRequest(
             request_id=item["image_id"],
             image_base64=base64.b64encode(source.read_bytes()).decode("ascii"),
             display_bbox=DisplayBBox(**item["display_bbox"]),
             meter_type_hint=item.get("meter_family"),
             expected_digits=len(reading.replace(".", "")),
+            decimal_places=decimal_places,
         ))
         predicted = result.reading.value
         rows.append({"image_id": item["image_id"], "expected": reading, "predicted": predicted,

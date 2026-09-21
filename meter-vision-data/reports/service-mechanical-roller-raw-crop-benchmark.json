@@ -1,0 +1,476 @@
+{
+  "records": 28,
+  "exact": 6,
+  "exact_accuracy": 0.21428571428571427,
+  "results": [
+    {
+      "image_id": "datameter/account.analytic.meter(129).jpg",
+      "expected": "123846",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "NO_READING_DETECTED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (31).jpg",
+      "expected": "00205.8",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "NO_READING_DETECTED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (32).jpg",
+      "expected": "001577",
+      "predicted": "601577",
+      "confidence": 0.92,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "RAW_DISPLAY_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (33).jpg",
+      "expected": "000641",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "NO_READING_DETECTED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (47).jpg",
+      "expected": "06867",
+      "predicted": "06867",
+      "confidence": 0.92,
+      "exact": true,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "RAW_DISPLAY_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (48).jpg",
+      "expected": "19924.8",
+      "predicted": null,
+      "confidence": 0.66,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (50).jpg",
+      "expected": "13536",
+      "predicted": "13556",
+      "confidence": 0.92,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "RAW_DISPLAY_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (55).jpg",
+      "expected": "000487",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "NO_READING_DETECTED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (56).jpg",
+      "expected": "002522",
+      "predicted": "067577",
+      "confidence": 0.708,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "ROLLER_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (57).jpg",
+      "expected": "001101",
+      "predicted": "001101",
+      "confidence": 0.92,
+      "exact": true,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "RAW_DISPLAY_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (58).jpg",
+      "expected": "28456.8",
+      "predicted": "26156.8",
+      "confidence": 0.92,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "RAW_DISPLAY_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (59).jpg",
+      "expected": "05160.4",
+      "predicted": "51604.5",
+      "confidence": 0.74,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "ROLLER_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (60).jpg",
+      "expected": "05233.0",
+      "predicted": "52347.0",
+      "confidence": 0.9,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOURS_SEGMENTED",
+        "ROLLER_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (61).jpg",
+      "expected": "28183.9",
+      "predicted": "28183.9",
+      "confidence": 0.92,
+      "exact": true,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "RAW_DISPLAY_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (62).jpg",
+      "expected": "10706.4",
+      "predicted": null,
+      "confidence": 0.54,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (63).jpg",
+      "expected": "26304.3",
+      "predicted": "26304.3",
+      "confidence": 0.92,
+      "exact": true,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "RAW_DISPLAY_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (64).jpg",
+      "expected": "007421",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "NO_READING_DETECTED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (65).jpg",
+      "expected": "14436.5",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "NO_READING_DETECTED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (66).jpg",
+      "expected": "25509",
+      "predicted": "25509",
+      "confidence": 0.92,
+      "exact": true,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "RAW_DISPLAY_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (68).jpg",
+      "expected": "00265",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "NO_READING_DETECTED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (70).jpg",
+      "expected": "006233",
+      "predicted": "906255",
+      "confidence": 0.74,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "ROLLER_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (79).jpg",
+      "expected": "000160",
+      "predicted": null,
+      "confidence": 0.6,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "QUALITY_BELOW_AUTO_THRESHOLD",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (80).jpg",
+      "expected": "000231",
+      "predicted": "000235",
+      "confidence": 0.9,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "ROLLER_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "QUALITY_BELOW_AUTO_THRESHOLD",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (81).jpg",
+      "expected": "000243",
+      "predicted": "000242",
+      "confidence": 0.92,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "RAW_DISPLAY_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (82).jpg",
+      "expected": "000145",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "NO_READING_DETECTED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (83).jpg",
+      "expected": "000278",
+      "predicted": "000278",
+      "confidence": 0.92,
+      "exact": true,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "RAW_DISPLAY_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (84).jpg",
+      "expected": "000391",
+      "predicted": "100039",
+      "confidence": 0.92,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "RAW_DISPLAY_OCR_ENSEMBLE",
+        "SPECIALIZED_ROLLER_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    },
+    {
+      "image_id": "datameter/image (85).jpg",
+      "expected": "000067",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false,
+      "flags": [
+        "DIGIT_CONTOUR_COUNT_MISMATCH",
+        "NO_READING_DETECTED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ]
+    }
+  ]
+}
