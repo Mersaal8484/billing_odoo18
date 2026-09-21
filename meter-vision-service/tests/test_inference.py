@@ -1,6 +1,7 @@
 import base64
 import unittest
 from io import BytesIO
+from unittest.mock import patch
 
 from PIL import Image
 
@@ -71,6 +72,19 @@ class TestInference(unittest.TestCase):
             image_base64=base64.b64encode(output.getvalue()).decode("ascii"),
         ))
         self.assertIn("DISPLAY_CROP_REQUIRED", result.flags)
+        self.assertFalse(result.auto_approval_eligible)
+
+    @patch("app.inference.auto_detect_display", return_value={"x": 100, "y": 120, "w": 500, "h": 160})
+    def test_auto_detected_display_is_explicit_and_not_low_source_resolution(self, _detector):
+        output = BytesIO()
+        Image.new("RGB", (900, 700), (100, 100, 100)).save(output, format="PNG")
+        result = analyze(InferenceRequest(
+            request_id="MVR/auto-crop",
+            image_base64=base64.b64encode(output.getvalue()).decode("ascii"),
+        ))
+        self.assertIn("AUTO_DISPLAY_DETECTED", result.flags)
+        self.assertNotIn("DISPLAY_CROP_REQUIRED", result.flags)
+        self.assertFalse(result.quality.low_resolution)
         self.assertFalse(result.auto_approval_eligible)
 
     def test_display_crop_is_accepted_in_original_image_coordinates(self):

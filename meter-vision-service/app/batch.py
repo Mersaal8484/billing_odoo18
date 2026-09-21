@@ -4,13 +4,16 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from PIL import Image
+
 from .inference import analyze
 from .schemas import InferenceRequest
 
 
 def run_directory(input_dir: Path, output_file: Path,
                   meter_type_hint: str = "digital_lcd",
-                  sample: int = 0) -> dict:
+                  sample: int = 0,
+                  include_thumbnails: bool = False) -> dict:
     """Analyze all images in input_dir and write a JSON report.
 
     Parameters
@@ -25,10 +28,23 @@ def run_directory(input_dir: Path, output_file: Path,
     sample : int
         If > 0, process only the first *sample* images (useful for quick tests).
     """
-    files = sorted(
+    all_files = sorted(
         path for path in input_dir.rglob("*")
         if path.is_file() and path.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"}
     )
+    files = []
+    skipped_thumbnails = 0
+    for path in all_files:
+        try:
+            with Image.open(path) as image:
+                is_thumbnail = min(image.size) < 600
+        except (OSError, ValueError):
+            # Let inference record the error consistently for a corrupt image.
+            is_thumbnail = False
+        if is_thumbnail and not include_thumbnails:
+            skipped_thumbnails += 1
+            continue
+        files.append(path)
     if sample > 0:
         files = files[:sample]
 
@@ -43,7 +59,7 @@ def run_directory(input_dir: Path, output_file: Path,
             reading_dict = result.reading.model_dump() if hasattr(result.reading, "model_dump") else result.reading.dict()
             quality_dict = result.quality.model_dump() if hasattr(result.quality, "model_dump") else result.quality.dict()
             # Extract detected bbox from preprocessing flags if auto-detection fired
-            auto_detected = "AUTO_DISPLAY_DETECTED" in result.preprocessing
+            auto_detected = "AUTO_DISPLAY_DETECTED" in result.flags
             rows.append({
                 "image": path.name,
                 "state": result.state,
@@ -69,6 +85,9 @@ def run_directory(input_dir: Path, output_file: Path,
         "input_directory": str(input_dir),
         "meter_type_hint": meter_type_hint,
         "image_count": total,
+        "source_image_count": len(all_files),
+        "skipped_thumbnail_count": skipped_thumbnails,
+        "include_thumbnails": include_thumbnails,
         "auto_detect_success": detected,
         "auto_detect_rate": round(detected / max(1, total), 4),
         "reading_found": reading_found,
@@ -89,10 +108,13 @@ def main():
                         help="digital_lcd (default) | mechanical_roller | mechanical_round")
     parser.add_argument("--sample", type=int, default=0,
                         help="Process only the first N images (0 = all)")
+    parser.add_argument("--include-thumbnails", action="store_true",
+                        help="Also process source images smaller than 600px (review-only)")
     args = parser.parse_args()
     report = run_directory(args.input_dir, args.output_file,
                            meter_type_hint=args.meter_type,
-                           sample=args.sample)
+                           sample=args.sample,
+                           include_thumbnails=args.include_thumbnails)
     summary = {
         "image_count": report["image_count"],
         "auto_detect_rate": report["auto_detect_rate"],

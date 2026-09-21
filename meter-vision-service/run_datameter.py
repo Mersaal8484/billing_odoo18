@@ -40,6 +40,10 @@ def main():
         "--sample", type=int, default=0,
         help="Process only the first N images — 0 means all (default: 0)"
     )
+    parser.add_argument(
+        "--include-thumbnails", action="store_true",
+        help="Also process images smaller than 600px; results remain review-only"
+    )
     args = parser.parse_args()
 
     if not args.input.exists():
@@ -55,10 +59,13 @@ def main():
         args.output,
         meter_type_hint=args.meter_type,
         sample=args.sample,
+        include_thumbnails=args.include_thumbnails,
     )
 
     summary = {
         "image_count":            report["image_count"],
+        "source_image_count":     report["source_image_count"],
+        "skipped_thumbnails":     report["skipped_thumbnail_count"],
         "auto_detect_success":    report["auto_detect_success"],
         "auto_detect_rate_%":     f"{report['auto_detect_rate'] * 100:.1f}%",
         "reading_found":          report["reading_found"],

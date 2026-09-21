@@ -11,7 +11,7 @@ from PIL import Image, ImageEnhance, ImageOps
 from .schemas import ConfidenceValue, DisplayBBox, InferenceRequest, InferenceResponse, QualityResult
 from .model_registry import model_status
 from .pipeline import run_validation_gates
-from .image_enhancement import correct_display_perspective, prepare_for_vision, professional_display_preprocess
+from .image_enhancement import MIN_SOURCE_SIDE, correct_display_perspective, prepare_for_vision, professional_display_preprocess
 from .roller_ocr import recognize as recognize_roller
 from .seven_segment_ocr import recognize as recognize_seven_segment
 from .display_detector import auto_detect_display
@@ -87,7 +87,11 @@ def _prepare_image(raw: bytes, display_bbox: Optional[DisplayBBox], display_quad
     # more faithful than a thresholded or skew-corrected representation.
     original_display = image.copy()
     image, display_steps = professional_display_preprocess(image)
-    prepared, _, low_resolution = prepare_for_vision(image)
+    # The source-photo resolution decides whether a capture is a thumbnail.
+    # A valid small *display crop* is intentionally enlarged for OCR but must
+    # not be mislabeled as a low-resolution source photograph.
+    prepared, _, _crop_was_upscaled = prepare_for_vision(image)
+    low_resolution = min(source_size) < MIN_SOURCE_SIDE
     preprocessing.extend(display_steps)
     preprocessing.append("CONTRAST_SHARPEN_DENOISE")
     return prepared, original_display, source_size, low_resolution, crop_applied, preprocessing
@@ -207,6 +211,8 @@ def analyze(request: InferenceRequest) -> InferenceResponse:
     else:
         raw_text, candidate, confidence, flags = "", None, 0.0, ["DISPLAY_CROP_REQUIRED"]
     candidate = _apply_decimal_places(candidate, request.decimal_places)
+    if "AUTO_DISPLAY_DETECTED" in preprocessing:
+        flags.append("AUTO_DISPLAY_DETECTED")
     if not crop_applied:
         flags.append("DISPLAY_CROP_REQUIRED")
     if quality.state == "poor":
