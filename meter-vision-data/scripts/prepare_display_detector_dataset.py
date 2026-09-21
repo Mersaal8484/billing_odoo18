@@ -61,8 +61,14 @@ def main():
             "meter_family": item.get("meter_family", "unknown"), "label_state": item["label_state"],
             "split": split, "source": "local-field-image", "label_quality": item["label_state"],
         })
-    config = "path: .\ntrain: images/train\nval: images/val\ntest: images/test\nnames:\n  0: display\n"
     args.output.mkdir(parents=True, exist_ok=True)
+    # Ultralytics resolves ``path: .`` against the caller's working directory,
+    # not against this YAML file.  Persist the generated dataset's own path so
+    # training is reproducible from any working directory.
+    config = (
+        f"path: {args.output.resolve().as_posix()}\n"
+        "train: images/train\nval: images/val\ntest: images/test\nnames:\n  0: display\n"
+    )
     (args.output / "dataset.yaml").write_text(config, encoding="utf-8")
     manifest = {
         "dataset_id": "meter-display-detector", "version": "v0.1.0",

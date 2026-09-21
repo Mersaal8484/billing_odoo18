@@ -1,0 +1,773 @@
+{
+  "records": 51,
+  "detected": 20,
+  "detection_rate": 0.39215686274509803,
+  "matched_iou_50": 1,
+  "matched_iou_50_rate": 0.0196078431372549,
+  "mean_iou": 0.02917843137254902,
+  "results": [
+    {
+      "image_id": "datameter/account.analytic.meter(129).jpg",
+      "expected": {
+        "x": 476,
+        "y": 256,
+        "w": 657,
+        "h": 121
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(13).jpg",
+      "expected": {
+        "x": 118,
+        "y": 351,
+        "w": 585,
+        "h": 188
+      },
+      "predicted": {
+        "x": 416,
+        "y": 728,
+        "w": 384,
+        "h": 106
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(132).jpg",
+      "expected": {
+        "x": 596,
+        "y": 446,
+        "w": 474,
+        "h": 134
+      },
+      "predicted": {
+        "x": 428,
+        "y": 366,
+        "w": 288,
+        "h": 63
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(14).jpg",
+      "expected": {
+        "x": 148,
+        "y": 335,
+        "w": 524,
+        "h": 130
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(18).jpg",
+      "expected": {
+        "x": 5,
+        "y": 296,
+        "w": 581,
+        "h": 203
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (31).jpg",
+      "expected": {
+        "x": 335,
+        "y": 343,
+        "w": 541,
+        "h": 145
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (32).jpg",
+      "expected": {
+        "x": 117,
+        "y": 446,
+        "w": 433,
+        "h": 128
+      },
+      "predicted": {
+        "x": 6,
+        "y": 700,
+        "w": 592,
+        "h": 100
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (33).jpg",
+      "expected": {
+        "x": 82,
+        "y": 440,
+        "w": 517,
+        "h": 111
+      },
+      "predicted": {
+        "x": 162,
+        "y": 332,
+        "w": 272,
+        "h": 81
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (4).jpg",
+      "expected": {
+        "x": 227,
+        "y": 439,
+        "w": 278,
+        "h": 70
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (46).jpg",
+      "expected": {
+        "x": 211,
+        "y": 299,
+        "w": 311,
+        "h": 84
+      },
+      "predicted": {
+        "x": 150,
+        "y": 70,
+        "w": 325,
+        "h": 122
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (47).jpg",
+      "expected": {
+        "x": 328,
+        "y": 301,
+        "w": 513,
+        "h": 113
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (48).jpg",
+      "expected": {
+        "x": 436,
+        "y": 309,
+        "w": 496,
+        "h": 163
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (49).jpg",
+      "expected": {
+        "x": 282,
+        "y": 413,
+        "w": 601,
+        "h": 151
+      },
+      "predicted": {
+        "x": 361,
+        "y": 151,
+        "w": 168,
+        "h": 44
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (5).jpg",
+      "expected": {
+        "x": 445,
+        "y": 122,
+        "w": 363,
+        "h": 93
+      },
+      "predicted": {
+        "x": 190,
+        "y": 507,
+        "w": 253,
+        "h": 117
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (50).jpg",
+      "expected": {
+        "x": 394,
+        "y": 388,
+        "w": 581,
+        "h": 176
+      },
+      "predicted": {
+        "x": 201,
+        "y": 440,
+        "w": 297,
+        "h": 101
+      },
+      "iou": 0.0863,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (51).jpg",
+      "expected": {
+        "x": 676,
+        "y": 808,
+        "w": 551,
+        "h": 131
+      },
+      "predicted": {
+        "x": 424,
+        "y": 498,
+        "w": 1288,
+        "h": 305
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (53).jpg",
+      "expected": {
+        "x": 231,
+        "y": 389,
+        "w": 616,
+        "h": 160
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (54).jpg",
+      "expected": {
+        "x": 718,
+        "y": 555,
+        "w": 600,
+        "h": 129
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (55).jpg",
+      "expected": {
+        "x": 216,
+        "y": 411,
+        "w": 544,
+        "h": 152
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (56).jpg",
+      "expected": {
+        "x": 334,
+        "y": 377,
+        "w": 468,
+        "h": 94
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (57).jpg",
+      "expected": {
+        "x": 504,
+        "y": 378,
+        "w": 429,
+        "h": 113
+      },
+      "predicted": {
+        "x": 299,
+        "y": 68,
+        "w": 615,
+        "h": 122
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (58).jpg",
+      "expected": {
+        "x": 315,
+        "y": 312,
+        "w": 386,
+        "h": 123
+      },
+      "predicted": {
+        "x": 469,
+        "y": 458,
+        "w": 103,
+        "h": 45
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (59).jpg",
+      "expected": {
+        "x": 314,
+        "y": 310,
+        "w": 410,
+        "h": 90
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (60).jpg",
+      "expected": {
+        "x": 469,
+        "y": 467,
+        "w": 433,
+        "h": 93
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (61).jpg",
+      "expected": {
+        "x": 438,
+        "y": 305,
+        "w": 518,
+        "h": 137
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (62).jpg",
+      "expected": {
+        "x": 478,
+        "y": 266,
+        "w": 420,
+        "h": 106
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (63).jpg",
+      "expected": {
+        "x": 364,
+        "y": 310,
+        "w": 534,
+        "h": 128
+      },
+      "predicted": {
+        "x": 816,
+        "y": 325,
+        "w": 246,
+        "h": 105
+      },
+      "iou": 0.1006,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (64).jpg",
+      "expected": {
+        "x": 533,
+        "y": 716,
+        "w": 819,
+        "h": 194
+      },
+      "predicted": {
+        "x": 902,
+        "y": 769,
+        "w": 560,
+        "h": 202
+      },
+      "iou": 0.3042,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (65).jpg",
+      "expected": {
+        "x": 364,
+        "y": 287,
+        "w": 413,
+        "h": 119
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (66).jpg",
+      "expected": {
+        "x": 343,
+        "y": 329,
+        "w": 595,
+        "h": 120
+      },
+      "predicted": {
+        "x": 803,
+        "y": 164,
+        "w": 162,
+        "h": 57
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (67).jpg",
+      "expected": {
+        "x": 689,
+        "y": 426,
+        "w": 295,
+        "h": 127
+      },
+      "predicted": {
+        "x": 586,
+        "y": 639,
+        "w": 473,
+        "h": 125
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (68).jpg",
+      "expected": {
+        "x": 399,
+        "y": 397,
+        "w": 421,
+        "h": 128
+      },
+      "predicted": {
+        "x": 363,
+        "y": 266,
+        "w": 653,
+        "h": 114
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (69).jpg",
+      "expected": {
+        "x": 408,
+        "y": 220,
+        "w": 230,
+        "h": 53
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (7).jpg",
+      "expected": {
+        "x": 119,
+        "y": 312,
+        "w": 468,
+        "h": 110
+      },
+      "predicted": {
+        "x": 99,
+        "y": 235,
+        "w": 621,
+        "h": 209
+      },
+      "iou": 0.3966,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (70).jpg",
+      "expected": {
+        "x": 424,
+        "y": 392,
+        "w": 476,
+        "h": 128
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (71).jpg",
+      "expected": {
+        "x": 356,
+        "y": 245,
+        "w": 282,
+        "h": 68
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (72).jpg",
+      "expected": {
+        "x": 484,
+        "y": 246,
+        "w": 270,
+        "h": 68
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (73).jpg",
+      "expected": {
+        "x": 446,
+        "y": 304,
+        "w": 258,
+        "h": 63
+      },
+      "predicted": {
+        "x": 440,
+        "y": 290,
+        "w": 288,
+        "h": 94
+      },
+      "iou": 0.6004,
+      "detected": true,
+      "matched": true
+    },
+    {
+      "image_id": "datameter/image (74).jpg",
+      "expected": {
+        "x": 391,
+        "y": 239,
+        "w": 318,
+        "h": 68
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (75).jpg",
+      "expected": {
+        "x": 431,
+        "y": 210,
+        "w": 293,
+        "h": 60
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (76).jpg",
+      "expected": {
+        "x": 416,
+        "y": 228,
+        "w": 306,
+        "h": 80
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (77).jpg",
+      "expected": {
+        "x": 450,
+        "y": 245,
+        "w": 261,
+        "h": 71
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (78).jpg",
+      "expected": {
+        "x": 471,
+        "y": 337,
+        "w": 312,
+        "h": 91
+      },
+      "predicted": {
+        "x": 322,
+        "y": 95,
+        "w": 462,
+        "h": 134
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (79).jpg",
+      "expected": {
+        "x": 366,
+        "y": 183,
+        "w": 283,
+        "h": 63
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (8).jpg",
+      "expected": {
+        "x": 95,
+        "y": 389,
+        "w": 472,
+        "h": 182
+      },
+      "predicted": {
+        "x": 24,
+        "y": 594,
+        "w": 425,
+        "h": 207
+      },
+      "iou": 0.0,
+      "detected": true,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (80).jpg",
+      "expected": {
+        "x": 385,
+        "y": 292,
+        "w": 243,
+        "h": 54
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (81).jpg",
+      "expected": {
+        "x": 397,
+        "y": 204,
+        "w": 305,
+        "h": 88
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (82).jpg",
+      "expected": {
+        "x": 377,
+        "y": 210,
+        "w": 318,
+        "h": 94
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (83).jpg",
+      "expected": {
+        "x": 321,
+        "y": 232,
+        "w": 292,
+        "h": 80
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (84).jpg",
+      "expected": {
+        "x": 390,
+        "y": 286,
+        "w": 281,
+        "h": 101
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    },
+    {
+      "image_id": "datameter/image (85).jpg",
+      "expected": {
+        "x": 481,
+        "y": 228,
+        "w": 379,
+        "h": 78
+      },
+      "predicted": null,
+      "iou": 0.0,
+      "detected": false,
+      "matched": false
+    }
+  ]
+}

@@ -1,5 +1,9 @@
 # لا تحفظ الصور أو الملفات الحساسة في المستودع.
 raw/*
+!raw/.gitkeep
+!raw/by-meter-type/
+!raw/by-meter-type/**/
+!raw/by-meter-type/**/.gitkeep
 interim/*
 processed/images/*
 *.jpg

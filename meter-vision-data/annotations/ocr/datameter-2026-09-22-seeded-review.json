@@ -1,0 +1,1502 @@
+{
+  "schema_version": "0.3.0",
+  "created_at": "2026-09-21T23:52:51.231041+00:00",
+  "source_manifest": "datameter-2026-09-22-provisional-classification.json",
+  "provisional": true,
+  "images": [
+    {
+      "image_id": "image - 2026-09-22T022454.919.jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022454.919.jpg",
+      "image_size": {
+        "width": 1080,
+        "height": 1080
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 1080,
+        "h": 1080
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "69111",
+      "ocr_confidence": 0.68,
+      "ocr_flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022512.272.jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022512.272.jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 53,
+        "y": 0,
+        "w": 119,
+        "h": 90
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.0,
+      "ocr_flags": [
+        "SEVEN_SEGMENT_PATTERN_NOT_FOUND",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022523.863.jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022523.863.jpg",
+      "image_size": {
+        "width": 1080,
+        "height": 717
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 112,
+        "w": 1080,
+        "h": 605
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "95212",
+      "ocr_confidence": 0.68,
+      "ocr_flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022537.384.jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022537.384.jpg",
+      "image_size": {
+        "width": 775,
+        "height": 1080
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 241,
+        "w": 718,
+        "h": 374
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "8000",
+      "ocr_confidence": 0.7893,
+      "ocr_flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022550.855.jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022550.855.jpg",
+      "image_size": {
+        "width": 1008,
+        "height": 567
+      },
+      "display_bbox": {
+        "x": 97,
+        "y": 137,
+        "w": 554,
+        "h": 235
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.0,
+      "ocr_flags": [
+        "SEVEN_SEGMENT_PATTERN_NOT_FOUND",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022604.063.jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022604.063.jpg",
+      "image_size": {
+        "width": 776,
+        "height": 1080
+      },
+      "display_bbox": {
+        "x": 50,
+        "y": 401,
+        "w": 639,
+        "h": 288
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.0,
+      "ocr_flags": [
+        "SEVEN_SEGMENT_PATTERN_NOT_FOUND",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022901.930.jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022901.930.jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.0,
+      "ocr_flags": [],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022915.938.jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022915.938.jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 13,
+        "y": 60,
+        "w": 141,
+        "h": 133
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "2087",
+      "ocr_confidence": 0.7286,
+      "ocr_flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022928.771.jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022928.771.jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 55,
+        "y": 60,
+        "w": 119,
+        "h": 96
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "261277",
+      "ocr_confidence": 0.6679,
+      "ocr_flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023748.034.jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T023748.034.jpg",
+      "image_size": {
+        "width": 192,
+        "height": 416
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 79,
+        "w": 192,
+        "h": 112
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "1311",
+      "ocr_confidence": 0.6678,
+      "ocr_flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T024049.139.jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T024049.139.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": {
+        "x": 87,
+        "y": 136,
+        "w": 713,
+        "h": 664
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "8034",
+      "ocr_confidence": 0.7589,
+      "ocr_flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image (91).jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image (91).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 250,
+        "h": 250
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "10071",
+      "ocr_confidence": 0.7771,
+      "ocr_flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image (92).jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image (92).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 250,
+        "h": 250
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "14413",
+      "ocr_confidence": 0.7043,
+      "ocr_flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image (93).jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image (93).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 250,
+        "h": 250
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "118848804111",
+      "ocr_confidence": 0.6881,
+      "ocr_flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image (94).jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image (94).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 32,
+        "y": 149,
+        "w": 38,
+        "h": 26
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "298063872",
+      "ocr_confidence": 0.7555,
+      "ocr_flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "QUALITY_BELOW_AUTO_THRESHOLD",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image (95).jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image (95).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 19,
+        "y": 190,
+        "w": 96,
+        "h": 59
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.0,
+      "ocr_flags": [
+        "SEVEN_SEGMENT_PATTERN_NOT_FOUND",
+        "QUALITY_BELOW_AUTO_THRESHOLD",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image (96).jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image (96).jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 51,
+        "y": 77,
+        "w": 93,
+        "h": 90
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "1326",
+      "ocr_confidence": 0.7286,
+      "ocr_flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image (97).jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image (97).jpg",
+      "image_size": {
+        "width": 720,
+        "height": 762
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 366,
+        "w": 720,
+        "h": 396
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.0,
+      "ocr_flags": [
+        "SEVEN_SEGMENT_PATTERN_NOT_FOUND",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image (98).jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image (98).jpg",
+      "image_size": {
+        "width": 717,
+        "height": 757
+      },
+      "display_bbox": {
+        "x": 236,
+        "y": 169,
+        "w": 481,
+        "h": 422
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.6375,
+      "ocr_flags": [
+        "SEVEN_SEGMENT_LOW_CONFIDENCE",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image (99).jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image (99).jpg",
+      "image_size": {
+        "width": 594,
+        "height": 759
+      },
+      "display_bbox": {
+        "x": 17,
+        "y": 66,
+        "w": 92,
+        "h": 85
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "97658421",
+      "ocr_confidence": 0.6982,
+      "ocr_flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image (100).jpg",
+      "source_path": "raw/by-meter-type/lcd_dual_row/image (100).jpg",
+      "image_size": {
+        "width": 608,
+        "height": 1080
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 608,
+        "h": 66
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_dual_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "1981",
+      "ocr_confidence": 0.7286,
+      "ocr_flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "QUALITY_BELOW_AUTO_THRESHOLD",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022734.242.jpg",
+      "source_path": "raw/by-meter-type/lcd_single_row/image - 2026-09-22T022734.242.jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 2,
+        "y": 53,
+        "w": 34,
+        "h": 13
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_single_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.6557,
+      "ocr_flags": [
+        "SEVEN_SEGMENT_LOW_CONFIDENCE",
+        "QUALITY_BELOW_AUTO_THRESHOLD",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023252.585.jpg",
+      "source_path": "raw/by-meter-type/lcd_single_row/image - 2026-09-22T023252.585.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 800
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_single_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "92450",
+      "ocr_confidence": 0.7286,
+      "ocr_flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023500.988.jpg",
+      "source_path": "raw/by-meter-type/lcd_single_row/image - 2026-09-22T023500.988.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 582,
+        "w": 800,
+        "h": 218
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_single_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "4181",
+      "ocr_confidence": 0.7286,
+      "ocr_flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023622.371.jpg",
+      "source_path": "raw/by-meter-type/lcd_single_row/image - 2026-09-22T023622.371.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": {
+        "x": 236,
+        "y": 478,
+        "w": 446,
+        "h": 357
+      },
+      "meter_bbox": null,
+      "meter_family": "digital_lcd",
+      "meter_subtype": "lcd_single_row",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "71424417",
+      "ocr_confidence": 0.6679,
+      "ocr_flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022621.016.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T022621.016.jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 240,
+        "h": 236
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.4429,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022705.250.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T022705.250.jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 5,
+        "w": 245,
+        "h": 245
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.66,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022832.402.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T022832.402.jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 13,
+        "y": 0,
+        "w": 236,
+        "h": 225
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.9,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023307.771.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023307.771.jpg",
+      "image_size": {
+        "width": 310,
+        "height": 294
+      },
+      "display_bbox": {
+        "x": 268,
+        "y": 246,
+        "w": 41,
+        "h": 37
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.0,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "NO_READING_DETECTED",
+        "QUALITY_BELOW_AUTO_THRESHOLD",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023353.074.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023353.074.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.0,
+      "ocr_flags": [],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023410.074.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023410.074.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 230,
+        "w": 800,
+        "h": 570
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.5073,
+      "ocr_flags": [
+        "DIGIT_CONTOUR_COUNT_TOO_LOW",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023445.803.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023445.803.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 336,
+        "w": 800,
+        "h": 464
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.0,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "NO_READING_DETECTED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023523.675.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023523.675.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 353,
+        "h": 133
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.0,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "NO_READING_DETECTED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023553.659.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023553.659.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": {
+        "x": 333,
+        "y": 0,
+        "w": 412,
+        "h": 129
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.0,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "NO_READING_DETECTED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023637.779.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023637.779.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 297,
+        "w": 800,
+        "h": 769
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.5023,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_SEGMENTED",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023715.090.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023715.090.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 335,
+        "w": 800,
+        "h": 731
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.5,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_SEGMENTED",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023736.114.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023736.114.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1066
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 305,
+        "h": 58
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.9,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "QUALITY_BELOW_AUTO_THRESHOLD",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023805.963.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023805.963.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 1645
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 273,
+        "w": 774,
+        "h": 410
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.9,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023828.251.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023828.251.jpg",
+      "image_size": {
+        "width": 800,
+        "height": 800
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 800
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.468,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_SEGMENTED",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023854.738.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023854.738.jpg",
+      "image_size": {
+        "width": 720,
+        "height": 1280
+      },
+      "display_bbox": {
+        "x": 216,
+        "y": 501,
+        "w": 430,
+        "h": 430
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.54,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023926.972.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023926.972.jpg",
+      "image_size": {
+        "width": 447,
+        "height": 488
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 149,
+        "w": 426,
+        "h": 294
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.6,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T024001.658.jpg",
+      "source_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T024001.658.jpg",
+      "image_size": {
+        "width": 454,
+        "height": 405
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 454,
+        "h": 399
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_roller",
+      "meter_subtype": "mechanical_roller",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.9,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023539.370.jpg",
+      "source_path": "raw/by-meter-type/mechanical_round/image - 2026-09-22T023539.370.jpg",
+      "image_size": {
+        "width": 780,
+        "height": 1040
+      },
+      "display_bbox": null,
+      "meter_bbox": null,
+      "meter_family": "mechanical_round",
+      "meter_subtype": "mechanical_round",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.0,
+      "ocr_flags": [],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023913.075.jpg",
+      "source_path": "raw/by-meter-type/mechanical_round/image - 2026-09-22T023913.075.jpg",
+      "image_size": {
+        "width": 720,
+        "height": 1280
+      },
+      "display_bbox": {
+        "x": 266,
+        "y": 527,
+        "w": 423,
+        "h": 376
+      },
+      "meter_bbox": null,
+      "meter_family": "mechanical_round",
+      "meter_subtype": "mechanical_round",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": null,
+      "ocr_confidence": 0.58,
+      "ocr_flags": [
+        "DIGIT_CONTOURS_NOT_FOUND",
+        "OCR_CANDIDATES_DISAGREE",
+        "ROLLER_REVIEW_REQUIRED",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T022633.544.jpg",
+      "source_path": "raw/by-meter-type/unknown_needs_review/image - 2026-09-22T022633.544.jpg",
+      "image_size": {
+        "width": 250,
+        "height": 250
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 250,
+        "h": 250
+      },
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "meter_subtype": "unknown_needs_review",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "448617",
+      "ocr_confidence": 0.6881,
+      "ocr_flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T023238.522.jpg",
+      "source_path": "raw/by-meter-type/unknown_needs_review/image - 2026-09-22T023238.522.jpg",
+      "image_size": {
+        "width": 799,
+        "height": 1422
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 563,
+        "w": 799,
+        "h": 647
+      },
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "meter_subtype": "unknown_needs_review",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "7244721",
+      "ocr_confidence": 0.6765,
+      "ocr_flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    },
+    {
+      "image_id": "image - 2026-09-22T024016.722.jpg",
+      "source_path": "raw/by-meter-type/unknown_needs_review/image - 2026-09-22T024016.722.jpg",
+      "image_size": {
+        "width": 585,
+        "height": 1040
+      },
+      "display_bbox": {
+        "x": 0,
+        "y": 0,
+        "w": 451,
+        "h": 58
+      },
+      "meter_bbox": null,
+      "meter_family": "unknown",
+      "meter_subtype": "unknown_needs_review",
+      "reading": "",
+      "meter_number": "",
+      "label_state": "needs_review",
+      "training_eligible": false,
+      "ocr_suggestion": "8641",
+      "ocr_confidence": 0.6982,
+      "ocr_flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "QUALITY_BELOW_AUTO_THRESHOLD",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "CUSTOM_OCR_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD",
+        "LOW_SOURCE_RESOLUTION_UPSCALED"
+      ],
+      "annotation_notes": "مربع الشاشة وقراءة OCR اقتراحان آليان فقط؛ راجعهما وعدلهما قبل أي اعتماد للتدريب."
+    }
+  ]
+}

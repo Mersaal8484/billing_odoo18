@@ -1,0 +1,476 @@
+{
+  "dataset_id": "meter-display-detector",
+  "version": "v0.1.0",
+  "created_at": "2026-09-21T23:05:56.788134+00:00",
+  "images": [
+    {
+      "image_id": "datameter/account.analytic.meter(129).jpg",
+      "sha256": "8e15d2fb4210b9021718003d90a8531f800790e42239529de53f3d4241f25224",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "test",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(13).jpg",
+      "sha256": "f61d53947aefac73cac3d2ae556cfb190167e4e4257338866ca58a69ffcbfa74",
+      "meter_family": "digital_lcd",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(132).jpg",
+      "sha256": "96f7fa93b85c039ee887a26e7b97d11c9c8fff84e056b28d4f87d9d3bdc6d4a6",
+      "meter_family": "mechanical_round",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(14).jpg",
+      "sha256": "7dac55ce942b05bc3b08dc98b7e6f866d3283f4c3796c46eeb1e477ba103af5f",
+      "meter_family": "digital_lcd",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(18).jpg",
+      "sha256": "1bad1fd44f49671c6c568ff2fa1ffa087943088412f8b9f49f85061e3c3121df",
+      "meter_family": "digital_lcd",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (31).jpg",
+      "sha256": "32782da68e138cfbad36a07c64d718b05359335cdaa9bb48d8da4bb75f5cb9c6",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (32).jpg",
+      "sha256": "dd7a1a6dcfd5829ef68082a155327239130d21110908ea12546d6ac128dc4949",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (33).jpg",
+      "sha256": "494c57bbe8aecf9ef5ca17a04e152dd92fa6feafc757cb3aec65dfc6d386428c",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "test",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (4).jpg",
+      "sha256": "06fb78dca7c775e07074072f5d8d345d46309f40a33014d697070e6cca205370",
+      "meter_family": "digital_lcd",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (46).jpg",
+      "sha256": "06b107ad1f5b73d8a020d1965c412b7c115111d4d74bcd43ccd50358b96ddf2b",
+      "meter_family": "mechanical_round",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (47).jpg",
+      "sha256": "790a90c783aa74b5a44da418b4b00d79f774ea67c4e9d09e614c827f4adf70c4",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "val",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (48).jpg",
+      "sha256": "5c9e5e477fab7f1c59c4440ab03ea4e669f440f17d97864f19d5e6604d5ca13d",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (49).jpg",
+      "sha256": "b535e757d5ea675a94cf57ab86a15c5acac87c8e838eaab5cfdf2470a670373d",
+      "meter_family": "digital_lcd",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (5).jpg",
+      "sha256": "0461befafee9bf4de68559c47a5f2c87ebca4a976c94e52132a099a90f2b8691",
+      "meter_family": "digital_lcd",
+      "label_state": "single_review",
+      "split": "test",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (50).jpg",
+      "sha256": "58e93aa37e5b263a3cf746112eac3b7fd4601726294f124e59cba52965565a4c",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (51).jpg",
+      "sha256": "5fe7cdb4878e554702940acdf2936afbad057d67effd95dd2218d1e92117086e",
+      "meter_family": "mechanical_round",
+      "label_state": "single_review",
+      "split": "test",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (53).jpg",
+      "sha256": "340cc7ee263cc695f42b235ff8b55eeeee7542da4973e0b056490a50a4c55856",
+      "meter_family": "digital_lcd",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (54).jpg",
+      "sha256": "42502d6278280e0f7114494e6d901cfabef07e0e0f90230be204409c57cc4e6d",
+      "meter_family": "digital_lcd",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (55).jpg",
+      "sha256": "f2402c27d4dd114745778784a984fdede148eff76d36ad05e1af8caaab347e51",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (56).jpg",
+      "sha256": "56e9b80814cd4b49bb4dd984c3abe71a7189a0cde7589dd67eb4e912b8c309cf",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (57).jpg",
+      "sha256": "1df3da5073bc355f966bedf1978d4220345f15cf7187a1220cec4610bb23aaf5",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (58).jpg",
+      "sha256": "a0357dcb85a6f32898fa356325893c3b6625b6f92a9634d307358e3fc9cc3682",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "test",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (59).jpg",
+      "sha256": "ed033f237985a37ebaf5039ec893abbfe60be81c28e4dadf8bc2ad8a4f1dea0d",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (60).jpg",
+      "sha256": "a09ef46f2d77060654fdeed02368833ada1976d54643b53eda10ae853f5469da",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (61).jpg",
+      "sha256": "a193887a77bfbe35a9a2ef710ef0d852b9a7f78740b39280434af425f1b97e0e",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "val",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (62).jpg",
+      "sha256": "2ae24af44eec0e385c10ffc56013f596369c465c99cbe6f1550ea4cd499335b1",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (63).jpg",
+      "sha256": "ca2c14206c90ef133ffad90d74528268d8d8ad68e809df44a52a34d98dcbf3b5",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (64).jpg",
+      "sha256": "3dca8caa4c4280c40a936c0bed666b9ab2737472c5beb8b9f9d8dc46ac212e39",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (65).jpg",
+      "sha256": "ace5cb88f52976908633da3b734cc86d15f13fc6a0e458a9d991f1174e70d611",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (66).jpg",
+      "sha256": "16e32dfe372fc99ed5b028e9b04f70cca9e477c142329a8d0b89dc14796a7bc8",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (67).jpg",
+      "sha256": "cf8e5dc02879abc2d34e704a4e5b5011b5247ae8f520377e2dfed1111f0ec553",
+      "meter_family": "mechanical_round",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (68).jpg",
+      "sha256": "dfa28d563fb2efaa7241b40f1866935bc84c15e492b9e8eeb00617954a6208cf",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (69).jpg",
+      "sha256": "f7efa6dde068f19b9afeaac5d64ed98395fb463cd3da833b7017582922667a30",
+      "meter_family": "mechanical_round",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (7).jpg",
+      "sha256": "42b93f78cefbf74a73546b464224375456f042a30d33036b3a742c364be3ca35",
+      "meter_family": "digital_lcd",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (70).jpg",
+      "sha256": "3a643ad45e6fbe24559e3d8255f65f5d960da8d5d899ea34413d4b0a69079ab6",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (71).jpg",
+      "sha256": "29d3ed60eb089843e2a4f7c5bff192c5875f3c5c461726f0029a13c746182898",
+      "meter_family": "mechanical_round",
+      "label_state": "single_review",
+      "split": "test",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (72).jpg",
+      "sha256": "b771992a11c43e1b50fc74bbd1ef3ad6afb9aac532c079dadd4cf585075cef11",
+      "meter_family": "mechanical_round",
+      "label_state": "single_review",
+      "split": "test",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (73).jpg",
+      "sha256": "cec6bc15bb60235ef9fa4d01ef32ea9adae1577468a6ce9a15a6e3ff27156ad8",
+      "meter_family": "mechanical_round",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (74).jpg",
+      "sha256": "04d4b8535ca0524bad1bc2aa525135370c3ace0e48072f47f2b67f26c3bf280e",
+      "meter_family": "mechanical_round",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (75).jpg",
+      "sha256": "7375909cf4bff2fa5e0bc6184ba1486fe3822258cf2334e9b3a2197dc087eef1",
+      "meter_family": "mechanical_round",
+      "label_state": "single_review",
+      "split": "test",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (76).jpg",
+      "sha256": "bcc602ee4efc8ff408c9dcc4ab9fa478cb0104bc9f76d240f3442251584fff34",
+      "meter_family": "mechanical_round",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (77).jpg",
+      "sha256": "1060d7f4b81c130a43a69803cf636d778a65a1b26b8ed9a64341ac6811e2e78f",
+      "meter_family": "mechanical_round",
+      "label_state": "single_review",
+      "split": "test",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (78).jpg",
+      "sha256": "fd2c8dec94268969eb0b68febf1e1a1b919a7cc35afecbd6ecd22d421dd490db",
+      "meter_family": "digital_lcd",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (79).jpg",
+      "sha256": "fe5414e092be48b48db7d88c141bfb144a4dd12c21dfd1c754fc472f226597f5",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "test",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (8).jpg",
+      "sha256": "375b1060b3cc458ff6d39ccf64be82a4a63a674f878517de491fa5b8d5ac9366",
+      "meter_family": "digital_lcd",
+      "label_state": "single_review",
+      "split": "val",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (80).jpg",
+      "sha256": "0a6c490048eeff9ffdd263b34e9bdc31cd6284562d563c0970079fd4df889c0b",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (81).jpg",
+      "sha256": "9540220dd032f96a6f613cb829a8e8e4ed8a61e32d2166d03ea0449d6c7b60ea",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (82).jpg",
+      "sha256": "3fa64e3e8fb0a6f0f4ef25e5d52348b4de2fe6db43173ee80a49857603297d91",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (83).jpg",
+      "sha256": "b2040d56b8c1deb84de3ce5e128d26973286e01a5050999a48d611f6192b8d2d",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (84).jpg",
+      "sha256": "5e15a66a61888842ebf8ee1a5296d32cdac91e236837a2a45d20fbebcb30600c",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    },
+    {
+      "image_id": "datameter/image (85).jpg",
+      "sha256": "01c8084f043c1c6400a19c4537394ff9a84a61d7c1900fa98052953b7bca89dd",
+      "meter_family": "mechanical_roller",
+      "label_state": "single_review",
+      "split": "train",
+      "source": "local-field-image",
+      "label_quality": "single_review"
+    }
+  ],
+  "splits": {
+    "strategy": "grouped_by_meter_or_route",
+    "group_key": "meter_id_hash"
+  },
+  "privacy": {
+    "pii_removed": false,
+    "exif_removed": true,
+    "consent_recorded": false
+  },
+  "training_warning": "Single-review labels are bootstrap-only; require double review before production promotion."
+}

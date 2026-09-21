@@ -26,10 +26,23 @@ def main():
         with Image.open(source) as image:
             image = ImageOps.exif_transpose(image).convert("RGB")
             thumb = ImageOps.contain(image, (cell_w - 8, cell_h - 8), Image.Resampling.LANCZOS)
+        bbox = item.get("display_bbox")
+        if bbox:
+            scale_x, scale_y = thumb.width / image.width, thumb.height / image.height
+            overlay = ImageDraw.Draw(thumb)
+            overlay.rectangle(
+                (
+                    round(bbox["x"] * scale_x), round(bbox["y"] * scale_y),
+                    round((bbox["x"] + bbox["w"]) * scale_x),
+                    round((bbox["y"] + bbox["h"]) * scale_y),
+                ),
+                outline="red", width=3,
+            )
         col, row = index % args.columns, index // args.columns
         left, top = col * cell_w, row * (cell_h + caption_h)
         sheet.paste(thumb, (left + (cell_w - thumb.width) // 2, top + (cell_h - thumb.height) // 2))
-        label = f"{Path(item['image_id']).name} | {item.get('reading', '')}"
+        reading = item.get("reading") or item.get("ocr_suggestion") or "بدون اقتراح"
+        label = f"{Path(item['image_id']).name} | OCR: {reading}"
         draw.text((left + 4, top + cell_h + 3), label, fill="black")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(args.output, quality=90)

@@ -1,0 +1,439 @@
+{
+  "dataset_batch": "datameter-2026-09-22",
+  "created_at": "2026-09-21T23:43:32.134837+00:00",
+  "source_count": 47,
+  "privacy": "EXIF removed; source originals remain outside this repository",
+  "classification_policy": "Provisional visual grouping only. OCR values and display boxes require annotation and human review before training.",
+  "counts": {
+    "lcd_dual_row": 21,
+    "lcd_single_row": 4,
+    "mechanical_roller": 17,
+    "mechanical_round": 2,
+    "unknown_needs_review": 3
+  },
+  "images": [
+    {
+      "image_id": "meter-20260922-001",
+      "file_name": "image - 2026-09-22T022454.919.jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022454.919.jpg",
+      "sha256": "0461befafee9bf4de68559c47a5f2c87ebca4a976c94e52132a099a90f2b8691",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-002",
+      "file_name": "image - 2026-09-22T022512.272.jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022512.272.jpg",
+      "sha256": "86803e742d2883f155ea4062b75d675e7b2e0b2e900602f37a58824dcacd98f2",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-003",
+      "file_name": "image - 2026-09-22T022523.863.jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022523.863.jpg",
+      "sha256": "42b93f78cefbf74a73546b464224375456f042a30d33036b3a742c364be3ca35",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-004",
+      "file_name": "image - 2026-09-22T022537.384.jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022537.384.jpg",
+      "sha256": "375b1060b3cc458ff6d39ccf64be82a4a63a674f878517de491fa5b8d5ac9366",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-005",
+      "file_name": "image - 2026-09-22T022550.855.jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022550.855.jpg",
+      "sha256": "b0ead565b20b6fefea2702d9592f32bfe27adc61e100fb9107ad8334b5950883",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-006",
+      "file_name": "image - 2026-09-22T022604.063.jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022604.063.jpg",
+      "sha256": "5f25be57489271b14d30adabbdf4742962382936c9827d9bf6b6d717e76af0df",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-007",
+      "file_name": "image - 2026-09-22T022901.930.jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022901.930.jpg",
+      "sha256": "d73f92839bca8e5f2a1c0f09b3d1a74aaa1789b1daefa4defa3309a7731ede44",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-008",
+      "file_name": "image - 2026-09-22T022915.938.jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022915.938.jpg",
+      "sha256": "3da546ce6a348e65880e8a770c03ee3039086a10a29663ef54d8c2b9338fd169",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-009",
+      "file_name": "image - 2026-09-22T022928.771.jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T022928.771.jpg",
+      "sha256": "0ae6af1c1b5b0c9c00b273bedfd50461d12cfdd1f24271ee883ecd2a0e6443c6",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-010",
+      "file_name": "image - 2026-09-22T023748.034.jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T023748.034.jpg",
+      "sha256": "a9531dfff400a605e9331e4083ecc141bc74f8d5082fc8c69be7cbabfae34f22",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-011",
+      "file_name": "image - 2026-09-22T024049.139.jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image - 2026-09-22T024049.139.jpg",
+      "sha256": "99c2dde908ab3fe3b6eed54e650b516848b11ed78a5b3fe8215bd474ca356690",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-012",
+      "file_name": "image (91).jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image (91).jpg",
+      "sha256": "ff5af5bac9ed1d04674abba5fc1bcb94f45577cd1409b6f80f5434a1a650e49d",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-013",
+      "file_name": "image (92).jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image (92).jpg",
+      "sha256": "872cf973621ea2be7b597e6a3a23bbf4f2620568d72f0303f59b59b2928edb9f",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-014",
+      "file_name": "image (93).jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image (93).jpg",
+      "sha256": "27d283b6a50b100e3ed89ae237292b8c369e0feaedf48c4db8eb316c206fcfe7",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-015",
+      "file_name": "image (94).jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image (94).jpg",
+      "sha256": "e58c4523097d5f182059633694db0ac1a172f4040ce3c42112310e0111bc0de8",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-016",
+      "file_name": "image (95).jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image (95).jpg",
+      "sha256": "7176642ae721d6827e7aea3cdc352568ef99390239ff6cb9501baaabbf15642b",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-017",
+      "file_name": "image (96).jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image (96).jpg",
+      "sha256": "1a6b8dff979ef38c8cd29e18f1d8cf09d8ec7340201df4fd5938a958aca8178b",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-018",
+      "file_name": "image (97).jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image (97).jpg",
+      "sha256": "296a01967f4a5774d3052d1524f43282821d1fb99f5154fcec8302343f9204a2",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-019",
+      "file_name": "image (98).jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image (98).jpg",
+      "sha256": "37d71bcda93a86c08524e78f8a9a3dde67801faf9a206f09a0c95458e00e736a",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-020",
+      "file_name": "image (99).jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image (99).jpg",
+      "sha256": "8536af43e52491d04274683591b2010f424ec54aeb6d806f4724af7c4ba9f899",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-021",
+      "file_name": "image (100).jpg",
+      "meter_family": "lcd_dual_row",
+      "relative_path": "raw/by-meter-type/lcd_dual_row/image (100).jpg",
+      "sha256": "06fb78dca7c775e07074072f5d8d345d46309f40a33014d697070e6cca205370",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-022",
+      "file_name": "image - 2026-09-22T022734.242.jpg",
+      "meter_family": "lcd_single_row",
+      "relative_path": "raw/by-meter-type/lcd_single_row/image - 2026-09-22T022734.242.jpg",
+      "sha256": "56c2f972b02a52bcb0b7bbb3058e5ca8bdd99025b0490d60a096aeca6c2fc6e5",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-023",
+      "file_name": "image - 2026-09-22T023252.585.jpg",
+      "meter_family": "lcd_single_row",
+      "relative_path": "raw/by-meter-type/lcd_single_row/image - 2026-09-22T023252.585.jpg",
+      "sha256": "95e8d2283d5cf4e8a19a286bbc2847015965d1326e9d8069f42f292d7e2e637f",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-024",
+      "file_name": "image - 2026-09-22T023500.988.jpg",
+      "meter_family": "lcd_single_row",
+      "relative_path": "raw/by-meter-type/lcd_single_row/image - 2026-09-22T023500.988.jpg",
+      "sha256": "4b2fd273fb1d0398e145af76ad8db90c17079bca0fd5c8f33225673e95494217",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-025",
+      "file_name": "image - 2026-09-22T023622.371.jpg",
+      "meter_family": "lcd_single_row",
+      "relative_path": "raw/by-meter-type/lcd_single_row/image - 2026-09-22T023622.371.jpg",
+      "sha256": "dd17888b93c41b2a7fd82584b212e76219727f6e1df7bebd1a918cdc5521ef2d",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-026",
+      "file_name": "image - 2026-09-22T022621.016.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T022621.016.jpg",
+      "sha256": "f1166aa3ee6fff2a8b1da483d4251c5c553e0f093d40204d3f3f745a006f5ec6",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-027",
+      "file_name": "image - 2026-09-22T022705.250.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T022705.250.jpg",
+      "sha256": "bf83a48934ca5d3a539caa4670c7e4ed6f4a2c283ddcf1455ebd485c61d0e616",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-028",
+      "file_name": "image - 2026-09-22T022832.402.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T022832.402.jpg",
+      "sha256": "f9dac02b8315859996213a6f3f92f4935b548b4d8c4df16fbc4183d15e3d83a0",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-029",
+      "file_name": "image - 2026-09-22T023307.771.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023307.771.jpg",
+      "sha256": "3dd5c4245e482ec7accb3fe5a1292ffd0518e42f183bc17b4b3c283abd59b3af",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-030",
+      "file_name": "image - 2026-09-22T023353.074.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023353.074.jpg",
+      "sha256": "bc42bf04fd70ebe20cf0fa9a995b33f6066ccf67e9562f6befb12509cc2e2f77",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-031",
+      "file_name": "image - 2026-09-22T023410.074.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023410.074.jpg",
+      "sha256": "623ad57c4fd13a1ae76139770dde0a52480240613b0a7baf95cb8d0292dbd659",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-032",
+      "file_name": "image - 2026-09-22T023445.803.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023445.803.jpg",
+      "sha256": "1cd5c309332cea84b5b6ff18513b3b67b37c63d6b8af58bb78ff3f2ee7be48ec",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-033",
+      "file_name": "image - 2026-09-22T023523.675.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023523.675.jpg",
+      "sha256": "88b325ab13520c32f62e2a5559ba0cb9f7e2d04573c451357e978cf26c7e3d33",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-034",
+      "file_name": "image - 2026-09-22T023553.659.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023553.659.jpg",
+      "sha256": "ac5653372afdca903ca87f6922b98ec052ed4ace91d5cd56cd91f7799fef0611",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-035",
+      "file_name": "image - 2026-09-22T023637.779.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023637.779.jpg",
+      "sha256": "de6ee9500419971488cd13cb5171e2cf09e41b74cf9977e7a8601c4ee25e85f7",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-036",
+      "file_name": "image - 2026-09-22T023715.090.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023715.090.jpg",
+      "sha256": "7ad455506b264ed9f37c6cd8d49577fc8e5886b4463bf7eff8f6e85e9c2a6079",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-037",
+      "file_name": "image - 2026-09-22T023736.114.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023736.114.jpg",
+      "sha256": "7f1f31da6dd5e87992b3e7a0df6f6f8386e2ab67560d5a963e4c17383251aa92",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-038",
+      "file_name": "image - 2026-09-22T023805.963.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023805.963.jpg",
+      "sha256": "f83c5d0bd5b5060bf711896c47caa34069c8ac638e96b59435f7bb7f0b14bc26",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-039",
+      "file_name": "image - 2026-09-22T023828.251.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023828.251.jpg",
+      "sha256": "873ff8e0cd4ad17a0db89a553faeea598c80146c178571ce4152939edf640221",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-040",
+      "file_name": "image - 2026-09-22T023854.738.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023854.738.jpg",
+      "sha256": "b227c55a29d0a63b3ba8b64cebcda612265eeef6da191252ba73e402191f2fd5",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-041",
+      "file_name": "image - 2026-09-22T023926.972.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T023926.972.jpg",
+      "sha256": "934b14f9c84b0e1cf6fef75085aec5e432e1cf28f2373dcf690900b418bab653",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-042",
+      "file_name": "image - 2026-09-22T024001.658.jpg",
+      "meter_family": "mechanical_roller",
+      "relative_path": "raw/by-meter-type/mechanical_roller/image - 2026-09-22T024001.658.jpg",
+      "sha256": "e1d5c9480f6844316a21edadb07a0759b6858231b5f61f7ec3048189a302d34a",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-043",
+      "file_name": "image - 2026-09-22T023539.370.jpg",
+      "meter_family": "mechanical_round",
+      "relative_path": "raw/by-meter-type/mechanical_round/image - 2026-09-22T023539.370.jpg",
+      "sha256": "50c24873adff3221428ecaa5bd07c8df83c0388bdf2c238c367d96bcadd8f871",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-044",
+      "file_name": "image - 2026-09-22T023913.075.jpg",
+      "meter_family": "mechanical_round",
+      "relative_path": "raw/by-meter-type/mechanical_round/image - 2026-09-22T023913.075.jpg",
+      "sha256": "86f360f2700298118ef50435794644fde832b283fa95ae8895761303c5a863ce",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-045",
+      "file_name": "image - 2026-09-22T022633.544.jpg",
+      "meter_family": "unknown_needs_review",
+      "relative_path": "raw/by-meter-type/unknown_needs_review/image - 2026-09-22T022633.544.jpg",
+      "sha256": "e307aba48c73aa9f64d7bb30242b320fe588422969fc7b3774c8ad061135ad9e",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-046",
+      "file_name": "image - 2026-09-22T023238.522.jpg",
+      "meter_family": "unknown_needs_review",
+      "relative_path": "raw/by-meter-type/unknown_needs_review/image - 2026-09-22T023238.522.jpg",
+      "sha256": "6e48d353bc095782a3abda3dc40bd544ad3a74f7ec6878a4cea7fc16eb2bec50",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    },
+    {
+      "image_id": "meter-20260922-047",
+      "file_name": "image - 2026-09-22T024016.722.jpg",
+      "meter_family": "unknown_needs_review",
+      "relative_path": "raw/by-meter-type/unknown_needs_review/image - 2026-09-22T024016.722.jpg",
+      "sha256": "27bec2c3272a632ec38293cdf7eca7c28607c9a3e15a4e47ad363c992e72c206",
+      "review_status": "pending_annotation",
+      "classification_status": "provisional_visual_review"
+    }
+  ]
+}
