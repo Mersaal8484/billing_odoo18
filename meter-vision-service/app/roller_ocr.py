@@ -14,6 +14,7 @@ from .image_enhancement import build_ocr_variants, roller_register_variants
 
 _DIGIT_TRANSLATION = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
 _DIGITS = re.compile(r"\d{3,12}")
+_SINGLE_DIGIT = re.compile(r"(?<!\d)[0-9](?!\d)")
 
 
 def _direct_display_candidates(image: Image.Image, expected_digits: Optional[int]) -> tuple[Counter, dict[str, set[int]], list[str]]:
@@ -69,10 +70,11 @@ def recognize(image: Image.Image, expected_digits: Optional[int] = None,
                 candidate, votes = direct.most_common(1)[0]
                 # Matching a whole display and its localized register is a
                 # stronger signal than PSM variants of the same pixels.
-                if votes >= 2 and (len(sources.get(candidate, set())) >= 2 or len(sources) == 1):
+                if votes >= 2 and len(sources.get(candidate, set())) >= 2:
                     confidence = min(0.92, 0.60 + votes / max(1, sum(direct.values())) * 0.32)
                     return candidate, round(confidence, 4), segmentation_flags + direct_flags + ["RAW_DISPLAY_OCR_ENSEMBLE"]
-        for variant in build_ocr_variants(image):
+        variant_sources: dict[str, set[int]] = {}
+        for index, variant in enumerate(build_ocr_variants(image)):
             for psm in (6, 7, 8, 13):
                 text = pytesseract.image_to_string(
                     variant,
@@ -83,6 +85,7 @@ def recognize(image: Image.Image, expected_digits: Optional[int] = None,
                     if expected_digits and len(candidate) != expected_digits:
                         continue
                     candidates.append(candidate)
+                    variant_sources.setdefault(candidate, set()).add(index)
         # OCR on individual, contour-derived digit ROIs is used only when the
         # segmentation count agrees with the expected meter register width.
         if rois and (not expected_digits or len(rois) == expected_digits):
@@ -93,7 +96,7 @@ def recognize(image: Image.Image, expected_digits: Optional[int] = None,
                     text = pytesseract.image_to_string(
                         variant, lang="eng", config="--psm 10 -c tessedit_char_whitelist=0123456789"
                     ).translate(_DIGIT_TRANSLATION)
-                    votes.extend(_DIGITS.findall(text))
+                    votes.extend(_SINGLE_DIGIT.findall(text))
                 if not votes:
                     segmented = []
                     break
@@ -103,7 +106,11 @@ def recognize(image: Image.Image, expected_digits: Optional[int] = None,
                     break
                 segmented.append(digit)
             if segmented:
-                candidates.extend(["".join(segmented)] * 2)
+                segmented_candidate = "".join(segmented)
+                candidates.extend([segmented_candidate] * 2)
+                # Each isolated ROI contributes evidence distinct from a
+                # whole-display preprocessing variant.
+                variant_sources.setdefault(segmented_candidate, set()).add(-1)
     except (OSError, RuntimeError):
         return None, 0.0, segmentation_flags + ["OCR_ENGINE_UNAVAILABLE"]
 
@@ -113,6 +120,6 @@ def recognize(image: Image.Image, expected_digits: Optional[int] = None,
     candidate, votes = counts.most_common(1)[0]
     agreement = votes / len(candidates)
     confidence = min(0.94, 0.42 + agreement * 0.48)
-    if votes < 2 or confidence < 0.68:
+    if votes < 2 or len(variant_sources.get(candidate, set())) < 2 or confidence < 0.68:
         return None, round(confidence, 4), segmentation_flags + ["OCR_CANDIDATES_DISAGREE", "ROLLER_REVIEW_REQUIRED"]
     return candidate, round(confidence, 4), segmentation_flags + ["ROLLER_OCR_ENSEMBLE"]
