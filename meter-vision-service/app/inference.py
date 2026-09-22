@@ -109,12 +109,15 @@ def _quality(image: Image.Image, source_size: tuple[int, int], low_resolution: b
     gray = ImageOps.grayscale(image)
     sample = gray.resize((1, 1)).getpixel((0, 0))
     score = 1.0
-    if min(image.width, image.height) < 300:
-        score -= 0.35
+    if min(image.width, image.height) < 250:
+        score -= 0.30
+    elif min(image.width, image.height) < 300:
+        score -= 0.15
     if low_resolution:
+        score -= 0.15
+    # Wider brightness acceptance range (15–240 instead of 35–235)
+    if sample < 15 or sample > 240:
         score -= 0.20
-    if sample < 35 or sample > 235:
-        score -= 0.25
     score = max(0.0, min(1.0, score))
     state = "good" if score >= 0.75 else "review" if score >= 0.45 else "poor"
     return QualityResult(state=state, score=round(score, 4), width=image.width, height=image.height,

@@ -1,0 +1,92 @@
+[
+  {
+    "type": "crnn-ctc",
+    "input_shape": [
+      1,
+      1,
+      64,
+      256
+    ],
+    "vocab": "0123456789.",
+    "blank_index": 11,
+    "source_checkpoint": "reading_ocr.pt",
+    "output_path": "C:\\odoo\\odoo\\odoo\\utility_erp\\meter-vision-service\\models\\reading_ocr.onnx"
+  },
+  {
+    "type": "crnn-ctc",
+    "input_shape": [
+      1,
+      1,
+      48,
+      192
+    ],
+    "vocab": "0123456789.",
+    "blank_index": 11,
+    "source_checkpoint": "reading_ocr_mechanical_roller.pt",
+    "output_path": "C:\\odoo\\odoo\\odoo\\utility_erp\\meter-vision-service\\models\\reading_ocr_mechanical_roller.onnx"
+  },
+  {
+    "type": "digit-cnn",
+    "input_shape": [
+      1,
+      1,
+      72,
+      48
+    ],
+    "num_classes": 10,
+    "source_checkpoint": "mechanical_roller_digit_cnn.pt",
+    "output_path": "C:\\odoo\\odoo\\odoo\\utility_erp\\meter-vision-service\\models\\mechanical_roller_digit_cnn.onnx"
+  },
+  {
+    "type": "crnn-ctc",
+    "input_shape": [
+      1,
+      1,
+      64,
+      256
+    ],
+    "vocab": "0123456789.",
+    "blank_index": 11,
+    "source_checkpoint": "reading_ocr.pt",
+    "output_path": "C:\\odoo\\odoo\\odoo\\utility_erp\\meter-vision-service\\models\\reading_ocr.onnx"
+  },
+  {
+    "type": "crnn-ctc",
+    "input_shape": [
+      1,
+      1,
+      64,
+      256
+    ],
+    "vocab": "0123456789.",
+    "blank_index": 11,
+    "source_checkpoint": "reading_ocr_augmented.pt",
+    "output_path": "C:\\odoo\\odoo\\odoo\\utility_erp\\meter-vision-service\\models\\reading_ocr_augmented.onnx"
+  },
+  {
+    "type": "crnn-ctc",
+    "input_shape": [
+      1,
+      1,
+      48,
+      192
+    ],
+    "vocab": "0123456789.",
+    "blank_index": 11,
+    "source_checkpoint": "reading_ocr_compact.pt",
+    "output_path": "C:\\odoo\\odoo\\odoo\\utility_erp\\meter-vision-service\\models\\reading_ocr_compact.onnx"
+  },
+  {
+    "type": "crnn-ctc",
+    "input_shape": [
+      1,
+      1,
+      48,
+      192
+    ],
+    "vocab": "0123456789.",
+    "blank_index": 11,
+    "source_checkpoint": "reading_ocr_decimal_6.pt",
+    "output_path": "C:\\odoo\\odoo\\odoo\\utility_erp\\meter-vision-service\\models\\reading_ocr_decimal_6.onnx"
+  }
+]

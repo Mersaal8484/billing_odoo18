@@ -6,10 +6,13 @@ back to manual crop or flag the image for review.
 
 Detection strategy (in order):
 1. Upscale small images (<= 400px on short side) to improve mask quality.
-2. HSV colour mask: green-yellow LCD glass + bright white/gray backlit panel.
+2. HSV colour mask: green-yellow LCD glass + bright white/gray backlit panel
+   + blue-tinted LCD + wide-range green for varied backlight colours.
 3. Morphological join + contour scoring (aspect-ratio and area filters).
-4. Brightness percentile fallback (night shots, dirty glass, gray LCD).
-5. Adaptive CLAHE + Otsu fallback for remaining edge cases.
+4. Gray-range mask (gray LCD, dim backlight).
+5. Brightness percentile fallback with multiple thresholds.
+6. Upper-region rectangular search (meter displays sit in upper third).
+7. Adaptive CLAHE + Otsu fallback for remaining edge cases.
 """
 from __future__ import annotations
 
@@ -23,7 +26,7 @@ def auto_detect_display(
     image,
     min_area_ratio: float = 0.005,
     max_area_ratio: float = 0.70,
-    min_aspect: float = 1.0,
+    min_aspect: float = 0.8,
     max_aspect: float = 16.0,
 ) -> Optional[dict]:
     """Return {x, y, w, h} of the best display candidate or None.
@@ -69,13 +72,21 @@ def auto_detect_display(
     # ------------------------------------------------------------------
     hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
 
-    # Green-yellow LCD backlight (Holley, ISKRA, etc.)
-    lcd_mask = cv2.inRange(hsv, np.array([18, 8, 60]), np.array([115, 255, 255]))
+    # Green-yellow LCD backlight (Holley, ISKRA, etc.) — wider range
+    lcd_mask = cv2.inRange(hsv, np.array([15, 5, 50]), np.array([120, 255, 255]))
 
     # Bright white / light-gray panel face (covers inactive LCD state)
-    white_mask = cv2.inRange(hsv, np.array([0, 0, 145]), np.array([180, 70, 255]))
+    white_mask = cv2.inRange(hsv, np.array([0, 0, 135]), np.array([180, 75, 255]))
+
+    # Blue-tinted LCD panels (some Landis+Gyr, IEC meters)
+    blue_mask = cv2.inRange(hsv, np.array([85, 5, 80]), np.array([130, 255, 255]))
+
+    # Wide-range green for faded/dirty LCD glass
+    faded_green = cv2.inRange(hsv, np.array([25, 3, 70]), np.array([95, 180, 255]))
 
     combined = cv2.bitwise_or(lcd_mask, white_mask)
+    combined = cv2.bitwise_or(combined, blue_mask)
+    combined = cv2.bitwise_or(combined, faded_green)
 
     close_size = max(10, min(h, w) // 35)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (close_size, close_size))
@@ -93,7 +104,7 @@ def auto_detect_display(
     # ------------------------------------------------------------------
     # Stage 2: Gray-range mask (gray LCD, dim backlight)
     # ------------------------------------------------------------------
-    gray_mask = cv2.inRange(hsv, np.array([0, 0, 100]), np.array([180, 100, 255]))
+    gray_mask = cv2.inRange(hsv, np.array([0, 0, 85]), np.array([180, 110, 255]))
     kernel2 = cv2.getStructuringElement(cv2.MORPH_RECT, (close_size, close_size))
     gray_closed = cv2.morphologyEx(gray_mask, cv2.MORPH_CLOSE, kernel2)
 
@@ -103,24 +114,49 @@ def auto_detect_display(
         return _scale_back(best, scale)
 
     # ------------------------------------------------------------------
-    # Stage 3: Brightness percentile fallback
+    # Stage 3: Brightness percentile fallback (multiple thresholds)
     # ------------------------------------------------------------------
     gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
     clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
     enhanced = clahe.apply(gray)
 
-    thresh_val = int(np.percentile(enhanced, 70))
-    _, bright = cv2.threshold(enhanced, max(thresh_val, 110), 255, cv2.THRESH_BINARY)
-    kernel3 = cv2.getStructuringElement(cv2.MORPH_RECT, (close_size, close_size))
-    bright = cv2.morphologyEx(bright, cv2.MORPH_CLOSE, kernel3)
+    for percentile in (75, 65, 55):
+        thresh_val = int(np.percentile(enhanced, percentile))
+        _, bright = cv2.threshold(enhanced, max(thresh_val, 100), 255, cv2.THRESH_BINARY)
+        kernel3 = cv2.getStructuringElement(cv2.MORPH_RECT, (close_size, close_size))
+        bright = cv2.morphologyEx(bright, cv2.MORPH_CLOSE, kernel3)
 
-    best = _score_contours(bright, h, w, total_area,
-                           min_area_ratio, max_area_ratio, min_aspect, max_aspect)
-    if best:
-        return _scale_back(best, scale)
+        best = _score_contours(bright, h, w, total_area,
+                               min_area_ratio, max_area_ratio, min_aspect, max_aspect)
+        if best:
+            return _scale_back(best, scale)
 
     # ------------------------------------------------------------------
-    # Stage 4: Canny edges (last resort, no fill requirement)
+    # Stage 4: Upper-region rectangular search (meter displays are near top)
+    # ------------------------------------------------------------------
+    upper_band = enhanced[int(h * 0.05):int(h * 0.75), :]
+    if upper_band.size > 0:
+        _, upper_thresh = cv2.threshold(upper_band, 0, 255,
+                                        cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        kernel4 = cv2.getStructuringElement(cv2.MORPH_RECT, (close_size, close_size))
+        upper_closed = cv2.morphologyEx(upper_thresh, cv2.MORPH_CLOSE, kernel4)
+        ub_h, ub_w = upper_closed.shape
+        ub_area = ub_h * ub_w
+        # Search only contours that sit horizontally (aspect >= 1.5)
+        best = _score_contours(upper_closed, ub_h, ub_w, ub_area,
+                               min_area_ratio * 0.5, max_area_ratio,
+                               1.5, max_aspect, require_fill=True)
+        if best:
+            # Offset y back to full image coordinates
+            offset_y = int(h * 0.05)
+            return _scale_back(
+                {"x": best["x"], "y": best["y"] + offset_y,
+                 "w": best["w"], "h": best["h"]},
+                scale,
+            )
+
+    # ------------------------------------------------------------------
+    # Stage 5: Canny edges (last resort, no fill requirement)
     # ------------------------------------------------------------------
     blurred = cv2.GaussianBlur(enhanced, (5, 5), 0)
     edges = cv2.Canny(blurred, 25, 90)
@@ -180,11 +216,11 @@ def _score_contours(
         asp = bw / max(1, bh)
         if asp < min_aspect or asp > max_aspect:
             continue
-        # Prefer displays in the upper 88% of the frame (meter body)
-        if by > h * 0.88:
+        # Prefer displays in the upper 92% of the frame (meter body)
+        if by > h * 0.92:
             continue
         # Reject extremely thin strips (likely a label, not a display)
-        if bh < h * 0.035:
+        if bh < h * 0.025:
             continue
         if require_fill:
             roi_mask = mask[by: by + bh, bx: bx + bw]

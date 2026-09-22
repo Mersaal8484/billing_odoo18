@@ -25,6 +25,14 @@ ROIS = {
     "g": (0.20, 0.43, 0.80, 0.58),
 }
 
+# Occupancy threshold for segment activation — lowered from 0.22 to 0.18
+# to recover displays with thinner or dimmer segments.
+_SEGMENT_OCCUPANCY_THRESHOLD = 0.18
+
+# Minimum confidence to accept a reading — lowered from 0.66 to 0.60
+# to recover borderline readings that are still mostly correct.
+_MIN_CONFIDENCE = 0.60
+
 
 def _otsu(gray: Image.Image) -> int:
     histogram = gray.histogram()[:256]
@@ -43,6 +51,34 @@ def _otsu(gray: Image.Image) -> int:
         if between > best:
             best, threshold = between, index
     return threshold
+
+
+def _active_pixels_variants(image: Image.Image) -> list[tuple[Image.Image, str]]:
+    """Return multiple binary variants for robust pattern matching."""
+    gray = ImageOps.grayscale(image).resize(
+        (max(240, image.width * 2), max(100, image.height * 2))
+    )
+    otsu_threshold = _otsu(gray)
+    variants = []
+
+    # Otsu threshold (normal + inverted)
+    variants.append(
+        (gray.point(lambda v, t=otsu_threshold: 255 if v <= t else 0), "otsu")
+    )
+    variants.append(
+        (gray.point(lambda v, t=otsu_threshold: 255 if v > t else 0), "otsu_inv")
+    )
+
+    # Fixed thresholds to catch displays Otsu misses
+    for fixed_thresh in (90, 120, 150, 180):
+        variants.append(
+            (gray.point(lambda v, t=fixed_thresh: 255 if v <= t else 0), f"fixed_{fixed_thresh}")
+        )
+        variants.append(
+            (gray.point(lambda v, t=fixed_thresh: 255 if v > t else 0), f"fixed_{fixed_thresh}_inv")
+        )
+
+    return variants
 
 
 def _active_pixels(image: Image.Image, invert: bool) -> Image.Image:
@@ -72,7 +108,7 @@ def _segment_pattern(cell: Image.Image) -> tuple[set[str], float]:
         values = [pixels[x, y] > 0 for y in range(top, bottom) for x in range(left, right)]
         occupancy = sum(values) / max(1, len(values))
         occupancies[name] = occupancy
-        if occupancy >= 0.22:
+        if occupancy >= _SEGMENT_OCCUPANCY_THRESHOLD:
             active.add(name)
     return active, sum(occupancies.values()) / 7.0
 
@@ -91,10 +127,10 @@ def _classify(active: set[str]) -> tuple[Optional[str], float]:
 def _recognize_one(image: Image.Image, expected_digits: Optional[int]) -> list:
     """Run the segment pattern loop on a single image, returning candidates list."""
     candidates = []
-    for invert in (False, True):
-        binary = _active_pixels(image, invert)
+
+    # Use multiple binary variants for robustness
+    for binary, _label in _active_pixels_variants(image):
         foreground_ratio = sum(binary.getdata()) / (255 * binary.width * binary.height)
-        # The background must not be treated as the seven-segment foreground.
         if foreground_ratio > 0.55 or foreground_ratio < 0.005:
             continue
         if expected_digits:
@@ -109,7 +145,6 @@ def _recognize_one(image: Image.Image, expected_digits: Optional[int]) -> list:
         min_digits = expected_digits or 4
         max_digits = expected_digits or 12
         for count in range(min_digits, max_digits + 1):
-            # Leave a small gutter around the crop; each cell is one display digit.
             gutter = max(2, int(binary.width * 0.02))
             usable = binary.crop((gutter, 0, max(gutter + 1, binary.width - gutter), binary.height))
             width = usable.width / count
@@ -125,8 +160,15 @@ def _recognize_one(image: Image.Image, expected_digits: Optional[int]) -> list:
                 value.append(digit)
                 confidences.append(confidence)
             if len(value) == count:
-                candidates.append((sum(confidences) / count, "".join(value), invert, count))
-    return candidates
+                candidates.append((sum(confidences) / count, "".join(value), False, count))
+
+    # Deduplicate by value, keep highest confidence
+    best_by_value: dict[str, tuple[float, str, bool, int]] = {}
+    for cand in candidates:
+        val = cand[1]
+        if val not in best_by_value or cand[0] > best_by_value[val][0]:
+            best_by_value[val] = cand
+    return list(best_by_value.values())
 
 
 def recognize(image: Image.Image, expected_digits: Optional[int] = None) -> tuple[Optional[str], float, list[str]]:
@@ -147,7 +189,7 @@ def recognize(image: Image.Image, expected_digits: Optional[int] = None) -> tupl
             best = row_candidates[0]
             same_value = [item for item in row_candidates if item[1] == best[1]]
             confidence = min(0.96, best[0] * (1.0 if len(same_value) > 1 else 0.85))
-            if confidence >= 0.66:
+            if confidence >= _MIN_CONFIDENCE:
                 return best[1], round(confidence, 4), ["DUAL_ROW_SPLIT_APPLIED"]
 
     # --- Pass 2: full crop ---
@@ -158,7 +200,6 @@ def recognize(image: Image.Image, expected_digits: Optional[int] = None) -> tupl
     best = candidates[0]
     same_value = [item for item in candidates if item[1] == best[1]]
     confidence = min(0.96, best[0] * (1.0 if len(same_value) > 1 else 0.85))
-    # Threshold lowered from 0.72 → 0.66 for large LCD digit formats
-    if confidence < 0.66:
+    if confidence < _MIN_CONFIDENCE:
         return None, round(confidence, 4), extra_flags + ["SEVEN_SEGMENT_LOW_CONFIDENCE"]
     return best[1], round(confidence, 4), extra_flags

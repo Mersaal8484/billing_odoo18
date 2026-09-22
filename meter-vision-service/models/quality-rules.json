@@ -1,5 +1,17 @@
 {
   "name": "baseline-image-quality-rules",
-  "version": "0.1.0",
-  "notes": "Initial deterministic rules; calibrate with labelled production images."
+  "version": "0.2.0",
+  "notes": "Calibrated from D:\\datameter batch analysis. Adjusted thresholds for field captures.",
+  "min_dimension_px": 250,
+  "min_source_side_px": 600,
+  "brightness_range": [15, 240],
+  "score_thresholds": {
+    "good": 0.75,
+    "review": 0.45
+  },
+  "penalties": {
+    "small_dimension": -0.30,
+    "low_resolution": -0.15,
+    "bad_brightness": -0.20
+  }
 }
