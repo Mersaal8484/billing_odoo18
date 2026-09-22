@@ -1,6 +1,701 @@
 {
-  "records": 0,
+  "records": 51,
   "exact": 0,
   "exact_accuracy": 0.0,
-  "results": []
+  "results": [
+    {
+      "image_id": "datameter/account.analytic.meter(129).jpg",
+      "expected": "123846",
+      "predicted": "888888",
+      "confidence": 0.85,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(13).jpg",
+      "expected": "0000008.0",
+      "predicted": "3822222.2",
+      "confidence": 0.7437,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(132).jpg",
+      "expected": "02916.4",
+      "predicted": "82608.8",
+      "confidence": 0.769,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(14).jpg",
+      "expected": "0000000.0",
+      "predicted": "8880004.2",
+      "confidence": 0.7438,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/account.analytic.meter(18).jpg",
+      "expected": "0516.6",
+      "predicted": "2300.9",
+      "confidence": 0.7043,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (31).jpg",
+      "expected": "00205.8",
+      "predicted": "88386.8",
+      "confidence": 0.8095,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (32).jpg",
+      "expected": "001577",
+      "predicted": "898871",
+      "confidence": 0.8298,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (33).jpg",
+      "expected": "000641",
+      "predicted": "311347",
+      "confidence": 0.7893,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (4).jpg",
+      "expected": "0000000.7",
+      "predicted": "8881888.2",
+      "confidence": 0.7437,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (46).jpg",
+      "expected": "12931",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false,
+      "flags": [
+        "SEVEN_SEGMENT_PATTERN_NOT_FOUND",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (47).jpg",
+      "expected": "06867",
+      "predicted": "66665",
+      "confidence": 0.8014,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (48).jpg",
+      "expected": "19924.8",
+      "predicted": "26608.8",
+      "confidence": 0.7488,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (49).jpg",
+      "expected": "0000014.2",
+      "predicted": "1322228.8",
+      "confidence": 0.7286,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (5).jpg",
+      "expected": "0000010.8",
+      "predicted": "8889816.2",
+      "confidence": 0.7741,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (50).jpg",
+      "expected": "13536",
+      "predicted": "88888",
+      "confidence": 0.85,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (51).jpg",
+      "expected": "08520.9",
+      "predicted": "02266.8",
+      "confidence": 0.769,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (53).jpg",
+      "expected": "0000058.2",
+      "predicted": "1149300.0",
+      "confidence": 0.7134,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (54).jpg",
+      "expected": "23280.0",
+      "predicted": "06628.8",
+      "confidence": 0.769,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (55).jpg",
+      "expected": "000487",
+      "predicted": "888668",
+      "confidence": 0.8298,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (56).jpg",
+      "expected": "002522",
+      "predicted": "622288",
+      "confidence": 0.769,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (57).jpg",
+      "expected": "001101",
+      "predicted": "993328",
+      "confidence": 0.8298,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (58).jpg",
+      "expected": "28456.8",
+      "predicted": "88888.8",
+      "confidence": 0.85,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (59).jpg",
+      "expected": "05160.4",
+      "predicted": "68266.8",
+      "confidence": 0.769,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (60).jpg",
+      "expected": "05233.0",
+      "predicted": "86226.8",
+      "confidence": 0.769,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (61).jpg",
+      "expected": "28183.9",
+      "predicted": "99828.8",
+      "confidence": 0.8095,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (62).jpg",
+      "expected": "10706.4",
+      "predicted": "88888.1",
+      "confidence": 0.769,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (63).jpg",
+      "expected": "26304.3",
+      "predicted": "66662.2",
+      "confidence": 0.8095,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (64).jpg",
+      "expected": "007421",
+      "predicted": "888886",
+      "confidence": 0.7893,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (65).jpg",
+      "expected": "14436.5",
+      "predicted": "36666.8",
+      "confidence": 0.8095,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (66).jpg",
+      "expected": "25509",
+      "predicted": "83826",
+      "confidence": 0.8014,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (67).jpg",
+      "expected": "316471",
+      "predicted": "220235",
+      "confidence": 0.7286,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (68).jpg",
+      "expected": "00265",
+      "predicted": "60266",
+      "confidence": 0.8014,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (69).jpg",
+      "expected": "28866",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false,
+      "flags": [
+        "SEVEN_SEGMENT_PATTERN_NOT_FOUND",
+        "QUALITY_BELOW_AUTO_THRESHOLD",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (7).jpg",
+      "expected": "00000376",
+      "predicted": "09940860",
+      "confidence": 0.7589,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (70).jpg",
+      "expected": "006233",
+      "predicted": "414888",
+      "confidence": 0.8095,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (71).jpg",
+      "expected": "24319",
+      "predicted": "88888",
+      "confidence": 0.8014,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (72).jpg",
+      "expected": "16491",
+      "predicted": "89606",
+      "confidence": 0.7286,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (73).jpg",
+      "expected": "29655",
+      "predicted": "83828",
+      "confidence": 0.8014,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (74).jpg",
+      "expected": "11881",
+      "predicted": "21483",
+      "confidence": 0.7043,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (75).jpg",
+      "expected": "09679",
+      "predicted": "38488",
+      "confidence": 0.7528,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "QUALITY_BELOW_AUTO_THRESHOLD",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (76).jpg",
+      "expected": "14630",
+      "predicted": "88882",
+      "confidence": 0.8257,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (77).jpg",
+      "expected": "20661",
+      "predicted": "88888",
+      "confidence": 0.85,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (78).jpg",
+      "expected": "0000008.7",
+      "predicted": null,
+      "confidence": 0.0,
+      "exact": false,
+      "flags": [
+        "SEVEN_SEGMENT_PATTERN_NOT_FOUND",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (79).jpg",
+      "expected": "000160",
+      "predicted": "833368",
+      "confidence": 0.7488,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (8).jpg",
+      "expected": "00001004",
+      "predicted": "88862888",
+      "confidence": 0.7589,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (80).jpg",
+      "expected": "000231",
+      "predicted": "773331",
+      "confidence": 0.7488,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "QUALITY_BELOW_AUTO_THRESHOLD",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (81).jpg",
+      "expected": "000243",
+      "predicted": "839332",
+      "confidence": 0.7488,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (82).jpg",
+      "expected": "000145",
+      "predicted": "836666",
+      "confidence": 0.6679,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (83).jpg",
+      "expected": "000278",
+      "predicted": "332222",
+      "confidence": 0.769,
+      "exact": false,
+      "flags": [
+        "DUAL_ROW_SPLIT_APPLIED",
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (84).jpg",
+      "expected": "000391",
+      "predicted": "888888",
+      "confidence": 0.7488,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    },
+    {
+      "image_id": "datameter/image (85).jpg",
+      "expected": "000067",
+      "predicted": "838888",
+      "confidence": 0.8298,
+      "exact": false,
+      "flags": [
+        "SPECIALIZED_SEVEN_SEGMENT_OCR",
+        "METER_DETECTOR_WEIGHTS_NOT_READY",
+        "METER_TYPE_WEIGHTS_NOT_READY",
+        "OCR_BELOW_AUTO_THRESHOLD"
+      ]
+    }
+  ]
 }
