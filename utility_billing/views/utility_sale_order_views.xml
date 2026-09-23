@@ -161,6 +161,11 @@
                 <filter name="draft_bills" string="مسودة" domain="[('bill_state','=','draft')]"/>
                 <separator/>
                 <filter name="group_bill_state" string="حالة الفاتورة" context="{'group_by':'bill_state'}"/>
+                <filter name="group_date_range" string="الفترة" context="{'group_by':'date_range_id'}"/>
+                <filter name="group_region" string="المنطقة" context="{'group_by':'region_id'}"/>
+                <filter name="group_area" string="المنطقة الفرعية" context="{'group_by':'area_id'}"/>
+                <filter name="group_route" string="خط السير / المسار" context="{'group_by':'route_id'}"/>
+                <filter name="group_subscriber_category" string="فئة المشترك" context="{'group_by':'subscriber_category_id'}"/>
             </filter>
         </field>
     </record>
@@ -179,7 +184,7 @@
     <record id="action_utility_sale_order" model="ir.actions.act_window">
         <field name="name">فواتير الكهرباء</field>
         <field name="res_model">sale.order</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,pivot,graph,form</field>
         <field name="domain">[('customer_id','!=',False)]</field>
         <field name="search_view_id" ref="view_utility_sale_order_search"/>
         <field name="context">{

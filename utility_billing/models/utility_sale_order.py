@@ -30,6 +30,10 @@ class UtilitySaleOrder(models.Model):
     available_billing_period_ids = fields.Many2many('date.range', compute='_compute_available_billing_period_ids')
     date_range_id = fields.Many2one('date.range', 'فترة الفاتورة', index=True)
     route_id = fields.Many2one('utility.route', related='customer_id.route_id', store=True, string='خط السير', index=True)
+    region_id = fields.Many2one('utility.region', related='customer_id.region_id', store=True, string='المنطقة', index=True)
+    area_id = fields.Many2one('utility.region', related='customer_id.area_id', store=True, string='المنطقة الفرعية', index=True)
+    zone_id = fields.Many2one('utility.region', related='customer_id.zone_id', store=True, string='المنطقة التفصيلية', index=True)
+    subscriber_category_id = fields.Many2one('utility.subscriber.category', related='customer_id.category_id', store=True, string='فئة المشترك', index=True)
 
     meter_image = fields.Binary(related='reading_id.meter_image', string='صورة العداد', readonly=False)
     reading_reviewer = fields.Many2one(related='reading_id.reviewer_id', string='مراجع القراءة')

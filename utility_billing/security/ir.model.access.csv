@@ -61,3 +61,4 @@ access_utility_billing_adjustment_manager,utility.billing.adjustment.manager,mod
 access_utility_billing_adjustment_auditor,utility.billing.adjustment.auditor,model_utility_billing_adjustment,utility_core.group_utility_auditor,1,0,0,0
 access_utility_transformer_loss_report_readonly,utility.transformer.loss.report.readonly,model_utility_transformer_loss_report,utility_core.group_utility_readonly,1,0,0,0
 access_utility_billing_adjustment_admin,utility.billing.adjustment.admin,model_utility_billing_adjustment,base.group_system,1,1,1,1
+

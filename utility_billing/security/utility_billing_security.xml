@@ -173,45 +173,6 @@
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
         </record>
-        <record id="utility_energy_sent_report_company_rule" model="ir.rule">
-            <field name="name">Energy Sent Report Multi-Company Rule</field>
-            <field name="model_id" ref="model_utility_energy_sent_report"/>
-            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
-            <field name="global" eval="True"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
-        </record>
-        <record id="utility_report_sales_collector_company_rule" model="ir.rule">
-            <field name="name">Collector Sales Report Multi-Company Rule</field>
-            <field name="model_id" ref="model_utility_report_sales_collector"/>
-            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
-            <field name="global" eval="True"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
-        </record>
-        <record id="utility_report_sales_collector_org_scope_rule" model="ir.rule">
-            <field name="name">Collector Sales Report Organizational Scope Rule</field>
-            <field name="model_id" ref="model_utility_report_sales_collector"/>
-            <field name="domain_force">[(1, '=', 1)] if user._is_global_utility_scope() else (['|', ('area_id', 'in', user._get_effective_branch_ids()), ('region_id', 'in', user._get_effective_region_ids())] if (user._get_effective_branch_ids() or user._get_effective_region_ids()) else [('id', '=', False)])</field>
-            <field name="global" eval="True"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
-        </record>
-        <record id="utility_energy_sent_report_org_scope_rule" model="ir.rule">
-            <field name="name">Energy Sent Report Organizational Scope Rule</field>
-            <field name="model_id" ref="model_utility_energy_sent_report"/>
-            <field name="domain_force">[(1, '=', 1)] if user._is_global_utility_scope() else (['|', ('area_id', 'in', user._get_effective_branch_ids()), ('region_id', 'in', user._get_effective_region_ids())] if (user._get_effective_branch_ids() or user._get_effective_region_ids()) else [('id', '=', False)])</field>
-            <field name="global" eval="True"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
-        </record>
     </data>
 </odoo>
+

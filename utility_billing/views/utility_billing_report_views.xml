@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ================================================================= -->
+    <!-- تقارير المبيعات والتحصيل عبر نموذج فواتير الكهرباء sale.order المباشر -->
+    <!-- ================================================================= -->
+
+    <!-- جدول محوري لتحليل المبيعات والتحصيل على sale.order -->
+    <record id="view_utility_sale_order_report_pivot" model="ir.ui.view">
+        <field name="name">sale.order.utility.report.pivot</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <pivot string="تحليل المبيعات والتحصيل" sample="1">
+                <field name="date_range_id" type="row"/>
+                <field name="region_id" type="row"/>
+                <field name="area_id" type="row"/>
+                <field name="consumption" type="measure"/>
+                <field name="amount_energy" type="measure"/>
+                <field name="amount_service" type="measure"/>
+                <field name="amount_total" type="measure"/>
+                <field name="amount_paid" type="measure"/>
+                <field name="balance_due" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- رسم بياني لتحليل المبيعات والتحصيل على sale.order -->
+    <record id="view_utility_sale_order_report_graph" model="ir.ui.view">
+        <field name="name">sale.order.utility.report.graph</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <graph string="المبيعات والتحصيل" type="bar" sample="1">
+                <field name="date_range_id"/>
+                <field name="amount_total" type="measure"/>
+                <field name="amount_paid" type="measure"/>
+                <field name="balance_due" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- إجراء تقرير مبيعات وسداد المناطق -->
+    <record id="action_utility_report_sales_region" model="ir.actions.act_window">
+        <field name="name">تقرير مبيعات وسداد المناطق</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">pivot,graph,tree,form</field>
+        <field name="domain">[('customer_id', '!=', False), ('state', '!=', 'cancel')]</field>
+        <field name="search_view_id" ref="view_utility_sale_order_search"/>
+        <field name="context">{
+            'search_default_group_date_range': 1,
+            'search_default_group_region': 1,
+            'search_default_group_area': 1
+        }</field>
+    </record>
+
+    <!-- ربط عروض التقرير الخاصة بإجراء مبيعات المناطق -->
+    <record id="action_utility_report_sales_region_pivot" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_utility_sale_order_report_pivot"/>
+        <field name="act_window_id" ref="action_utility_report_sales_region"/>
+    </record>
+
+    <record id="action_utility_report_sales_region_graph" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_utility_sale_order_report_graph"/>
+        <field name="act_window_id" ref="action_utility_report_sales_region"/>
+    </record>
+
+    <record id="action_utility_report_sales_region_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_utility_sale_order_tree"/>
+        <field name="act_window_id" ref="action_utility_report_sales_region"/>
+    </record>
+
+    <!-- إجراء تقرير إنجاز التحصيل والمبيع بحسب المسار -->
+    <record id="action_utility_report_sales_collector" model="ir.actions.act_window">
+        <field name="name">تقرير إنجاز التحصيل والمبيع بحسب المسار</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">pivot,graph,tree,form</field>
+        <field name="domain">[('customer_id', '!=', False), ('state', '!=', 'cancel')]</field>
+        <field name="search_view_id" ref="view_utility_sale_order_search"/>
+        <field name="context">{
+            'search_default_group_date_range': 1,
+            'search_default_group_route': 1
+        }</field>
+    </record>
+
+    <record id="action_utility_report_sales_collector_pivot" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_utility_sale_order_report_pivot"/>
+        <field name="act_window_id" ref="action_utility_report_sales_collector"/>
+    </record>
+
+    <record id="action_utility_report_sales_collector_graph" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_utility_sale_order_report_graph"/>
+        <field name="act_window_id" ref="action_utility_report_sales_collector"/>
+    </record>
+
+    <record id="action_utility_report_sales_collector_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_utility_sale_order_tree"/>
+        <field name="act_window_id" ref="action_utility_report_sales_collector"/>
+    </record>
+
+    <!-- ================================================================= -->
+    <!-- تقرير الطاقة المرسلة عبر نموذج القراءات utility.reading المباشر   -->
+    <!-- ================================================================= -->
+
+    <!-- جدول محوري لقراءات الخلايا / الفيدرات -->
+    <record id="view_utility_reading_feeder_report_pivot" model="ir.ui.view">
+        <field name="name">utility.reading.feeder.report.pivot</field>
+        <field name="model">utility.reading</field>
+        <field name="arch" type="xml">
+            <pivot string="تقرير الطاقة المرسلة" sample="1">
+                <field name="date_range_id" type="row"/>
+                <field name="feeder_id" type="row"/>
+                <field name="consumption" type="measure" string="الطاقة المرسلة (ك.و.س)"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- رسم بياني للطاقة المرسلة -->
+    <record id="view_utility_reading_feeder_report_graph" model="ir.ui.view">
+        <field name="name">utility.reading.feeder.report.graph</field>
+        <field name="model">utility.reading</field>
+        <field name="arch" type="xml">
+            <graph string="الطاقة المرسلة بحسب الخلية" type="bar" sample="1">
+                <field name="feeder_id"/>
+                <field name="consumption" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- إجراء تقرير الطاقة المرسلة على utility.reading -->
+    <record id="action_utility_energy_sent_report" model="ir.actions.act_window">
+        <field name="name">تقرير الطاقة المرسلة</field>
+        <field name="res_model">utility.reading</field>
+        <field name="view_mode">pivot,graph,tree,form</field>
+        <field name="domain">[('reading_category', '=', 'feeder'), ('state', 'in', ('approved', 'billed'))]</field>
+        <field name="search_view_id" ref="view_utility_reading_search"/>
+        <field name="context">{
+            'search_default_group_by_period': 1,
+            'search_default_group_by_feeder': 1
+        }</field>
+    </record>
+
+    <record id="action_utility_energy_sent_report_pivot" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_utility_reading_feeder_report_pivot"/>
+        <field name="act_window_id" ref="action_utility_energy_sent_report"/>
+    </record>
+
+    <record id="action_utility_energy_sent_report_graph" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_utility_reading_feeder_report_graph"/>
+        <field name="act_window_id" ref="action_utility_energy_sent_report"/>
+    </record>
+
+    <!-- ================================================================= -->
+    <!-- القوائم في شريط التنقل تحت قائمة التقارير                          -->
+    <!-- ================================================================= -->
+
+    <menuitem id="menu_utility_report_sales_region"
+              name="مبيعات وسداد المناطق"
+              parent="menu_utility_billing_reports"
+              action="action_utility_report_sales_region"
+              sequence="20"
+              groups="base.group_system,utility_core.group_utility_admin,utility_core.group_utility_billing_manager,utility_core.group_utility_supervisor,utility_core.group_utility_revenue_manager,utility_core.group_utility_auditor"/>
+
+    <menuitem id="menu_utility_report_sales_collector"
+              name="إنجاز التحصيل بحسب المسار"
+              parent="menu_utility_billing_reports"
+              action="action_utility_report_sales_collector"
+              sequence="25"
+              groups="base.group_system,utility_core.group_utility_admin,utility_core.group_utility_billing_manager,utility_core.group_utility_supervisor,utility_core.group_utility_revenue_manager,utility_core.group_utility_auditor"/>
+
+    <menuitem id="menu_utility_energy_sent_report"
+              name="تقرير الطاقة المرسلة"
+              parent="menu_utility_billing_reports"
+              action="action_utility_energy_sent_report"
+              sequence="15"
+              groups="base.group_system,utility_core.group_utility_admin,utility_core.group_utility_billing_manager,utility_core.group_utility_supervisor,utility_core.group_utility_revenue_manager,utility_core.group_utility_auditor"/>
+</odoo>
