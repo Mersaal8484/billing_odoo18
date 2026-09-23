@@ -70,6 +70,26 @@ class UtilityMigrationMapping(models.Model):
         for vals in vals_list:
             if vals.get('legacy_code'):
                 vals['legacy_code'] = vals['legacy_code'].strip()
+        
+        if self.env.context.get('install_mode') or self.env.context.get('install_module'):
+            import psycopg2
+            records = self.env['utility.migration.mapping']
+            for vals in vals_list:
+                try:
+                    with self.env.cr.savepoint():
+                        records |= super().create([vals])
+                except psycopg2.errors.UniqueViolation:
+                    existing = self.search([
+                        ('company_id', '=', vals.get('company_id', self.env.company.id)),
+                        ('mapping_type', '=', vals.get('mapping_type')),
+                        ('legacy_code', '=', vals.get('legacy_code')),
+                    ], limit=1)
+                    if existing:
+                        records |= existing
+                    else:
+                        raise
+            return records
+
         return super().create(vals_list)
 
     def write(self, vals):

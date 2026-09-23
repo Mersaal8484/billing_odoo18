@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_utility_report_sales_collector_search" model="ir.ui.view">
+        <field name="name">utility.report.sales.collector.search</field>
+        <field name="model">utility.report.sales.collector</field>
+        <field name="arch" type="xml">
+            <search string="تقرير انجاز التحصيل والمبيع بحسب الكاشف">
+                <field name="period_id"/>
+                <field name="collector_id"/>
+                <field name="region_id"/>
+                <field name="area_id"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_period" string="الفترة"
+                            context="{'group_by': 'period_id'}"/>
+                    <filter name="group_region" string="المنطقة"
+                            context="{'group_by': 'region_id'}"/>
+                    <filter name="group_collector" string="الكاشف / المتحصل"
+                            context="{'group_by': 'collector_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_utility_report_sales_collector_tree" model="ir.ui.view">
+        <field name="name">utility.report.sales.collector.tree</field>
+        <field name="model">utility.report.sales.collector</field>
+        <field name="arch" type="xml">
+            <tree string="تقرير انجاز التحصيل والمبيع بحسب الكاشف"
+                  create="0" edit="0" delete="0"
+                  default_order="period_id desc, collector_id">
+                <field name="period_id"/>
+                <field name="region_id"/>
+                <field name="collector_id"/>
+                <field name="invoice_count" sum="الإجمالي"/>
+                <field name="consumption_kwh" sum="الإجمالي"/>
+                <field name="sale_amount" sum="الإجمالي"/>
+                <field name="gross_sales" sum="الإجمالي"/>
+                <field name="cumulative_collection" sum="الإجمالي"/>
+                <field name="today_collection" sum="الإجمالي"/>
+                <field name="total_collection" sum="الإجمالي"/>
+                <field name="collection_rate" widget="percentage"/>
+                <field name="cumulative_paid_invoices" sum="الإجمالي"/>
+                <field name="today_paid_invoices" sum="الإجمالي"/>
+                <field name="total_paid_invoices" sum="الإجمالي"/>
+                <field name="paid_invoice_rate" widget="percentage"/>
+                <field name="remaining_sales" sum="الإجمالي"/>
+                <field name="remaining_invoices" sum="الإجمالي"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_utility_report_sales_collector_pivot" model="ir.ui.view">
+        <field name="name">utility.report.sales.collector.pivot</field>
+        <field name="model">utility.report.sales.collector</field>
+        <field name="arch" type="xml">
+            <pivot string="تقرير انجاز التحصيل والمبيع بحسب الكاشف"
+                   disable_linking="1">
+                <field name="period_id" type="row"/>
+                <field name="region_id" type="row"/>
+                <field name="collector_id" type="row"/>
+                <field name="invoice_count" type="measure"/>
+                <field name="consumption_kwh" type="measure"/>
+                <field name="sale_amount" type="measure"/>
+                <field name="gross_sales" type="measure"/>
+                <field name="cumulative_collection" type="measure"/>
+                <field name="today_collection" type="measure"/>
+                <field name="total_collection" type="measure"/>
+                <field name="collection_rate" type="measure"/>
+                <field name="cumulative_paid_invoices" type="measure"/>
+                <field name="today_paid_invoices" type="measure"/>
+                <field name="total_paid_invoices" type="measure"/>
+                <field name="paid_invoice_rate" type="measure"/>
+                <field name="remaining_sales" type="measure"/>
+                <field name="remaining_invoices" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_utility_report_sales_collector_graph" model="ir.ui.view">
+        <field name="name">utility.report.sales.collector.graph</field>
+        <field name="model">utility.report.sales.collector</field>
+        <field name="arch" type="xml">
+            <graph string="التحصيل والمبيع بحسب الكاشف" type="bar">
+                <field name="collector_id"/>
+                <field name="gross_sales" type="measure"/>
+                <field name="total_collection" type="measure"/>
+                <field name="remaining_sales" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_utility_report_sales_collector" model="ir.actions.act_window">
+        <field name="name">تقرير انجاز التحصيل والمبيع بحسب الكاشف</field>
+        <field name="res_model">utility.report.sales.collector</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="search_view_id" ref="view_utility_report_sales_collector_search"/>
+        <field name="domain">[('period_id', '!=', False)]</field>
+        <field name="context">{'search_default_group_period': 1, 'search_default_group_region': 2, 'search_default_group_collector': 3}</field>
+    </record>
+
+    <menuitem id="menu_utility_report_sales_collector"
+              name="تقرير انجاز التحصيل والمبيع بحسب الكاشف"
+              parent="menu_utility_billing_reports"
+              action="action_utility_report_sales_collector"
+              sequence="40"
+              groups="base.group_system,utility_core.group_utility_admin,utility_core.group_utility_billing_manager,utility_core.group_utility_supervisor,utility_core.group_utility_revenue_manager,utility_core.group_utility_auditor"/>
+</odoo>

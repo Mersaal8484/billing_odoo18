@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Template TM1 (قالب عام) -->
+        <record id="tmpl_general" model="utility.contract.template" context="{'skip_tier_validation': True}">
+            <field name="name">قالب عام</field>
+            <field name="code">TM1</field>
+            <field name="pricing_mode">tier</field>
+            <field name="recurring_rule_type">semi_monthly</field>
+            <field name="recurring_invoicing_type">postpaid</field>
+            <field name="recurring_interval">1</field>
+            <field name="subscriber_category_ids" eval="[(6, 0, [ref('utility_core.cat_public')])]" />
+            <field name="subscriber_ids" eval="[(6, 0, [ref('utility_core.sub_category_public'), ref('utility_core.sub_public_tenant'), ref('utility_core.sub_public_commercial'), ref('utility_core.sub_public_mosque'), ref('utility_core.sub_public_doctor'), ref('utility_core.sub_public_pasture'), ref('utility_core.sub_public_martyr')])]" />
+            <field name="scope">global</field>
+            <field name="sale_autoconfirm" eval="True" />
+            <field name="create_invoice_automatically" eval="True" />
+            <field name="active" eval="True" />
+            <field name="service_charge">500.0</field>
+        </record>
+
+        <!-- Template TM1 Lines -->
+        <record id="tmpl_general_line_electricity" model="utility.contract.template.line">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">10</field>
+            <field name="product_id" ref="utility_core.utility_product_consumption" />
+            <field name="name">استهلاك كهرباء</field>
+            <field name="price_type">fixed</field>
+            <field name="specific_price">0</field>
+            <field name="meter_line_type">consumption</field>
+        </record>
+        <record id="tmpl_general_line_service" model="utility.contract.template.line">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">20</field>
+            <field name="product_id" ref="utility_core.utility_product_service_charge" />
+            <field name="name">رسوم خدمات إضافية</field>
+            <field name="price_type">fixed</field>
+            <field name="specific_price">0</field>
+            <field name="meter_line_type">service_charge</field>
+        </record>
+        <record id="tmpl_general_line_mu_allim" model="utility.contract.template.line">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">30</field>
+            <field name="product_id" ref="utility_core.utility_product_mu_allim" />
+            <field name="name">رسم المعلم</field>
+            <field name="price_type">fixed</field>
+            <field name="specific_price">0</field>
+            <field name="meter_line_type">mu_allim</field>
+        </record>
+        <record id="tmpl_general_line_cleaning" model="utility.contract.template.line">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">40</field>
+            <field name="product_id" ref="utility_core.utility_product_cleaning" />
+            <field name="name">رسم النظافة</field>
+            <field name="price_type">fixed</field>
+            <field name="specific_price">0</field>
+            <field name="meter_line_type">cleaning</field>
+        </record>
+        <record id="tmpl_general_line_municipality" model="utility.contract.template.line">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">50</field>
+            <field name="product_id" ref="utility_core.utility_product_municipality" />
+            <field name="name">رسم المجالس المحلية</field>
+            <field name="price_type">fixed</field>
+            <field name="specific_price">0</field>
+            <field name="meter_line_type">municipality</field>
+        </record>
+
+        <!-- Template TM1 Blocks -->
+        <record id="tmpl_general_block_1" model="utility.contract.template.block">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">10</field><field name="name">الشريحة الأولى (0-2,999)</field><field name="from_kwh">0</field><field name="to_kwh">3000</field><field name="price_per_kwh">230</field>
+        </record>
+        <record id="tmpl_general_block_2" model="utility.contract.template.block">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">20</field><field name="name">الشريحة الثانية (3,000-9,999)</field><field name="from_kwh">3000</field><field name="to_kwh">10000</field><field name="price_per_kwh">0</field>
+        </record>
+        <record id="tmpl_general_block_3" model="utility.contract.template.block">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">30</field><field name="name">الشريحة الثالثة (10,000-19,999)</field><field name="from_kwh">10000</field><field name="to_kwh">20000</field><field name="price_per_kwh">0</field>
+        </record>
+        <record id="tmpl_general_block_4" model="utility.contract.template.block">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">40</field><field name="name">الشريحة الرابعة (20,000-29,999)</field><field name="from_kwh">20000</field><field name="to_kwh">30000</field><field name="price_per_kwh">0</field>
+        </record>
+        <record id="tmpl_general_block_5" model="utility.contract.template.block">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">50</field><field name="name">الشريحة الخامسة (30,000-99,999)</field><field name="from_kwh">30000</field><field name="to_kwh">100000</field><field name="price_per_kwh">0</field>
+        </record>
+        <record id="tmpl_general_block_6" model="utility.contract.template.block">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">60</field><field name="name">الشريحة السادسة (100,000-199,999)</field><field name="from_kwh">100000</field><field name="to_kwh">200000</field><field name="price_per_kwh">0</field>
+        </record>
+        <record id="tmpl_general_block_7" model="utility.contract.template.block">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">70</field><field name="name">الشريحة السابعة (200,000-299,999)</field><field name="from_kwh">200000</field><field name="to_kwh">300000</field><field name="price_per_kwh">0</field>
+        </record>
+        <record id="tmpl_general_block_8" model="utility.contract.template.block">
+            <field name="template_id" ref="tmpl_general" />
+            <field name="sequence">80</field><field name="name">الشريحة الثامنة (300,000+)</field><field name="from_kwh">300000</field><field name="to_kwh">0</field><field name="price_per_kwh">0</field>
+        </record>
+
+        <!-- Template TPM1 (قالب عام مع الخصم) -->
+        <record id="tmpl_general_discount" model="utility.contract.template" context="{'skip_tier_validation': True}">
+            <field name="name">قالب عام مع الخصم</field>
+            <field name="code">TPM1</field>
+            <field name="pricing_mode">tier</field>
+            <field name="recurring_rule_type">semi_monthly</field>
+            <field name="recurring_invoicing_type">postpaid</field>
+            <field name="recurring_interval">1</field>
+            <field name="subscriber_category_ids" eval="[(6, 0, [ref('utility_core.cat_public')])]" />
+            <field name="subscriber_ids" eval="[(6, 0, [ref('utility_core.sub_category_public'), ref('utility_core.sub_public_tenant'), ref('utility_core.sub_public_commercial'), ref('utility_core.sub_public_mosque'), ref('utility_core.sub_public_doctor'), ref('utility_core.sub_public_pasture'), ref('utility_core.sub_public_martyr')])]" />
+            <field name="scope">global</field>
+            <field name="sale_autoconfirm" eval="True" />
+            <field name="create_invoice_automatically" eval="True" />
+            <field name="active" eval="True" />
+            <field name="service_charge">500.0</field>
+            <field name="sponsor_id" ref="utility_core.partner_sponsor_fund" />
+            <field name="discount_formula_id" ref="utility_core.formula_discount" />
+        </record>
+
+        <!-- Template TPM1 Lines -->
+        <record id="tmpl_general_discount_line_electricity" model="utility.contract.template.line">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">10</field>
+            <field name="product_id" ref="utility_core.utility_product_consumption" />
+            <field name="name">استهلاك كهرباء</field>
+            <field name="price_type">fixed</field>
+            <field name="specific_price">0</field>
+            <field name="meter_line_type">consumption</field>
+        </record>
+        <record id="tmpl_general_discount_line_service" model="utility.contract.template.line">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">20</field>
+            <field name="product_id" ref="utility_core.utility_product_service_charge" />
+            <field name="name">رسوم خدمات إضافية</field>
+            <field name="price_type">fixed</field>
+            <field name="specific_price">0</field>
+            <field name="meter_line_type">service_charge</field>
+        </record>
+        <record id="tmpl_general_discount_line_mu_allim" model="utility.contract.template.line">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">30</field>
+            <field name="product_id" ref="utility_core.utility_product_mu_allim" />
+            <field name="name">رسم المعلم</field>
+            <field name="price_type">fixed</field>
+            <field name="specific_price">0</field>
+            <field name="meter_line_type">mu_allim</field>
+        </record>
+        <record id="tmpl_general_discount_line_cleaning" model="utility.contract.template.line">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">40</field>
+            <field name="product_id" ref="utility_core.utility_product_cleaning" />
+            <field name="name">رسم النظافة</field>
+            <field name="price_type">fixed</field>
+            <field name="specific_price">0</field>
+            <field name="meter_line_type">cleaning</field>
+        </record>
+        <record id="tmpl_general_discount_line_municipality" model="utility.contract.template.line">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">50</field>
+            <field name="product_id" ref="utility_core.utility_product_municipality" />
+            <field name="name">رسم المجالس المحلية</field>
+            <field name="price_type">fixed</field>
+            <field name="specific_price">0</field>
+            <field name="meter_line_type">municipality</field>
+        </record>
+        <record id="tmpl_general_discount_line_discount" model="utility.contract.template.line">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">60</field>
+            <field name="product_id" ref="utility_core.utility_product_discount" />
+            <field name="name">خصم استهلاك مدعوم</field>
+            <field name="price_type">fixed</field>
+            <field name="specific_price">0</field>
+            <field name="meter_line_type">discount</field>
+        </record>
+
+        <!-- Template TPM1 Pricing Blocks -->
+        <record id="tmpl_general_discount_block_1" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">10</field><field name="name">الشريحة الأولى (0-2,999)</field><field name="from_kwh">0</field><field name="to_kwh">3000</field><field name="price_per_kwh">230</field>
+        </record>
+        <record id="tmpl_general_discount_block_2" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">20</field><field name="name">الشريحة الثانية (3,000-9,999)</field><field name="from_kwh">3000</field><field name="to_kwh">10000</field><field name="price_per_kwh">0</field>
+        </record>
+        <record id="tmpl_general_discount_block_3" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">30</field><field name="name">الشريحة الثالثة (10,000-19,999)</field><field name="from_kwh">10000</field><field name="to_kwh">20000</field><field name="price_per_kwh">0</field>
+        </record>
+        <record id="tmpl_general_discount_block_4" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">40</field><field name="name">الشريحة الرابعة (20,000-29,999)</field><field name="from_kwh">20000</field><field name="to_kwh">30000</field><field name="price_per_kwh">0</field>
+        </record>
+        <record id="tmpl_general_discount_block_5" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">50</field><field name="name">الشريحة الخامسة (30,000-99,999)</field><field name="from_kwh">30000</field><field name="to_kwh">100000</field><field name="price_per_kwh">0</field>
+        </record>
+        <record id="tmpl_general_discount_block_6" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">60</field><field name="name">الشريحة السادسة (100,000-199,999)</field><field name="from_kwh">100000</field><field name="to_kwh">200000</field><field name="price_per_kwh">0</field>
+        </record>
+        <record id="tmpl_general_discount_block_7" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">70</field><field name="name">الشريحة السابعة (200,000-299,999)</field><field name="from_kwh">200000</field><field name="to_kwh">300000</field><field name="price_per_kwh">0</field>
+        </record>
+        <record id="tmpl_general_discount_block_8" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">80</field><field name="name">الشريحة الثامنة (300,000+)</field><field name="from_kwh">300000</field><field name="to_kwh">0</field><field name="price_per_kwh">0</field>
+        </record>
+
+        <!-- Template TPM1 Discount Blocks -->
+        <record id="tmpl_general_discount_block_discount_1" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">10</field>
+            <field name="name">خصم اول 100 وحدة</field>
+            <field name="from_kwh">0</field>
+            <field name="to_kwh">100</field>
+            <field name="price_per_kwh">130</field>
+            <field name="is_discount">True</field>
+        </record>
+        <record id="tmpl_general_discount_block_discount_2" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">20</field><field name="name">الشريحة الثانية</field><field name="from_kwh">100</field><field name="to_kwh">10000</field><field name="price_per_kwh">0</field><field name="is_discount">True</field>
+        </record>
+        <record id="tmpl_general_discount_block_discount_3" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">30</field><field name="name">الشريحة الثالثة</field><field name="from_kwh">10000</field><field name="to_kwh">20000</field><field name="price_per_kwh">0</field><field name="is_discount">True</field>
+        </record>
+        <record id="tmpl_general_discount_block_discount_4" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">40</field><field name="name">الشريحة الرابعة</field><field name="from_kwh">20000</field><field name="to_kwh">30000</field><field name="price_per_kwh">0</field><field name="is_discount">True</field>
+        </record>
+        <record id="tmpl_general_discount_block_discount_5" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">50</field><field name="name">الشريحة الخامسة</field><field name="from_kwh">30000</field><field name="to_kwh">100000</field><field name="price_per_kwh">0</field><field name="is_discount">True</field>
+        </record>
+        <record id="tmpl_general_discount_block_discount_6" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">60</field><field name="name">الشريحة السادسة</field><field name="from_kwh">100000</field><field name="to_kwh">200000</field><field name="price_per_kwh">0</field><field name="is_discount">True</field>
+        </record>
+        <record id="tmpl_general_discount_block_discount_7" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">70</field><field name="name">الشريحة السابعة</field><field name="from_kwh">200000</field><field name="to_kwh">300000</field><field name="price_per_kwh">0</field><field name="is_discount">True</field>
+        </record>
+        <record id="tmpl_general_discount_block_discount_8" model="utility.contract.template.block" context="{'skip_tier_validation': True}">
+            <field name="template_id" ref="tmpl_general_discount" />
+            <field name="sequence">80</field><field name="name">الشريحة الثامنة</field><field name="from_kwh">300000</field><field name="to_kwh">0</field><field name="price_per_kwh">0</field><field name="is_discount">True</field>
+        </record>
+
+    </data>
+</odoo>
