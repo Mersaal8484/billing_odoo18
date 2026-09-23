@@ -197,12 +197,12 @@ class UtilitySaleOrder(models.Model):
 
     def _compute_pricing_snapshot_id(self):
         for order in self:
-            snapshot = self.env['utility.bill.pricing.snapshot'].search([('sale_order_id', '=', order.id)], limit=1)
+            snapshot = self.env['utility.bill.pricing.snapshot'].sudo().search([('sale_order_id', '=', order.id)], limit=1)
             order.pricing_snapshot_id = snapshot.id if snapshot else False
 
     def _compute_pricing_snapshot_count(self):
         for order in self:
-            count = self.env['utility.bill.pricing.snapshot'].search_count([('sale_order_id', '=', order.id)])
+            count = self.env['utility.bill.pricing.snapshot'].sudo().search_count([('sale_order_id', '=', order.id)])
             order.pricing_snapshot_count = count
 
     def action_view_pricing_snapshot(self):

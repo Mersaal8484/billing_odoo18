@@ -173,6 +173,20 @@
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
         </record>
+
+        <record id="utility_bill_pricing_snapshot_company_rule" model="ir.rule">
+            <field name="name">Utility Bill Pricing Snapshot Multi-Company Rule</field>
+            <field name="model_id" ref="model_utility_bill_pricing_snapshot"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="utility_bill_pricing_block_company_rule" model="ir.rule">
+            <field name="name">Utility Bill Pricing Block Multi-Company Rule</field>
+            <field name="model_id" ref="model_utility_bill_pricing_block"/>
+            <field name="domain_force">['|', ('sale_order_id.company_id', '=', False), ('sale_order_id.company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
     </data>
 </odoo>
 
