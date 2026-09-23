@@ -63,6 +63,7 @@
 ## Reading
 
 - [`READING_BATCH_ARCHITECTURE.md`](READING_BATCH_ARCHITECTURE.md)
+- [`METER_VISION_OCR_ROADMAP.md`](METER_VISION_OCR_ROADMAP.md) — خارطة طريق الذكاء الاصطناعي وOCR لقراءة العدادات وخطوات الوصول لأعلى دقة.
 
 ## API and integration
 
