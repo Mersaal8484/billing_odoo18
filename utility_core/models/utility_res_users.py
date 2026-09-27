@@ -177,7 +177,70 @@ class ResUsers(models.Model):
         users = super().create(vals_list)
         if any(vals.get('utility_role_ids') for vals in vals_list):
             users._sync_utility_roles_to_groups()
+        users._sync_utility_staff_links()
         return users
+
+    def _sync_utility_staff_links(self):
+        """Create or link a staff file for each new internal utility user.
+
+        Existing unlinked staff records are reused only when the match is
+        unambiguous: the partner is identical, or the name and at least one
+        phone number match.  Otherwise a new staff file is created so a user
+        is never attached to the wrong employee by an approximate name match.
+        """
+        Staff = self.env['utility.staff']
+        for user in self.filtered(lambda record: record.active and not record.share):
+            if Staff.search([('user_id', '=', user.id)], limit=1):
+                continue
+
+            partner = user.partner_id
+            candidates = Staff.search([
+                ('user_id', '=', False),
+                ('company_id', '=', (user.company_id or self.env.company).id),
+                ('name', '=', user.name),
+            ])
+            if partner:
+                partner_matches = candidates.filtered(
+                    lambda staff: staff.partner_id == partner
+                )
+                if len(partner_matches) == 1:
+                    candidates = partner_matches
+
+            user_phones = {
+                value.strip()
+                for value in (partner.phone, partner.mobile)
+                if value and value.strip()
+            }
+            phone_matches = candidates.filtered(
+                lambda staff: bool(user_phones.intersection({
+                    value.strip()
+                    for value in (staff.phone, staff.mobile)
+                    if value and value.strip()
+                }))
+            )
+            if len(phone_matches) == 1:
+                candidates = phone_matches
+            elif len(candidates) > 1 or (
+                len(candidates) == 1 and not (
+                    partner and candidates.partner_id == partner
+                )
+            ):
+                candidates = Staff.browse()
+
+            if len(candidates) == 1:
+                candidates.write({'user_id': user.id})
+                continue
+
+            values = {
+                'name': user.name,
+                'user_id': user.id,
+                'company_id': user.company_id.id or self.env.company.id,
+                'phone': partner.phone or False,
+                'mobile': partner.mobile or False,
+            }
+            if partner.utility_partner_type == 'employee':
+                values['partner_id'] = partner.id
+            Staff.create(values)
 
     def write(self, vals):
         scope_fields = {'scope_mode', 'assigned_region_ids', 'assigned_branch_ids'}

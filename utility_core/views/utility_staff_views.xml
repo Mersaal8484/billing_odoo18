@@ -39,6 +39,18 @@
                             <field name="phone" placeholder="01XXXXXX"/>
                         </group>
                     </group>
+                    <group string="الصلاحيات والنطاق التنظيمي" attrs="{'invisible': [('user_id', '=', False)]}">
+                        <group string="النطاق التنظيمي" col="2">
+                            <field name="user_scope_mode" readonly="1"/>
+                            <field name="user_assigned_region_ids" widget="many2many_tags" readonly="1"/>
+                            <field name="user_assigned_branch_ids" widget="many2many_tags" readonly="1"/>
+                            <field name="user_assigned_route_ids" widget="many2many_tags" readonly="1"/>
+                        </group>
+                        <group string="صلاحيات الكهرباء" col="2">
+                            <field name="user_utility_role_ids" widget="many2many_tags" readonly="1"/>
+                            <field name="user_group_ids" widget="many2many_tags" readonly="1"/>
+                        </group>
+                    </group>
                 </sheet>
             </form>
         </field>
@@ -52,9 +64,34 @@
                 <field name="name" string="اسم الموظف"/>
                 <field name="employee_code"/>
                 <field name="user_id"/>
+                <field name="mobile"/>
+                <field name="phone"/>
+                <field name="team_id"/>
+                <field name="region_id"/>
+                <field name="area_id"/>
+                <field name="user_scope_mode"/>
+                <field name="user_utility_role_ids"/>
+                <field name="user_group_ids"/>
                 <separator/>
                 <filter name="active" string="النشطون فقط" domain="[('active','=',True)]"/>
                 <filter name="inactive" string="المعطلون" domain="[('active','=',False)]"/>
+                <filter name="linked_user" string="مرتبط بمستخدم" domain="[('user_id','!=',False)]"/>
+                <filter name="unlinked_user" string="بدون مستخدم" domain="[('user_id','=',False)]"/>
+                <filter name="restricted_scope" string="نطاق مقيّد" domain="[('user_scope_mode','=','restricted')]"/>
+                <filter name="global_scope" string="وصول شامل" domain="[('user_scope_mode','=','global')]"/>
+                <filter name="has_utility_role" string="لديه دور كهرباء" domain="[('user_utility_role_ids','!=',False)]"/>
+                <filter name="without_utility_role" string="بدون دور كهرباء" domain="[('user_utility_role_ids','=',False)]"/>
+                <filter name="has_region" string="له منطقة مخصصة" domain="[('user_assigned_region_ids','!=',False)]"/>
+                <filter name="has_branch" string="له فرع مخصص" domain="[('user_assigned_branch_ids','!=',False)]"/>
+                <filter name="has_route" string="له خطوط سير" domain="[('user_assigned_route_ids','!=',False)]"/>
+                <separator/>
+                <filter name="group_company" string="الشركة" context="{'group_by': 'company_id'}"/>
+                <filter name="group_team" string="الفريق" context="{'group_by': 'team_id'}"/>
+                <filter name="group_region" string="المنطقة" context="{'group_by': 'region_id'}"/>
+                <filter name="group_area" string="الفرع" context="{'group_by': 'area_id'}"/>
+                <filter name="group_scope" string="وضع النطاق" context="{'group_by': 'user_scope_mode'}"/>
+                <filter name="group_user" string="المستخدم" context="{'group_by': 'user_id'}"/>
+                <filter name="group_active" string="الحالة" context="{'group_by': 'active'}"/>
             </search>
         </field>
     </record>

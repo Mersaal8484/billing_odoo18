@@ -14,6 +14,16 @@ from odoo.tests.common import TransactionCase
 class TestStaffScopeSync(TransactionCase):
     """اختبارات تزامن النطاق الجغرافي: utility.staff → res.users."""
 
+    def _staff_for_user(self, user, values):
+        """Use the auto-created staff file when the user already has one."""
+        staff = self.env['utility.staff'].search([
+            ('user_id', '=', user.id),
+        ], limit=1)
+        if staff:
+            staff.write(values)
+            return staff
+        return self.env['utility.staff'].create(dict(values, user_id=user.id))
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -103,14 +113,18 @@ class TestStaffScopeSync(TransactionCase):
     # ── §4-1: إنشاء موظف يُزامن النطاق تلقائياً ──────────────────────────
     def test_01_staff_create_syncs_region_to_user(self):
         """موظف جديد بـ region_id + user_id يُملأ assigned_region_ids تلقائياً دون تدخل يدوي."""
+        auto_staff = self.env['utility.staff'].search([
+            ('user_id', '=', self.user_a.id),
+        ], limit=1)
+        self.assertTrue(auto_staff, "إنشاء المستخدم الداخلي يجب أن ينشئ ملف موظف مرتبطاً به")
+        self.assertEqual(auto_staff.name, self.user_a.name)
         self.assertFalse(
             self.user_a.assigned_region_ids,
             "المستخدم يجب أن يبدأ بلا نطاق قبل إنشاء سجل الموظف",
         )
 
-        self.env['utility.staff'].create({
+        self._staff_for_user(self.user_a, {
             'name': 'موظف صنعاء (اختبار إنشاء)',
-            'user_id': self.user_a.id,
             'region_id': self.region_a.id,
             'area_id': self.area_a1.id,
         })
@@ -129,9 +143,8 @@ class TestStaffScopeSync(TransactionCase):
     # ── §4-2: تعديل region_id على الموظف يُحدِّث المستخدم ────────────────
     def test_02_staff_write_region_syncs_to_user(self):
         """تغيير region_id على موظف قائم يُحدِّث assigned_region_ids للمستخدم المرتبط فوراً."""
-        staff = self.env['utility.staff'].create({
+        staff = self._staff_for_user(self.user_b, {
             'name': 'موظف عدن (اختبار تعديل)',
-            'user_id': self.user_b.id,
             'region_id': self.region_b.id,
         })
         self.assertIn(self.region_b, self.user_b.assigned_region_ids)
@@ -164,9 +177,8 @@ class TestStaffScopeSync(TransactionCase):
                 self.env.ref('utility_core.group_utility_supervisor').id,
             ])],
         })
-        self.env['utility.staff'].create({
+        self._staff_for_user(clean_user_a, {
             'name': 'موظف صنعاء — عزل',
-            'user_id': clean_user_a.id,
             'region_id': self.region_a.id,
         })
 

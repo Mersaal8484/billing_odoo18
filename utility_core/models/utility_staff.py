@@ -19,6 +19,37 @@ class UtilityStaff(models.Model):
     active = fields.Boolean('نشط', default=True, tracking=True)
     company_id = fields.Many2one('res.company', 'الشركة', default=lambda self: self.env.company)
     user_id = fields.Many2one('res.users', 'المستخدم', tracking=True)
+    user_scope_mode = fields.Selection(
+        related='user_id.scope_mode',
+        string='وضع النطاق التنظيمي',
+        store=True,
+        readonly=True,
+    )
+    user_assigned_region_ids = fields.Many2many(
+        related='user_id.assigned_region_ids',
+        string='المناطق المخصصة',
+        readonly=True,
+    )
+    user_assigned_branch_ids = fields.Many2many(
+        related='user_id.assigned_branch_ids',
+        string='الفروع المخصصة',
+        readonly=True,
+    )
+    user_assigned_route_ids = fields.Many2many(
+        related='user_id.assigned_route_ids',
+        string='خطوط السير المخصصة',
+        readonly=True,
+    )
+    user_utility_role_ids = fields.Many2many(
+        related='user_id.utility_role_ids',
+        string='الأدوار الوظيفية للكهرباء',
+        readonly=True,
+    )
+    user_group_ids = fields.Many2many(
+        related='user_id.groups_id',
+        string='مجموعات المستخدم',
+        readonly=True,
+    )
     employee_code = fields.Char('رمز الموظف', tracking=True)
     name = fields.Char('الاسم', required=True, tracking=True)
     partner_id = fields.Many2one(
