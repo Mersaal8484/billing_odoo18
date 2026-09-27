@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="team_region_first" model="utility.team">
+        <field name="name">فريق المنطقة الأولى</field>
+        <field name="code">TEAM-REG-01</field>
+        <field name="region_id" ref="region_first"/>
+    </record>
+    <record id="team_region_second" model="utility.team">
+        <field name="name">فريق المنطقة الثانية</field>
+        <field name="code">TEAM-REG-02</field>
+        <field name="region_id" ref="region_second"/>
+    </record>
+    <record id="team_region_third" model="utility.team">
+        <field name="name">فريق المنطقة الثالثة</field>
+        <field name="code">TEAM-REG-03</field>
+        <field name="region_id" ref="region_third"/>
+    </record>
+    <record id="team_region_fourth" model="utility.team">
+        <field name="name">فريق المنطقة الرابعة</field>
+        <field name="code">TEAM-REG-04</field>
+        <field name="region_id" ref="region_fourth"/>
+    </record>
+    <record id="team_region_hodeidah" model="utility.team">
+        <field name="name">فريق منطقة الحديدة</field>
+        <field name="code">TEAM-REG-HUD</field>
+        <field name="region_id" ref="region_hodeidah"/>
+    </record>
+    <record id="team_region_second_distribution" model="utility.team">
+        <field name="name">فريق المنطقة الثانية توزيع</field>
+        <field name="code">TEAM-REG-DIS-02</field>
+        <field name="region_id" ref="region_second_distribution"/>
+    </record>
+    <record id="team_region_hajjah" model="utility.team">
+        <field name="name">فريق منطقة حجة</field>
+        <field name="code">TEAM-REG-HAJ</field>
+        <field name="region_id" ref="region_hajjah"/>
+    </record>
+    <record id="team_region_generation" model="utility.team">
+        <field name="name">فريق منطقة التوليد</field>
+        <field name="code">TEAM-REG-GEN</field>
+        <field name="region_id" ref="region_generation"/>
+    </record>
+    <record id="team_region_rada" model="utility.team">
+        <field name="name">فريق منطقة رداع</field>
+        <field name="code">TEAM-REG-RAD</field>
+        <field name="region_id" ref="region_rada"/>
+    </record>
+    <record id="team_region_amran" model="utility.team">
+        <field name="name">فريق منطقة عمران</field>
+        <field name="code">TEAM-REG-AMR</field>
+        <field name="region_id" ref="region_amran"/>
+    </record>
+    <record id="team_region_dhamar" model="utility.team">
+        <field name="name">فريق منطقة ذمار</field>
+        <field name="code">TEAM-REG-DHA</field>
+        <field name="region_id" ref="region_dhamar"/>
+    </record>
+    <record id="team_region_sanaa" model="utility.team">
+        <field name="name">فريق منطقة صنعاء</field>
+        <field name="code">TEAM-REG-SAN</field>
+        <field name="region_id" ref="region_sanaa"/>
+    </record>
+    <record id="team_region_ibb" model="utility.team">
+        <field name="name">فريق منطقة إب</field>
+        <field name="code">TEAM-REG-IBB</field>
+        <field name="region_id" ref="region_ibb"/>
+    </record>
+    <record id="team_region_saada" model="utility.team">
+        <field name="name">فريق منطقة صعدة</field>
+        <field name="code">TEAM-REG-SAA</field>
+        <field name="region_id" ref="region_saada"/>
+    </record>
+    <record id="team_region_taiz" model="utility.team">
+        <field name="name">فريق منطقة تعز</field>
+        <field name="code">TEAM-REG-TAZ</field>
+        <field name="region_id" ref="region_taiz"/>
+    </record>
+    <record id="team_region_mahwit" model="utility.team">
+        <field name="name">فريق منطقة المحويت</field>
+        <field name="code">TEAM-REG-MAH</field>
+        <field name="region_id" ref="region_mahwit"/>
+    </record>
+    <record id="team_region_yarim" model="utility.team">
+        <field name="name">فريق منطقة يريم</field>
+        <field name="code">TEAM-REG-YAR</field>
+        <field name="region_id" ref="region_yarim"/>
+    </record>
+    <record id="team_region_bayda" model="utility.team">
+        <field name="name">فريق منطقة البيضاء</field>
+        <field name="code">TEAM-REG-BAY</field>
+        <field name="region_id" ref="region_bayda"/>
+    </record>
+    <record id="team_region_jawf" model="utility.team">
+        <field name="name">فريق منطقة الجوف</field>
+        <field name="code">TEAM-REG-JAW</field>
+        <field name="region_id" ref="region_jawf"/>
+    </record>
+</odoo>

@@ -27,6 +27,7 @@ User Role.
         'data/utility_meter_status_data.xml',
         'data/utility_subscriber_data.xml',
         'data/utility_region_data.xml',
+        'data/utility_team_data.xml',
         'data/utility_config_data.xml',
         'data/utility_product_data.xml',
         'data/utility_pricelist_data.xml',

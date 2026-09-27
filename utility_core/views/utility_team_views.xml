@@ -9,6 +9,7 @@
                 <field name="code"/>
                 <field name="team_leader_id"/>
                 <field name="member_count"/>
+                <field name="region_id"/>
                 <field name="area_id"/>
                 <field name="active"/>
             </tree>
@@ -32,8 +33,8 @@
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group>
-                            <field name="region_id"/>
-                            <field name="area_id"/>
+                            <field name="region_id" required="1" options="{'no_create': True}"/>
+                            <field name="area_id" options="{'no_create': True}"/>
                         </group>
                     </group>
                     <notebook>
@@ -57,14 +58,29 @@
         <field name="model">utility.team</field>
         <field name="arch" type="xml">
             <search>
-                <field name="name"/>
-                <field name="code"/>
-                <field name="team_leader_id"/>
-                <field name="area_id"/>
-                <filter name="active" string="Active" domain="[('active','=',True)]"/>
-                <group expand="0" string="Group By">
-                    <filter name="group_area" string="Area" context="{'group_by':'area_id'}"/>
-                    <filter name="group_region" string="Region" context="{'group_by':'region_id'}"/>
+                <field name="name" string="اسم الفريق" filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="code" string="رمز الفريق"/>
+                <field name="region_id" string="المنطقة"/>
+                <field name="area_id" string="الفرع"/>
+                <field name="team_leader_id" string="قائد الفريق"/>
+                <field name="staff_ids" string="أعضاء الفريق"/>
+                <field name="company_id" string="الشركة" groups="base.group_multi_company"/>
+                <separator/>
+                <filter name="active" string="الفرق النشطة" domain="[('active','=',True)]"/>
+                <filter name="inactive" string="الفرق المؤرشفة" domain="[('active','=',False)]"/>
+                <filter name="has_area" string="لها فرع محدد" domain="[('area_id','!=',False)]"/>
+                <filter name="no_area" string="بدون فرع محدد" domain="[('area_id','=',False)]"/>
+                <filter name="has_leader" string="لها قائد" domain="[('team_leader_id','!=',False)]"/>
+                <filter name="no_leader" string="بدون قائد" domain="[('team_leader_id','=',False)]"/>
+                <filter name="has_members" string="لها أعضاء" domain="[('member_count','>',0)]"/>
+                <filter name="no_members" string="بلا أعضاء" domain="[('member_count','=',0)]"/>
+                <separator/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_region" string="المنطقة" context="{'group_by':'region_id'}"/>
+                    <filter name="group_area" string="الفرع" context="{'group_by':'area_id'}"/>
+                    <filter name="group_leader" string="قائد الفريق" context="{'group_by':'team_leader_id'}"/>
+                    <filter name="group_company" string="الشركة" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    <filter name="group_active" string="الحالة" context="{'group_by':'active'}"/>
                 </group>
             </search>
         </field>
