@@ -262,8 +262,19 @@ class UtilityServiceOrder(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('order_number', _('جديد')) == _('جديد'):
-                vals['order_number'] = self.env['ir.sequence'].next_by_code('utility.service.order') or _('جديد')
+                company_id = vals.get('company_id') or self.env.company.id
+                while True:
+                    seq = self.env['ir.sequence'].next_by_code('utility.service.order') or _('جديد')
+                    if seq == _('جديد') or not self.sudo().search_count([('order_number', '=', seq), ('company_id', '=', company_id)]):
+                        vals['order_number'] = seq
+                        break
         return super().create(vals_list)
+
+    def unlink(self):
+        for rec in self:
+            if rec.state != 'draft':
+                raise ValidationError(_('لا يمكن حذف أمر الخدمة إلا في حالة المسودة.'))
+        return super().unlink()
 
     @api.model
     def cron_detect_zero_consumption_meters(self, batch_limit=500):

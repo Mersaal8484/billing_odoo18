@@ -237,6 +237,8 @@ class ResUsers(models.Model):
                 'company_id': user.company_id.id or self.env.company.id,
                 'phone': partner.phone or False,
                 'mobile': partner.mobile or False,
+                'region_id': user.assigned_region_ids[0].id if user.assigned_region_ids else False,
+                'area_id': user.assigned_branch_ids[0].id if user.assigned_branch_ids else False,
             }
             if partner.utility_partner_type == 'employee':
                 values['partner_id'] = partner.id

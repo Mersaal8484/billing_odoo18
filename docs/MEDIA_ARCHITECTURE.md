@@ -75,12 +75,12 @@ Boundary adapters are responsible for:
 
 Before ready:
 - decode successful.
-- supported image format.
+- supported image format (JPEG/PNG/WebP).
 - Pillow verify.
 - MIME detection from bytes.
 - max size/dimensions policy.
 - optional rotation/orientation normalization.
-- generate variants.
+- single standard attachment storage in Odoo Filestore (`attachment=True`). No separate thumbnail files or database variants generated.
 
 Invalid bytes never become Ready.
 

@@ -1,9 +1,14 @@
 {
     'name': 'Utility Meter Vision',
-    'version': '16.0.1.0.0',
+    'version': '16.0.0.0.0',
     'category': 'Utility ERP',
-    'summary': 'طلبات تحليل صور العدادات مع مراجعة بشرية',
-    'description': 'يسجل نتائج خدمة الرؤية الحاسوبية دون تعديل القراءة أو الفاتورة تلقائياً.',
+    'summary': '[قيد التطوير - غير مفعّل] طلبات تحليل صور العدادات بالذكاء الاصطناعي',
+    'description': (
+        'وحدة مستقبلية لتحليل صور العدادات عبر OCR/Computer Vision. '
+        'هذه الوحدة قيد التطوير وليست جزءاً من إصدار V1 الحالي. '
+        'لا يجب تثبيتها في بيئات الإنتاج. '
+        'سيتم تفعيلها في مرحلة V2 بعد اكتمال التطوير والاختبار.'
+    ),
     'author': 'Utility ERP Platform',
     'license': 'LGPL-3',
     'depends': ['utility_core'],
@@ -15,7 +20,14 @@
         'views/utility_meter_vision_menu.xml',
         'views/res_config_settings_views.xml',
     ],
-    'installable': True,
+    # -------------------------------------------------------------------
+    # FUTURE MODULE — NOT PART OF V1
+    # هذه الوحدة قيد التطوير ولن تُثبَّت في بيئة الإنتاج الحالية.
+    # سيتم تفعيلها في V2 بعد اكتمال التطوير والاختبار والتحقق.
+    # -------------------------------------------------------------------
+    'installable': False,
     'application': False,
     'auto_install': False,
+    'development_status': 'Alpha',
 }
+

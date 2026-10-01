@@ -67,7 +67,12 @@ class UtilityWorkOrder(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('work_order_number', _('جديد')) == _('جديد'):
-                vals['work_order_number'] = self.env['ir.sequence'].next_by_code('utility.work.order') or _('جديد')
+                company_id = vals.get('company_id') or self.env.company.id
+                while True:
+                    seq = self.env['ir.sequence'].next_by_code('utility.work.order') or _('جديد')
+                    if seq == _('جديد') or not self.sudo().search_count([('work_order_number', '=', seq), ('company_id', '=', company_id)]):
+                        vals['work_order_number'] = seq
+                        break
         return super().create(vals_list)
 
     def action_assign(self):

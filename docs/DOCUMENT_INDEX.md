@@ -101,7 +101,7 @@ The repository router is [`../AGENTS.md`](../AGENTS.md). Repo-local execution sk
 ## Current V1 module chain
 
 ```text
-date_range
+date_range (External OCA Dependency)
     ↓
 utility_core
     ↓
@@ -112,7 +112,9 @@ utility_operations
 utility_billing
 ```
 
-`utility_prepaid` is **OUT OF SCOPE for V1**.
+`utility_prepaid` and `additional` have been **removed from the repository**. V1 is strictly focused on Postpaid electricity distribution.
+
+`utility_meter_vision` (OCR/AI Vision) is a **future V2 module** (`installable: False`) — **not part of V1**. Do not install or reference it as a current dependency.
 
 ## Root operational release entrypoints
 

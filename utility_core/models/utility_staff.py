@@ -142,6 +142,9 @@ class UtilityStaff(models.Model):
             region_ids = record.region_id.ids if record.region_id else []
             area_ids = record.area_id.ids if record.area_id else []
 
+            if not region_ids and not area_ids and (user.assigned_region_ids or user.assigned_branch_ids):
+                continue
+
             _logger.info(
                 'utility.staff [%s] "%s": مزامنة نطاق جغرافي → مستخدم uid=%s | '
                 'region_ids=%s area_ids=%s',

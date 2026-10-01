@@ -18,7 +18,7 @@ Implementation SHA: `bf951a05a6031e94192e692dacbeb9dd01ca035e`
 Documentation Version: `3.2`
 Documentation Status: Current V1 (Including Implemented Organizational Region/Branch Data Isolation)
 
-Requirements below distinguish current implementation from accepted target architecture. Current V1 is the `date_range → utility_core → utility_inventory → utility_operations → utility_billing` chain; `utility_prepaid` is out of scope. Runtime/CI proof is deferred unless a requirement explicitly cites executed evidence.
+Requirements below distinguish current implementation from accepted target architecture. Current V1 is the `date_range (OCA) → utility_core → utility_inventory → utility_operations → utility_billing` chain; `utility_prepaid` and `additional` have been deleted from the repository.
 
 ### Current V1 lifecycle compatibility
 
@@ -36,9 +36,9 @@ Direct state editing is not equivalent to executing a workflow action because ac
 
 ### Organizational security requirements
 
-The security architecture SHALL keep functional roles independent from organizational scope. Current V1 groups answer what a user may do; the existing assigned Regions/Routes and company boundaries provide partial scope controls. In the canonical `utility.region` hierarchy, `type='area'` is the organizational Branch. A complete `GLOBAL/RESTRICTED` scope mode, automatic Region-to-area expansion, explicit additional area/Branch assignment, and comprehensive server-side isolation remain **TARGET V1 SECURITY HARDENING** until verified in source and runtime UAT.
+The security architecture SHALL keep functional roles independent from organizational scope. In the canonical `utility.region` hierarchy, `type='area'` is the organizational Branch. A complete `GLOBAL/RESTRICTED` scope mode, automatic Region-to-area expansion (`_get_effective_branch_ids()`), explicit Branch assignment, and server-side isolation via true global record rules (`global=True`, `groups=[(6, 0, [])]`) are **CURRENT V1 VERIFIED IMPLEMENTATION**.
 
-An empty restricted scope SHALL be default-deny. UI domains SHALL NOT be treated as the security boundary. Any future `sudo()` path SHALL resolve company and organizational scope before processing user-supplied identifiers.
+An empty restricted scope SHALL be default-deny. UI domains SHALL NOT be treated as the security boundary. Any `sudo()` path SHALL resolve company and organizational scope before processing user-supplied identifiers.
 
 > صياغة قابلة للاختبار للمتطلبات باستخدام معرفات ثابتة وعبارة SHALL.
 
@@ -117,7 +117,7 @@ An empty restricted scope SHALL be default-deny. UI domains SHALL NOT be treated
 ### Media
 
 **SRS-MED-001** — SHALL represent canonical evidence as `utility.media.asset`.
-**SRS-MED-002** — SHALL support original/review/thumbnail variants.
+**SRS-MED-002** — SHALL store evidence as standard single `ir.attachment` records (`attachment=True`) without redundant thumbnail variants or external object storage (S3/MinIO) in V1.
 **SRS-MED-003** — SHALL accept raw bytes at the Media Service boundary.
 **SRS-MED-004** — SHALL validate image bytes before marking asset ready.
 **SRS-MED-005** — SHALL authorize media using the same geographic policy as the linked business record.

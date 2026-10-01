@@ -44,16 +44,10 @@
             <field name="code">EM_TP</field>
             <field name="description">عداد قياس استهلاك مشتركين ثلاثي</field>
         </record>
-        <record id="meter_type_sts_single_prepaid" model="utility.meter.type">
-            <field name="name">عداد مشترك مسبق الدفع</field>
-            <field name="code">STS_SP_PRE</field>
-            <field name="description">عداد قياس استهلاك مشتركين مسبق الدفع</field>
-        </record>
-        <record id="meter_type_sts_three_prepaid" model="utility.meter.type">
-            <field name="name">عداد مشترك تجاري مسبق الدفع</field>
-            <field name="code">STS_TP_PRE</field>
-            <field name="description">عداد قياس استهلاك مشتركين تجاري مسبق الدفع</field>
-        </record>
+        <!-- Removed: meter_type_sts_single_prepaid & meter_type_sts_three_prepaid -->
+        <!-- V1 is strictly Postpaid. Prepaid/STS meter types are OUT OF SCOPE. -->
+        <!-- These XML IDs are retired; do not reuse in V1 data files.           -->
+
         <record id="meter_type_smart_single_postpaid" model="utility.meter.type">
             <field name="name">عداد مشترك آجل الدفع</field>
             <field name="code">SMART_SP_POST</field>

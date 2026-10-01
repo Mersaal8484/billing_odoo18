@@ -234,6 +234,9 @@ class TestMeterStockExecution(TransactionCase):
             'usage': 'internal',
             'company_id': dummy_company.id,
         })
+        wh = self.env['stock.warehouse'].search([('company_id', '=', dummy_company.id)])
+        wh.write({'out_type_id': False})
+        self.env['stock.picking.type'].search([('warehouse_id', 'in', wh.ids), ('code', '=', 'outgoing')]).write({'warehouse_id': False})
         with self.assertRaises(ValidationError):
             self.meter._resolve_meter_picking_type(
                 source_loc=dummy_loc,

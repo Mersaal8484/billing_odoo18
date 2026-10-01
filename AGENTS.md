@@ -38,9 +38,13 @@ Do not present TARGET V2 proposals, a UI affordance, a test file, or an empty CI
 
 ## Project and dependency invariants
 
-- Odoo 16 ERP for electricity distribution. Install addons in this order: `date_range`, `utility_core`, `utility_inventory`, `utility_operations`, `utility_billing`, then optional `utility_prepaid`.
-- `utility_core` is always first. Migration staging models live inside `utility_core`; there is no standalone `utility_migration` addon. `utility_portal` was merged into `utility_billing`.
-- V1 is postpaid. Do not introduce prepaid vending or STS/POS architecture into V1 scope.
+- Odoo 16 ERP for electricity distribution. External dependency: `date_range` (from OCA). Core repository addons installed in this order: `utility_core`, `utility_inventory`, `utility_operations`, `utility_billing`. **`utility_meter_vision` is a future V2 OCR/AI module** — its manifest is `installable: False` and it must NOT be installed in V1 production environments.
+- `utility_core` is always first among repo addons. Migration staging models live inside `utility_core`; there is no standalone `utility_migration` addon. `utility_portal` was merged into `utility_billing`.
+- V1 is strictly postpaid. `utility_prepaid` and `additional` directories have been deleted from the repository. Do not introduce prepaid vending, STS/POS architecture, or OCR/AI auto-billing into V1 scope.
+
+- Media architecture uses standard Odoo `ir.attachment` (`attachment=True`) stored in the native Filestore. Thumbnail generation and external object storage (S3/MinIO) are excluded from V1.
+- All record rules for organizational data isolation must be true global rules (`global=True`, `groups=[(6, 0, [])]`) so they evaluate with strict conjunction (`AND`) against multi-company rules.
+- Staff geographic scope synchronization is non-destructive: a staff record without defined regions/areas does not wipe user assigned regions.
 - `utility_core` owns master data and the base unified `utility.reading`; `utility_billing` owns financial extensions and billing APIs.
 - The utility Bill is inherited `sale.order`; the posted Invoice is `account.move`; payments are `account.payment`. Do not recreate deleted `utility.bill`, `utility.collection`, or allocation ledgers.
 - Standard Odoo stock, lots, pickings, quants, and valuation are physical custody truth. `utility.meter` is the logical record and `utility_inventory` is the bridge.

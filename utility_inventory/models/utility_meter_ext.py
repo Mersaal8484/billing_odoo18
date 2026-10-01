@@ -203,35 +203,37 @@ class UtilityMeterExt(models.Model):
         if warehouse:
             return warehouse
 
-        company = (self and self.company_id) or (source_loc and source_loc.company_id) or self.env.company
+        company = (source_loc and source_loc.company_id) or (self and self.company_id) or self.env.company
 
         # 2. Inferred from source_loc
         if source_loc:
             wh = getattr(source_loc, 'warehouse_id', False)
             if not wh and hasattr(source_loc, 'get_warehouse'):
                 wh = source_loc.get_warehouse()
-            if not wh:
-                wh = self.env['stock.warehouse'].search([
-                    ('company_id', '=', company.id),
-                    '|', ('view_location_id', 'parent_of', source_loc.id),
-                    ('lot_stock_id', 'parent_of', source_loc.id),
-                ], limit=1)
+            if wh and wh.company_id == company:
+                return wh
+            wh = self.env['stock.warehouse'].search([
+                ('company_id', '=', company.id),
+                '|', ('view_location_id', 'parent_of', source_loc.id),
+                ('lot_stock_id', 'parent_of', source_loc.id),
+            ], limit=1)
             if wh:
                 return wh
 
         # 3. Inferred from current lot location
         if self and hasattr(self, '_get_lot_current_location'):
             cur_loc = self._get_lot_current_location()
-            if cur_loc:
+            if cur_loc and (not cur_loc.company_id or cur_loc.company_id == company):
                 wh = getattr(cur_loc, 'warehouse_id', False) or (
                     hasattr(cur_loc, 'get_warehouse') and cur_loc.get_warehouse()
                 )
-                if not wh:
-                    wh = self.env['stock.warehouse'].search([
-                        ('company_id', '=', company.id),
-                        '|', ('view_location_id', 'parent_of', cur_loc.id),
-                        ('lot_stock_id', 'parent_of', cur_loc.id),
-                    ], limit=1)
+                if wh and wh.company_id == company:
+                    return wh
+                wh = self.env['stock.warehouse'].search([
+                    ('company_id', '=', company.id),
+                    '|', ('view_location_id', 'parent_of', cur_loc.id),
+                    ('lot_stock_id', 'parent_of', cur_loc.id),
+                ], limit=1)
                 if wh:
                     return wh
 
@@ -241,6 +243,8 @@ class UtilityMeterExt(models.Model):
             return warehouses[0]
 
         # 5. Deterministic failure
+        if not warehouses:
+            raise ValidationError(_('لم يتم العثور على أي مستودع مسجل للشركة %s.') % company.name)
         raise ValidationError(_(
             'لم يتم تحديد المستودع (Warehouse) المطلوب للعملية المخزنية، ويوجد أكثر من مستودع مسجل للشركة %s. '
             'يرجى اختيار المستودع صراحة في أمر الخدمة أو تفاصيل العملية.'
@@ -408,6 +412,11 @@ class UtilityMeterExt(models.Model):
         self.ensure_one()
         self._ensure_physical_identity(_('تركيب عداد'))
 
+        # Idempotency check before resolving warehouse or movement validations
+        existing = self._get_existing_meter_picking('install', operation_ref)
+        if existing:
+            return existing
+
         wh = self._resolve_warehouse(warehouse=warehouse)
         stock_loc = wh.lot_stock_id
         cust_loc = self.env.ref('stock.stock_location_customers', raise_if_not_found=False)
@@ -565,7 +574,10 @@ class UtilityMeterExt(models.Model):
         current_loc = self._get_lot_current_location()
         wh = self._resolve_warehouse(warehouse=warehouse, source_loc=current_loc)
         source_loc = current_loc or wh.meter_inspection_location_id
-        scrap_loc = self.env.ref('stock.stock_location_scrapped', raise_if_not_found=False)
+        scrap_loc = self.env.ref('stock.stock_location_scrapped', raise_if_not_found=False) or self.env['stock.location'].search([
+            ('scrap_location', '=', True),
+            ('company_id', 'in', [self.company_id.id or self.env.company.id, False]),
+        ], limit=1)
         if not source_loc or not scrap_loc:
             raise ValidationError(_('مواقع المخزون (Scrap Location) غير معرفة.'))
 

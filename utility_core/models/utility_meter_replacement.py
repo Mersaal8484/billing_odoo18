@@ -84,23 +84,31 @@ class UtilityMeterReplacement(models.Model):
         ('done', 'تم الاستبدال (Done)'),
     ], string="الحالة", default='draft', tracking=True)
 
-    @api.depends('target_type', 'utility_account_id', 'utility_account_id.meter_id', 'feeder_id', 'feeder_id.coupling_meter_id', 'transformer_id', 'transformer_id.coupling_meter_id')
+    @api.depends('target_type', 'old_meter_id', 'utility_account_id', 'utility_account_id.meter_id', 'feeder_id', 'feeder_id.coupling_meter_id', 'transformer_id', 'transformer_id.coupling_meter_id')
     def _compute_old_meter_info(self):
         for rec in self:
+            if rec.state == 'done':
+                continue
             meter = False
             last_invo_reading = 0.0
             if rec.target_type == 'subscriber' and rec.utility_account_id:
                 acc = rec.utility_account_id
-                meter = acc.meter_id
-                last_invo_reading = acc.last_invoice_reading or acc.last_reading_value or 0.0
+                meter = rec.old_meter_id or acc.meter_id
+                last_invo_reading = (
+                    rec.old_last_invo_reading
+                    or acc.last_invoice_reading
+                    or acc.last_reading_value
+                    or (meter.last_reading_value if meter else 0.0)
+                    or 0.0
+                )
             elif rec.target_type == 'feeder' and rec.feeder_id:
                 feeder = rec.feeder_id
-                meter = feeder.coupling_meter_id or self.env['utility.meter'].search([('linked_feeder_id', '=', feeder.id)], limit=1)
-                last_invo_reading = meter.last_reading_value if meter else 0.0
+                meter = rec.old_meter_id or feeder.coupling_meter_id or self.env['utility.meter'].search([('linked_feeder_id', '=', feeder.id)], limit=1)
+                last_invo_reading = rec.old_last_invo_reading or (meter.last_reading_value if meter else 0.0)
             elif rec.target_type == 'transformer' and rec.transformer_id:
                 trans = rec.transformer_id
-                meter = trans.coupling_meter_id or self.env['utility.meter'].search([('linked_transformer_id', '=', trans.id)], limit=1)
-                last_invo_reading = meter.last_reading_value if meter else 0.0
+                meter = rec.old_meter_id or trans.coupling_meter_id or self.env['utility.meter'].search([('linked_transformer_id', '=', trans.id)], limit=1)
+                last_invo_reading = rec.old_last_invo_reading or (meter.last_reading_value if meter else 0.0)
 
             if meter:
                 rec.old_meter_id = meter
@@ -174,8 +182,12 @@ class UtilityMeterReplacement(models.Model):
             if target and target.company_id != rec.company_id:
                 raise ValidationError(_('العنصر المستهدف وعملية الاستبدال يجب أن ينتميا إلى الشركة نفسها.'))
             phase = rec._get_target_phase()
+            if rec.old_meter_id and rec.new_meter_id and rec.old_meter_id == rec.new_meter_id:
+                raise UserError(_('يجب اختيار عداد جديد مختلف عن العداد القديم.'))
             if rec.new_meter_id:
-                if rec.new_meter_id.connection_type != 'not_connected':
+                if (not self.env.context.get('in_replacement_execution')
+                        and rec.state == 'draft'
+                        and rec.new_meter_id.connection_type != 'not_connected'):
                     raise ValidationError(_('العداد الجديد المختار يجب أن يكون غير مرتبط.'))
                 if phase and not rec.new_meter_id.phase:
                     raise ValidationError(_('يجب أن يكون للعداد الجديد طور محدد من موديل العداد.'))
@@ -270,6 +282,7 @@ class UtilityMeterReplacement(models.Model):
 
     def _action_confirm_replacement_unified(self):
         """Complete replacement and create auditable closing/opening readings for Subscribers, Feeders, or Transformers."""
+        self = self.with_context(in_replacement_execution=True)
         for rec in self:
             if rec.state == 'done':
                 continue
@@ -327,9 +340,15 @@ class UtilityMeterReplacement(models.Model):
                 new_meter = self.env['utility.meter'].create(meter_vals)
                 rec.new_meter_id = new_meter
 
-            if not new_meter or old_meter == new_meter:
-                raise UserError(_('يجب اختيار عداد جديد مختلف عن العداد القديم.'))
-            if rec.old_closing_reading < rec.old_last_invo_reading:
+            prev_reading = rec.old_last_invo_reading
+            if not prev_reading and account:
+                prev_reading = account.last_invoice_reading or account.last_reading_value or 0.0
+            elif not prev_reading and old_meter:
+                prev_reading = old_meter.last_reading_value or 0.0
+            if not rec.old_last_invo_reading and prev_reading:
+                rec.old_last_invo_reading = prev_reading
+
+            if rec.old_closing_reading < prev_reading:
                 raise UserError(_('القراءة الختامية لا يمكن أن تقل عن آخر قراءة مفوترة.'))
 
             Reading = self.env['utility.reading'].with_context(_bypass_reading_protection=True)
@@ -340,7 +359,7 @@ class UtilityMeterReplacement(models.Model):
                 'meter_id': old_meter.id,
                 'reading_date': rec.replace_date,
                 'reading_value': rec.old_closing_reading,
-                'previous_reading': rec.old_last_invo_reading,
+                'previous_reading': prev_reading,
                 'previous_reading_date': (account.last_invoice_date if account else False) or rec.replace_date,
                 'meter_multiplier': old_meter.multiplier or 1.0,
                 'reading_type': 'manual',

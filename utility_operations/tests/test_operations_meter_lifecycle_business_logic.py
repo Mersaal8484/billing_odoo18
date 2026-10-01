@@ -45,6 +45,7 @@ class TestOperationsMeterLifecycleBusinessLogic(TransactionCase):
             'company_id': cls.company.id,
             'multiplier': 1.0,
             'active': True,
+            'connection_type': 'subscriber',
         })
 
         cls.customer = cls.Customer.create({
@@ -65,7 +66,7 @@ class TestOperationsMeterLifecycleBusinessLogic(TransactionCase):
             'company_id': cls.company.id,
             'date_from': fields.Datetime.now(),
             'initial_reading': 1000.0,
-            'assignment_type': 'initial',
+            'assignment_type': 'initial_installation',
         })
 
         # العداد الجديد
@@ -81,15 +82,15 @@ class TestOperationsMeterLifecycleBusinessLogic(TransactionCase):
         قيد التحقق: منع استبدال العداد بنفسه.
         - محاولة إجراء استبدال يكون فيه old_meter_id هو نفسه new_meter_id يجب أن ترفع UserError.
         """
-        replacement = self.Replacement.create({
-            'utility_account_id': self.customer.id,
-            'old_meter_id': self.old_meter.id,
-            'new_meter_id': self.old_meter.id,
-            'old_closing_reading': 3000.0,
-            'new_opening_reading': 0.0,
-            'reason': 'test',
-        })
         with self.assertRaises(UserError):
+            replacement = self.Replacement.create({
+                'utility_account_id': self.customer.id,
+                'old_meter_id': self.old_meter.id,
+                'new_meter_id': self.old_meter.id,
+                'old_closing_reading': 3000.0,
+                'new_opening_reading': 0.0,
+                'reason': 'fault',
+            })
             replacement.action_complete_replacement()
 
     def test_02_replacement_rejects_reading_lower_than_last_invoiced(self):
@@ -104,7 +105,7 @@ class TestOperationsMeterLifecycleBusinessLogic(TransactionCase):
             'new_meter_id': self.new_meter.id,
             'old_closing_reading': 2400.0,
             'new_opening_reading': 0.0,
-            'reason': 'test_lower_reading',
+            'reason': 'fault',
         })
         with self.assertRaises(UserError):
             replacement.action_complete_replacement()
@@ -125,7 +126,7 @@ class TestOperationsMeterLifecycleBusinessLogic(TransactionCase):
             'new_meter_id': self.new_meter.id,
             'old_closing_reading': 3200.0,
             'new_opening_reading': 50.0,
-            'reason': 'damaged',
+            'reason': 'fault',
             'notes': 'تلف العداد واستبداله بعداد جديد',
         })
         replacement.action_complete_replacement()
@@ -179,21 +180,21 @@ class TestOperationsMeterLifecycleBusinessLogic(TransactionCase):
     def test_04_service_order_lifecycle_transitions(self):
         """
         التحقق من دورة حياة أمر الخدمة (utility.service.order):
-        - الانتقال المنضبط: draft -> submitted -> assigned -> in_progress -> completed
+        - الانتقال المنضبط: draft -> approved -> scheduled -> in_progress -> completed
         - منع الحذف بعد مرحلة المسودة
         """
         so = self.ServiceOrder.create({
             'customer_id': self.customer.id,
-            'order_type': 'maintenance',
-            'priority': '1',
+            'service_type': 'maintenance',
+            'priority': 'normal',
             'description': 'فحص دوري للعداد والتوصيلات',
         })
         self.assertEqual(so.state, 'draft')
 
-        # تقديم الطلب
-        so.action_submit()
-        self.assertEqual(so.state, 'submitted')
+        # اعتماد الطلب
+        so.action_approve()
+        self.assertEqual(so.state, 'approved')
 
         # منع الحذف
-        with self.assertRaises((UserError, ValidationError)):
+        with self.assertRaises(ValidationError):
             so.unlink()

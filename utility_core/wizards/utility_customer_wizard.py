@@ -100,9 +100,8 @@ class UtilityCustomerWizard(models.TransientModel):
     operational_number = fields.Char(string='الرقم التشغيلي')
     payment_type = fields.Selection([
         ('postpaid', 'آجل الدفع'),
-        ('prepaid', 'دفع مسبق'),
         ('manual', 'يدوي')
-    ], string='نظام العداد', default='manual', required=True)
+    ], string='نظام العداد', default='postpaid', required=True)
 
     def _get_dynamic_domains(self):
         """Return UI domains without relying on helper field names in JS eval."""

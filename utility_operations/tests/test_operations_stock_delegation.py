@@ -191,7 +191,7 @@ class TestOperationsStockDelegation(TransactionCase):
         """Disconnection resolves customer from attached meter if customer_id is empty, or fails if unresolvable."""
         self.meter.inventory_install_meter(origin='PRE-INST-09')
         self.meter.write({'customer_id': self.customer.id})
-        self.customer.write({'meter_id': self.meter.id})
+        self.customer.with_context(lifecycle_operation=True).write({'meter_id': self.meter.id})
         self.customer.action_activate()
 
         # 1. Successful disconnection resolving customer from meter_id
@@ -222,7 +222,7 @@ class TestOperationsStockDelegation(TransactionCase):
     def test_10_reconnection_service_order_executes_lifecycle(self):
         """Reconnection executes action_reconnect on customer."""
         self.meter.write({'customer_id': self.customer.id})
-        self.customer.write({'meter_id': self.meter.id})
+        self.customer.with_context(lifecycle_operation=True).write({'meter_id': self.meter.id})
         self.customer.action_activate()
         self.customer.with_context(lifecycle_override=True).action_disconnect(reason='فصل تجريبي لإعادة التوصيل')
 

@@ -40,13 +40,11 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_accounting_invoices" type="object"
-                                class="oe_stat_button" icon="fa-usd"
-                                attrs="{'invisible': [('payment_type', '=', 'prepaid')]}">
+                                class="oe_stat_button" icon="fa-usd">
                             <field name="accounting_balance" string="المديونية" widget="statinfo"/>
                         </button>
                         <button name="action_view_bills" type="object"
-                                class="oe_stat_button" icon="fa-pencil-square-o"
-                                attrs="{'invisible': [('payment_type', '=', 'prepaid')]}">
+                                class="oe_stat_button" icon="fa-pencil-square-o">
                             <field name="invoice_count" string="الفواتير" widget="statinfo"/>
                         </button>
                         <button name="action_view_accounting_invoices" type="object"
@@ -54,8 +52,7 @@
                             <field name="accounting_invoice_count" string="الفواتير المحاسبية" widget="statinfo"/>
                         </button>
                         <button name="action_view_readings" type="object"
-                                class="oe_stat_button" icon="fa-tasks"
-                                attrs="{'invisible': [('payment_type', '=', 'prepaid')]}">
+                                class="oe_stat_button" icon="fa-tasks">
                             <field name="reading_count" string="القراءات" widget="statinfo"/>
                         </button>
                         <button name="action_view_payments" type="object"
@@ -81,7 +78,7 @@
                             <field name="partner_id" domain="[('utility_partner_type', '=', 'subscriber')]"/>
                             <field name="category_id" options="{'no_create': True}"/>
                             <field name="subscriber_id" options="{'no_create': True}"/>
-                            <field name="payment_type" widget="badge" decoration-info="payment_type == 'prepaid'" decoration-success="payment_type == 'postpaid'"/>
+                            <field name="payment_type" widget="badge" decoration-success="payment_type == 'postpaid'"/>
                             <field name="active"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
@@ -92,7 +89,7 @@
                             <field name="zone_id"/>
 
                             <field name="available_route_ids" invisible="1"/>
-                            <field name="route_id" domain="[('id', 'in', available_route_ids)]" attrs="{'invisible': [('payment_type', '=', 'prepaid')]}"/>
+                            <field name="route_id" domain="[('id', 'in', available_route_ids)]"/>
                         </group>
                     </group>
                     
@@ -210,7 +207,6 @@
                 <filter name="disconnected_state" string="مفصول" domain="[('state','=','disconnected')]"/>
                 <filter name="closed_state" string="مغلق" domain="[('state','=','closed')]"/>
                 <filter name="postpaid" string="آجل" domain="[('payment_type','=','postpaid')]"/>
-                <filter name="prepaid" string="مسبق" domain="[('payment_type','=','prepaid')]"/>
                 <filter name="private_transformer" string="محول خاص" domain="[('is_private_transformer','=',True)]"/>
                 <filter name="without_meter" string="بدون عداد" domain="[('meter_id','=',False)]"/>
                 <filter name="without_route" string="بدون مسار" domain="[('route_id','=',False)]"/>

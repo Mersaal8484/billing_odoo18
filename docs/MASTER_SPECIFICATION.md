@@ -22,9 +22,12 @@ This document separates implementation evidence at the reviewed SHA from accepte
 
 ### Current V1 scope
 
-`date_range → utility_core → utility_inventory → utility_operations → utility_billing`
+`date_range (OCA) → utility_core → utility_inventory → utility_operations → utility_billing`
 
-`utility_prepaid` is **OUT OF SCOPE** for the current V1 release. There is no customer wallet architecture, no parallel financial ledger, and no duplicate stock ledger.
+> **`utility_meter_vision`** (OCR/AI Vision) هي وحدة مستقبلية قيد التطوير (`installable: False`) وليست جزءاً من V1. لا تُدرج كاعتمادية حالية.
+
+
+`utility_prepaid` and `additional` have been **deleted from the repository**. V1 is strictly focused on Postpaid electricity distribution. There is no customer wallet architecture, no parallel financial ledger, and no duplicate stock ledger.
 
 ### Current workflow and safety baseline
 
@@ -149,7 +152,7 @@ Functional role authorization is **CURRENT V1**. User-assigned Regions/Routes an
 يجب أن تمر القراءة بمرحلة Validation/VEE/Review قبل أن تصبح Approved/Billable وفق السياسة.
 
 ### MS-FR-006 — Media Evidence
-يجب أن يرتبط دليل الصورة بـ`utility.media.asset`، مع Original/Review/Thumbnail، وتخزين قابل للتبديل عبر Adapter.
+يجب أن يرتبط دليل الصورة بـ`utility.media.asset` كمرفق Odoo قياسي موحد (`ir.attachment`) في الـ Filestore بدون توليد مصغرات (No Thumbnails) وبدون S3/MinIO في الإصدار V1.
 
 ### MS-FR-007 — Billing
 يجب أن ينتج النظام فاتورة Utility واحدة لكل Account + Reading Period نشط، مع Reading Components Immutable.

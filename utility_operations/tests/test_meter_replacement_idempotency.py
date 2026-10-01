@@ -36,6 +36,7 @@ class TestMeterReplacementIdempotency(TransactionCase):
         cls.old_meter = cls.Meter.create({
             'meter_number': 'MTR-OLD-001',
             'company_id': cls.env.company.id,
+            'connection_type': 'subscriber',
         })
 
         cls.customer = cls.Customer.create({
@@ -45,6 +46,7 @@ class TestMeterReplacementIdempotency(TransactionCase):
             'subscriber_id': cls.subscriber.id,
             'meter_id': cls.old_meter.id,
         })
+        cls.old_meter.customer_id = cls.customer.id
 
         cls.new_meter = cls.Meter.create({
             'meter_number': 'MTR-NEW-001',

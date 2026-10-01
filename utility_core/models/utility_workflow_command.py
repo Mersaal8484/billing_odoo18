@@ -76,8 +76,9 @@ class UtilityWorkflowCommand(models.Model):
     company_id = fields.Many2one('res.company', string='الشركة / Company', default=lambda self: self.env.company, index=True)
 
     backend = fields.Selection([
-        ('local', 'محلي (تطوير) / Local Outbox (Dev)'),
-        ('temporal', 'تيمبورال (إنتاج) / Temporal (Prod)'),
+        ('local', 'محلي (Outbox) / Local Outbox'),
+        ('temporal', 'تيمبورال / Temporal (Prod)'),
+        ('queue_job', 'طوابير OCA موزعة / OCA Queue Job'),
     ], string='محرك المعالجة / Workflow Backend', default='local', required=True, index=True)
 
     state = fields.Selection([
@@ -443,3 +444,34 @@ class UtilityWorkflowCommand(models.Model):
             'failed': failed,
             'skipped': skipped,
         }
+
+    # -------------------------------------------------------------------------
+    # OCA Queue Job Handler — يُستدعى من with_delay() تلقائياً
+    # -------------------------------------------------------------------------
+    def _execute_via_queue_job_handler(self, command_id):
+        """
+        نقطة الدخول لـ OCA Queue Job:
+        يُنفَّذ هذا الأسلوب داخل worker منفصل عبر queue_job.
+        يتولى تنفيذ الأمر بمنطق المحول المحلي (محول محايد للأعمال).
+
+        :param command_id: معرف سجل utility.workflow.command المراد تنفيذه
+        :return: ملخص نتيجة التنفيذ (str)
+        """
+        from ..adapters.workflow.local import LocalWorkflowAdapter
+
+        cmd = self.sudo().browse(command_id).exists()
+        if not cmd:
+            _logger.warning("QueueJob handler: command ID %s not found, skipping.", command_id)
+            return 'not_found'
+
+        local_adapter = LocalWorkflowAdapter(self.env)
+        result = local_adapter.execute_command(cmd)
+        status = result.get('status', 'unknown')
+        _logger.info(
+            "QueueJob handler: command [%s] finished with status=%s.",
+            cmd.name, status
+        )
+        if status == 'failed':
+            # إعادة رفع الخطأ حتى يُعيد OCA queue_job المحاولة تلقائياً
+            raise Exception(result.get('error', 'Unknown execution error in queue_job handler'))
+        return status

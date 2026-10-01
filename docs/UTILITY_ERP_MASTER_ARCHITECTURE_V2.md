@@ -30,10 +30,10 @@
 
 ### Mandatory classification
 
-- **CURRENT V1:** سلسلة التشغيل الحالية هي `date_range → utility_core → utility_inventory → utility_operations → utility_billing`. Odoo/PostgreSQL، `account.move`، وStandard Odoo Stock هي مصادر الحقيقة الحالية. `utility_prepaid` خارج V1.
-- **TARGET V2:** PgBouncer، التوسع الأفقي، backend وسائط قابل للتوسع، partition planning، micro-batch billing على نطاق كبير، وHybrid/Temporal orchestration عند الحاجة.
+- **CURRENT V1:** سلسلة التشغيل الحالية هي `date_range (OCA) → utility_core → utility_inventory → utility_operations → utility_billing`. Odoo/PostgreSQL، `account.move`، وStandard Odoo Stock هي مصادر الحقيقة الحالية. `utility_prepaid` و`additional` تم حذفهما تماماً من المستودع للتركيز الصارم على الآجل (Postpaid). `utility_meter_vision` (OCR/AI) وحدة مستقبلية قيد التطوير وغير مثبتة في V1.
+- **TARGET V2:** PgBouncer، التوسع الأفقي، partition planning، micro-batch billing على نطاق كبير، وHybrid/Temporal orchestration عند الحاجة.
 - **DEFERRED:** runtime/CI proof، load benchmarking، rollout فعلي للتقسيم، وتحسين `stock.quant` N+1 حتى يثبت profiling أثرًا إنتاجيًا.
-- **OUT OF SCOPE:** إدخال customer wallet أو دفتر مالي/مخزون موازٍ، وضم `utility_prepaid` إلى Release V1.
+- **OUT OF SCOPE:** إدخال customer wallet أو دفتر مالي/مخزون موازٍ، أو معمارية الدفع المسبق (STS/Prepaid).
 
 ### Current V1 workflow corrections
 
@@ -42,7 +42,7 @@
 - Reading Batch الحالي يستخدم `uploaded → processing → done / partial / error` مع Cron bounded processing و`FOR UPDATE NOWAIT` وSQLSTATE `55P03` handling، ويعرض `image_count`, `progress_percent`, active/attention filters.
 - Bill هو تمثيل تجاري لـ`sale.order`، بينما Accounting Invoice هو `account.move`؛ توجد smart navigation من Bill إلى الفواتير المحاسبية والدفعات.
 - Write-off الحالي هو `draft → approved → applied`، وله invariant: **One write-off → at most one generated Credit Note**.
-- Security CURRENT V1 يثبت Role-Based groups، `assigned_region_ids`/`assigned_route_ids`، وشركة كحد أعلى مع قواعد Region/Route محددة؛ أما unified `GLOBAL/RESTRICTED` Region/Branch isolation الشامل فهو **TARGET V1 SECURITY HARDENING**.
+- Security CURRENT V1: تم تفعيل والتحقق من طبقة العزل الجغرافي الموحدة `GLOBAL/RESTRICTED` بنجاح عبر قواعد سجلات عامة حقيقية (`global=True`, `groups=[(6, 0, [])]`) مع المزامنة غير الإتلافية لنطاقات الموظفين والمستخدمين.
 
 ### Current V1 operational diagrams
 
@@ -178,12 +178,10 @@ utility_core
 utility_billing
 utility_operations
 utility_inventory
-utility_prepaid
+# utility_meter_vision — FUTURE V2 (OCR/AI Vision, قيد التطوير، غير مثبت في V1)
 ```
 
-قدرات Portal وIntegration تبقى ضمن الوحدات الحالية، ولا يتم إنشاء Module جديد لمجرد فصل Feature صغير.
-
-`utility_prepaid` موجود، لكنه ليس ضمن مسار Production Hardening الحالي للـPostpaid؛ يتم تجميده أثناء تثبيت Core/Billing/Operations/Inventory.
+قدرات Portal وIntegration تبقى ضمن الوحدات الحالية، ولا يتم إنشاء Module جديد لمجرد فصل Feature صغير. يتم استدعاء اعتمادية `date_range` من مستودع OCA، وتم حذف `utility_prepaid` و`additional` من المستودع للتركيز الصارم على استقرار الآجل.
 
 ---
 
@@ -2104,7 +2102,7 @@ Kafka
 Separate Media Microservice
 Utility Wallet
 Tax Engine
-Full Prepaid Redesign
+Full Prepaid Redesign (STS/Vending — خارج نطاق V1 كلياً)
 Complex Business Multi-Company Partitioning
 Distributed SQL Database
 Temporal workflow per individual bill

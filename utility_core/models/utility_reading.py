@@ -97,8 +97,8 @@ class UtilityReading(models.Model):
     rejected_at = fields.Datetime('تاريخ الرفض', readonly=True, copy=False)
     is_validated = fields.Boolean('تم التحقق', default=False)
     validator_id = fields.Many2one('res.users', 'المُتحقّق')
-    previous_reading = fields.Float('القراءة السابقة', compute='_compute_previous_reading', store=True)
-    previous_reading_date = fields.Datetime('تاريخ القراءة السابقة', compute='_compute_previous_reading', store=True)
+    previous_reading = fields.Float('القراءة السابقة', compute='_compute_previous_reading', store=True, readonly=False)
+    previous_reading_date = fields.Datetime('تاريخ القراءة السابقة', compute='_compute_previous_reading', store=True, readonly=False)
     consumption_difference = fields.Float('فرق الاستهلاك',
         compute='_compute_consumption_analysis', store=True)
     consumption_diff_percentage = fields.Float('نسبة الفرق %',
@@ -617,7 +617,7 @@ class UtilityReading(models.Model):
                 r.consumption_diff_percentage = 0
                 r.consumption_alert = 'normal'
 
-    @api.depends('meter_id', 'reading_date')
+    @api.depends('meter_id', 'reading_date', 'reading_purpose', 'replacement_id', 'account_id')
     def _compute_previous_reading(self):
         meters = self.mapped('meter_id')
         prev_map = {}
@@ -639,8 +639,14 @@ class UtilityReading(models.Model):
                     found = True
                     break
             if not found:
-                r.previous_reading = 0.0
-                r.previous_reading_date = False
+                if r.reading_purpose == 'replacement_closing' and r.replacement_id and r.replacement_id.old_last_invo_reading:
+                    r.previous_reading = r.replacement_id.old_last_invo_reading
+                elif r.account_id and (r.account_id.last_invoice_reading or r.account_id.last_reading_value):
+                    r.previous_reading = r.account_id.last_invoice_reading or r.account_id.last_reading_value or 0.0
+                elif not r.previous_reading:
+                    r.previous_reading = 0.0
+                if not r.previous_reading_date:
+                    r.previous_reading_date = False
 
     def _get_effective_previous_reading(self):
         """Return the effective previous reading value for the NEXT reading's consumption calculation.

@@ -31,7 +31,11 @@ class UtilityMeterReplacement(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('order_number', _('New')) == _('New'):
-                vals['order_number'] = self.env['ir.sequence'].next_by_code('utility.meter.replacement') or _('New')
+                while True:
+                    seq = self.env['ir.sequence'].next_by_code('utility.meter.replacement') or _('New')
+                    if seq == _('New') or not self.sudo().search_count([('order_number', '=', seq)]):
+                        vals['order_number'] = seq
+                        break
         return super().create(vals_list)
 
     def action_complete_replacement(self):
@@ -48,15 +52,22 @@ class UtilityMeterReplacement(models.Model):
         new_meter = self.new_meter_id
         ref = self.order_number or self.name
 
-        # 1. Delegate physical stock execution to canonical inventory layer
-        if old_meter:
+        # 1. Delegate physical stock execution to canonical inventory layer if physical identity is present
+        if (
+            old_meter and hasattr(old_meter, 'inventory_replace_meter')
+            and old_meter.product_id and old_meter.lot_id
+            and new_meter and new_meter.product_id and new_meter.lot_id
+        ):
             old_meter.inventory_replace_meter(
                 new_meter=new_meter,
                 origin=ref,
                 operation_ref=f"REPLACEMENT:{ref}",
                 old_destination='inspection',
             )
-        elif new_meter:
+        elif (
+            new_meter and hasattr(new_meter, 'inventory_install_meter')
+            and new_meter.product_id and new_meter.lot_id
+        ):
             new_meter.inventory_install_meter(
                 origin=ref,
                 operation_ref=f"REPLACEMENT:{ref}:INSTALL",

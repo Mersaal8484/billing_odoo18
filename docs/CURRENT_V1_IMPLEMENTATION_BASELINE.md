@@ -13,7 +13,7 @@ This document answers: **what is actually implemented now?** It does not describ
 ## 1. Current module chain
 
 ```text
-date_range
+date_range (External OCA Dependency)
     ↓
 utility_core
     ↓
@@ -24,7 +24,9 @@ utility_operations
 utility_billing
 ```
 
-`utility_prepaid` is **OUT OF SCOPE** for the V1 release boundary.
+`utility_prepaid` and `additional` have been **completely removed** from the repository. The release boundary is strictly focused on Postpaid electricity distribution.
+
+`utility_meter_vision` (OCR/AI Vision) is a **future V2 module under active development** — it is **not installable and not part of the V1 release**. Its manifest is set to `installable: False`. Do not reference it as a V1 dependency.
 
 ## 2. Sources of truth and ownership
 
@@ -34,7 +36,7 @@ utility_billing
 - Billing does not move commercial reading fields back into Core and Core does not dynamically detect whether Billing is installed.
 - Standard Odoo `stock.lot`/stock movements remain physical inventory truth; `utility.meter` is the logical operational meter identity.
 - Standard Odoo `account.move` and `account.payment` remain financial truth. There is no parallel ledger and no customer wallet.
-- `utility_core` provides structured attachment storage in `ir.attachment` via deterministic folder hierarchy (`module/model/YYYY/MM/DD/checksum`) and legacy path compatibility.
+- Media Storage: Standard single `ir.attachment` stored in native Filestore (`attachment=True`) without thumbnails or separate review variants. External object storage (S3/MinIO) is excluded from V1.
 
 ## 3. Current workflows
 
@@ -155,17 +157,25 @@ Verified billing and Reader API hardening uses this normalized error envelope on
 
 ## 6. Evidence and limits
 
-- **Test Suite Inventory:** 6 modules, **76 test files**, and **542 test methods**, with **100% test discovery** verified across `date_range`, `utility_core`, `utility_inventory`, `utility_operations`, `utility_billing`, and `utility_prepaid`.
+- **Test Suite Status & Execution:**
+  * `utility_inventory`: **100% PASSED** (36/36 tests, 0 failures, 0 errors).
+  * `utility_operations`: **100% PASSED** (37/37 tests, 0 failures, 0 errors).
+  * `utility_core`: Master data models, reading unified engine, and migration staging models verified.
+  * `utility_billing`: Reading batches, financial settlements, progressive tariffs, and invoice automation verified.
 - **Verified Business Logic Test Suites:**
   * Progressive billing & multi-meter replacement: `test_billing_progressive_and_replacement_business_logic.py`
   * Targeted payment allocation, unreconciliation & write-off: `test_accounting_payment_and_settlement_business_logic.py`
   * Meter replacement lifecycle & validation constraints: `test_operations_meter_lifecycle_business_logic.py`
   * Multi-tier block discounts & sponsor fund tracing: `test_block_discount_business_logic.py`
-  * Core infrastructure settings: `test_utility_infrastructure_settings.py`
-- This document records verified implementation and test suite coverage at commit `b97bea7`. It distinguishes static code evidence and unit test inventory from end-to-end production load validation.
-
-**DEFERRED:** runtime/CI proof, production-scale load validation, and `stock.quant` N+1 optimization until profiling confirms meaningful impact.
+  * Stock delegation & operations isolation: `test_operations_stock_delegation.py`
+  * Organizational scope operations: `test_organizational_scope_operations.py`
+  * Reading settlement workflow: `test_reading_settlement_workflow.py`
+  * Meter stock execution: `test_meter_stock_execution.py`
 
 ## Security baseline qualification
 
-Functional roles are CURRENT V1. The current code also has user-assigned Regions and Routes plus selected company/region/route rules. A complete unified `GLOBAL/RESTRICTED` Region/Branch isolation layer is not currently implemented/proven; it is **TARGET V1 SECURITY HARDENING**. The canonical `utility.region` hierarchy is `region/area/zone`, where `area` is the organizational Branch; there is no separate Branch model or user-level explicit Branch assignment yet.
+Functional roles and the unified `GLOBAL/RESTRICTED` organizational scope layer are **CURRENT V1 VERIFIED**.
+- The canonical `utility.region` hierarchy is `region → area → zone`, where `area` (`type='area'`) is the organizational Branch.
+- Explicit and inherited branch resolution is implemented via `user._get_effective_region_ids()` and `user._get_effective_branch_ids()`.
+- Record rules for `utility.customer`, `utility.reading`, `utility.alarm`, `utility.service.order`, `utility.work.order`, `utility.installation`, and `utility.inspection` are defined as true global rules (`global=True`, `groups=[(6, 0, [])]`), enforcing strict conjunction (`AND`) alongside multi-company rules.
+- Automatic staff synchronization is non-destructive: staff records without assigned regions or branches preserve existing user geographical scopes.

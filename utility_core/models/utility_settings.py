@@ -210,6 +210,7 @@ class ResConfigSettings(models.TransientModel):
     # --- Infrastructure Settings (إعدادات البنية التحتية — مسارات العمل والوسائط) ---
     workflow_backend = fields.Selection([
         ('local', 'Local Odoo (In-Process Outbox)'),
+        ('queue_job', 'طوابير OCA الموزعة (OCA Queue Job)'),
         ('temporal', 'Temporal Workflow Service'),
     ], string='مُحَوِّل مسارات العمل (Workflow Backend)',
        config_parameter='utility.workflow_adapter',
@@ -221,6 +222,19 @@ class ResConfigSettings(models.TransientModel):
     ], string='مُحَوِّل الوسائط والصور (Media Backend)',
        config_parameter='utility.media_backend',
        default='attachment', required=True)
+
+    # إعدادات Queue Job (OCA)
+    queue_job_channel = fields.Char(
+        string='قناة OCA Queue Job الافتراضية',
+        config_parameter='utility.queue_job_default_channel',
+        default='root',
+        help=(
+            'اسم القناة الافتراضية عند عدم تحديد منطقة. '
+            'يتم إنشاء قنوات جغرافية تلقائياً بشكل '
+            'utility_region.<id> عند تحديد region_id/branch_id في '
+            'حمولة الأمر.'
+        )
+    )
 
     # إعدادات Temporal
     temporal_target_host = fields.Char(
@@ -241,10 +255,22 @@ class ResConfigSettings(models.TransientModel):
     def _check_infrastructure_backend_config(self):
         for rec in self:
             if rec.workflow_backend == 'temporal':
-                raise ValidationError(_("مُحَوِّل Temporal Workflow حاليًا في مرحلة العقد الأولي (Placeholder Contract) وغير جاهز للإنتاج. يُرجى اختيار Local Odoo (In-Process Outbox)."))
+                raise ValidationError(_(
+                    "مُحَوِّل Temporal Workflow حالياً في مرحلة العقد الأولي (Placeholder Contract) "
+                    "وغير جاهز للإنتاج. يُرجى اختيار Local Odoo (In-Process Outbox) أو OCA Queue Job."
+                ))
+
+            if rec.workflow_backend == 'queue_job':
+                # تحقق من وجود queue_job OCA مثبتة
+                if 'queue.job' not in self.env:
+                    raise ValidationError(_(
+                        "وحدة OCA Queue Job غير مثبتة على هذا الخادم. "
+                        "يُرجى تثبيتها أولاً."
+                    ))
 
             if rec.media_backend == 'filesystem' and not rec.filesystem_storage_path:
                 raise ValidationError(_("عند اختيار Filesystem يجب تحديد مسار تخزين الملفات."))
+
 
     def action_populate_missing_defaults(self):
         """فحص وتوليد الإعدادات الافتراضية والحسابات والمنتجات وموديلات العدادات الناقصة للشركة."""

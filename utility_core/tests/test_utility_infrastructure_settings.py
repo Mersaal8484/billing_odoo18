@@ -1,8 +1,10 @@
 import base64
+from unittest.mock import patch, MagicMock
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
 from ..adapters.workflow.local import LocalWorkflowAdapter
 from ..adapters.workflow.temporal import TemporalWorkflowAdapter
+from ..adapters.workflow.queue_job import QueueJobWorkflowAdapter, _build_geo_channel
 from ..adapters.media.attachment import AttachmentMediaAdapter
 from ..adapters.media.filesystem import FilesystemMediaAdapter
 
@@ -148,3 +150,81 @@ class TestUtilityInfrastructureSettings(TransactionCase):
         yer = self.env.ref('base.YER', raise_if_not_found=False) or self.env['res.currency'].search([('name', '=', 'YER')], limit=1)
         self.assertTrue(yer.active)
         self.assertEqual(company.currency_id, yer)
+
+    # =========================================================================
+    # Queue Job Adapter Tests
+    # =========================================================================
+
+    def test_10_geo_channel_routing_logic(self):
+        """اختبار منطق توزيع القنوات الجغرافية لـ OCA Queue Job"""
+        # قناة بناءً على region_id
+        self.assertEqual(_build_geo_channel({'region_id': 5}), 'utility_region.5')
+        # قناة بناءً على branch_id عند غياب region_id
+        self.assertEqual(_build_geo_channel({'branch_id': 12}), 'utility_region.12')
+        # قناة region_id مقدمة على branch_id
+        self.assertEqual(_build_geo_channel({'region_id': 3, 'branch_id': 12}), 'utility_region.3')
+        # قناة افتراضية عند غياب المنطقة
+        self.assertEqual(_build_geo_channel({}), 'root')
+        self.assertEqual(_build_geo_channel(None), 'root')
+        # قناة fallback مخصصة
+        self.assertEqual(_build_geo_channel({}, fallback_channel='billing_queue'), 'billing_queue')
+
+    def test_11_queue_job_resolver_when_module_present(self):
+        """اختبار أن resolver يعيد QueueJobWorkflowAdapter عند اختيار queue_job"""
+        self.ConfigParam.set_param('utility.workflow_adapter', 'queue_job')
+        # نحاكي queue.job كمثبتة
+        with patch.object(
+            type(self.env), '__contains__',
+            lambda self_env, model: True if model == 'queue.job' else model in self_env.registry,
+        ):
+            adapter = self.WorkflowService._get_workflow_adapter()
+            self.assertIsInstance(adapter, QueueJobWorkflowAdapter)
+
+    def test_12_queue_job_resolver_when_module_absent(self):
+        """اختبار أن QueueJobWorkflowAdapter يرفع UserError عند غياب queue_job"""
+        self.ConfigParam.set_param('utility.workflow_adapter', 'queue_job')
+        # queue.job غير مثبتة -> يجب رفع UserError
+        with patch.object(
+            type(self.env), '__contains__',
+            lambda self_env, model: False if model == 'queue.job' else model in self_env.registry,
+        ):
+            with self.assertRaises(UserError):
+                self.WorkflowService._get_workflow_adapter()
+
+    def test_13_queue_job_dispatch_idempotency(self):
+        """اختبار عدم التكرار وإنشاء سجل الأمر بالمحول الموزع"""
+        # نحاكي queue.job و with_delay
+        mock_job = MagicMock()
+        mock_job.uuid = 'test-job-uuid-001'
+        mock_delayed = MagicMock()
+        mock_delayed._execute_via_queue_job_handler = MagicMock(return_value=mock_job)
+
+        period = self.env['date.range'].search([], limit=1)
+        if not period:
+            self.skipTest('لا توجد فترة date.range للاختبار')
+
+        with patch.object(
+            type(self.env), '__contains__',
+            lambda self_env, model: True if model == 'queue.job' else model in self_env.registry,
+        ), patch.object(
+            type(self.env['utility.workflow.command']), 'with_delay',
+            return_value=mock_delayed,
+        ):
+            adapter = QueueJobWorkflowAdapter(self.env)
+            cmd1 = adapter.dispatch(
+                workflow_type='open_reading_window',
+                reference_model='date.range',
+                reference_id=period.id,
+                payload={'region_id': 7},
+                idempotency_key='TEST-QJ-IDEMPOTENCY-001',
+            )
+            cmd2 = adapter.dispatch(
+                workflow_type='open_reading_window',
+                reference_model='date.range',
+                reference_id=period.id,
+                payload={'region_id': 7},
+                idempotency_key='TEST-QJ-IDEMPOTENCY-001',
+            )
+            # نفس السجل (idempotent)
+            self.assertEqual(cmd1.id, cmd2.id)
+            self.assertEqual(cmd1.backend, 'queue_job')

@@ -14,18 +14,9 @@
             <field name="phase">three</field>
             <field name="description">للمنشآت الصغيرة والمتوسطة - عداد حثي تقليدي</field>
         </record>
-        <record id="meter_type_sts_single_prepaid" model="utility.meter.type">
-            <field name="name">عداد STS مسبق الدفع - أحادي الطور</field>
-            <field name="code">STS_SP_PRE</field>
-            <field name="phase">single</field>
-            <field name="description">عداد إلكتروني مسبق الدفع بنظام STS للمنازل</field>
-        </record>
-        <record id="meter_type_sts_three_prepaid" model="utility.meter.type">
-            <field name="name">عداد STS مسبق الدفع - ثلاثي الطور</field>
-            <field name="code">STS_TP_PRE</field>
-            <field name="phase">three</field>
-            <field name="description">عداد إلكتروني مسبق الدفع بنظام STS للمنشآت التجارية</field>
-        </record>
+        <!-- Removed: meter_type_sts_single_prepaid & meter_type_sts_three_prepaid -->
+        <!-- V1 is strictly Postpaid. Prepaid/STS meter types are OUT OF SCOPE.   -->
+
         <record id="meter_type_smart_single_postpaid" model="utility.meter.type">
             <field name="name">عداد ذكي آجل الدفع - أحادي الطور</field>
             <field name="code">SMART_SP_POST</field>

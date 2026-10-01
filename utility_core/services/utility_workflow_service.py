@@ -78,15 +78,26 @@ class UtilityWorkflowService(models.AbstractModel):
 
     @api.model
     def _get_workflow_adapter(self):
-        """الحصول على المحول النشط دون fallback صامت عند اختيار Temporal"""
+        """
+        الحصول على المحول النشط دون fallback صامت.
+        - local     : LocalWorkflowAdapter     (الافتراضي)
+        - queue_job : QueueJobWorkflowAdapter  (OCA Queue Job الموزع)
+        - temporal  : TemporalWorkflowAdapter  (Placeholder غير جاهز)
+        """
         adapter_type = self.env['ir.config_parameter'].sudo().get_param('utility.workflow_adapter', 'local')
         if adapter_type == 'local':
             from ..adapters.workflow.local import LocalWorkflowAdapter
             return LocalWorkflowAdapter(self.env)
+        elif adapter_type == 'queue_job':
+            from ..adapters.workflow.queue_job import QueueJobWorkflowAdapter
+            return QueueJobWorkflowAdapter(self.env)
         elif adapter_type == 'temporal':
             from ..adapters.workflow.temporal import TemporalWorkflowAdapter
             if not getattr(TemporalWorkflowAdapter, 'PRODUCTION_READY', False):
-                raise UserError(_("محول Temporal Workflow غير جاهز للإنتاج حالياً (Placeholder Contract). يُرجى استخدام Local Odoo Outbox."))
+                raise UserError(_(
+                    "محول Temporal Workflow غير جاهز للإنتاج حالياً (Placeholder Contract). "
+                    "يُرجى استخدام Local Odoo Outbox أو OCA Queue Job."
+                ))
             return TemporalWorkflowAdapter(self.env)
         else:
             raise UserError(_("نوع محول مسارات العمل غير معروف: %s") % adapter_type)

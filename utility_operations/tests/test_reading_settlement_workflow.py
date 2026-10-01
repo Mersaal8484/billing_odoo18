@@ -57,7 +57,28 @@ class TestReadingSettlementWorkflow(TransactionCase):
         cls.approver_user = cls.env['res.users'].create({
             'name': 'Settlement Approver',
             'login': 'settlement_approver',
-            'groups_id': [(4, cls.env.ref('base.group_user').id)],
+            'email': 'settlement_approver@example.com',
+            'groups_id': [(4, cls.env.ref('base.group_user').id), (4, cls.env.ref('utility_core.group_utility_supervisor').id), (4, cls.env.ref('utility_core.group_utility_admin').id)],
+        })
+
+        period_type = cls.env['date.range.type'].search([('company_id', 'in', (cls.env.company.id, False))], limit=1)
+        if not period_type:
+            period_type = cls.env['date.range.type'].create({'name': 'شهري', 'company_id': cls.env.company.id})
+        cls.period_jan = cls.env['date.range'].create({
+            'name': 'يناير 2026 تسوية',
+            'type_id': period_type.id,
+            'date_start': '2026-01-01',
+            'date_end': '2026-01-31',
+            'company_id': cls.env.company.id,
+            'reading_state': 'open',
+        })
+        cls.period_feb = cls.env['date.range'].create({
+            'name': 'فبراير 2026 تسوية',
+            'type_id': period_type.id,
+            'date_start': '2026-02-01',
+            'date_end': '2026-02-28',
+            'company_id': cls.env.company.id,
+            'reading_state': 'planned',
         })
 
     def _make_billed_reading(self, value=10000.0, suffix=''):
@@ -69,6 +90,7 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'reading_date': '2026-01-15 10:00:00',
             'reading_purpose': 'periodic',
             'reading_type': 'manual',
+            'date_range_id': self.period_jan.id,
         })
         # Force to billed state via bypass for test setup
         reading.with_context(
@@ -97,11 +119,11 @@ class TestReadingSettlementWorkflow(TransactionCase):
                          'القيمة الأصلية يجب أن تُحفظ عند التقديم.')
 
         # action_technically_approve — must use a different user
-        settlement.sudo(self.approver_user).action_technically_approve()
+        settlement.with_user(self.approver_user).action_technically_approve()
         self.assertEqual(settlement.state, 'technically_approved')
 
         # action_process
-        settlement.sudo(self.approver_user).action_process()
+        settlement.with_user(self.approver_user).action_process()
         self.assertEqual(settlement.state, 'processed')
 
         # CRITICAL: reading_value must NOT have changed
@@ -136,8 +158,8 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'reason': 'اختبار عدم التعديل',
         })
         settlement.action_submit()
-        settlement.sudo(self.approver_user).action_technically_approve()
-        settlement.sudo(self.approver_user).action_process()
+        settlement.with_user(self.approver_user).action_technically_approve()
+        settlement.with_user(self.approver_user).action_process()
 
         # Re-read from DB
         reading.invalidate_recordset()
@@ -164,8 +186,8 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'reason': 'اختبار منع إلغاء processed',
         })
         settlement.action_submit()
-        settlement.sudo(self.approver_user).action_technically_approve()
-        settlement.sudo(self.approver_user).action_process()
+        settlement.with_user(self.approver_user).action_technically_approve()
+        settlement.with_user(self.approver_user).action_process()
 
         with self.assertRaises(ValidationError):
             settlement.action_cancel()
@@ -180,7 +202,7 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'reason': 'اختبار hook الإحالة',
         })
         settlement.action_submit()
-        settlement.sudo(self.approver_user).action_technically_approve()
+        settlement.with_user(self.approver_user).action_technically_approve()
 
         hook_called = []
         original_hook = type(settlement)._on_settlement_processed
@@ -190,7 +212,7 @@ class TestReadingSettlementWorkflow(TransactionCase):
             return original_hook(self_record)
 
         with patch.object(type(settlement), '_on_settlement_processed', spy_hook):
-            settlement.sudo(self.approver_user).action_process()
+            settlement.with_user(self.approver_user).action_process()
 
         self.assertTrue(hook_called, 'Hook _on_settlement_processed لم يُستدعَ.')
 
@@ -204,7 +226,7 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'reason': 'اختبار الـbaseline الفعّال',
         })
         settlement.action_submit()
-        settlement.sudo(self.approver_user).action_technically_approve()
+        settlement.with_user(self.approver_user).action_technically_approve()
 
         effective = reading._get_effective_previous_reading()
         self.assertAlmostEqual(effective, 9800.0,
@@ -260,9 +282,11 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'reason': 'تصحيح خطأ قراءة يناير',
         })
         settlement.action_submit()
-        settlement.sudo(self.approver_user).action_technically_approve()
+        settlement.with_user(self.approver_user).action_technically_approve()
 
-        # 3. February reading at 10,500
+        # 3. Transition to February period and create reading at 10,500
+        self.period_jan.write({'reading_state': 'closed'})
+        self.period_feb.write({'reading_state': 'open'})
         feb_reading = self.Reading.create({
             'meter_id': self.meter.id,
             'account_id': self.customer.id,
@@ -270,6 +294,7 @@ class TestReadingSettlementWorkflow(TransactionCase):
             'reading_date': '2026-02-15 10:00:00',
             'reading_purpose': 'periodic',
             'reading_type': 'manual',
+            'date_range_id': self.period_feb.id,
         })
 
         # 4. Verify previous reading and consumption

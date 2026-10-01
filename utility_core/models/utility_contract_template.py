@@ -36,8 +36,8 @@ class UtilityContractTemplate(models.Model):
     ], default='monthly', required=True)
     recurring_invoicing_type = fields.Selection([
         ('postpaid', 'آجل'),
-        ('prepaid', 'مسبق'),
     ], default='postpaid', required=True)
+
     recurring_interval = fields.Integer(default=1, string='الفاصل الزمني للدورة')
 
     # البنود

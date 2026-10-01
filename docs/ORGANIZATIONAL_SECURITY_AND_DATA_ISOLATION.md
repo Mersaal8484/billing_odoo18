@@ -50,18 +50,19 @@ Readonly
 - Route-based rules exist for selected Collector/Technician paths.
 - API ownership checks exist for portal/customer access and selected service/reading/billing endpoints.
 
-### NOT CURRENTLY PROVEN
+### CURRENT V1: verified unified organizational isolation
 
-The reviewed source does not provide a complete unified implementation of:
+The implementation has been unified and verified across Core and Operations:
 
-- `scope_mode = GLOBAL / RESTRICTED` on `res.users`.
-- `allowed_branch_ids` or an equivalent user-level explicit branch assignment.
-- Automatic Region → all child Branch expansion for user scope.
-- A separate `branch` model. The canonical organizational model is `utility.region`; `type='region'` is Region, `type='area'` is the organizational Branch, and `type='zone'` is the lower operational zone.
-- One consistent Region/Branch Record Rule layer across Customers, Meters, Readings, Batches, Service Orders, Work Orders, Installations, Inspections, Alarms, Bills, Adjustments, Write-offs, dashboards, exports, and reports.
-- Per-role geographic scope. This is intentionally not introduced in V1.
-
-Therefore, **complete organizational isolation is TARGET V1 SECURITY HARDENING**, not a CURRENT V1 claim.
+- **`scope_mode = 'global' / 'restricted'` on `res.users`**: Defaults to restricted unless marked global or member of `group_utility_admin`.
+- **`assigned_region_ids` & `assigned_branch_ids` on `res.users`**: Managed strictly by admins.
+- **Scope resolution methods**:
+  * `user._is_global_utility_scope()`: Returns True for Admin / System or explicit global mode.
+  * `user._get_effective_region_ids()`: Returns assigned regions (or all regions if global).
+  * `user._get_effective_branch_ids()`: Returns explicit branches plus all child areas of assigned regions (`parent_id in region_ids`).
+- **Canonical Model Mapping**: `utility.region` with `type='region'` represents Region; `type='area'` represents the organizational Branch.
+- **True Global Record Rules**: Rules for Customers, Readings, Meters, Service Orders, Work Orders, Installations, Inspections, and Alarms are defined as `global=True` with `groups=[(6, 0, [])]`. This guarantees strict logical conjunction (`AND`) with multi-company rules, preventing accidental bypass via group disjunction (`OR`).
+- **Non-Destructive Staff Scope Sync**: When creating or updating `utility.staff`, if the staff record does not define a geographic region or area, it does not wipe out the user's existing assigned regions/branches. When a user is created with assigned regions/branches, they are seamlessly propagated to the staff profile.
 
 ## 3. Role-Based Authorization
 
