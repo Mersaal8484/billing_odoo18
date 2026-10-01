@@ -13,7 +13,7 @@ This document contains accepted forward-looking architecture only. It must not b
 |---|---|---|---|
 | PgBouncer | TARGET / CONDITIONAL | Multiple Odoo workers/nodes create connection pressure | Pool PostgreSQL connections without becoming a source of truth |
 | Horizontal Odoo topology | TARGET / CONDITIONAL | Measured concurrent workload exceeds one application node | Multiple application workers/nodes behind controlled routing |
-| Scalable media backend | TARGET / CONDITIONAL | Attachment volume, delivery latency, or backup size becomes material | Media Adapter over organized filesystem/NGINX or S3-compatible storage |
+| Scalable media backend | TARGET / CONDITIONAL | Attachment volume, delivery latency, or backup size becomes material | Media Adapter over organized filesystem/NGINX |
 | Reading-table partition planning | TARGET / CONDITIONAL | Reading/staging volume and maintenance evidence justify partitions | Partition by period/time after Odoo compatibility and migration rehearsal |
 | High-volume reading architecture | TARGET / CONDITIONAL | Batch throughput and queue backlog exceed V1 operating envelope | Persistent staging plus chunk workers and durable orchestration |
 | Micro-batch billing | TARGET / CONDITIONAL | Billing volume makes a single transaction operationally unsafe | Independent idempotent micro-batches with partial failure reporting |

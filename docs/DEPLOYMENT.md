@@ -137,7 +137,6 @@ Target:
 - path strategy not exposed externally.
 - NGINX read access internal.
 - application write permission least privilege.
-- optional S3-compatible abstraction.
 
 ---
 

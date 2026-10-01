@@ -50,10 +50,14 @@ class TestUtilityMediaAsset(TransactionCase):
         self.assertTrue(asset.original_attachment_id)
         self.assertTrue(asset.review_attachment_id)
         self.assertTrue(asset.thumbnail_attachment_id)
+        self.assertEqual(asset.original_attachment_id.id, asset.thumbnail_attachment_id.id)
+        self.assertEqual(asset.original_attachment_id.id, asset.review_attachment_id.id)
 
         # استرجاع المحتوى عبر Adapter
         retrieved_orig = self.MediaService.retrieve_media(asset, variant='original')
         self.assertEqual(retrieved_orig, self.sample_bytes)
+        retrieved_thumb = self.MediaService.retrieve_media(asset, variant='thumbnail')
+        self.assertEqual(retrieved_thumb, self.sample_bytes)
 
     def test_01b_invalid_variant_is_rejected_by_the_adapter_contract(self):
         asset = self.MediaService.store_media(

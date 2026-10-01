@@ -188,6 +188,10 @@ class UtilityReading(models.Model):
         )
         if old_asset and old_asset != new_asset:
             new_asset.sudo().write({'revision': (old_asset.revision or 1) + 1})
+        if new_asset and new_asset.original_attachment_id and len(self) == 1 and real_id:
+            self.sudo().with_context(_bypass_reading_protection=True).write({
+                'attachment_id': new_asset.original_attachment_id.id,
+            })
         return new_asset
 
     @api.onchange('meter_image_upload')
@@ -202,18 +206,21 @@ class UtilityReading(models.Model):
         )
         if new_asset:
             self.image_asset_id = new_asset.id
+            if new_asset.original_attachment_id:
+                self.attachment_id = new_asset.original_attachment_id.id
             self.meter_image_upload = False
             self.meter_image_url = (
-                new_asset.review_url
-                or new_asset.thumbnail_url
+                (f"/web/image/{new_asset.original_attachment_id.id}" if new_asset.original_attachment_id else False)
+                or new_asset.review_url
                 or new_asset.original_url
-                or (f"/utility/media/{new_asset.asset_uuid}/review" if new_asset.asset_uuid else '')
+                or (f"/utility/media/{new_asset.asset_uuid}/original" if new_asset.asset_uuid else '')
             )
             if self.image_state == 'none':
                 self.image_state = 'pending'
             if target_id:
                 reading_origin.sudo().with_context(_bypass_reading_protection=True).write({
                     'image_asset_id': new_asset.id,
+                    'attachment_id': new_asset.original_attachment_id.id if new_asset.original_attachment_id else False,
                     'meter_image_upload': False,
                     'image_state': self.image_state,
                 })
@@ -234,15 +241,13 @@ class UtilityReading(models.Model):
     @api.depends('image_asset_id', 'image_asset_id.state', 'image_asset_id.review_url', 'attachment_id', 'meter_image_upload')
     def _compute_meter_image_url(self):
         for r in self:
-            asset = r.image_asset_id.sudo() if r.image_asset_id else False
-            attachment = r.attachment_id.sudo() if r.attachment_id else False
-            if asset:
-                url = asset.review_url or asset.thumbnail_url or asset.original_url
-                if not url and asset.asset_uuid:
-                    url = f"/utility/media/{asset.asset_uuid}/review"
-                r.meter_image_url = url or ''
-            elif attachment:
+            attachment = r.attachment_id.sudo() if r.attachment_id else (
+                r.image_asset_id.original_attachment_id.sudo() if r.image_asset_id and r.image_asset_id.original_attachment_id else False
+            )
+            if attachment:
                 r.meter_image_url = f"/web/image/{attachment.id}"
+            elif r.image_asset_id and r.image_asset_id.sudo().asset_uuid:
+                r.meter_image_url = f"/utility/media/{r.image_asset_id.sudo().asset_uuid}/original"
             elif r.meter_image_upload and isinstance(r.id, int):
                 r.meter_image_url = f"/web/image?model=utility.reading&id={r.id}&field=meter_image_upload"
             else:
@@ -261,10 +266,13 @@ class UtilityReading(models.Model):
                 filename=f"reading_{r.id or 'legacy'}.jpg"
             )
             if new_asset:
-                r.with_context(_bypass_reading_protection=True).write({
+                write_vals = {
                     'image_asset_id': new_asset.id,
                     'image_state': 'pending' if r.image_state == 'none' else r.image_state,
-                })
+                }
+                if new_asset.original_attachment_id:
+                    write_vals['attachment_id'] = new_asset.original_attachment_id.id
+                r.with_context(_bypass_reading_protection=True).write(write_vals)
 
     def action_save_image(self):
         """حفظ الصورة وإغلاق النافذة المنبثقة."""

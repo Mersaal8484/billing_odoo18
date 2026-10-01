@@ -7,7 +7,6 @@ from odoo import api, fields, models, _
 from odoo.exceptions import AccessError, UserError, ValidationError
 from ..adapters.media.attachment import AttachmentMediaAdapter
 from ..adapters.media.filesystem import FilesystemMediaAdapter
-from ..adapters.media.s3 import S3MediaAdapter
 
 _logger = logging.getLogger(__name__)
 
@@ -23,13 +22,10 @@ class UtilityMediaService(models.AbstractModel):
         adapters = {
             'attachment': AttachmentMediaAdapter,
             'filesystem': FilesystemMediaAdapter,
-            's3': S3MediaAdapter,
         }
         adapter_class = adapters.get(backend)
         if not adapter_class:
             raise UserError(_("نوع محول تخزين الوسائط غير معروف: %s") % backend)
-        if backend == 's3' and not getattr(adapter_class, 'PRODUCTION_READY', False):
-            raise UserError(_("محول S3 Storage غير جاهز للإنتاج حالياً (Placeholder Contract). يُرجى استخدام Odoo Attachments أو Local Filesystem."))
         return adapter_class(self.env)
 
     @api.model
@@ -38,38 +34,14 @@ class UtilityMediaService(models.AbstractModel):
 
     @api.model
     def generate_image_variants(self, raw_bytes):
-        """توليد 3 نسخ محددة للأصل: الأصلية الكاملة، المعاينة المكبرة (1024px)، والمصغرة (150px)"""
+        """إرجاع بيانات الصورة للأصل دون توليد مصغرات إضافية (Standard Single Attachment)"""
         if not raw_bytes:
             return {'original': b'', 'review': b'', 'thumbnail': b''}
-
-        try:
-            image = Image.open(io.BytesIO(raw_bytes))
-            image_format = image.format or 'JPEG'
-            
-            # 1. النسخة الأصلية
-            original_bytes = raw_bytes
-
-            # 2. نسخة المعاينة المكبرة (Review 1024px)
-            review_img = image.copy()
-            review_img.thumbnail((1024, 1024), Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.ANTIALIAS)
-            review_io = io.BytesIO()
-            review_img.save(review_io, format=image_format, quality=85)
-            review_bytes = review_io.getvalue()
-
-            # 3. النسخة المصغرة (Thumbnail 150px)
-            thumb_img = image.copy()
-            thumb_img.thumbnail((150, 150), Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.ANTIALIAS)
-            thumb_io = io.BytesIO()
-            thumb_img.save(thumb_io, format=image_format, quality=75)
-            thumb_bytes = thumb_io.getvalue()
-
-            return {
-                'original': original_bytes,
-                'review': review_bytes,
-                'thumbnail': thumb_bytes,
-            }
-        except (OSError, ValueError, KeyError) as exc:
-            raise ValidationError(_("تعذر توليد نسخ الصورة من الملف المرفوع.")) from exc
+        return {
+            'original': raw_bytes,
+            'review': raw_bytes,
+            'thumbnail': raw_bytes,
+        }
 
     @api.model
     def _detect_mime_from_bytes(self, raw_bytes):
@@ -151,11 +123,17 @@ class UtilityMediaService(models.AbstractModel):
                 'state': 'ready',
                 'storage_backend': existing_asset.storage_backend or active_backend,
                 'original_attachment_id': existing_asset.original_attachment_id.id,
-                'review_attachment_id': existing_asset.review_attachment_id.id if existing_asset.review_attachment_id else existing_asset.original_attachment_id.id,
-                'thumbnail_attachment_id': existing_asset.thumbnail_attachment_id.id if existing_asset.thumbnail_attachment_id else existing_asset.original_attachment_id.id,
+                'review_attachment_id': existing_asset.original_attachment_id.id,
+                'thumbnail_attachment_id': existing_asset.original_attachment_id.id,
                 'processed_at': fields.Datetime.now(),
             })
             new_asset = self.env['utility.media.asset'].sudo().create(reused_vals)
+            if reading_id:
+                reading = self.env['utility.reading'].browse(reading_id)
+                if reading.exists() and not reading.attachment_id:
+                    reading.sudo().with_context(_bypass_reading_protection=True).write({
+                        'attachment_id': existing_asset.original_attachment_id.id,
+                    })
             return new_asset
 
         # إنشاء سجل الأصل الرقمي
@@ -163,39 +141,32 @@ class UtilityMediaService(models.AbstractModel):
 
         try:
             adapter = self.get_media_adapter()
-            variants = self.generate_image_variants(raw_bytes)
 
-            # تخزين النسخة الأصلية
+            # تخزين المرفق القياسي الأصلي الوحيد (Standard Attachment بدون توليد أو تخزين أي صور مصغرة)
+            target_res_model = 'utility.reading' if reading_id else 'utility.media.asset'
+            target_res_id = reading_id or asset.id
             orig_att = adapter.store(
-                file_data=variants['original'],
-                filename=f"orig_{filename}",
+                file_data=raw_bytes,
+                filename=filename,
                 mimetype=mimetype,
-                metadata={'res_model': 'utility.media.asset', 'res_id': asset.id, 'asset_uuid': asset.asset_uuid}
-            )
-
-            # تخزين نسخة المعاينة المكبرة
-            rev_att = adapter.store(
-                file_data=variants['review'],
-                filename=f"rev_{filename}",
-                mimetype=mimetype,
-                metadata={'res_model': 'utility.media.asset', 'res_id': asset.id, 'asset_uuid': asset.asset_uuid}
-            )
-
-            # تخزين النسخة المصغرة
-            thumb_att = adapter.store(
-                file_data=variants['thumbnail'],
-                filename=f"thumb_{filename}",
-                mimetype=mimetype,
-                metadata={'res_model': 'utility.media.asset', 'res_id': asset.id, 'asset_uuid': asset.asset_uuid}
+                metadata={'res_model': target_res_model, 'res_id': target_res_id, 'asset_uuid': asset.asset_uuid}
             )
 
             asset.write({
                 'original_attachment_id': orig_att.id,
-                'review_attachment_id': rev_att.id,
-                'thumbnail_attachment_id': thumb_att.id,
+                'review_attachment_id': orig_att.id,
+                'thumbnail_attachment_id': orig_att.id,
                 'state': 'ready',
                 'processed_at': fields.Datetime.now(),
             })
+
+            if reading_id:
+                reading = self.env['utility.reading'].browse(reading_id)
+                if reading.exists() and not reading.attachment_id:
+                    reading.sudo().with_context(_bypass_reading_protection=True).write({
+                        'attachment_id': orig_att.id,
+                    })
+
             return asset
         except (AccessError, UserError, ValidationError, OSError) as exc:
             asset.write({

@@ -44,7 +44,6 @@ class UtilityMediaAsset(models.Model):
     storage_backend = fields.Selection([
         ('attachment', 'مرفقات Odoo الرسمية (ir.attachment)'),
         ('filesystem', 'نظام ملفات الخادم المباشر (Filesystem)'),
-        ('s3', 'تخزين سحابي S3/MinIO'),
     ], string='خادم التخزين الرقمي', default='attachment', required=True, index=True)
 
     # ===== روابط المرفقات المحلية (Development Phase) =====
@@ -87,19 +86,15 @@ class UtilityMediaAsset(models.Model):
     def get_variant_url(self, variant='original'):
         self.ensure_one()
         if self.storage_backend == 'attachment':
-            if variant == 'thumbnail' and self.thumbnail_attachment_id:
-                return f"/utility/media/{self.asset_uuid}/thumbnail"
-            elif variant == 'review' and self.review_attachment_id:
-                return f"/utility/media/{self.asset_uuid}/review"
-            elif self.original_attachment_id:
+            att = self.original_attachment_id or self.review_attachment_id or self.thumbnail_attachment_id
+            if att:
+                return f"/web/image/{att.id}"
+            elif self.asset_uuid:
                 return f"/utility/media/{self.asset_uuid}/original"
             return ''
         elif self.storage_backend == 'filesystem':
             ref = getattr(self, f"external_{variant}_reference", False) or self.external_original_reference
             return f"/media/file/{ref}" if ref else ''
-        elif self.storage_backend == 's3':
-            ref = getattr(self, f"external_{variant}_reference", False) or self.external_original_reference
-            return f"https://s3.amazonaws.com/utility-media/{ref}" if ref else ''
         return ''
 
     def check_user_access_security(self, user=None):

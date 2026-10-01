@@ -47,18 +47,12 @@ utility.media.asset
 
 ---
 
-## 2. Variants
+## 2. Variants & Storage Strategy
 
-- Original: evidence master.
-- Review: optimized reviewer image.
-- Thumbnail: queues/lists.
-
-Rule:
-```text
-List → Thumbnail
-Reviewer → Review
-Full-resolution → Original on explicit request only
-```
+- Standard Single Attachment: يتم حفظ الصورة الأصلية فقط كمرفق Odoo قياسي (`ir.attachment`) دون توليد أو تخزين مرفقات مصغرة (`thumb_`, `rev_`) في قاعدة البيانات أو الـ Filestore.
+- جميع المتغيرات (Original / Review / Thumbnail) تشير إلى نفس المرفق القياسي الأصلي.
+- يعتمد النظام على مسارات Odoo القياسية (`/web/image/<id>`) لمعالجة العرض والمصغرات ديناميكياً عند الطلب دون مضاعفة سجلات المرفقات.
+- يرتبط المرفق القياسي مباشرة بسجل القراءة عبر `attachment_id` ويكون `res_model='utility.reading'`.
 
 ---
 
@@ -121,11 +115,6 @@ Target:
 ```text
 Organized Filesystem outside Odoo
  + NGINX delivery
-```
-
-Future:
-```text
-S3-compatible adapter
 ```
 
 Business/UI do not change.
@@ -242,6 +231,6 @@ Deletion must be a bounded, resumable, audited job with dry-run reporting, check
 
 **CURRENT V1:** media is represented through `utility.media.asset` and structured `ir.attachment` storage (`utility_ir_attachment.py`) protected by ownership and geographic authorization. Files are stored in a deterministic directory tree (`module/model/YYYY/MM/DD/checksum`) in the Odoo Filestore with checksum deduplication, while maintaining full backward-compatibility for reading and deleting legacy files. Reading and batch UIs expose operational image evidence without making media storage a second business truth.
 
-**TARGET V2 / CONDITIONAL:** organized filesystem/NGINX or S3-compatible storage behind a storage-agnostic Media Adapter. Delivery scaling is triggered by measured attachment volume, latency, or backup impact; it is not a current V1 deployment assumption.
+**TARGET V2 / CONDITIONAL:** organized filesystem/NGINX behind a storage-agnostic Media Adapter. Delivery scaling is triggered by measured attachment volume, latency, or backup impact; it is not a current V1 deployment assumption.
 
-**TARGET V2 / CONDITIONAL:** the initial recommendation is `ir.attachment` backed by a shared Odoo Filestore with 4 TB usable capacity. MinIO is intentionally deferred until measured storage/IOPS, retention, public-upload, object-size, or immutability triggers justify it.
+**TARGET V2 / CONDITIONAL:** the recommendation is `ir.attachment` backed by a shared Odoo Filestore with 4 TB usable capacity.

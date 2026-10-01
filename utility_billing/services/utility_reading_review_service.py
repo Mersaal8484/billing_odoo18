@@ -205,16 +205,16 @@ class UtilityReadingReviewService(models.AbstractModel):
     def _build_reading_item(self, reading):
         """Build a single reading DTO for the review queue."""
         asset = reading.image_asset_id
-        asset_uuid = asset.asset_uuid if asset else False
+        attachment = reading.attachment_id or (asset.original_attachment_id if asset else False)
 
-        if asset_uuid:
-            thumb_url = f"/utility/media/{asset_uuid}/thumbnail"
-            review_url = f"/utility/media/{asset_uuid}/review"
-            orig_url = f"/utility/media/{asset_uuid}/original"
-        elif reading.attachment_id:
-            thumb_url = f"/web/image/{reading.attachment_id.id}"
-            review_url = f"/web/image/{reading.attachment_id.id}"
-            orig_url = f"/web/image/{reading.attachment_id.id}"
+        if attachment:
+            thumb_url = f"/web/image/{attachment.id}"
+            review_url = f"/web/image/{attachment.id}"
+            orig_url = f"/web/image/{attachment.id}"
+        elif asset and asset.asset_uuid:
+            thumb_url = f"/utility/media/{asset.asset_uuid}/original"
+            review_url = f"/utility/media/{asset.asset_uuid}/original"
+            orig_url = f"/utility/media/{asset.asset_uuid}/original"
         else:
             thumb_url = ''
             review_url = ''

@@ -319,6 +319,8 @@ class TestUtilityPeriodManagement(TransactionCase):
         self.assertEqual(reading.image_asset_id.state, 'ready')
         self.assertEqual(reading.image_asset_id.reading_id, reading)
         self.assertTrue(reading.image_asset_id.original_attachment_id)
+        self.assertTrue(reading.attachment_id, 'يجب ربط المرفق القياسي بحقل attachment_id في القراءة')
+        self.assertEqual(reading.attachment_id.id, reading.image_asset_id.original_attachment_id.id)
         self.assertTrue(reading.meter_image_url, 'يجب توليد رابط معاينة للصورة المخزنة')
         self.assertTrue(reading.meter_image)
         self.assertFalse(

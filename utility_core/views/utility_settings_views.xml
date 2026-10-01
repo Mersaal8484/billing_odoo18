@@ -344,24 +344,6 @@
                                     <label for="filesystem_storage_path" class="o_light_label"/>
                                     <field name="filesystem_storage_path"/>
                                 </div>
-                                <div attrs="{'invisible': [('media_backend', '!=', 's3')]}" class="mt16 border p-2 bg-light rounded">
-                                    <div>
-                                        <label for="s3_endpoint_url" class="o_light_label"/>
-                                        <field name="s3_endpoint_url"/>
-                                    </div>
-                                    <div class="mt8">
-                                        <label for="s3_bucket_name" class="o_light_label"/>
-                                        <field name="s3_bucket_name"/>
-                                    </div>
-                                    <div class="mt8">
-                                        <label for="s3_access_key" class="o_light_label"/>
-                                        <field name="s3_access_key"/>
-                                    </div>
-                                    <div class="mt8">
-                                        <label for="s3_secret_key" class="o_light_label"/>
-                                        <field name="s3_secret_key"/>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

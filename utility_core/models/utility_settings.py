@@ -234,7 +234,6 @@ class ResConfigSettings(models.TransientModel):
     media_backend = fields.Selection([
         ('attachment', 'Odoo Attachments (Database/Filestore)'),
         ('filesystem', 'Local Shared Filesystem'),
-        ('s3', 'S3 Compatible Cloud Storage'),
     ], string='مُحَوِّل الوسائط والصور (Media Backend)',
        config_parameter='utility.media_backend',
        default='attachment', required=True)
@@ -254,32 +253,11 @@ class ResConfigSettings(models.TransientModel):
         string='مسار تخزين الملفات (Filesystem Path)',
         config_parameter='utility.filesystem_storage_path')
 
-    # إعدادات S3
-    s3_endpoint_url = fields.Char(
-        string='رابط خادم S3 Endpoint URL',
-        config_parameter='utility.s3_endpoint_url')
-    s3_bucket_name = fields.Char(
-        string='اسم الحاوية S3 Bucket Name',
-        config_parameter='utility.s3_bucket_name')
-    s3_access_key = fields.Char(
-        string='مفتاح الوصول S3 Access Key',
-        config_parameter='utility.s3_access_key')
-    s3_secret_key = fields.Char(
-        string='المفتاح السري S3 Secret Key',
-        config_parameter='utility.s3_secret_key')
-    s3_region_name = fields.Char(
-        string='المنطقة S3 Region',
-        config_parameter='utility.s3_region_name',
-        default='us-east-1')
-
-    @api.constrains('workflow_backend', 'temporal_target_host', 'media_backend', 'filesystem_storage_path', 's3_endpoint_url', 's3_bucket_name', 's3_access_key', 's3_secret_key')
+    @api.constrains('workflow_backend', 'temporal_target_host', 'media_backend', 'filesystem_storage_path')
     def _check_infrastructure_backend_config(self):
         for rec in self:
             if rec.workflow_backend == 'temporal':
                 raise ValidationError(_("مُحَوِّل Temporal Workflow حاليًا في مرحلة العقد الأولي (Placeholder Contract) وغير جاهز للإنتاج. يُرجى اختيار Local Odoo (In-Process Outbox)."))
-
-            if rec.media_backend == 's3':
-                raise ValidationError(_("مُحَوِّل S3 Cloud Storage حاليًا في مرحلة العقد الأولي (Placeholder Contract) وغير جاهز للإنتاج. يُرجى اختيار Odoo Attachments أو Local Shared Filesystem."))
 
             if rec.media_backend == 'filesystem' and not rec.filesystem_storage_path:
                 raise ValidationError(_("عند اختيار Filesystem يجب تحديد مسار تخزين الملفات."))

@@ -5,7 +5,6 @@ from ..adapters.workflow.local import LocalWorkflowAdapter
 from ..adapters.workflow.temporal import TemporalWorkflowAdapter
 from ..adapters.media.attachment import AttachmentMediaAdapter
 from ..adapters.media.filesystem import FilesystemMediaAdapter
-from ..adapters.media.s3 import S3MediaAdapter
 
 
 class TestUtilityInfrastructureSettings(TransactionCase):
@@ -53,48 +52,12 @@ class TestUtilityInfrastructureSettings(TransactionCase):
         media_adapter = self.MediaService.get_media_adapter()
         self.assertIsInstance(media_adapter, FilesystemMediaAdapter)
 
-    def test_04_s3_media_adapter_validation(self):
-        """4. اختبار فحص إعدادات التخزين السحابي S3 وحظر تفعيل الـ Placeholder"""
-        self.ConfigParam.set_param('utility.media_backend', 's3')
-        self.ConfigParam.set_param('utility.s3_endpoint_url', '')
-
-        with self.assertRaises(UserError):
-            self.MediaService.get_media_adapter()
-
-        self.ConfigParam.set_param('utility.s3_endpoint_url', 'https://s3.example.com')
-        self.ConfigParam.set_param('utility.s3_bucket_name', 'utility-bucket')
-        self.ConfigParam.set_param('utility.s3_access_key', 'AKIAIOSFODNN7EXAMPLE')
-        self.ConfigParam.set_param('utility.s3_secret_key', 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY')
-
-        # الـ Resolver يرفع UserError لأن المحول في مرحلة Placeholder وغير جاهز للإنتاج
-        with self.assertRaises(UserError):
-            self.MediaService.get_media_adapter()
-
-        # اختبار أسبقية متغيرات البيئة OS Environment Variables مباشرة على فئة المحول (دون المرور بالـ Resolver الحاظر)
-        import os
-        os.environ['S3_ACCESS_KEY'] = 'ENV_ACCESS_KEY'
-        os.environ['S3_SECRET_KEY'] = 'ENV_SECRET_KEY'
-        env_adapter = S3MediaAdapter(self.env)
-        self.assertEqual(env_adapter.access_key, 'ENV_ACCESS_KEY')
-        self.assertEqual(env_adapter.secret_key, 'ENV_SECRET_KEY')
-        del os.environ['S3_ACCESS_KEY']
-        del os.environ['S3_SECRET_KEY']
-
     def test_05_res_config_settings_v1_stabilization_constraints(self):
-        """5. اختبار قيود شاشة الإعدادات لمنع تفعيل الأنظمة التي في مرحلة Placeholder (Temporal / S3)"""
+        """5. اختبار قيود شاشة الإعدادات لمنع تفعيل الأنظمة التي في مرحلة Placeholder (Temporal)"""
         with self.assertRaises(ValidationError):
             self.env['res.config.settings'].create({
                 'workflow_backend': 'temporal',
                 'temporal_target_host': 'localhost:7233',
-            })
-
-        with self.assertRaises(ValidationError):
-            self.env['res.config.settings'].create({
-                'media_backend': 's3',
-                's3_endpoint_url': 'https://s3.example.com',
-                's3_bucket_name': 'test-bucket',
-                's3_access_key': 'key',
-                's3_secret_key': 'secret',
             })
 
     def test_06_filesystem_adapter_partitioning(self):
@@ -146,11 +109,7 @@ class TestUtilityInfrastructureSettings(TransactionCase):
         with self.assertRaises(UserError):
             self.WorkflowService._get_workflow_adapter()
 
-        self.ConfigParam.set_param('utility.media_backend', 's3')
-        self.ConfigParam.set_param('utility.s3_endpoint_url', 'https://s3.example.com')
-        self.ConfigParam.set_param('utility.s3_bucket_name', 'test-bucket')
-        self.ConfigParam.set_param('utility.s3_access_key', 'key')
-        self.ConfigParam.set_param('utility.s3_secret_key', 'secret')
+        self.ConfigParam.set_param('utility.media_backend', 'unknown_backend')
         with self.assertRaises(UserError):
             self.MediaService.get_media_adapter()
 

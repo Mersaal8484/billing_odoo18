@@ -70,7 +70,7 @@ The current operational lifecycles are also explicit: Installation `draft → in
 4. **الاستبدال لا يولد فاتورة منفصلة لكل عداد**؛ جميع `replacement_closing` segments تدخل مع الـPeriodic Anchor في فاتورة واحدة للحساب/الفترة.
 5. **`utility.media.asset` هو Canonical Media Model**.
 6. **التخزين الحالي عبر Attachment هو Compatibility Backend فقط**؛ Target Production هو Organized Filesystem خارج Odoo مع تسليم NGINX، خلف Media Adapter.
-7. **Media storage API يبقى Storage-Agnostic**، مع واجهة قابلة للنقل لاحقًا إلى S3-Compatible backend دون تغيير Business Domain.
+7. **Media storage API يبقى Storage-Agnostic**.
 8. **Payment reconciliation يجب أن يكون Targeted/Explicit**؛ يمنع Partner-wide automatic reconciliation.
 9. **Hybrid Workflow Architecture**:
    - Odoo/local execution للمعاملات القصيرة والذرية.
@@ -303,7 +303,7 @@ Quarantine / Repair / Return / Scrap
                                ▼
 ┌──────────────────────────────────────────────────────────────┐
 │ Persistence                                                  │
-│ PostgreSQL | Filestore/Attachment | Future FS/S3            │
+│ PostgreSQL | Filestore/Attachment | Future Shared FS            │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -890,10 +890,9 @@ Media Adapter
 ```text
 Media Service
   ├── Attachment Adapter [current / compatibility]
-  ├── Filesystem Adapter [target production]
-  │      └── Organized filesystem outside Odoo
-  │             └── NGINX / X-Accel-Redirect delivery
-  └── S3-Compatible Adapter [future portability / optional scale-out]
+  └── Filesystem Adapter [target production]
+         └── Organized filesystem outside Odoo
+                └── NGINX / X-Accel-Redirect delivery
 ```
 
 ### Target Production Storage Rule
@@ -1893,7 +1892,6 @@ reconciliation
                            ┌─────────────────────────┐
                            │ Organized Media Storage │
                            │ SSD/FileSystem target   │
-                           │ S3-compatible boundary  │
                            └────────────┬────────────┘
                                         ▼
                                       NGINX
@@ -2109,7 +2107,6 @@ Tax Engine
 Full Prepaid Redesign
 Complex Business Multi-Company Partitioning
 Distributed SQL Database
-Mandatory S3/Cloud Object Storage from day one
 Temporal workflow per individual bill
 Temporal workflow per trivial notification
 Temporal workflow per image unless benchmark proves value
@@ -2487,7 +2484,7 @@ Can the original historical state be reconstructed?
 |---|---|
 | Temporal fully deferred | Temporal is Target but strictly scoped |
 | Local Workflow Adapter as final production target | Local remains current default; Hybrid workflow is scaled target |
-| Attachment backend current, FS/S3 future | Attachment compatibility; Filesystem+NGINX is Target Production |
+| Attachment backend current, FS future | Attachment compatibility; Filesystem+NGINX is Target Production |
 | Simple single-node deployment target | Right-sized horizontal topology for million-subscriber capacity |
 | Generic DB performance tuning | PgBouncer + partition planning + batch architecture explicitly required |
 | Billing execution mainly business-flow oriented | Billing execution also defined as micro-batched scale process |
