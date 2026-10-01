@@ -71,22 +71,6 @@ class ResConfigSettings(models.TransientModel):
        config_parameter='utility.meter_reading_validation',
        default='both')
 
-    # --- Transformer ---
-    max_transformer_loss_tolerance = fields.Float(
-        string='نسبة الفاقد المسموح في المحولات (%)',
-        config_parameter='utility.max_transformer_loss_tolerance',
-        default=10.0)
-
-    # --- Consumption Alerts ---
-    high_consumption_threshold = fields.Float(
-        string='حد الاستهلاك العالي (kWh)',
-        config_parameter='utility.high_consumption_threshold',
-        default=10000.0)
-    consumption_variation_alert_percentage = fields.Float(
-        string='نسبة التغير المنبهة للاستهلاك (%)',
-        config_parameter='utility.consumption_variation_alert_percentage',
-        default=50.0)
-
     # --- SMS / Notifications ---
     stock_move_sms_validation = fields.Boolean(
         string='تأكيد رسائل SMS لحركات المخزون',

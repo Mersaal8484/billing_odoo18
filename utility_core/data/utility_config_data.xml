@@ -14,14 +14,6 @@
             <field name="key">utility.meter_reading_validation</field>
             <field name="value">both</field>
         </record>
-        <record id="config_max_transformer_loss_tolerance" model="ir.config_parameter">
-            <field name="key">utility.max_transformer_loss_tolerance</field>
-            <field name="value">10.0</field>
-        </record>
-        <record id="config_consumption_variation_alert_percentage" model="ir.config_parameter">
-            <field name="key">utility.consumption_variation_alert_percentage</field>
-            <field name="value">50.0</field>
-        </record>
     </data>
     <data noupdate="0">
         <!-- Ensure Yemeni Rial (YER) is Active -->
