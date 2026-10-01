@@ -3,19 +3,19 @@
     <record id="action_utility_writeoff" model="ir.actions.act_window">
         <field name="name">الإعفاءات</field>
         <field name="res_model">utility.writeoff</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <record id="action_utility_deposit" model="ir.actions.act_window">
         <field name="name">التأمينات</field>
         <field name="res_model">utility.deposit</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <record id="action_utility_penalty" model="ir.actions.act_window">
         <field name="name">الغرامات</field>
         <field name="res_model">utility.penalty</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <menuitem id="menu_utility_billing_root" name="الفوترة الآجلة"
@@ -45,7 +45,7 @@
     <record id="action_utility_penalty_type" model="ir.actions.act_window">
         <field name="name">أنواع الغرامات</field>
         <field name="res_model">utility.penalty.type</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <menuitem id="menu_utility_penalty_type" name="أنواع الغرامات والجزاءات"

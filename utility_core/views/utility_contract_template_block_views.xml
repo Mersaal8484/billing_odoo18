@@ -4,7 +4,7 @@
         <field name="name">utility.contract.template.block.tree</field>
         <field name="model">utility.contract.template.block</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="template_id"/>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
@@ -15,7 +15,7 @@
                 <field name="to_month"/>
                 <field name="time_from"/>
                 <field name="time_to"/>
-            </tree>
+            </list>
         </field>
     </record>
 

@@ -213,7 +213,7 @@ class UtilityStaff(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'utility.route',
             'domain': [('id', 'in', routes.ids)],
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'target': 'current',
         }
 

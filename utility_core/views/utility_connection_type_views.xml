@@ -4,12 +4,12 @@
         <field name="name">utility.connection.type.tree</field>
         <field name="model">utility.connection.type</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="code"/>
                 <field name="voltage_level"/>
                 <field name="phase"/>
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_utility_connection_type_form" model="ir.ui.view">
@@ -38,6 +38,6 @@
     <record id="action_utility_connection_type" model="ir.actions.act_window">
         <field name="name">أنواع التوصيلات</field>
         <field name="res_model">utility.connection.type</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 </odoo>

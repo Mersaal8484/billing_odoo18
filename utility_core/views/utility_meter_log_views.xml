@@ -4,7 +4,7 @@
         <field name="name">utility.meter.log.tree</field>
         <field name="model">utility.meter.log</field>
         <field name="arch" type="xml">
-            <tree default_order="date desc, id desc" create="0" edit="0" delete="0"
+            <list default_order="date desc, id desc" create="0" edit="0" delete="0"
                   decoration-info="log_type in ('installation', 'replacement', 'reconnection')"
                   decoration-warning="log_type in ('removal', 'disconnection', 'status_change')"
                   decoration-danger="log_type == 'tamper'">
@@ -16,7 +16,7 @@
                 <field name="ref_name" optional="show"/>
                 <field name="user_id"/>
                 <field name="company_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -27,14 +27,12 @@
             <form create="0" edit="0" delete="0" string="سجل العداد">
                 <header>
                     <button name="action_open_source" type="object" string="فتح المستند المصدر"
-                            class="btn-primary"
-                            attrs="{'invisible': ['|', ('ref_model', '=', False), ('ref_id', '=', False)]}"/>
+                            class="btn-primary" invisible="((ref_model == False) or (ref_id == False))"/>
                 </header>
                 <sheet>
                     <field name="active" invisible="1"/>
                     <field name="company_id" invisible="1"/>
-                    <widget name="web_ribbon" title="مؤرشف" bg_color="bg-info"
-                            attrs="{'invisible': [('active', '=', True)]}"/>
+                    <widget name="web_ribbon" title="مؤرشف" bg_color="bg-info" invisible="(active == True)"/>
                     <div class="oe_title">
                         <h1><field name="name"/></h1>
                         <h2><field name="log_type" widget="badge"/></h2>
@@ -94,7 +92,7 @@
     <record id="action_utility_meter_log" model="ir.actions.act_window">
         <field name="name">سجل حركات العدادات</field>
         <field name="res_model">utility.meter.log</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_meter_log_search"/>
         <field name="context">{'search_default_group_by_meter': 1, 'create': False}</field>
     </record>

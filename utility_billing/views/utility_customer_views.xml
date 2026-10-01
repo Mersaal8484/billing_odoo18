@@ -7,13 +7,11 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_service_charges" type="object"
-                        class="oe_stat_button" icon="fa-plug"
-                        attrs="{'invisible': [('service_charge_count', '=', 0)]}">
+                        class="oe_stat_button" icon="fa-plug" invisible="(service_charge_count == 0)">
                     <field name="service_charge_count" string="رسم إدخال الخدمة" widget="statinfo"/>
                 </button>
                 <button name="action_view_payment_allocations" type="object"
-                        class="oe_stat_button" icon="fa-money"
-                        attrs="{'invisible': [('payment_allocation_count', '=', 0)]}">
+                        class="oe_stat_button" icon="fa-money" invisible="(payment_allocation_count == 0)">
                     <field name="payment_allocation_count" string="تخصيصات التحصيل" widget="statinfo"/>
                 </button>
             </xpath>

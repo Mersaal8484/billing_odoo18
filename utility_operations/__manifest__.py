@@ -1,6 +1,6 @@
 {
     'name': 'Utility Operations',
-    'version': '16.0.1.0.0',
+    'version': '18.0.1.0.0',
     'category': 'Utility ERP',
     'summary': 'Field Operations & Service Order Management',
     'description': """

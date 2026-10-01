@@ -608,7 +608,7 @@ class IrCron(models.Model):
             'name': _('سجل تنفيذ: %s') % self.name,
             'type': 'ir.actions.act_window',
             'res_model': 'utility.cron.execution',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('cron_id', '=', self.id)],
             'context': {'default_cron_id': self.id, 'search_default_cron_id': self.id},
         }
@@ -620,7 +620,7 @@ class IrCron(models.Model):
             'name': _('سجل إخفاقات: %s') % self.name,
             'type': 'ir.actions.act_window',
             'res_model': 'utility.cron.execution',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('cron_id', '=', self.id), ('status', '=', 'failed')],
             'context': {'default_cron_id': self.id, 'search_default_cron_id': self.id},
         }

@@ -776,7 +776,7 @@ class UtilityContractTemplate(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('إصدارات قالب العقد: %s') % self.name,
             'res_model': 'utility.contract.template.version',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('template_id', '=', self.id)],
             'context': {'default_template_id': self.id, 'create': False, 'delete': False},
         }

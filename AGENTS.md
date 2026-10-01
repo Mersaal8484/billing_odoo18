@@ -33,12 +33,12 @@ Do not present TARGET V2 proposals, a UI affordance, a test file, or an empty CI
 | Diff/PR security review, blast radius, auth, workflow and integrity regressions | `utility-differential-review` | diff, baseline, ADR, security scope, routed domain skill |
 | Python/Dart dependencies, lockfiles, package provenance, secrets, supply chain | `utility-dependency-security` | requirements, pubspec, lockfiles, manifests, CI/deployment |
 | Flutter/Dart unit, widget, integration, offline-sync, mocks, analysis, coverage | `utility-mobile-quality` | mobile package, sync engine, API client, mobile integration, API specification |
-| Odoo 16 backend JavaScript, OWL components, client actions, field widgets, templates, assets, RTL UX | `utility-frontend-owl` | operational UX, SRS, UAT, module asset blocks, existing static/src |
-| Odoo 16 ORM performance, OCA code quality, N+1, XML, sudo | `odoo-framework-best-practices` | skills/odoo-framework-best-practices/SKILL.md |
+| Odoo 18 backend JavaScript, OWL components, client actions, field widgets, templates, assets, RTL UX | `utility-frontend-owl` | operational UX, SRS, UAT, module asset blocks, existing static/src |
+| Odoo 18 ORM performance, OCA code quality, N+1, XML, sudo | `odoo-framework-best-practices` | skills/odoo-framework-best-practices/SKILL.md |
 
 ## Project and dependency invariants
 
-- Odoo 16 ERP for electricity distribution. External dependency: `date_range` (from OCA). Core repository addons installed in this order: `utility_core`, `utility_inventory`, `utility_operations`, `utility_billing`. **`utility_meter_vision` is a future V2 OCR/AI module** — its manifest is `installable: False` and it must NOT be installed in V1 production environments.
+- This branch (`18`) targets Odoo 18 for electricity distribution; `main` and `development` remain on Odoo 16. External dependency: `date_range` (from OCA's 18.0 branch). Core repository addons installed in this order: `utility_core`, `utility_inventory`, `utility_operations`, `utility_billing`. **`utility_meter_vision` is a future V2 OCR/AI module** — its manifest is `installable: False` and it must NOT be installed in V1 production environments.
 - `utility_core` is always first among repo addons. Migration staging models live inside `utility_core`; there is no standalone `utility_migration` addon. `utility_portal` was merged into `utility_billing`.
 - V1 is strictly postpaid. `utility_prepaid` and `additional` directories have been deleted from the repository. Do not introduce prepaid vending, STS/POS architecture, or OCR/AI auto-billing into V1 scope.
 

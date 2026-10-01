@@ -4,11 +4,11 @@
         <field name="name">utility.meter.status.tree</field>
         <field name="model">utility.meter.status</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="code"/>
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_utility_meter_status_form" model="ir.ui.view">
@@ -34,6 +34,6 @@
     <record id="action_utility_meter_status" model="ir.actions.act_window">
         <field name="name">حالات العدادات</field>
         <field name="res_model">utility.meter.status</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 </odoo>

@@ -6,7 +6,7 @@
             <field name="name">utility.work.order.tree</field>
             <field name="model">utility.work.order</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="work_order_number"/>
                     <field name="date_created"/>
                     <field name="work_type"/>
@@ -15,7 +15,7 @@
                     <field name="assigned_technician_id"/>
                     <field name="state"/>
                     <field name="date_scheduled"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -25,11 +25,11 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button name="action_assign" type="object" string="تعيين أمر العمل" class="btn-primary" states="draft"/>
-                        <button name="action_start" type="object" string="بدء التنفيذ" class="btn-primary" states="assigned"/>
-                        <button name="action_complete" type="object" string="إكمال العمل" class="btn-success" states="in_progress"/>
-                        <button name="action_verify" type="object" string="تحقق من العمل" class="btn-success" states="completed"/>
-                        <button name="action_cancel" type="object" string="إلغاء أمر العمل" class="btn-secondary" states="draft,assigned,in_progress,completed" confirm="هل أنت متاكد من إلغاء امر العمل؟"/>
+                        <button name="action_assign" type="object" string="تعيين أمر العمل" class="btn-primary" invisible="state not in ('draft')"/>
+                        <button name="action_start" type="object" string="بدء التنفيذ" class="btn-primary" invisible="state not in ('assigned')"/>
+                        <button name="action_complete" type="object" string="إكمال العمل" class="btn-success" invisible="state not in ('in_progress')"/>
+                        <button name="action_verify" type="object" string="تحقق من العمل" class="btn-success" invisible="state not in ('completed')"/>
+                        <button name="action_cancel" type="object" string="إلغاء أمر العمل" class="btn-secondary" confirm="هل أنت متاكد من إلغاء امر العمل؟" invisible="state not in ('draft', 'assigned', 'in_progress', 'completed')"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,assigned,in_progress,completed,verified,cancelled" options="{'clickable': False}"/>
                     </header>
                     <sheet>
@@ -98,7 +98,7 @@
         <record id="action_utility_work_order" model="ir.actions.act_window">
             <field name="name">أوامر العمل</field>
             <field name="res_model">utility.work.order</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
             <field name="context">{'search_default_open_work': 1}</field>
         </record>
 

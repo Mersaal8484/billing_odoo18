@@ -29,14 +29,14 @@
                         <notebook>
                             <page string="تفاصيل نتائج الفحص">
                                 <field name="line_ids" readonly="1">
-                                    <tree decoration-success="status == 'pass'"
+                                    <list decoration-success="status == 'pass'"
                                           decoration-warning="status == 'warning'"
                                           decoration-danger="status == 'fail'">
                                         <field name="section"/>
                                         <field name="status" widget="badge"/>
                                         <field name="check_name"/>
                                         <field name="detail"/>
-                                    </tree>
+                                    </list>
                                 </field>
                             </page>
                         </notebook>

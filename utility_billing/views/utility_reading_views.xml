@@ -23,8 +23,7 @@
                                      style="border-color: #4f86c6 !important; background-color: #f0f5ff; min-height: 220px;">
                                     <field name="meter_image_upload" widget="binary"
                                            filename="meter_image_filename"
-                                           attrs="{'readonly': [('state', 'not in', ('draft', 'under_review', 'error'))]}"
-                                           class="o_utility_binary_upload"/>
+                                           class="o_utility_binary_upload" readonly="(state not in ('draft', 'under_review', 'error'))"/>
                                 </div>
                             </div>
                         </div>
@@ -53,7 +52,7 @@
                 <field name="name">utility.reading.tree</field>
                 <field name="model">utility.reading</field>
                 <field name="arch" type="xml">
-            <tree decoration-warning="state == 'under_review'"
+            <list decoration-warning="state == 'under_review'"
                   decoration-success="state == 'approved'"
                   decoration-danger="state == 'error'">
                 <field name="company_id" invisible="1"/>
@@ -74,7 +73,7 @@
                 <field name="state" widget="badge" decoration-warning="state == 'under_review'" decoration-success="state == 'approved'" decoration-primary="state == 'billed'" string="الحالة"/>
                 <field name="create_uid" string="القارئ (الاسم)"/>
                 <field name="reviewer_id" optional="show" string="المراجع"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -92,44 +91,35 @@
                     <!-- أزرار حسب الحالة -->
                     <button name="action_submit_review" type="object"
                             string="إرسال للمراجعة" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'draft')]}"
-                            groups="utility_core.group_utility_meter_reader,utility_core.group_utility_technician,utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_admin"/>
+                            groups="utility_core.group_utility_meter_reader,utility_core.group_utility_technician,utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_admin" invisible="(state != 'draft')"/>
                     <button name="action_mark_image_clear" type="object"
                             string="الصورة واضحة" class="btn-outline-success"
                             icon="fa-check"
-                            attrs="{'invisible': ['|', ('image_state', '=', 'clear'), ('state', 'not in', ('draft', 'under_review'))]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="((image_state == 'clear') or (state not in ('draft', 'under_review')))"/>
                     <button name="action_mark_image_not_clear" type="object"
                             string="الصورة غير واضحة" class="btn-outline-warning"
                             icon="fa-times"
-                            attrs="{'invisible': ['|', ('image_state', '=', 'not_clear'), ('state', 'not in', ('draft', 'under_review'))]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="((image_state == 'not_clear') or (state not in ('draft', 'under_review')))"/>
                     <button name="action_mark_image_not_same" type="object"
                             string="عداد غير مطابق" class="btn-outline-danger"
                             icon="fa-exclamation-triangle"
-                            attrs="{'invisible': ['|', ('image_state', '=', 'not_same'), ('state', 'not in', ('draft', 'under_review'))]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="((image_state == 'not_same') or (state not in ('draft', 'under_review')))"/>
                     <button name="action_mark_image_loss_read" type="object"
                             string="فاقد قراءة" class="btn-outline-secondary"
                             icon="fa-eye-slash"
-                            attrs="{'invisible': ['|', ('image_state', '=', 'loss_read'), ('state', 'not in', ('draft', 'under_review'))]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="((image_state == 'loss_read') or (state not in ('draft', 'under_review')))"/>
                     <button name="action_approve" type="object"
                             string="اعتماد القراءة" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'under_review')]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin" invisible="(state != 'under_review')"/>
                     <button name="action_reject" type="object"
                             string="رفض" class="btn-danger"
-                            attrs="{'invisible': [('state', 'not in', ('under_review', 'approved'))]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin" invisible="(state not in ('under_review', 'approved'))"/>
                     <button name="action_generate_bill" type="object"
                             string="إنشاء فاتورة" class="oe_highlight"
-                            attrs="{'invisible': ['|', ('state', 'not in', ('approved', 'queued')), ('reading_purpose', '!=', 'periodic')]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin" invisible="((state not in ('approved', 'queued')) or (reading_purpose != 'periodic'))"/>
                     <button name="action_requeue" type="object"
                             string="إعادة للطابور" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'error')]}"
-                            groups="utility_core.group_utility_billing_manager,utility_core.group_utility_admin"/>
+                            groups="utility_core.group_utility_billing_manager,utility_core.group_utility_admin" invisible="(state != 'error')"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,under_review,approved,queued,billed,error"
                            options="{'clickable': False}"/>
@@ -156,37 +146,37 @@
                     </div>
                     <group>
                         <group string="معلومات القراءة">
-                            <field name="reading_category" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="reading_category" readonly="(state != 'draft')"/>
                             <field name="reading_id" readonly="1"/>
-                            <field name="reading_purpose" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="reading_event" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="meter_serial_scan" widget="barcode_camera" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-                            <field name="meter_id" domain="[('id', 'in', available_meter_ids)]" options="{'no_create': True}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="account_id" options="{'no_create': True}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="reading_purpose" readonly="(state != 'draft')"/>
+                            <field name="reading_event" readonly="(state != 'draft')"/>
+                            <field name="meter_serial_scan" widget="barcode_camera" invisible="(state != 'draft')"/>
+                            <field name="meter_id" domain="[('id', 'in', available_meter_ids)]" options="{'no_create': True}" readonly="(state != 'draft')"/>
+                            <field name="account_id" options="{'no_create': True}" readonly="(state != 'draft')"/>
                             <field name="reading_history_count" string="سجل القراءات" widget="statinfo"/>
-                            <field name="transformer_id" attrs="{'invisible': [('reading_category', '!=', 'transformer')]}"/>
+                            <field name="transformer_id" invisible="(reading_category != 'transformer')"/>
                             <field name="is_private_transformer" invisible="1"/>
-                            <field name="feeder_id" attrs="{'invisible': [('reading_category', '!=', 'feeder')]}"/>
-                            <field name="customer_id" attrs="{'invisible': ['|', ('reading_category', 'not in', ('customer', 'transformer')), '&amp;', ('reading_category', '=', 'transformer'), ('is_private_transformer', '=', False)]}"/>
-                            <field name="reading_date" attrs="{'readonly': [('state', 'not in', ('draft', 'error'))]}"/>
-                            <field name="date_range_id" options="{'no_create': True}" attrs="{'readonly': [('state', 'not in', ('draft', 'error'))], 'invisible': [('reading_purpose', '!=', 'periodic')], 'required': [('reading_purpose', '=', 'periodic')]}"/>
-                            <field name="replacement_id" readonly="1" attrs="{'invisible': [('replacement_id', '=', False)]}"/>
-                            <field name="reading_type" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="feeder_id" invisible="(reading_category != 'feeder')"/>
+                            <field name="customer_id" invisible="((reading_category not in ('customer', 'transformer')) or ((reading_category == 'transformer') and (is_private_transformer == False)))"/>
+                            <field name="reading_date" readonly="(state not in ('draft', 'error'))"/>
+                            <field name="date_range_id" options="{'no_create': True}" readonly="(state not in ('draft', 'error'))" invisible="(reading_purpose != 'periodic')" required="(reading_purpose == 'periodic')"/>
+                            <field name="replacement_id" readonly="1" invisible="(replacement_id == False)"/>
+                            <field name="reading_type" readonly="(state != 'draft')"/>
                         </group>
                         <group string="قراءات العداد">
                             <field name="previous_reading" readonly="1"/>
                             <field name="previous_reading_date" readonly="1"/>
-                            <field name="reading_value" attrs="{'readonly': [('state', 'not in', ('draft', 'error'))]}"/>
-                            <field name="is_rollover" attrs="{'readonly': [('state', 'not in', ('draft', 'under_review', 'error'))]}"/>
-                            <field name="max_reading_value" attrs="{'invisible': [('is_rollover', '=', False)], 'readonly': [('state', 'not in', ('draft', 'under_review', 'error'))]}"/>
+                            <field name="reading_value" readonly="(state not in ('draft', 'error'))"/>
+                            <field name="is_rollover" readonly="(state not in ('draft', 'under_review', 'error'))"/>
+                            <field name="max_reading_value" invisible="(is_rollover == False)" readonly="(state not in ('draft', 'under_review', 'error'))"/>
                             <field name="raw_consumption" readonly="1"/>
                             <field name="meter_multiplier" readonly="1"/>
                             <field name="consumption" class="text-success" readonly="1"/>
-                            <field name="carried_consumption" readonly="1" attrs="{'invisible': [('reading_purpose', '!=', 'periodic')]}"/>
-                            <field name="billing_consumption" class="text-success" readonly="1" attrs="{'invisible': [('reading_purpose', '!=', 'periodic')]}"/>
+                            <field name="carried_consumption" readonly="1" invisible="(reading_purpose != 'periodic')"/>
+                            <field name="billing_consumption" class="text-success" readonly="1" invisible="(reading_purpose != 'periodic')"/>
                             <!-- تحليل الاستهلاك -->
-                            <field name="consumption_difference" attrs="{'invisible': [('consumption_alert', '=', 'normal')]}"/>
-                            <field name="consumption_diff_percentage" attrs="{'invisible': [('consumption_alert', '=', 'normal')]}"/>
+                            <field name="consumption_difference" invisible="(consumption_alert == 'normal')"/>
+                            <field name="consumption_diff_percentage" invisible="(consumption_alert == 'normal')"/>
                             <field name="consumption_alert" widget="badge" readonly="1"/>
                         </group>
                     </group>
@@ -204,24 +194,22 @@
                                      style="border-color: #4f86c6 !important; background-color: #f0f5ff; min-height: 180px;">
                                     <field name="meter_image_upload" widget="binary"
                                            filename="meter_image_filename"
-                                           attrs="{'readonly': [('state', 'not in', ('draft', 'under_review', 'error'))]}"
-                                           class="o_utility_binary_upload"/>
+                                           class="o_utility_binary_upload" readonly="(state not in ('draft', 'under_review', 'error'))"/>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <group string="المراجعة" groups="utility_core.group_utility_supervisor">
-                        <field name="image_state" attrs="{'readonly': [('state', 'not in', ('draft', 'under_review', 'error'))]}"/>
+                        <field name="image_state" readonly="(state not in ('draft', 'under_review', 'error'))"/>
                         <field name="reviewer_id" readonly="1"/>
                         <field name="review_date" readonly="1"/>
-                        <field name="review_notes" attrs="{'readonly': [('state', '!=', 'under_review')]}"/>
-                        <field name="rejection_reason" attrs="{'readonly': [('state', 'in', ('queued', 'billed'))], 'invisible': [('rejection_reason', '=', False)]}"/>
-                        <field name="rejected_by" readonly="1" attrs="{'invisible': [('rejected_by', '=', False)]}"/>
-                        <field name="rejected_at" readonly="1" attrs="{'invisible': [('rejected_at', '=', False)]}"/>
+                        <field name="review_notes" readonly="(state != 'under_review')"/>
+                        <field name="rejection_reason" readonly="(state in ('queued', 'billed'))" invisible="(rejection_reason == False)"/>
+                        <field name="rejected_by" readonly="1" invisible="(rejected_by == False)"/>
+                        <field name="rejected_at" readonly="1" invisible="(rejected_at == False)"/>
                     </group>
-                    <field name="remarks" nolabel="1" placeholder="ملاحظات إضافية..."
-                           attrs="{'readonly': [('state', 'not in', ('draft', 'error'))]}"/>
-                    <group string="خطأ الفوترة" attrs="{'invisible': [('billing_error', '=', False)]}">
+                    <field name="remarks" nolabel="1" placeholder="ملاحظات إضافية..." readonly="(state not in ('draft', 'error'))"/>
+                    <group string="خطأ الفوترة" invisible="(billing_error == False)">
                         <field name="billing_error" nolabel="1" readonly="1"/>
                     </group>
                 </sheet>
@@ -250,7 +238,7 @@
                 <field name="create_uid"/>
                 <field name="id"/>
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click o_kanban_record_has_image_fill">
                             <div class="o_kanban_image_fill_left d-none d-md-block" t-attf-style="background-image:url('#{record.meter_image_url.raw_value || ''}')">
                                 <img class="o_kanban_image_inner_pic" t-if="record.meter_image_url.raw_value" t-att-alt="record.reading_id.value" t-att-src="record.meter_image_url.raw_value"/>
@@ -340,7 +328,7 @@
     <record id="action_utility_reading" model="ir.actions.act_window">
         <field name="name">قراءات العدادات</field>
         <field name="res_model">utility.reading</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_reading_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -351,7 +339,7 @@
 
     <record id="action_utility_reading_tree_view" model="ir.actions.act_window.view">
         <field name="sequence" eval="1"/>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">list</field>
         <field name="view_id" ref="view_utility_reading_tree"/>
         <field name="act_window_id" ref="action_utility_reading"/>
     </record>
@@ -366,7 +354,7 @@
     <record id="action_utility_readings_pending_review" model="ir.actions.act_window">
         <field name="name">قراءات تنتظر المراجعة</field>
         <field name="res_model">utility.reading</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('state', '=', 'under_review')]</field>
         <field name="context">{'default_state': 'under_review'}</field>
         <field name="help" type="html">

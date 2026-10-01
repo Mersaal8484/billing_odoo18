@@ -6,7 +6,7 @@
             <field name="name">utility.tamper.case.tree</field>
             <field name="model">utility.tamper.case</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="case_number"/>
                     <field name="date_reported"/>
                     <field name="customer_id"/>
@@ -14,7 +14,7 @@
                     <field name="severity"/>
                     <field name="assigned_to"/>
                     <field name="state"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -81,7 +81,7 @@
         <record id="action_utility_tamper_case" model="ir.actions.act_window">
             <field name="name">حالات التلاعب</field>
             <field name="res_model">utility.tamper.case</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
         </record>
 
     </data>

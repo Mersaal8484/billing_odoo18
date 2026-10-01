@@ -4,7 +4,7 @@
         <field name="name">utility.tariff.tree</field>
         <field name="model">utility.tariff</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="code"/>
                 <field name="category_id"/>
@@ -12,7 +12,7 @@
                 <field name="price_per_kwh"/>
                 <field name="is_active"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_utility_tariff_form" model="ir.ui.view">
@@ -53,7 +53,7 @@
                     <notebook>
                         <page name="blocks" string="Rate Blocks">
                             <field name="block_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
                                     <field name="from_kwh"/>
@@ -61,28 +61,28 @@
                                     <field name="price_per_kwh"/>
                                     <field name="from_month"/>
                                     <field name="to_month"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page name="history" string="History">
                             <field name="history_ids">
-                                <tree>
+                                <list>
                                     <field name="change_date"/>
                                     <field name="old_price"/>
                                     <field name="new_price"/>
                                     <field name="reason"/>
                                     <field name="changed_by"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page name="accounts" string="Accounts">
                             <field name="account_ids">
-                                <tree>
+                                <list>
                                     <field name="customer_number"/>
                                     <field name="customer_id"/>
                                     <field name="state"/>
                                     <field name="balance" widget="monetary"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -117,7 +117,7 @@
     <record id="action_utility_tariff" model="ir.actions.act_window">
         <field name="name">التعرفات</field>
         <field name="res_model">utility.tariff</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_tariff_search"/>
     </record>
 </odoo>

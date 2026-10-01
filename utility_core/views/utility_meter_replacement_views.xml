@@ -5,7 +5,7 @@
         <field name="name">utility.meter.replacement.tree</field>
         <field name="model">utility.meter.replacement</field>
         <field name="arch" type="xml">
-            <tree string="استبدال العدادات (مشتركين / فيدرات / محولات)" decoration-info="state == 'draft'" decoration-success="state == 'done'">
+            <list string="استبدال العدادات (مشتركين / فيدرات / محولات)" decoration-info="state == 'draft'" decoration-success="state == 'done'">
                 <field name="company_id" invisible="1"/>
                 <field name="target_type"/>
                 <field name="utility_account_id"/>
@@ -17,7 +17,7 @@
                 <field name="replace_date"/>
                 <field name="reason"/>
                 <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'done'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -31,28 +31,26 @@
                 <field name="closing_reading_id" invisible="1"/>
                 <field name="opening_reading_id" invisible="1"/>
                 <header>
-                    <button name="action_confirm_replacement" string="تأكيد الاستبدال" type="object" class="oe_highlight" states="draft" groups="utility_core.group_utility_supervisor"/>
+                    <button name="action_confirm_replacement" string="تأكيد الاستبدال" type="object" class="oe_highlight" groups="utility_core.group_utility_supervisor" invisible="state not in ('draft')"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" type="object" name="action_view_closing_reading"
-                                icon="fa-tachometer"
-                                attrs="{'invisible': [('closing_reading_id', '=', False)]}">
+                                icon="fa-tachometer" invisible="(closing_reading_id == False)">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">القراءة الختامية</span>
                             </div>
                         </button>
                         <button class="oe_stat_button" type="object" name="action_view_opening_reading"
-                                icon="fa-power-off"
-                                attrs="{'invisible': [('opening_reading_id', '=', False)]}">
+                                icon="fa-power-off" invisible="(opening_reading_id == False)">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">القراءة الافتتاحية</span>
                             </div>
                         </button>
                     </div>
 
-                    <div class="alert alert-info text-center" role="alert" attrs="{'invisible': [('state', '!=', 'done')]}">
+                    <div class="alert alert-info text-center" role="alert" invisible="(state != 'done')">
                         <i class="fa fa-info-circle me-2" title="تنبيه"/>
                         <strong>تم الاستبدال بنجاح!</strong>
                         تم إنشاء القراءة الختامية والقراءة الافتتاحية المعتمدة بنجاح. الاستهلاك غير المفوتر المرحل: 
@@ -60,17 +58,17 @@
                     </div>
 
                     <group string="نوع التبعية والعنصر المستبدل">
-                        <field name="target_type" widget="radio" options="{'horizontal': true}" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                        <field name="utility_account_id" options="{'no_create': True}" attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('target_type', '!=', 'subscriber')], 'required': [('target_type', '=', 'subscriber')]}"/>
-                        <field name="partner_id" attrs="{'invisible': [('target_type', '!=', 'subscriber')]}"/>
-                        <field name="feeder_id" options="{'no_create': True}" attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('target_type', '!=', 'feeder')], 'required': [('target_type', '=', 'feeder')]}"/>
-                        <field name="transformer_id" options="{'no_create': True}" attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('target_type', '!=', 'transformer')], 'required': [('target_type', '=', 'transformer')]}"/>
+                        <field name="target_type" widget="radio" options="{'horizontal': true}" readonly="(state == 'done')"/>
+                        <field name="utility_account_id" options="{'no_create': True}" readonly="(state == 'done')" invisible="(target_type != 'subscriber')" required="(target_type == 'subscriber')"/>
+                        <field name="partner_id" invisible="(target_type != 'subscriber')"/>
+                        <field name="feeder_id" options="{'no_create': True}" readonly="(state == 'done')" invisible="(target_type != 'feeder')" required="(target_type == 'feeder')"/>
+                        <field name="transformer_id" options="{'no_create': True}" readonly="(state == 'done')" invisible="(target_type != 'transformer')" required="(target_type == 'transformer')"/>
                     </group>
 
                     <group>
                         <group>
-                            <field name="replace_date" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="reason" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="replace_date" readonly="(state == 'done')"/>
+                            <field name="reason" readonly="(state == 'done')"/>
                         </group>
                         <group>
                             <field name="user_id" readonly="1"/>
@@ -78,7 +76,7 @@
                     </group>
                     
                     <group string="بيانات العداد القديم والقراءة الختامية">
-                        <field name="old_meter_serial_scan" widget="barcode_camera" attrs="{'invisible': [('state', '=', 'done')]}"/>
+                        <field name="old_meter_serial_scan" widget="barcode_camera" invisible="(state == 'done')"/>
                         <group>
                             <field name="old_meter_id" invisible="1" force_save="1"/>
                             <field name="old_meter_number" force_save="1"/>
@@ -87,27 +85,27 @@
                         </group>
                         <group>
                             <field name="old_last_invo_reading" force_save="1"/>
-                            <field name="old_closing_reading" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="old_closing_reading" readonly="(state == 'done')"/>
                             <field name="old_uninvoiced_consumption" force_save="1"/>
                         </group>
                     </group>
 
                     <group string="صورة العداد (اختياري)">
-                        <field name="replacement_image" widget="image" nolabel="1" class="oe_avatar" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                        <field name="replacement_image" widget="image" nolabel="1" class="oe_avatar" readonly="(state == 'done')"/>
                     </group>
 
                     <group string="بيانات العداد الجديد والقراءة الافتتاحية">
-                        <field name="new_meter_serial_scan" widget="barcode_camera" attrs="{'invisible': [('state', '=', 'done')]}"/>
+                        <field name="new_meter_serial_scan" widget="barcode_camera" invisible="(state == 'done')"/>
                         <group>
-                            <field name="new_meter_id" options="{'no_create': True}" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="new_meter_number" attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('new_meter_id', '!=', False)]}"/>
+                            <field name="new_meter_id" options="{'no_create': True}" readonly="(state == 'done')"/>
+                            <field name="new_meter_number" readonly="(state == 'done')" invisible="(new_meter_id != False)"/>
                         </group>
                         <group>
-                            <field name="new_meter_model_id" options="{'no_create': True}" attrs="{'readonly': [('state', '=', 'done')], 'required': [('new_meter_id', '=', False)], 'invisible': [('new_meter_id', '!=', False)]}"/>
-                            <field name="new_meter_type_id" attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('new_meter_id', '!=', False)]}"/>
-                            <field name="new_phase" attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('new_meter_id', '!=', False)]}"/>
-                            <field name="new_opening_reading" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="new_meter_val" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="new_meter_model_id" options="{'no_create': True}" readonly="(state == 'done')" required="(new_meter_id == False)" invisible="(new_meter_id != False)"/>
+                            <field name="new_meter_type_id" readonly="(state == 'done')" invisible="(new_meter_id != False)"/>
+                            <field name="new_phase" readonly="(state == 'done')" invisible="(new_meter_id != False)"/>
+                            <field name="new_opening_reading" readonly="(state == 'done')"/>
+                            <field name="new_meter_val" readonly="(state == 'done')"/>
                         </group>
                     </group>
                     
@@ -160,7 +158,7 @@
     <record id="action_utility_meter_replacement" model="ir.actions.act_window">
         <field name="name">سجل استبدال العدادات</field>
         <field name="res_model">utility.meter.replacement</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_meter_replacement_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

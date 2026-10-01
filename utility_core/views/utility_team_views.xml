@@ -4,7 +4,7 @@
         <field name="name">utility.team.tree</field>
         <field name="model">utility.team</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="code"/>
                 <field name="team_leader_id"/>
@@ -12,7 +12,7 @@
                 <field name="region_id"/>
                 <field name="area_id"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_utility_team_form" model="ir.ui.view">
@@ -40,12 +40,12 @@
                     <notebook>
                         <page name="members" string="Members">
                             <field name="staff_ids">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="employee_code"/>
                                     <field name="role_ids" widget="many2many_tags"/>
                                     <field name="mobile"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -88,7 +88,7 @@
     <record id="action_utility_team" model="ir.actions.act_window">
         <field name="name">فرق العمل</field>
         <field name="res_model">utility.team</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_team_search"/>
     </record>
 </odoo>

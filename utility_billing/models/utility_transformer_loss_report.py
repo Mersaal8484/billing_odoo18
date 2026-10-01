@@ -28,7 +28,7 @@ class UtilityTransformerLossReport(models.Model):
     energy_sent = fields.Float(string='الطاقة المرسلة', readonly=True)
     energy_sold = fields.Float(string='الطاقة المباعة', readonly=True)
     loss_kwh = fields.Float(string='الفاقد', readonly=True)
-    loss_percent = fields.Float(string='نسبة الفاقد %', readonly=True, group_operator='avg')
+    loss_percent = fields.Float(string='نسبة الفاقد %', readonly=True, aggregator='avg')
     customer_count = fields.Integer(string='عدد المشتركين', readonly=True)
     invoice_count = fields.Integer(string='عدد الفواتير', readonly=True)
     amount_total = fields.Monetary(string='إجمالي الفواتير', readonly=True, currency_field='currency_id')

@@ -27,13 +27,11 @@
                                    options="{'no_create': True}"
                                    placeholder="ابحث عن محول..."
                                    colspan="2"/>
-                            <div class="alert alert-info" role="status" colspan="2"
-                                 attrs="{'invisible': [('customer_count', '=', 0)]}">
+                            <div class="alert alert-info" role="status" colspan="2" invisible="(customer_count == 0)">
                                 <i class="fa fa-info-circle"/> 
                                 تم العثور على <strong><field name="customer_count" nolabel="1"/></strong> مشترك مرتبط بالمحولات المختارة.
                             </div>
-                            <div class="alert alert-warning" role="alert" colspan="2"
-                                 attrs="{'invisible': [('customer_count', '!=', 0)]}">
+                            <div class="alert alert-warning" role="alert" colspan="2" invisible="(customer_count != 0)">
                                 <i class="fa fa-exclamation-triangle"/> 
                                 لا يوجد مشتركون مرتبطون بالمحولات المختارة.
                                 تأكد من ربط العدادات بالمحول أولاً.
@@ -46,12 +44,8 @@
                                    options="{'no_create': True}"
                                    placeholder="اختر مساراً موجوداً أو اتركه فارغاً لإنشاء جديد"/>
                             <field name="assign_mode" widget="radio"/>
-                            <field name="new_route_name"
-                                   attrs="{'invisible': [('route_id', '!=', False)],
-                                           'required': [('route_id', '=', False)]}"/>
-                            <field name="new_route_code"
-                                   attrs="{'invisible': [('route_id', '!=', False)],
-                                           'required': [('route_id', '=', False)]}"/>
+                            <field name="new_route_name" invisible="(route_id != False)" required="(route_id == False)"/>
+                            <field name="new_route_code" invisible="(route_id != False)" required="(route_id == False)"/>
                         </group>
 
                         <!-- ── القسم 3: طاقم العمل ─────────────────────── -->
@@ -69,8 +63,7 @@
                     </group>
 
                     <!-- ── القسم 4: المشتركون ─────────────────────────── -->
-                    <group string="④ تحديد المشتركين" colspan="2"
-                           attrs="{'invisible': [('customer_count', '=', 0)]}">
+                    <group string="④ تحديد المشتركين" colspan="2" invisible="(customer_count == 0)">
 
                         <!-- أزرار سريعة -->
                         <div class="mb-3" colspan="2">
@@ -92,12 +85,12 @@
                                widget="many2many"
                                domain="[('id', 'in', available_customer_ids)]"
                                colspan="2">
-                            <tree>
+                            <list>
                                 <field name="display_name" string="المشترك"/>
                                 <field name="customer_number" string="رقم المشترك"/>
                                 <field name="route_id" string="المسار الحالي"
                                        optional="show"/>
-                            </tree>
+                            </list>
                         </field>
                     </group>
 
@@ -108,8 +101,7 @@
                     <button type="object"
                             name="action_confirm"
                             string="تأكيد التعيين"
-                            class="btn-primary"
-                            attrs="{'invisible': [('selected_count', '=', 0)]}"/>
+                            class="btn-primary" invisible="(selected_count == 0)"/>
                     <button special="cancel"
                             string="إلغاء"
                             class="btn-secondary"/>
@@ -145,7 +137,7 @@
                         string="تعيين مشتركين"
                         icon="fa-users"
                         class="oe_stat_button"
-                        context="{'default_route_id': active_id,
+                        context="{'default_route_id': id,
                                   'default_transformer_ids': [(6,0,[transformer_id])] if transformer_id else []}"/>
             </xpath>
 

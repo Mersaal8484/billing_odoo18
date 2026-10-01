@@ -4,16 +4,16 @@
         <field name="name">utility.migration.mapping.tree</field>
         <field name="model">utility.migration.mapping</field>
         <field name="arch" type="xml">
-            <tree string="جدول الترميز" editable="bottom">
+            <list string="جدول الترميز" editable="bottom">
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="mapping_type"/>
                 <field name="legacy_code"/>
-                <field name="region_id" attrs="{'readonly': [('mapping_type', '!=', 'region')], 'required': [('mapping_type', '=', 'region')]}"/>
-                <field name="area_id" attrs="{'readonly': [('mapping_type', '!=', 'area')], 'required': [('mapping_type', '=', 'area')]}"/>
-                <field name="category_id" attrs="{'readonly': [('mapping_type', '!=', 'category')], 'required': [('mapping_type', '=', 'category')]}"/>
-                <field name="subscriber_type_id" attrs="{'readonly': [('mapping_type', '!=', 'subscriber')], 'required': [('mapping_type', '=', 'subscriber')]}"/>
-                <field name="contract_template_id" attrs="{'readonly': [('mapping_type', '!=', 'contract')], 'required': [('mapping_type', '=', 'contract')]}"/>
-            </tree>
+                <field name="region_id" readonly="(mapping_type != 'region')" required="(mapping_type == 'region')"/>
+                <field name="area_id" readonly="(mapping_type != 'area')" required="(mapping_type == 'area')"/>
+                <field name="category_id" readonly="(mapping_type != 'category')" required="(mapping_type == 'category')"/>
+                <field name="subscriber_type_id" readonly="(mapping_type != 'subscriber')" required="(mapping_type == 'subscriber')"/>
+                <field name="contract_template_id" readonly="(mapping_type != 'contract')" required="(mapping_type == 'contract')"/>
+            </list>
         </field>
     </record>
 
@@ -42,7 +42,7 @@
     <record id="action_utility_migration_mapping" model="ir.actions.act_window">
         <field name="name">جدول الترميز</field>
         <field name="res_model">utility.migration.mapping</field>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">list</field>
         <field name="search_view_id" ref="view_utility_migration_mapping_search"/>
     </record>
 

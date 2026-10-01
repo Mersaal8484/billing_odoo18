@@ -41,13 +41,13 @@ async function copyText(text) {
     }
 }
 
-patch(ErrorDialog.prototype, "utility_core.error_dialog_clipboard", {
+patch(ErrorDialog.prototype, {
     onClickClipboard() {
         return copyText(`${this.props.name}\n${this.props.message}\n${this.props.traceback}`);
     },
 });
 
-patch(RPCErrorDialog.prototype, "utility_core.rpc_error_dialog_clipboard", {
+patch(RPCErrorDialog.prototype, {
     onClickClipboard() {
         return copyText(`${this.props.name}\n${this.props.message}\n${this.traceback}`);
     },

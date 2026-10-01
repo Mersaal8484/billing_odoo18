@@ -4,7 +4,7 @@
         <field name="name">utility.reading.commercial.review.tree</field>
         <field name="model">utility.reading</field>
         <field name="arch" type="xml">
-            <tree string="مراجعة قراءات الفواتير التجارية"
+            <list string="مراجعة قراءات الفواتير التجارية"
                   decoration-warning="state == 'under_review'"
                   decoration-success="state == 'approved'"
                   decoration-muted="state == 'draft'">
@@ -26,22 +26,18 @@
                 <button name="action_mark_image_clear" type="object" string="واضحة"
                         icon="fa-check-circle" class="text-success"
                         title="تحديد الصورة كواضحة"
-                        attrs="{'invisible': ['|', ('image_state', '=', 'clear'), ('state', 'not in', ('draft', 'under_review'))]}"
-                        groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"/>
+                        groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="((image_state == 'clear') or (state not in ('draft', 'under_review')))"/>
                 <button name="action_mark_image_not_clear" type="object" string="غير واضحة"
                         icon="fa-times-circle" class="text-warning"
                         title="تحديد الصورة كغير واضحة"
-                        attrs="{'invisible': ['|', ('image_state', '=', 'not_clear'), ('state', 'not in', ('draft', 'under_review'))]}"
-                        groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"/>
+                        groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="((image_state == 'not_clear') or (state not in ('draft', 'under_review')))"/>
                 <button name="action_approve" type="object" string="اعتماد"
                         icon="fa-check" class="text-success"
-                        groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"
-                        attrs="{'invisible': [('state', '!=', 'under_review')]}"/>
+                        groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="(state != 'under_review')"/>
                 <button name="action_reject" type="object" string="رفض"
                         icon="fa-times" class="text-danger"
-                        groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"
-                        attrs="{'invisible': [('state', '!=', 'under_review')]}"/>
-            </tree>
+                        groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="(state != 'under_review')"/>
+            </list>
         </field>
     </record>
 
@@ -85,31 +81,25 @@
                     <button name="action_mark_image_clear" type="object"
                             string="الصورة واضحة" class="btn-success"
                             icon="fa-check"
-                            attrs="{'invisible': ['|', ('image_state', '=', 'clear'), ('state', 'not in', ('draft', 'under_review'))]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="((image_state == 'clear') or (state not in ('draft', 'under_review')))"/>
                     <button name="action_mark_image_not_clear" type="object"
                             string="الصورة غير واضحة" class="btn-warning"
                             icon="fa-times"
-                            attrs="{'invisible': ['|', ('image_state', '=', 'not_clear'), ('state', 'not in', ('draft', 'under_review'))]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="((image_state == 'not_clear') or (state not in ('draft', 'under_review')))"/>
                     <button name="action_mark_image_not_same" type="object"
                             string="عداد غير مطابق" class="btn-outline-danger"
                             icon="fa-exclamation-triangle"
-                            attrs="{'invisible': ['|', ('image_state', '=', 'not_same'), ('state', 'not in', ('draft', 'under_review'))]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="((image_state == 'not_same') or (state not in ('draft', 'under_review')))"/>
                     <button name="action_mark_image_loss_read" type="object"
                             string="فاقد قراءة" class="btn-outline-secondary"
                             icon="fa-eye-slash"
-                            attrs="{'invisible': ['|', ('image_state', '=', 'loss_read'), ('state', 'not in', ('draft', 'under_review'))]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="((image_state == 'loss_read') or (state not in ('draft', 'under_review')))"/>
                     <button name="action_approve" type="object" string="اعتماد القراءة"
                             class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'under_review')]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="(state != 'under_review')"/>
                     <button name="action_reject" type="object" string="رفض القراءة"
                             class="btn-danger"
-                            attrs="{'invisible': [('state', 'not in', ('under_review', 'approved'))]}"
-                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor"/>
+                            groups="utility_core.group_utility_supervisor,utility_core.group_utility_billing_manager,utility_core.group_utility_revenue_manager,utility_core.group_utility_admin,utility_core.group_utility_auditor" invisible="(state not in ('under_review', 'approved'))"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,under_review,approved,billed"/>
                 </header>
@@ -120,25 +110,20 @@
                                class="o_utility_commercial_review_main_image"
                                options="{'size': [450, 325]}"/>
                         <div class="text-muted mt-2">صورة العداد المستخدمة في مراجعة الفاتورة التجارية</div>
-                        <div class="mt-3 p-2 bg-white border rounded d-inline-flex align-items-center gap-2 flex-wrap shadow-sm"
-                             attrs="{'invisible': [('state', 'not in', ('draft', 'under_review', 'error'))]}">
+                        <div class="mt-3 p-2 bg-white border rounded d-inline-flex align-items-center gap-2 flex-wrap shadow-sm" invisible="(state not in ('draft', 'under_review', 'error'))">
                             <span class="fw-bold text-muted me-2 ms-2">تغيير حالة الصورة:</span>
                             <button name="action_mark_image_clear" type="object"
                                     string="واضحة" class="btn btn-sm btn-success"
-                                    icon="fa-check"
-                                    attrs="{'invisible': [('image_state', '=', 'clear')]}"/>
+                                    icon="fa-check" invisible="(image_state == 'clear')"/>
                             <button name="action_mark_image_not_clear" type="object"
                                     string="غير واضحة" class="btn btn-sm btn-warning"
-                                    icon="fa-times"
-                                    attrs="{'invisible': [('image_state', '=', 'not_clear')]}"/>
+                                    icon="fa-times" invisible="(image_state == 'not_clear')"/>
                             <button name="action_mark_image_not_same" type="object"
                                     string="عداد غير مطابق" class="btn btn-sm btn-outline-danger"
-                                    icon="fa-exclamation-triangle"
-                                    attrs="{'invisible': [('image_state', '=', 'not_same')]}"/>
+                                    icon="fa-exclamation-triangle" invisible="(image_state == 'not_same')"/>
                             <button name="action_mark_image_loss_read" type="object"
                                     string="فاقد قراءة" class="btn btn-sm btn-outline-secondary"
-                                    icon="fa-eye-slash"
-                                    attrs="{'invisible': [('image_state', '=', 'loss_read')]}"/>
+                                    icon="fa-eye-slash" invisible="(image_state == 'loss_read')"/>
                         </div>
                     </div>
                     <group string="ملخص القراءة">
@@ -157,14 +142,13 @@
                     </group>
                     <group string="المراجعة">
                         <group>
-                            <field name="image_state"
-                                   attrs="{'readonly': [('state', 'not in', ('draft', 'under_review', 'error'))]}"/>
+                            <field name="image_state" readonly="(state not in ('draft', 'under_review', 'error'))"/>
                             <field name="reviewer_id" readonly="1"/>
                             <field name="review_date" readonly="1"/>
                         </group>
                         <group>
-                            <field name="review_notes" attrs="{'readonly': [('state', 'not in', ('draft', 'under_review', 'error'))]}"/>
-                            <field name="rejection_reason" attrs="{'readonly': [('state', 'not in', ('draft', 'under_review', 'error'))]}"/>
+                            <field name="review_notes" readonly="(state not in ('draft', 'under_review', 'error'))"/>
+                            <field name="rejection_reason" readonly="(state not in ('draft', 'under_review', 'error'))"/>
                         </group>
                     </group>
                 </sheet>
@@ -180,7 +164,7 @@
     <record id="action_utility_reading_commercial_review" model="ir.actions.act_window">
         <field name="name">مراجعة الفواتير التجارية</field>
         <field name="res_model">utility.reading</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_reading_commercial_review_search"/>
         <field name="domain">[('is_billable', '=', True), ('state', 'in', ('under_review', 'approved', 'draft'))]</field>
         <field name="context">{'search_default_pending': 1}</field>
@@ -188,7 +172,7 @@
 
     <record id="action_utility_reading_commercial_review_tree" model="ir.actions.act_window.view">
         <field name="sequence" eval="1"/>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">list</field>
         <field name="view_id" ref="view_utility_reading_commercial_review_tree"/>
         <field name="act_window_id" ref="action_utility_reading_commercial_review"/>
     </record>

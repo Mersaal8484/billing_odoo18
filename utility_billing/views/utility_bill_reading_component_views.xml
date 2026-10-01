@@ -4,7 +4,7 @@
         <field name="name">utility.bill.reading.component.tree</field>
         <field name="model">utility.bill.reading.component</field>
         <field name="arch" type="xml">
-            <tree create="0" edit="0" delete="0">
+            <list create="0" edit="0" delete="0">
                 <field name="sale_order_id"/>
                 <field name="reading_id"/>
                 <field name="reading_purpose" widget="badge"/>
@@ -17,7 +17,7 @@
                 <field name="meter_multiplier"/>
                 <field name="consumption" sum="إجمالي الاستهلاك"/>
                 <field name="company_id" invisible="1"/>
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_utility_bill_reading_component_form" model="ir.ui.view">

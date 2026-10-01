@@ -5,14 +5,14 @@
         <field name="name">utility.region.tree.region</field>
         <field name="model">utility.region</field>
         <field name="arch" type="xml">
-            <tree string="المناطق الرئيسية">
+            <list string="المناطق الرئيسية">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="recurring_rule_type"/>
                 <field name="area_count"/>
                 <field name="financial_manager_id"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -21,14 +21,14 @@
         <field name="name">utility.region.tree.area</field>
         <field name="model">utility.region</field>
         <field name="arch" type="xml">
-            <tree string="المناطق الفرعية">
+            <list string="المناطق الفرعية">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="parent_id" string="المنطقة الرئيسية"/>
                 <field name="recurring_rule_type"/>
                 <field name="zone_count"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -37,14 +37,14 @@
         <field name="name">utility.region.tree.zone</field>
         <field name="model">utility.region</field>
         <field name="arch" type="xml">
-            <tree string="المناطق التفصيلية">
+            <list string="المناطق التفصيلية">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="parent_id" string="المنطقة الفرعية"/>
                 <field name="transformer_origin_id" string="المحول المرتبط"/>
                 <field name="private_transformer_id" string="المحول الخاص"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -87,21 +87,21 @@
                     <notebook>
                         <page name="areas" string="المناطق الفرعية">
                             <field name="area_ids">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="code"/>
                                     <field name="zone_count"/>
                                     <field name="active"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page name="zones" string="المناطق التفصيلية">
                             <field name="zone_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="code"/>
                                     <field name="parent_id" string="المنطقة الفرعية"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -149,12 +149,12 @@
                     <notebook>
                         <page name="zones" string="المناطق التفصيلية">
                             <field name="zone_ids">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="code"/>
                                     <field name="transformer_origin_id" string="المحول المرتبط"/>
                                     <field name="active"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -171,19 +171,16 @@
             <form>
                 <sheet>
                     <field name="type" widget="statusbar"
-                           statusbar_visible="region,area,zone"
-                           attrs="{'readonly': [('transformer_origin_id', '!=', False)]}"/>
+                           statusbar_visible="region,area,zone" readonly="(transformer_origin_id != False)"/>
                     <div class="oe_title">
                         <label for="name"/>
                         <h1><field name="name"/></h1>
                     </div>
                     <group>
                         <group string="البيانات الأساسية">
-                            <field name="code"
-                                   attrs="{'readonly': [('transformer_origin_id', '!=', False)]}"/>
+                            <field name="code" readonly="(transformer_origin_id != False)"/>
                             <field name="filter_region_id"
-                                   string="المنطقة الرئيسية"
-                                   attrs="{'invisible': [('type', '!=', 'zone')]}"/>
+                                   string="المنطقة الرئيسية" invisible="(type != 'zone')"/>
                             <field name="parent_id"
                                    string="المنطقة الفرعية"
                                    domain="[('type', '=', 'area')]"
@@ -192,11 +189,9 @@
                             <field name="company_id"/>
                         </group>
                         <group string="ربط المحول">
-                            <field name="transformer_origin_id"
-                                   attrs="{'invisible': [('transformer_origin_id', '=', False)]}"/>
+                            <field name="transformer_origin_id" invisible="(transformer_origin_id == False)"/>
                             <field name="private_transformer_id"
-                                   domain="[('is_private', '=', True), ('company_id', '=', company_id)]"
-                                   attrs="{'invisible': [('private_transformer_id', '=', False)]}"/>
+                                   domain="[('is_private', '=', True), ('company_id', '=', company_id)]" invisible="(private_transformer_id == False)"/>
                         </group>
                     </group>
                 </sheet>
@@ -237,13 +232,13 @@
     <record id="action_utility_region" model="ir.actions.act_window">
         <field name="name">المناطق الرئيسية</field>
         <field name="res_model">utility.region</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[('type', '=', 'region')]</field>
         <field name="context">{'default_type': 'region'}</field>
         <field name="search_view_id" ref="view_utility_region_search"/>
         <field name="view_ids" eval="[
             (5, 0, 0),
-            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_utility_region_tree')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_utility_region_tree')}),
             (0, 0, {'view_mode': 'form', 'view_id': ref('view_utility_region_form')})
         ]"/>
     </record>
@@ -251,13 +246,13 @@
     <record id="action_utility_area" model="ir.actions.act_window">
         <field name="name">المناطق الفرعية</field>
         <field name="res_model">utility.region</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[('type', '=', 'area')]</field>
         <field name="context">{'default_type': 'area'}</field>
         <field name="search_view_id" ref="view_utility_region_search"/>
         <field name="view_ids" eval="[
             (5, 0, 0),
-            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_utility_area_tree')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_utility_area_tree')}),
             (0, 0, {'view_mode': 'form', 'view_id': ref('view_utility_area_form')})
         ]"/>
     </record>
@@ -265,13 +260,13 @@
     <record id="action_utility_zone" model="ir.actions.act_window">
         <field name="name">المناطق التفصيلية</field>
         <field name="res_model">utility.region</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[('type', '=', 'zone')]</field>
         <field name="context">{'default_type': 'zone'}</field>
         <field name="search_view_id" ref="view_utility_region_search"/>
         <field name="view_ids" eval="[
             (5, 0, 0),
-            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_utility_zone_tree')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_utility_zone_tree')}),
             (0, 0, {'view_mode': 'form', 'view_id': ref('view_utility_zone_form')})
         ]"/>
     </record>

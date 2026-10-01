@@ -4,7 +4,7 @@
         <field name="name">utility.meter.tree</field>
         <field name="model">utility.meter</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="meter_number"/>
                 <field name="operational_number" />
                 <field name="connection_type" widget="badge" decoration-info="connection_type == 'subscriber'"
@@ -22,7 +22,7 @@
                 <field name="multiplier"/>
                 <field name="installation_date" optional="hide"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_utility_meter_form" model="ir.ui.view">
@@ -53,32 +53,28 @@
                         </button>
                         <button name="action_add_subscriber" type="object"
                                 class="oe_stat_button" icon="fa-user-plus"
-                                attrs="{'invisible': ['|', ('connection_type', '!=', 'not_connected'), ('customer_id', '!=', False)]}"
-                                help="إضافة مشترك جديد لهذا العداد">
+                                help="إضافة مشترك جديد لهذا العداد" invisible="((connection_type != 'not_connected') or (customer_id != False))">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">إضافة مشترك</span>
                             </div>
                         </button>
                         <button name="action_add_private_transformer" type="object"
                                 class="oe_stat_button" icon="fa-bolt"
-                                attrs="{'invisible': [('connection_type', '!=', 'private_transformer')]}"
-                                help="إضافة محول خاص جديد لهذا العداد">
+                                help="إضافة محول خاص جديد لهذا العداد" invisible="(connection_type != 'private_transformer')">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">إضافة محول خاص</span>
                             </div>
                         </button>
                         <button name="action_add_transformer" type="object"
                                 class="oe_stat_button" icon="fa-bolt"
-                                attrs="{'invisible': [('connection_type', '!=', 'transformer')]}"
-                                help="إضافة محول جديد لهذا العداد">
+                                help="إضافة محول جديد لهذا العداد" invisible="(connection_type != 'transformer')">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">إضافة محول</span>
                             </div>
                         </button>
                         <button name="action_add_feeder" type="object"
                                 class="oe_stat_button" icon="fa-sitemap"
-                                attrs="{'invisible': [('connection_type', '!=', 'feeder')]}"
-                                help="إضافة فيدر / خلية جديد لهذا العداد">
+                                help="إضافة فيدر / خلية جديد لهذا العداد" invisible="(connection_type != 'feeder')">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">إضافة فيدر</span>
                             </div>
@@ -92,18 +88,10 @@
                         <group string="معلومات أساسية">
                             <field name="payment_type"/>
                             <field name="connection_type" widget="radio"/>
-                            <field name="customer_id"
-                                   attrs="{'required': [('connection_type', '=', 'subscriber')],
-                                           'invisible': [('connection_type', '!=', 'subscriber')]}"/>
-                            <field name="linked_transformer_id"
-                                   attrs="{'required': [('connection_type', '=', 'transformer')],
-                                           'invisible': [('connection_type', '!=', 'transformer')]}"/>
-                            <field name="linked_private_transformer_id"
-                                   attrs="{'required': [('connection_type', '=', 'private_transformer')],
-                                           'invisible': [('connection_type', '!=', 'private_transformer')]}"/>
-                            <field name="linked_feeder_id"
-                                   attrs="{'required': [('connection_type', '=', 'feeder')],
-                                           'invisible': [('connection_type', '!=', 'feeder')]}"/>
+                            <field name="customer_id" required="(connection_type == 'subscriber')" invisible="(connection_type != 'subscriber')"/>
+                            <field name="linked_transformer_id" required="(connection_type == 'transformer')" invisible="(connection_type != 'transformer')"/>
+                            <field name="linked_private_transformer_id" required="(connection_type == 'private_transformer')" invisible="(connection_type != 'private_transformer')"/>
+                            <field name="linked_feeder_id" required="(connection_type == 'feeder')" invisible="(connection_type != 'feeder')"/>
                             <field name="meter_type_id" domain="[('id', 'in', available_meter_type_ids)]" options="{'no_create': True, 'no_open': True}"/>
                             <field name="operational_number" placeholder="OP-XXXXX"/>
                             <field name="manufacturer"/>
@@ -135,7 +123,7 @@
                     <notebook>
                         <page name="reading_history" string="سجل القراءات">
                             <field name="reading_ids" readonly="1">
-                                <tree default_order="reading_date desc">
+                                <list default_order="reading_date desc">
                                     <field name="reading_id"/>
                                     <field name="reading_purpose" widget="badge"/>
                                     <field name="reading_date"/>
@@ -143,18 +131,18 @@
                                     <field name="consumption"/>
                                     <field name="reading_type"/>
                                     <field name="state" widget="badge"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page name="meter_history" string="تاريخ العداد">
                             <field name="log_ids" readonly="1">
-                                <tree default_order="date desc">
+                                <list default_order="date desc">
                                     <field name="date"/>
                                     <field name="log_type" widget="badge"/>
                                     <field name="description"/>
                                     <field name="ref_name"/>
                                     <field name="user_id"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page name="assignment" string="التعيين والموقع">
@@ -238,7 +226,7 @@
     <record id="action_utility_meter" model="ir.actions.act_window">
         <field name="name">العدادات</field>
         <field name="res_model">utility.meter</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_meter_search"/>
     </record>
 </odoo>

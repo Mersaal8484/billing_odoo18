@@ -11,7 +11,7 @@
         <field name="model">date.range.type</field>
         <field name="priority" eval="5"/>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="parent_type_id" optional="show"/>
                 <field name="default_billing_period" optional="show"/>
@@ -22,7 +22,7 @@
                 <field name="fiscal_year" widget="boolean_toggle"/>
                 <field name="allow_overlap" widget="boolean_toggle"/>
                 <field name="active" widget="boolean_toggle"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -87,7 +87,7 @@
         <field name="model">date.range</field>
         <field name="priority" eval="5"/>
         <field name="arch" type="xml">
-            <tree decoration-success="reading_state == 'open' and collection_state == 'open'"
+            <list decoration-success="reading_state == 'open' and collection_state == 'open'"
                   decoration-info="reading_state == 'closing' or collection_state == 'closing'"
                   decoration-warning="reading_state == 'closed'"
                   decoration-muted="state in ('locked', 'planned')">
@@ -123,7 +123,7 @@
                 <field name="period_role" optional="hide"/>
                 <field name="state" optional="hide"/>
                 <field name="active" optional="hide"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -136,47 +136,35 @@
             <form>
                 <header>
                     <!-- مرحلة التخطيط: فتح الدورة ومزامنة المناطق فقط -->
-                    <button name="action_open_period" type="object" string="فتح الدورة للعمليات" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                    <button name="action_open_period" type="object" string="فتح الدورة للعمليات" class="oe_highlight" invisible="(state != 'planned')"/>
                     <button name="action_sync_regions_by_cadence" type="object"
                             string="مزامنة المناطق" class="btn-secondary" icon="fa-refresh"
-                            attrs="{'invisible': [('state', '!=', 'planned')]}"
-                            confirm="سيتم تحديث المناطق المشتركة في هذه الفترة بناءً على دوريتها. هل تريد المتابعة؟"/>
+                            confirm="سيتم تحديث المناطق المشتركة في هذه الفترة بناءً على دوريتها. هل تريد المتابعة؟" invisible="(state != 'planned')"/>
 
                     <!-- التحكم المباشر بالقراءة -->
-                    <button name="action_open_reading" type="object" string="فتح القراءة" class="btn-primary" icon="fa-play"
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('reading_state', '=', 'open')]}"/>
+                    <button name="action_open_reading" type="object" string="فتح القراءة" class="btn-primary" icon="fa-play" invisible="((period_role != 'reading') or (reading_state == 'open'))"/>
                     <button name="action_close_reading" type="object" string="إغلاق القراءة" class="btn-danger" icon="fa-lock"
-                            confirm="هل أنت متأكد من إغلاق القراءة؟ التحصيل سيبقى مفتوحاً."
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('reading_state', 'not in', ('open', 'closing'))]}"/>
+                            confirm="هل أنت متأكد من إغلاق القراءة؟ التحصيل سيبقى مفتوحاً." invisible="((period_role != 'reading') or (reading_state not in ('open', 'closing')))"/>
 
                     <!-- التحكم المباشر بالتحصيل -->
-                    <button name="action_open_payment" type="object" string="فتح التحصيل" class="btn-success" icon="fa-play"
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('collection_state', '=', 'open')]}"/>
-                    <button name="action_reconcile_collection" type="object" string="مطابقة وإغلاق التحصيل" class="btn-outline-success" icon="fa-check-square-o"
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('collection_state', 'not in', ('open', 'closing'))]}"/>
+                    <button name="action_open_payment" type="object" string="فتح التحصيل" class="btn-success" icon="fa-play" invisible="((period_role != 'reading') or (collection_state == 'open'))"/>
+                    <button name="action_reconcile_collection" type="object" string="مطابقة وإغلاق التحصيل" class="btn-outline-success" icon="fa-check-square-o" invisible="((period_role != 'reading') or (collection_state not in ('open', 'closing')))"/>
 
                     <!-- التوافق العكسي: أزرار فترات payment التاريخية -->
-                    <button name="action_reconcile_payment" type="object" string="مطابقة التحصيل (تاريخي)" class="btn-success"
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'payment'), ('state', 'not in', ('open', 'closing'))]}"/>
-                    <button name="action_close_payment" type="object" string="إغلاق التحصيل (تاريخي)" class="btn-danger"
-                            attrs="{'invisible': ['|', ('period_role', '!=', 'payment'), ('state', '!=', 'open')]}"/>
+                    <button name="action_reconcile_payment" type="object" string="مطابقة التحصيل (تاريخي)" class="btn-success" invisible="((period_role != 'payment') or (state not in ('open', 'closing')))"/>
+                    <button name="action_close_payment" type="object" string="إغلاق التحصيل (تاريخي)" class="btn-danger" invisible="((period_role != 'payment') or (state != 'open'))"/>
 
                     <!-- مرحلة الإقفال النهائي -->
-                    <button name="action_lock_period" type="object" string="إقفال تاريخي نهائي" class="btn-outline-dark"
-                            attrs="{'invisible': [('state', 'not in', ('closed', 'reconciled'))]}"/>
+                    <button name="action_lock_period" type="object" string="إقفال تاريخي نهائي" class="btn-outline-dark" invisible="(state not in ('closed', 'reconciled'))"/>
                     <button name="%(action_utility_period_adjust_wizard)d" type="action"
                             string="تعديل / تمديد" class="btn-secondary"
-                            context="{'default_period_id': active_id}"
-                            attrs="{'invisible': [('state', 'in', ('planned', 'locked'))]}"/>
+                            context="{'default_period_id': id}" invisible="(state in ('planned', 'locked'))"/>
 
                     <!-- شريط الحالة الرئيسي -->
                     <field name="state" widget="statusbar"
-                           statusbar_visible="planned,open,closing,closed,locked"
-                           attrs="{'invisible': [('period_role', '!=', 'reading')]}"/>
+                           statusbar_visible="planned,open,closing,closed,locked" invisible="(period_role != 'reading')"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="planned,open,closing,reconciled,locked"
-                           attrs="{'invisible': [('period_role', '=', 'reading')]}"/>
+                           statusbar_visible="planned,open,closing,reconciled,locked" invisible="(period_role == 'reading')"/>
                 </header>
 
                 <sheet>
@@ -229,7 +217,7 @@
                         <group string="بيانات الدورة والتهيئة">
                             <field name="billing_cadence" widget="radio" options="{'horizontal': true}"/>
                             <field name="type_id" options="{'no_create': True, 'no_open': True}"/>
-                            <field name="reading_period_id" attrs="{'invisible': [('period_role', '!=', 'payment')]}" options="{'no_create': True}"/>
+                            <field name="reading_period_id" options="{'no_create': True}" invisible="(period_role != 'payment')"/>
                             <field name="active" invisible="1"/>
                         </group>
                         <group string="النطاقات الزمنية للتشغيل">
@@ -257,7 +245,7 @@
                     <!-- التبويبات المنظمة -->
                     <notebook>
                         <!-- التبويب 1: متابعة العمليات -->
-                        <page string="متابعة العمليات" attrs="{'invisible': [('period_role', '!=', 'reading')]}">
+                        <page string="متابعة العمليات" invisible="(period_role != 'reading')">
                             <group>
                                 <group string="عمليات القراءة والفوترة">
                                     <field name="reading_state" widget="badge"
@@ -265,16 +253,13 @@
                                            decoration-info="reading_state == 'closing'"
                                            decoration-warning="reading_state == 'closed'"
                                            decoration-muted="reading_state in ('locked', 'planned')"/>
-                                    <field name="reading_closed_at" readonly="1"
-                                           attrs="{'invisible': [('reading_closed_at', '=', False)]}"/>
+                                    <field name="reading_closed_at" readonly="1" invisible="(reading_closed_at == False)"/>
                                     <div class="mt16">
                                         <button name="action_open_reading" type="object" string="بدء / فتح القراءة"
-                                                class="btn btn-sm btn-primary me-2" icon="fa-play"
-                                                attrs="{'invisible': [('reading_state', '=', 'open')]}"/>
+                                                class="btn btn-sm btn-primary me-2" icon="fa-play" invisible="(reading_state == 'open')"/>
                                         <button name="action_close_reading" type="object" string="إغلاق القراءة"
                                                 class="btn btn-sm btn-danger" icon="fa-lock"
-                                                confirm="هل أنت متأكد من إغلاق القراءة؟ التحصيل سيبقى مفتوحاً."
-                                                attrs="{'invisible': [('reading_state', 'not in', ('open', 'closing'))]}"/>
+                                                confirm="هل أنت متأكد من إغلاق القراءة؟ التحصيل سيبقى مفتوحاً." invisible="(reading_state not in ('open', 'closing'))"/>
                                     </div>
                                 </group>
                                 <group string="عمليات التحصيل والسداد">
@@ -283,16 +268,13 @@
                                            decoration-info="collection_state == 'closing'"
                                            decoration-warning="collection_state == 'reconciled'"
                                            decoration-muted="collection_state in ('locked', 'planned')"/>
-                                    <field name="collection_reconciled_at" readonly="1"
-                                           attrs="{'invisible': [('collection_reconciled_at', '=', False)]}"/>
+                                    <field name="collection_reconciled_at" readonly="1" invisible="(collection_reconciled_at == False)"/>
                                     <div class="mt16">
                                         <button name="action_open_payment" type="object" string="بدء / فتح التحصيل"
-                                                class="btn btn-sm btn-success me-2" icon="fa-play"
-                                                attrs="{'invisible': [('collection_state', '=', 'open')]}"/>
+                                                class="btn btn-sm btn-success me-2" icon="fa-play" invisible="(collection_state == 'open')"/>
                                         <button name="action_reconcile_collection" type="object" string="مطابقة وإغلاق التحصيل"
                                                 class="btn btn-sm btn-outline-success" icon="fa-check-square-o"
-                                                confirm="هل أنت متأكد من مطابقة وإغلاق التحصيل لهذه الدورة؟"
-                                                attrs="{'invisible': [('collection_state', 'not in', ('open', 'closing'))]}"/>
+                                                confirm="هل أنت متأكد من مطابقة وإغلاق التحصيل لهذه الدورة؟" invisible="(collection_state not in ('open', 'closing'))"/>
                                     </div>
                                 </group>
                             </group>
@@ -307,23 +289,23 @@
                         </page>
 
                         <!-- التبويب 4: فترات التحصيل التاريخية (للتوافق القديم فقط) -->
-                        <page string="فترات التحصيل المرتبطة (تاريخي)" attrs="{'invisible': ['|', ('period_role', '!=', 'reading'), ('payment_period_ids', '=', [])]}">
+                        <page string="فترات التحصيل المرتبطة (تاريخي)" invisible="((period_role != 'reading') or (payment_period_ids == []))">
                             <field name="payment_period_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="period_code"/>
                                     <field name="name"/>
                                     <field name="state"/>
                                     <field name="payment_window_start"/>
                                     <field name="payment_window_end"/>
                                     <field name="collected_in_window"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
 
                         <!-- التبويب 5: سجل التدقيق -->
                         <page string="سجل التدقيق والتغييرات">
                             <field name="log_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="timestamp"/>
                                     <field name="user_id"/>
                                     <field name="action_type" optional="show"/>
@@ -331,7 +313,7 @@
                                     <field name="new_state" optional="show"/>
                                     <field name="changed_fields" optional="show"/>
                                     <field name="reason"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
 
@@ -405,10 +387,10 @@
     <record id="action_utility_date_range" model="ir.actions.act_window">
         <field name="name">الفترات الزمنية</field>
         <field name="res_model">date.range</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="view_ids" eval="[
             (5, 0, 0),
-            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_utility_date_range_tree')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_utility_date_range_tree')}),
             (0, 0, {'view_mode': 'form', 'view_id': ref('view_utility_date_range_form')}),
         ]"/>
         <field name="search_view_id" ref="view_utility_date_range_search"/>
@@ -417,10 +399,10 @@
     <record id="action_utility_date_range_type" model="ir.actions.act_window">
         <field name="name">أنواع الفترات الزمنية</field>
         <field name="res_model">date.range.type</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="view_ids" eval="[
             (5, 0, 0),
-            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_utility_date_range_type_tree')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_utility_date_range_type_tree')}),
             (0, 0, {'view_mode': 'form', 'view_id': ref('view_utility_date_range_type_form')}),
         ]"/>
     </record>

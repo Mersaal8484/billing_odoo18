@@ -15,7 +15,7 @@ class UtilityCustomerWizardInventory(models.TransientModel):
     def _compute_available_meter_product_ids(self):
         products = self.env['product.product'].search([
             ('tracking', '=', 'serial'),
-            ('type', '=', 'product'),
+            ('type', '=', 'consu'),
         ])
         for wizard in self:
             wizard.available_meter_product_ids = products

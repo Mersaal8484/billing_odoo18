@@ -466,7 +466,7 @@ class UtilityReading(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('سجل القراءات - %s') % self.meter_id.meter_number,
             'res_model': 'utility.reading',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('meter_id', '=', self.meter_id.id), ('id', '!=', self.id)],
             'context': {'create': False},
         }

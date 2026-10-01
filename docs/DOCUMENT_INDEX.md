@@ -2,15 +2,18 @@
 
 **This file is the canonical documentation entry point.**
 
-**Platform:** Odoo 16 Community\
+**Platform:** Odoo 18 Community (branch `18`)\
 **Repository:** `AbdulrhmanBashammmakh/utility_erp`\
-**Branch:** `development`\
-**Last verified implementation SHA:** `b97bea78aaba6b91575dd9b8cd2c14d685c64fd5`\
+**Branch:** `18`\
+**Odoo 18 port status:** Source migration in progress; runtime installation and UAT are not yet verified.\
+**Source branch at port start (Odoo 16):** `36ef0db`\
 **Documentation version:** `3.3`\
 **Reviewed Date:** `2026-09-18`\
 **Status:** Current V1 + Target V2
 
 اقرأ هذا الفهرس أولًا، ثم اتبع مسار المجال المطلوب فقط. هذه الصفحة تنظّم الوصول إلى الوثائق ولا تعيد كتابة مواصفاتها.
+
+تصف وثائق المجالات قرارات الأعمال وخط أساس Odoo 16؛ وتوافق فرع Odoo 18 يحتاج تحققًا مستقلًا من الكود والتشغيل.
 
 ## Source-of-truth precedence
 

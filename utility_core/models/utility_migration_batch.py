@@ -225,7 +225,7 @@ class UtilityMigrationBatch(models.Model):
             'name': _('سجلات الدفعة (%s)') % self.name,
             'res_model': res_model,
             'domain': [('id', 'in', records.ids)],
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'target': 'current',
         }
 
@@ -243,7 +243,7 @@ class UtilityMigrationBatch(models.Model):
             'name': _('سجلات الأخطاء للدفعة (%s)') % self.name,
             'res_model': res_model,
             'domain': [('id', 'in', records.ids)],
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'target': 'current',
         }
 

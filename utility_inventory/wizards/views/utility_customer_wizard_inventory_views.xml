@@ -8,12 +8,10 @@
             <xpath expr="//field[@name='operational_number']" position="after">
                 <field name="meter_product_id"
                        domain="[('id', 'in', available_meter_product_ids)]"
-                       attrs="{'invisible': [('create_meter', '=', False)]}"
-                       options="{'no_create': True, 'no_open': True}"/>
+                       options="{'no_create': True, 'no_open': True}" invisible="(create_meter == False)"/>
                 <field name="lot_id"
                        domain="[('product_id', '=', meter_product_id)]"
-                       attrs="{'invisible': [('create_meter', '=', False)]}"
-                       options="{'no_create': True, 'no_open': True}"/>
+                       options="{'no_create': True, 'no_open': True}" invisible="(create_meter == False)"/>
             </xpath>
             <xpath expr="//field[@name='meter_product_id']" position="before">
                 <field name="available_meter_product_ids" invisible="1"/>

@@ -4,7 +4,7 @@
         <field name="name">utility.contract.template.tree</field>
         <field name="model">utility.contract.template</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="code"/>
                 <field name="name"/>
                 <field name="recurring_rule_type"/>
@@ -12,7 +12,7 @@
                 <field name="recurring_interval"/>
 
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -73,11 +73,11 @@
                 <header>
                     <button name="action_open_clone_wizard" type="object" string="استنساخ كقالب جديد" class="btn-secondary" icon="fa-clone"/>
                     <button name="action_sync_lines_with_template" type="object" string="إضافة / مزامنة بنود القالب" class="oe_highlight" icon="fa-plus"/>
-                    <button name="action_create_biweekly_blocks" type="object" string="توليد شرائح نموذجية (نصف شهري)" class="btn-secondary" icon="fa-list-ol" attrs="{'invisible': [('pricing_mode', 'not in', ['tier', 'block'])]}"/>
+                    <button name="action_create_biweekly_blocks" type="object" string="توليد شرائح نموذجية (نصف شهري)" class="btn-secondary" icon="fa-list-ol" invisible="(pricing_mode not in ['tier', 'block'])"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button type="object" name="action_view_versions" class="oe_stat_button" icon="fa-history" attrs="{'invisible': [('version_count', '=', 0)]}">
+                        <button type="object" name="action_view_versions" class="oe_stat_button" icon="fa-history" invisible="(version_count == 0)">
                             <field name="version_count" widget="statinfo" string="الإصدارات"/>
                         </button>
                     </div>
@@ -96,8 +96,8 @@
                             <field name="subscriber_category_ids" widget="many2many_tags" placeholder="فئات المشتركين الرئيسية..." required="1"/>
                             <field name="subscriber_ids" widget="many2many_tags" placeholder="انواع المشتركين..." required="1" domain="[('category_id', 'in', subscriber_category_ids)]"/>
                             <field name="scope" widget="radio" options="{'horizontal': true}"/>
-                            <field name="region_ids" widget="many2many_tags" placeholder="اختر المناطق الرئيسية المسموح بها..." domain="[('type', '=', 'region'), ('recurring_rule_type', '=', recurring_rule_type)]" attrs="{'invisible': [('scope', '!=', 'restricted')], 'required': [('scope', '=', 'restricted')]}"/>
-                            <field name="area_ids" widget="many2many_tags" placeholder="اختر المناطق الفرعية المسموح بها..." domain="[('type', '=', 'area'), ('parent_id', 'in', region_ids), ('recurring_rule_type', '=', recurring_rule_type)]" attrs="{'invisible': [('scope', '!=', 'restricted')], 'required': [('scope', '=', 'restricted')]}"/>
+                            <field name="region_ids" widget="many2many_tags" placeholder="اختر المناطق الرئيسية المسموح بها..." domain="[('type', '=', 'region'), ('recurring_rule_type', '=', recurring_rule_type)]" invisible="(scope != 'restricted')" required="(scope == 'restricted')"/>
+                            <field name="area_ids" widget="many2many_tags" placeholder="اختر المناطق الفرعية المسموح بها..." domain="[('type', '=', 'area'), ('parent_id', 'in', region_ids), ('recurring_rule_type', '=', recurring_rule_type)]" invisible="(scope != 'restricted')" required="(scope == 'restricted')"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="active"/>
                         </group>
@@ -121,8 +121,8 @@
                     </group>
                     <group string="الدفع التلقائي">
                         <field name="is_auto_pay"/>
-                        <field name="auto_pay_retries" attrs="{'invisible': [('is_auto_pay', '=', False)]}"/>
-                        <field name="auto_pay_retry_hours" attrs="{'invisible': [('is_auto_pay', '=', False)]}"/>
+                        <field name="auto_pay_retries" invisible="(is_auto_pay == False)"/>
+                        <field name="auto_pay_retry_hours" invisible="(is_auto_pay == False)"/>
                     </group>
                     <notebook>
                         <page string="التسعير">
@@ -152,15 +152,14 @@
                             <group string="خصم الدعم">
                                 <field name="subsidy_enabled" widget="boolean_toggle"/>
                             </group>
-                            <group string="إعدادات خصم الدعم" attrs="{'invisible': [('subsidy_enabled', '=', False)]}">
+                            <group string="إعدادات خصم الدعم" invisible="(subsidy_enabled == False)">
                                 <field name="sponsor_id" domain="[('utility_partner_type', '=', 'donor')]" invisible="1"/>
                                 <field name="discount_formula_id"/>
                             </group>
                         </page>
-                        <page string="شرائح التسعير"
-                               attrs="{'invisible': [('pricing_mode', 'not in', ['block', 'tier', 'seasonal', 'tou'])]}">
+                        <page string="شرائح التسعير" invisible="(pricing_mode not in ['block', 'tier', 'seasonal', 'tou'])">
                             <field name="block_ids" context="{'default_is_discount': False}">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
                                     <field name="from_kwh"/>
@@ -170,12 +169,12 @@
                                     <field name="to_month" optional="hide"/>
                                     <field name="time_from" optional="hide"/>
                                     <field name="time_to" optional="hide"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
-                        <page string="شرائح الخصم التدريجية" attrs="{'invisible': ['|', ('subsidy_enabled', '=', False), ('discount_formula_id', '=', False)]}">
+                        <page string="شرائح الخصم التدريجية" invisible="((subsidy_enabled == False) or (discount_formula_id == False))">
                             <field name="discount_block_ids" context="{'default_is_discount': True}">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="is_discount" invisible="1"/>
                                     <field name="name"/>
@@ -186,12 +185,12 @@
                                     <field name="to_month" optional="hide"/>
                                     <field name="time_from" optional="hide"/>
                                     <field name="time_to" optional="hide"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="سجل تغييرات التسعير">
                             <field name="history_ids" readonly="1">
-                                <tree decoration-muted="1">
+                                <list decoration-muted="1">
                                     <field name="change_date"/>
                                     <field name="old_price"/>
                                     <field name="new_price"/>
@@ -199,12 +198,12 @@
                                     <field name="new_service_charge"/>
                                     <field name="reason"/>
                                     <field name="changed_by"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="بنود العقد">
                             <field name="line_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="product_id"/>
                                     <field name="name"/>
@@ -214,13 +213,12 @@
                                     <field name="specific_price"/>
                                     <field name="meter_line_type"/>
                                     <field name="qty_formula_id"/>
-                                    <field name="is_subsidized"
-                                           attrs="{'column_invisible': [('meter_line_type', '!=', 'discount')]}"/>
-                                </tree>
+                                    <field name="is_subsidized" invisible="(meter_line_type != 'discount')"/>
+                                </list>
                             </field>
                         </page>
                     </notebook>
-                    <group string="تتبع الاستنساخ" attrs="{'invisible': [('cloned_from_template_id', '=', False)]}">
+                    <group string="تتبع الاستنساخ" invisible="(cloned_from_template_id == False)">
                         <group>
                             <field name="cloned_from_template_id" readonly="1"/>
                         </group>
@@ -248,7 +246,7 @@
     <record id="action_utility_contract_template" model="ir.actions.act_window">
         <field name="name">قوالب العقود</field>
         <field name="res_model">utility.contract.template</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_contract_template_search"/>
     </record>
 

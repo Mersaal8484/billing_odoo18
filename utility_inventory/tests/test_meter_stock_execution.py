@@ -10,7 +10,7 @@ class TestMeterStockExecution(TransactionCase):
         self.category = self.env['product.category'].create({'name': 'فئة العدادات المادية'})
         self.product_serial = self.env['product.product'].create({
             'name': 'عداد مادي ذكي',
-            'type': 'product',
+            'type': 'consu',
             'tracking': 'serial',
             'categ_id': self.category.id,
         })
@@ -87,7 +87,7 @@ class TestMeterStockExecution(TransactionCase):
         """Test installation rejects invalid lot/product combo."""
         other_product = self.env['product.product'].create({
             'name': 'منتج آخر',
-            'type': 'product',
+            'type': 'consu',
             'tracking': 'serial',
         })
         mismatch_meter = self.env['utility.meter'].create({
@@ -195,12 +195,12 @@ class TestMeterStockExecution(TransactionCase):
         """Test that assigning a meter product different from model_id.product_id raises ValidationError."""
         model_product = self.env['product.product'].create({
             'name': 'منتج موديل أصل',
-            'type': 'product',
+            'type': 'consu',
             'tracking': 'serial',
         })
         other_product = self.env['product.product'].create({
             'name': 'منتج مخالف',
-            'type': 'product',
+            'type': 'consu',
             'tracking': 'serial',
         })
         model = self.env['utility.meter.model'].create({

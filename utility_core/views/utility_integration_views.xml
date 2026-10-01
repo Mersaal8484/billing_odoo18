@@ -4,7 +4,7 @@
         <field name="name">utility.integration.provider.tree</field>
         <field name="model">utility.integration.provider</field>
         <field name="arch" type="xml">
-            <tree decoration-muted="active == False">
+            <list decoration-muted="active == False">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="provider_type"/>
@@ -12,7 +12,7 @@
                 <field name="mode"/>
                 <field name="endpoint_url"/>
                 <field name="active" widget="boolean_toggle"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -28,36 +28,36 @@
                             <field name="name"/>
                             <field name="provider_type"/>
                             <field name="is_payment_capable" invisible="1"/>
-                            <field name="payment_direction" attrs="{'invisible': [('is_payment_capable', '=', False)], 'required': [('is_payment_capable', '=', True)]}"/>
+                            <field name="payment_direction" invisible="(is_payment_capable == False)" required="(is_payment_capable == True)"/>
                             <field name="mode"/>
                             <field name="active"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group string="إعدادات الاتصال والمصادقة">
-                            <field name="endpoint_url" attrs="{'required': [('mode','=','http_json')]}"/>
-                            <field name="auth_header_style" attrs="{'invisible': [('mode','!=','http_json')]}"/>
-                            <field name="api_key_header_name" attrs="{'invisible': ['|', ('mode','!=','http_json'), ('auth_header_style','!=','api_key_header')]}"/>
-                            <field name="api_key" password="True" attrs="{'invisible': ['|', ('mode','!=','http_json'), ('auth_header_style','=','none')]}"/>
+                            <field name="endpoint_url" required="(mode == 'http_json')"/>
+                            <field name="auth_header_style" invisible="(mode != 'http_json')"/>
+                            <field name="api_key_header_name" invisible="((mode != 'http_json') or (auth_header_style != 'api_key_header'))"/>
+                            <field name="api_key" password="True" invisible="((mode != 'http_json') or (auth_header_style == 'none'))"/>
                             <field name="webhook_secret" password="True"/>
                             <field name="timeout"/>
                         </group>
                     </group>
                     <notebook>
-                        <page string="إعدادات اليوميات الحسابية" attrs="{'invisible': [('is_payment_capable', '=', False)]}">
+                        <page string="إعدادات اليوميات الحسابية" invisible="(is_payment_capable == False)">
                             <group>
                                 <group string="يوميات التحصيل (وارد)">
-                                    <field name="inbound_journal_id" attrs="{'invisible': [('payment_direction', '=', 'outbound')]}"/>
+                                    <field name="inbound_journal_id" invisible="(payment_direction == 'outbound')"/>
                                 </group>
                                 <group string="يوميات الصرف / الإرجاع (صادر)">
-                                    <field name="outbound_journal_id" attrs="{'invisible': [('payment_direction', '=', 'inbound')]}"/>
+                                    <field name="outbound_journal_id" invisible="(payment_direction == 'inbound')"/>
                                 </group>
                             </group>
                         </page>
-                        <page string="Headers إضافية (JSON)" attrs="{'invisible': [('mode','!=','http_json')]}">
+                        <page string="Headers إضافية (JSON)" invisible="(mode != 'http_json')">
                             <field name="extra_headers" placeholder='{"X-Custom-Header": "value", "Accept-Language": "ar"}'/>
                         </page>
                     </notebook>
-                    <group string="آخر خطأ" attrs="{'invisible': [('last_error', '=', False)]}">
+                    <group string="آخر خطأ" invisible="(last_error == False)">
                         <field name="last_error" nolabel="1" readonly="1"/>
                     </group>
                 </sheet>
@@ -69,7 +69,7 @@
         <field name="name">utility.integration.log.tree</field>
         <field name="model">utility.integration.log</field>
         <field name="arch" type="xml">
-            <tree decoration-success="state == 'success'" decoration-danger="state == 'failed'">
+            <list decoration-success="state == 'success'" decoration-danger="state == 'failed'">
                 <field name="create_date"/>
                 <field name="provider_id"/>
                 <field name="provider_type"/>
@@ -77,7 +77,7 @@
                 <field name="event_type"/>
                 <field name="http_status"/>
                 <field name="state" widget="badge"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -108,7 +108,7 @@
                         </page>
                         <page string="الاستجابة">
                             <field name="response_payload" nolabel="1"/>
-                            <field name="error_message" nolabel="1" attrs="{'invisible': [('error_message', '=', False)]}"/>
+                            <field name="error_message" nolabel="1" invisible="(error_message == False)"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -119,13 +119,13 @@
     <record id="action_utility_integration_provider" model="ir.actions.act_window">
         <field name="name">مزودو التكامل</field>
         <field name="res_model">utility.integration.provider</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <record id="action_utility_integration_log" model="ir.actions.act_window">
         <field name="name">سجل التكاملات</field>
         <field name="res_model">utility.integration.log</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <menuitem id="menu_utility_integrations" name="التكاملات" parent="utility_core.menu_utility_config" sequence="130" groups="utility_core.group_utility_admin"/>

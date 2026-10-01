@@ -141,7 +141,7 @@ class UtilityMeterReader(models.Model):
             'name': _('مشتركو الكاشف: %s') % self.name,
             'type': 'ir.actions.act_window',
             'res_model': 'utility.customer',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('route_id', 'in', self.route_ids.ids)],
             'context': {'default_route_id': self.route_ids[:1].id if self.route_ids else False},
         }
@@ -152,7 +152,7 @@ class UtilityMeterReader(models.Model):
             'name': _('مسارات الكاشف: %s') % self.name,
             'type': 'ir.actions.act_window',
             'res_model': 'utility.route',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('id', 'in', self.route_ids.ids)],
         }
 

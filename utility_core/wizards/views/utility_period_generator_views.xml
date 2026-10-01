@@ -60,7 +60,7 @@
                                         <field name="override_offsets"/>
                                         <label for="override_offsets" class="ms-2"/>
                                     </div>
-                                    <div attrs="{'invisible': [('override_offsets', '=', False)]}">
+                                    <div invisible="(override_offsets == False)">
                                         <div class="mb-3">
                                             <label for="reading_start_offset_days" class="o_light_label"/>
                                             <field name="reading_start_offset_days"/>
@@ -78,7 +78,7 @@
                                             <field name="payment_end_offset_days"/>
                                         </div>
                                     </div>
-                                    <div class="text-muted" attrs="{'invisible': [('override_offsets', '=', True)]}">
+                                    <div class="text-muted" invisible="(override_offsets == True)">
                                         <i class="fa fa-info-circle"/> يتم اعتماد إزاحات النوافذ التشغيلية الافتراضية المحددة على أنواع الفترات الزمنيّة.
                                     </div>
                                 </div>

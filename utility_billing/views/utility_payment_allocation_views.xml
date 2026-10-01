@@ -4,7 +4,7 @@
         <field name="name">utility.payment.allocation.tree</field>
         <field name="model">utility.payment.allocation</field>
         <field name="arch" type="xml">
-            <tree string="تخصيصات دفعات الكهرباء" create="false" delete="false">
+            <list string="تخصيصات دفعات الكهرباء" create="false" delete="false">
                 <field name="name"/>
                 <field name="allocation_date"/>
                 <field name="payment_id"/>
@@ -19,7 +19,7 @@
                        decoration-success="state == 'reconciled'"
                        decoration-warning="state == 'allocated'"
                        decoration-danger="state in ('error', 'cancelled', 'reversed')"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -30,9 +30,9 @@
             <form string="تخصيص دفعة كهرباء" create="false" delete="false">
                 <header>
                     <button name="action_reverse_allocation" type="object" string="عكس التخصيص"
-                            class="btn-secondary" attrs="{'invisible': [('state', 'not in', ('allocated', 'reconciled'))]}"
+                            class="btn-secondary"
                             confirm="هل أنت متأكد من عكس هذا التخصيص؟ سيتم فك المطابقة المحاسبية وإعادة ترصيد الفاتورة دون إلغاء الدفعة."
-                            groups="utility_core.group_utility_billing_manager,utility_core.group_utility_admin"/>
+                            groups="utility_core.group_utility_billing_manager,utility_core.group_utility_admin" invisible="(state not in ('allocated', 'reconciled'))"/>
                     <field name="state" widget="statusbar" statusbar_visible="allocated,reconciled,reversed,cancelled"/>
                 </header>
                 <sheet>
@@ -63,11 +63,11 @@
                                 <field name="reconciliation_reference"/>
                                 <field name="partial_reconcile_ids" widget="many2many_tags"/>
                                 <field name="created_by"/>
-                                <field name="reversed_at" attrs="{'invisible': [('reversed_at', '=', False)]}"/>
-                                <field name="reversed_by" attrs="{'invisible': [('reversed_by', '=', False)]}"/>
-                                <field name="reversal_reason" attrs="{'invisible': [('reversal_reason', '=', False)]}"/>
+                                <field name="reversed_at" invisible="(reversed_at == False)"/>
+                                <field name="reversed_by" invisible="(reversed_by == False)"/>
+                                <field name="reversal_reason" invisible="(reversal_reason == False)"/>
                                 <field name="notes"/>
-                                <field name="error_message" attrs="{'invisible': [('error_message', '=', False)]}"/>
+                                <field name="error_message" invisible="(error_message == False)"/>
                             </group>
                         </page>
                     </notebook>
@@ -101,7 +101,7 @@
     <record id="action_utility_payment_allocation" model="ir.actions.act_window">
         <field name="name">تخصيصات دفعات الكهرباء</field>
         <field name="res_model">utility.payment.allocation</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_payment_allocation_search"/>
         <field name="context">{'create': False, 'delete': False}</field>
     </record>

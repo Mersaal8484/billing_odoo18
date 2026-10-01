@@ -4,35 +4,35 @@
         <!-- Physical Meter Products (Serial Tracked) owned by utility_inventory. -->
         <record id="utility_product_meter_single" model="product.product">
             <field name="name">عداد ذكي طور واحد (Single Phase Smart Meter)</field>
-            <field name="type">product</field>
+            <field name="type">consu</field>
             <field name="tracking">serial</field>
             <field name="list_price">15000.00</field>
             <field name="default_code">MTR-1PH-SMART</field>
         </record>
         <record id="utility_product_meter_three" model="product.product">
             <field name="name">عداد ذكي ثلاثة أطوار (Three Phase Smart Meter)</field>
-            <field name="type">product</field>
+            <field name="type">consu</field>
             <field name="tracking">serial</field>
             <field name="list_price">45000.00</field>
             <field name="default_code">MTR-3PH-SMART</field>
         </record>
         <record id="utility_product_meter_mech_single" model="product.product">
             <field name="name">عداد ميكانيكي طور واحد (Single Phase Mechanical)</field>
-            <field name="type">product</field>
+            <field name="type">consu</field>
             <field name="tracking">serial</field>
             <field name="list_price">5000.00</field>
             <field name="default_code">MTR-1PH-MECH</field>
         </record>
         <record id="utility_product_meter_mech_three" model="product.product">
             <field name="name">عداد ميكانيكي ثلاثة أطوار (Three Phase Mechanical)</field>
-            <field name="type">product</field>
+            <field name="type">consu</field>
             <field name="tracking">serial</field>
             <field name="list_price">12000.00</field>
             <field name="default_code">MTR-3PH-MECH</field>
         </record>
         <record id="utility_product_meter_ct_three" model="product.product">
             <field name="name">عداد ذكي محولات تيار ثلاثة أطوار (CT Operated Smart Meter)</field>
-            <field name="type">product</field>
+            <field name="type">consu</field>
             <field name="tracking">serial</field>
             <field name="list_price">85000.00</field>
             <field name="default_code">MTR-3PH-CT</field>

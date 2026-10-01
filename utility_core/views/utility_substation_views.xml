@@ -4,14 +4,14 @@
         <field name="name">utility.substation.tree</field>
         <field name="model">utility.substation</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="code"/>
                 <field name="voltage_level"/>
                 <field name="capacity_kva"/>
                 <field name="status"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_utility_substation_form" model="ir.ui.view">
@@ -39,23 +39,23 @@
                     <notebook>
                         <page name="feeders" string="Feeders">
                             <field name="feeder_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="code"/>
                                     <field name="voltage_level"/>
                                     <field name="rated_capacity"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page name="transformers" string="Transformers">
                             <field name="transformer_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="code"/>
                                     <field name="capacity"/>
                                     <field name="phase"/>
                                     <field name="status"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -81,7 +81,7 @@
     <record id="action_utility_substation" model="ir.actions.act_window">
         <field name="name">المحطات الفرعية</field>
         <field name="res_model">utility.substation</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_substation_search"/>
     </record>
 </odoo>

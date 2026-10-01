@@ -7,10 +7,10 @@
             <form string="إجراء دورة حياة الحساب"><group string="الحساب">
                 <field name="customer_id"/><field name="current_state"/><field name="current_meter_id"/>
             </group><group string="تفاصيل الإجراء"><field name="action_type"/><field name="reason"/>
-                <field name="effective_date" attrs="{'invisible': [('action_type', 'in', ['reactivate', 'reconnect'])]}"/>
-                <field name="administrative_override" groups="utility_core.group_utility_admin" attrs="{'invisible': [('action_type', 'not in', ['disconnect', 'reconnect'])]}"/>
-                <field name="final_reading" attrs="{'invisible': [('action_type', '!=', 'close')]}"/>
-                <field name="require_field_removal" attrs="{'invisible': [('action_type', '!=', 'close')]}"/>
+                <field name="effective_date" invisible="(action_type in ['reactivate', 'reconnect'])"/>
+                <field name="administrative_override" groups="utility_core.group_utility_admin" invisible="(action_type not in ['disconnect', 'reconnect'])"/>
+                <field name="final_reading" invisible="(action_type != 'close')"/>
+                <field name="require_field_removal" invisible="(action_type != 'close')"/>
                 <field name="notes"/></group><footer>
                 <button name="action_confirm" type="object" string="تأكيد الإجراء" class="btn-primary"/>
                 <button string="إلغاء" special="cancel" class="btn-secondary"/>

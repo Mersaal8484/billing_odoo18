@@ -10,7 +10,7 @@
         <field name="name">ir.cron.utility.tree</field>
         <field name="model">ir.cron</field>
         <field name="arch" type="xml">
-            <tree string="المهام المجدولة لنظام الكهرباء"
+            <list string="المهام المجدولة لنظام الكهرباء"
                   decoration-danger="health_status == 'failed'"
                   decoration-warning="health_status in ('delayed', 'warning')"
                   decoration-info="health_status == 'running'"
@@ -35,8 +35,8 @@
                 <field name="last_duration_seconds" widget="float_time"/>
                 <field name="consecutive_failure_count" decoration-danger="consecutive_failure_count > 0"/>
                 <button name="action_run_now" type="object" string="تشغيل فوري" icon="fa-play"
-                        class="btn-link" attrs="{'invisible': [('allow_manual_run', '=', False)]}"/>
-            </tree>
+                        class="btn-link" invisible="(allow_manual_run == False)"/>
+            </list>
         </field>
     </record>
 
@@ -49,20 +49,16 @@
             <form string="المهمة المجدولة لنظام الكهرباء">
                 <header>
                     <button name="action_run_now" string="تشغيل فوري / Run Now" type="object"
-                            class="oe_highlight" icon="fa-play"
-                            attrs="{'invisible': [('allow_manual_run', '=', False)]}"/>
+                            class="oe_highlight" icon="fa-play" invisible="(allow_manual_run == False)"/>
                     <button name="action_enable" string="تمكين / Enable" type="object"
                             class="btn-success" icon="fa-check"
-                            attrs="{'invisible': [('active', '=', True)]}"
-                            groups="utility_core.group_utility_admin,base.group_system"/>
+                            groups="utility_core.group_utility_admin,base.group_system" invisible="(active == True)"/>
                     <button name="action_disable" string="تعطيل / Disable" type="object"
                             class="btn-secondary" icon="fa-ban"
-                            attrs="{'invisible': ['|', ('active', '=', False), ('allow_disable', '=', False)]}"
-                            groups="utility_core.group_utility_admin,base.group_system"/>
+                            groups="utility_core.group_utility_admin,base.group_system" invisible="((active == False) or (allow_disable == False))"/>
                     <button name="action_reset_failure_count" string="تصفير عداد الأخطاء / Reset Failures" type="object"
                             class="btn-warning" icon="fa-refresh"
-                            attrs="{'invisible': [('consecutive_failure_count', '=', 0)]}"
-                            groups="utility_core.group_utility_admin,base.group_system"/>
+                            groups="utility_core.group_utility_admin,base.group_system" invisible="(consecutive_failure_count == 0)"/>
                     <field name="health_status" widget="statusbar" statusbar_visible="healthy,running,warning,delayed,failed,disabled"/>
                 </header>
                 <sheet>
@@ -90,11 +86,11 @@
                         <group string="الجدولة والتحكم / Schedule &amp; Timing">
                             <label for="interval_number" string="التكرار الدوري"/>
                             <div class="o_row">
-                                <field name="interval_number" class="oe_inline" attrs="{'readonly': [('allow_schedule_edit', '=', False)]}"/>
-                                <field name="interval_type" class="oe_inline" attrs="{'readonly': [('allow_schedule_edit', '=', False)]}"/>
+                                <field name="interval_number" class="oe_inline" readonly="(allow_schedule_edit == False)"/>
+                                <field name="interval_type" class="oe_inline" readonly="(allow_schedule_edit == False)"/>
                             </div>
-                            <field name="nextcall" attrs="{'readonly': [('allow_schedule_edit', '=', False)]}"/>
-                            <field name="priority" attrs="{'readonly': [('allow_schedule_edit', '=', False)]}"/>
+                            <field name="nextcall" readonly="(allow_schedule_edit == False)"/>
+                            <field name="priority" readonly="(allow_schedule_edit == False)"/>
                             <field name="active" widget="boolean_toggle"/>
                         </group>
 
@@ -125,7 +121,7 @@
                         </group>
                     </group>
 
-                    <group string="آخر رسالة خطأ" attrs="{'invisible': [('last_error_message', '=', False)]}">
+                    <group string="آخر رسالة خطأ" invisible="(last_error_message == False)">
                         <field name="last_error_message" nolabel="1" readonly="1" widget="text" class="text-danger"/>
                     </group>
 
@@ -193,7 +189,7 @@
     <record id="action_utility_cron" model="ir.actions.act_window">
         <field name="name">المهام المجدولة / Scheduled Jobs</field>
         <field name="res_model">ir.cron</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[('utility_managed', '=', True)]</field>
         <field name="context">{'default_utility_managed': True, 'search_default_filter_active': 1}</field>
         <field name="search_view_id" ref="view_utility_cron_search"/>
@@ -206,7 +202,7 @@
 
     <record id="action_utility_cron_tree_view" model="ir.actions.act_window.view">
         <field name="sequence" eval="1"/>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">list</field>
         <field name="view_id" ref="view_utility_cron_tree"/>
         <field name="act_window_id" ref="action_utility_cron"/>
     </record>
@@ -228,7 +224,7 @@
         <field name="name">utility.cron.execution.tree</field>
         <field name="model">utility.cron.execution</field>
         <field name="arch" type="xml">
-            <tree string="سجل تنفيذ المهام المجدولة" create="false" edit="false" delete="false"
+            <list string="سجل تنفيذ المهام المجدولة" create="false" edit="false" delete="false"
                   decoration-danger="status == 'failed'"
                   decoration-warning="status in ('partial', 'skipped')"
                   decoration-info="status == 'running'"
@@ -250,7 +246,7 @@
                 <field name="failure_count" decoration-danger="failure_count > 0"/>
                 <field name="skipped_count"/>
                 <field name="error_message"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -296,11 +292,11 @@
                         </group>
                     </group>
 
-                    <group string="رسالة الخطأ / Error Message" attrs="{'invisible': [('error_message', '=', False)]}">
+                    <group string="رسالة الخطأ / Error Message" invisible="(error_message == False)">
                         <field name="error_message" nolabel="1" readonly="1" class="text-danger"/>
                     </group>
 
-                    <notebook attrs="{'invisible': [('error_details', '=', False)]}">
+                    <notebook invisible="(error_details == False)">
                         <page string="التفاصيل الفنية للخطأ / Traceback">
                             <field name="error_details" nolabel="1" readonly="1" widget="ace" options="{'mode': 'python'}"/>
                         </page>
@@ -347,7 +343,7 @@
     <record id="action_utility_cron_execution" model="ir.actions.act_window">
         <field name="name">سجل تنفيذ المهام / Execution History</field>
         <field name="res_model">utility.cron.execution</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_cron_execution_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

@@ -84,7 +84,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-file-text-o"
-                        context="{'default_customer_id': active_id}">
+                        context="{'default_customer_id': id}">
                     <div class="o_stat_info">
                         <span class="o_stat_text">كشف الحساب</span>
                     </div>

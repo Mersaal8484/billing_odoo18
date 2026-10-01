@@ -4,7 +4,7 @@
         <field name="name">utility.service.charge.tree</field>
         <field name="model">utility.service.charge</field>
         <field name="arch" type="xml">
-            <tree create="0" default_order="date desc, id desc"
+            <list create="0" default_order="date desc, id desc"
                   decoration-success="state == 'paid'"
                   decoration-warning="state in ('confirmed', 'payment_requested', 'invoiced')"
                   decoration-muted="state in ('cancelled', 'reversed')">
@@ -18,7 +18,7 @@
                 <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 <field name="state" widget="badge"/>
                 <field name="company_id" groups="base.group_multi_company"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -28,11 +28,11 @@
         <field name="arch" type="xml">
             <form create="0">
                 <header>
-                    <button name="action_confirm" string="تأكيد" type="object" states="draft" class="btn-primary"/>
-                    <button name="action_create_invoice" string="إنشاء فاتورة" type="object" states="confirmed" class="btn-primary" attrs="{'invisible': [('billing_method', '!=', 'invoice')]}"/>
-                    <button name="action_open_direct_payment" string="تحصيل مباشر" type="object" states="confirmed,payment_requested" class="btn-primary" attrs="{'invisible': [('billing_method', '!=', 'direct_payment')]}"/>
-                    <button name="action_mark_paid_from_payment" string="تحديث حالة السداد" type="object" states="invoiced,payment_requested" class="btn-secondary"/>
-                    <button name="action_cancel" string="إلغاء" type="object" states="draft,confirmed,payment_requested" class="btn-secondary"/>
+                    <button name="action_confirm" string="تأكيد" type="object" class="btn-primary" invisible="state not in ('draft')"/>
+                    <button name="action_create_invoice" string="إنشاء فاتورة" type="object" class="btn-primary" invisible="((billing_method != 'invoice')) or (state not in ('confirmed'))"/>
+                    <button name="action_open_direct_payment" string="تحصيل مباشر" type="object" class="btn-primary" invisible="((billing_method != 'direct_payment')) or (state not in ('confirmed', 'payment_requested'))"/>
+                    <button name="action_mark_paid_from_payment" string="تحديث حالة السداد" type="object" class="btn-secondary" invisible="state not in ('invoiced', 'payment_requested')"/>
+                    <button name="action_cancel" string="إلغاء" type="object" class="btn-secondary" invisible="state not in ('draft', 'confirmed', 'payment_requested')"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,invoiced,payment_requested,paid"/>
                 </header>
                 <sheet>
@@ -45,8 +45,8 @@
                             <field name="company_id" groups="base.group_multi_company" readonly="1"/>
                         </group>
                         <group string="بيانات التحصيل">
-                            <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="billing_method" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="date" readonly="(state != 'draft')"/>
+                            <field name="billing_method" readonly="(state != 'draft')"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
@@ -54,13 +54,13 @@
                         <page string="تفاصيل الرسم">
                             <group>
                                 <group>
-                                    <field name="product_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                    <field name="description" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                    <field name="quantity" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                    <field name="product_id" readonly="(state != 'draft')"/>
+                                    <field name="description" readonly="(state != 'draft')"/>
+                                    <field name="quantity" readonly="(state != 'draft')"/>
                                 </group>
                                 <group>
-                                    <field name="price_unit" widget="monetary" options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                    <field name="tax_ids" widget="many2many_tags" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                    <field name="price_unit" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="(state != 'draft')"/>
+                                    <field name="tax_ids" widget="many2many_tags" readonly="(state != 'draft')"/>
                                     <field name="amount_untaxed" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
                                     <field name="amount_tax" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
                                     <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
@@ -98,7 +98,7 @@
     <record id="action_utility_service_charge" model="ir.actions.act_window">
         <field name="name">رسوم إدخال الخدمة</field>
         <field name="res_model">utility.service.charge</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_service_charge_search"/>
         <field name="context">{'create': False}</field>
     </record>

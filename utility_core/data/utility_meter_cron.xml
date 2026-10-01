@@ -8,8 +8,6 @@
             <field name="code">model.cron_check_idle_meters()</field>
             <field name="interval_number">1</field>
             <field name="interval_type">months</field>
-            <field name="numbercall">-1</field>
-            <field name="doall" eval="False"/>
             <field name="active" eval="True"/>
             <field name="utility_managed" eval="True"/>
             <field name="utility_code">idle_meter_detector</field>

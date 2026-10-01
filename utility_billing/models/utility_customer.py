@@ -73,7 +73,7 @@ class UtilityCustomer(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window', 'name': _('رسم إدخال الخدمة'),
-            'res_model': 'utility.service.charge', 'view_mode': 'tree,form',
+            'res_model': 'utility.service.charge', 'view_mode': 'list,form',
             'domain': [('account_id', '=', self.id)],
             'context': {'default_account_id': self.id},
         }
@@ -84,7 +84,7 @@ class UtilityCustomer(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('تخصيصات التحصيل'),
             'res_model': 'utility.payment.allocation',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('utility_customer_id', '=', self.id)],
             'context': {'default_utility_customer_id': self.id, 'create': False},
         }

@@ -14,7 +14,7 @@
         <field name="name">utility.migration.batch.tree</field>
         <field name="model">utility.migration.batch</field>
         <field name="arch" type="xml">
-            <tree string="دفعات تنفيذ الميجريشن" default_order="id desc" decoration-info="state == 'queued'" decoration-warning="state == 'processing'" decoration-success="state == 'done'" decoration-danger="state == 'failed'" decoration-muted="state == 'cancelled'">
+            <list string="دفعات تنفيذ الميجريشن" default_order="id desc" decoration-info="state == 'queued'" decoration-warning="state == 'processing'" decoration-success="state == 'done'" decoration-danger="state == 'failed'" decoration-muted="state == 'cancelled'">
                 <field name="name"/>
                 <field name="migration_type"/>
                 <field name="company_id" groups="base.group_multi_company"/>
@@ -25,7 +25,7 @@
                 <field name="queued_at"/>
                 <field name="finished_at"/>
                 <field name="state" widget="badge" decoration-info="state == 'queued'" decoration-warning="state == 'processing'" decoration-success="state == 'done'" decoration-primary="state == 'partial'" decoration-danger="state == 'failed'" decoration-muted="state == 'cancelled'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -36,11 +36,11 @@
         <field name="arch" type="xml">
             <form string="دفعة تنفيذ الميجريشن">
                 <header>
-                    <button name="action_run_now" type="object" string="تنفيذ الدفعة فوراً ⚠ للاختبار فقط" class="btn-warning" icon="fa-play" groups="utility_core.group_utility_admin" attrs="{'invisible': [('state', 'in', ('done', 'cancelled', 'processing'))]}" confirm="هذا الإجراء مخصص للاختبار اليدوي فقط. المسار التشغيلي الأساسي للدفعات هو المعالجة الخلفية عبر Cron. هل تريد الاستمرار؟"/>
+                    <button name="action_run_now" type="object" string="تنفيذ الدفعة فوراً ⚠ للاختبار فقط" class="btn-warning" icon="fa-play" groups="utility_core.group_utility_admin" confirm="هذا الإجراء مخصص للاختبار اليدوي فقط. المسار التشغيلي الأساسي للدفعات هو المعالجة الخلفية عبر Cron. هل تريد الاستمرار؟" invisible="(state in ('done', 'cancelled', 'processing'))"/>
                     <button name="action_open_records" type="object" string="عرض السجلات" class="oe_highlight" icon="fa-list"/>
-                    <button name="action_open_errors" type="object" string="عرض الأخطاء" class="btn-warning" icon="fa-exclamation-triangle" attrs="{'invisible': [('error_count', '=', 0)]}"/>
-                    <button name="action_retry_errors" type="object" string="إعادة محاولة الأخطاء" class="btn-primary" icon="fa-refresh" attrs="{'invisible': ['|', ('error_count', '=', 0), ('state', '=', 'processing')]}"/>
-                    <button name="action_cancel" type="object" string="إلغاء الدفعة" class="btn-secondary" confirm="هل أنت تأكد من إلغاء الدفعة واستعادة السجلات إلى حالة المسودة؟" attrs="{'invisible': [('state', 'in', ('done', 'cancelled'))]}"/>
+                    <button name="action_open_errors" type="object" string="عرض الأخطاء" class="btn-warning" icon="fa-exclamation-triangle" invisible="(error_count == 0)"/>
+                    <button name="action_retry_errors" type="object" string="إعادة محاولة الأخطاء" class="btn-primary" icon="fa-refresh" invisible="((error_count == 0) or (state == 'processing'))"/>
+                    <button name="action_cancel" type="object" string="إلغاء الدفعة" class="btn-secondary" confirm="هل أنت تأكد من إلغاء الدفعة واستعادة السجلات إلى حالة المسودة؟" invisible="(state in ('done', 'cancelled'))"/>
                     <field name="state" widget="statusbar" statusbar_visible="queued,processing,partial,done"/>
                 </header>
                 <sheet>
@@ -51,13 +51,13 @@
                                 <span class="o_stat_text">إجمالي السجلات</span>
                             </div>
                         </button>
-                        <button name="action_open_records" type="object" class="oe_stat_button" icon="fa-check-circle" attrs="{'invisible': [('success_count', '=', 0)]}">
+                        <button name="action_open_records" type="object" class="oe_stat_button" icon="fa-check-circle" invisible="(success_count == 0)">
                             <div class="o_stat_info">
                                 <field name="success_count" class="o_stat_value text-success"/>
                                 <span class="o_stat_text">تم استيرادها</span>
                             </div>
                         </button>
-                        <button name="action_open_errors" type="object" class="oe_stat_button" icon="fa-times-circle" attrs="{'invisible': [('error_count', '=', 0)]}">
+                        <button name="action_open_errors" type="object" class="oe_stat_button" icon="fa-times-circle" invisible="(error_count == 0)">
                             <div class="o_stat_info">
                                 <field name="error_count" class="o_stat_value text-danger"/>
                                 <span class="o_stat_text">أخطاء</span>
@@ -75,7 +75,7 @@
                         <group string="بيانات الدفعة">
                             <field name="migration_type" readonly="1"/>
                             <field name="company_id" groups="base.group_multi_company" readonly="1"/>
-                            <field name="chunk_size" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="chunk_size" readonly="(state != 'draft')"/>
                         </group>
                         <group string="توقيت المعالجة والإحصائيات">
                             <field name="queued_at" readonly="1"/>
@@ -85,44 +85,44 @@
                         </group>
                     </group>
 
-                    <group attrs="{'invisible': [('last_error', '=', False)]}" string="تفاصيل آخر خطأ فني">
+                    <group string="تفاصيل آخر خطأ فني" invisible="(last_error == False)">
                         <field name="last_error" readonly="1" nolabel="1" class="text-danger"/>
                     </group>
 
                     <notebook>
-                        <page string="سجلات العملاء" attrs="{'invisible': [('migration_type', '!=', 'customer')]}">
+                        <page string="سجلات العملاء" invisible="(migration_type != 'customer')">
                             <field name="customer_ids" readonly="1">
-                                <tree string="العملاء">
+                                <list string="العملاء">
                                     <field name="customer_number"/>
                                     <field name="name"/>
                                     <field name="meter_number"/>
                                     <field name="phase"/>
                                     <field name="state" widget="badge"/>
                                     <field name="error_message"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
-                        <page string="سجلات الفيدرات" attrs="{'invisible': [('migration_type', '!=', 'feeder')]}">
+                        <page string="سجلات الفيدرات" invisible="(migration_type != 'feeder')">
                             <field name="feeder_ids" readonly="1">
-                                <tree string="الفيدرات">
+                                <list string="الفيدرات">
                                     <field name="feeder_code"/>
                                     <field name="feeder_name"/>
                                     <field name="meter_number"/>
                                     <field name="state" widget="badge"/>
                                     <field name="error_message"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
-                        <page string="سجلات المحولات" attrs="{'invisible': [('migration_type', '!=', 'transformer')]}">
+                        <page string="سجلات المحولات" invisible="(migration_type != 'transformer')">
                             <field name="transformer_ids" readonly="1">
-                                <tree string="المحولات">
+                                <list string="المحولات">
                                     <field name="reference"/>
                                     <field name="transformer_code"/>
                                     <field name="transformer_name"/>
                                     <field name="meter_number"/>
                                     <field name="state" widget="badge"/>
                                     <field name="error_message"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -158,7 +158,7 @@
     <record id="action_utility_migration_batch" model="ir.actions.act_window">
         <field name="name">دفعات تنفيذ الميجريشن</field>
         <field name="res_model">utility.migration.batch</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_migration_batch_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

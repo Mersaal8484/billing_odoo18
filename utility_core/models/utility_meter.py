@@ -5,6 +5,7 @@ import re
 from odoo import api, fields, models, _
 import base64
 from odoo.exceptions import AccessError, UserError, ValidationError
+from odoo.osv import expression
 
 
 PHONE_9_RE = re.compile(r'^\d{9}$')
@@ -263,7 +264,7 @@ class UtilityMeter(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('سجل القراءات - %s') % self.meter_number,
             'res_model': 'utility.reading',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('meter_id', '=', self.id)],
             'context': {'default_meter_id': self.id},
         }
@@ -603,10 +604,8 @@ class UtilityMeter(models.Model):
             ))
 
     @api.model
-    def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
-        args = args or []
-        domain = self._name_search_domain(name, operator)
-        return self._search(domain + args, limit=limit, access_rights_uid=name_get_uid)
+    def _search_display_name(self, operator, value):
+        return self._name_search_domain(value, operator)
 
     def _get_physical_serial(self):
         """Return the physical serial when an inventory bridge provides it."""
@@ -618,12 +617,16 @@ class UtilityMeter(models.Model):
         """Build the logical meter lookup domain without inventory fields."""
         if not name:
             return []
-        return ['|', '|', '|',
-            ('meter_number', operator, name),
-            ('operational_number', operator, name),
-            ('customer_id.partner_id.name', operator, name),
-            ('meter_type_id.name', operator, name),
-        ]
+        domains = [[(field, operator, name)] for field in (
+            'meter_number',
+            'operational_number',
+            'customer_id.partner_id.name',
+            'meter_type_id.name',
+        )]
+        if 'lot_id' in self._fields:
+            domains.append([('lot_id.name', operator, name)])
+        aggregator = expression.AND if operator in expression.NEGATIVE_TERM_OPERATORS else expression.OR
+        return aggregator(domains)
 
     @api.model
     def _scan_domain(self, value):
@@ -666,9 +669,6 @@ class UtilityMeter(models.Model):
                 parts.append(type_name)
 
             meter.display_name = " - ".join(parts)
-
-    def name_get(self):
-        return [(meter.id, meter.display_name or f"[{meter.meter_number}]") for meter in self]
 
     def write(self, vals):
         vals = dict(vals)

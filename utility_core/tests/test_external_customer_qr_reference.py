@@ -60,4 +60,5 @@ class TestExternalCustomerQRReference(TransactionCase):
 
     def test_customer_search_by_external_qr_reference(self):
         customer = self._customer('SEARCH', 'QR-SEARCH')
-        self.assertIn(customer.id, self.env['utility.customer']._name_search('QR-SEARCH'))
+        matches = self.env['utility.customer'].name_search('QR-SEARCH')
+        self.assertIn(customer.id, [record_id for record_id, _name in matches])

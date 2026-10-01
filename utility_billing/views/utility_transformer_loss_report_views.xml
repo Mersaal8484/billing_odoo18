@@ -33,7 +33,7 @@
         <field name="name">utility.transformer.loss.report.tree</field>
         <field name="model">utility.transformer.loss.report</field>
         <field name="arch" type="xml">
-            <tree string="تقرير الفاقد للمحولات جميع الفترات"
+            <list string="تقرير الفاقد للمحولات جميع الفترات"
                   create="false"
                   edit="false"
                   delete="false"
@@ -57,7 +57,7 @@
                 <field name="balance_due" sum="إجمالي المتبقي"/>
                 <field name="transformer_reading_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -96,7 +96,7 @@
     <record id="action_utility_transformer_loss_report" model="ir.actions.act_window">
         <field name="name">تقرير الفاقد للمحولات جميع الفترات</field>
         <field name="res_model">utility.transformer.loss.report</field>
-        <field name="view_mode">pivot,graph,tree</field>
+        <field name="view_mode">pivot,graph,list</field>
         <field name="search_view_id" ref="view_utility_transformer_loss_report_search"/>
         <field name="context">{'search_default_group_period': 1, 'search_default_group_substation': 1}</field>
         <field name="help" type="html">

@@ -10,7 +10,7 @@
         <field name="name">utility.migration.feeder.tree</field>
         <field name="model">utility.migration.feeder</field>
         <field name="arch" type="xml">
-            <tree string="بيانات تهيئة الفيدرات والخلايا"
+            <list string="بيانات تهيئة الفيدرات والخلايا"
                   decoration-muted="state=='draft'"
                   decoration-info="state=='queued'"
                   decoration-warning="state=='processing'"
@@ -42,7 +42,7 @@
                        decoration-warning="state=='processing'"
                        decoration-success="state=='imported'"
                        decoration-danger="state=='error'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -59,8 +59,7 @@
                         <button name="action_open_feeder"
                                 type="object"
                                 class="oe_stat_button"
-                                icon="fa-bolt"
-                                attrs="{'invisible': [('created_feeder_id', '=', False)]}">
+                                icon="fa-bolt" invisible="(created_feeder_id == False)">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">الفيدر المنشأ</span>
                             </div>
@@ -68,8 +67,7 @@
                         <button name="action_open_meter"
                                 type="object"
                                 class="oe_stat_button"
-                                icon="fa-tachometer"
-                                attrs="{'invisible': [('created_meter_id', '=', False)]}">
+                                icon="fa-tachometer" invisible="(created_meter_id == False)">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">العداد المنشأ</span>
                             </div>
@@ -140,10 +138,10 @@
                     </group>
 
                     <notebook>
-                        <page string="رسالة الخطأ" attrs="{'invisible': [('state', '!=', 'error')]}">
+                        <page string="رسالة الخطأ" invisible="(state != 'error')">
                             <field name="error_message" style="color: red;"/>
                         </page>
-                        <page string="الارتباطات المنشأة" attrs="{'invisible': [('state', '!=', 'imported')]}">
+                        <page string="الارتباطات المنشأة" invisible="(state != 'imported')">
                             <group>
                                 <field name="created_feeder_id"/>
                                 <field name="created_meter_id"/>
@@ -188,7 +186,7 @@
     <record id="action_utility_migration_feeder" model="ir.actions.act_window">
         <field name="name">تهيئة الفيدرات والخلايا</field>
         <field name="res_model">utility.migration.feeder</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <menuitem id="menu_utility_migration_feeder"

@@ -44,9 +44,9 @@
                             <group string="بيانات العداد">
                                 <group>
                                     <field name="create_meter"/>
-                                    <field name="payment_type" attrs="{'invisible': [('create_meter', '=', False)]}"/>
-                                    <field name="meter_number" readonly="1" attrs="{'invisible': [('create_meter', '=', False)]}"/>
-                                    <field name="operational_number" attrs="{'invisible': [('create_meter', '=', False)], 'required': [('create_meter', '=', True)]}"/>
+                                    <field name="payment_type" invisible="(create_meter == False)"/>
+                                    <field name="meter_number" readonly="1" invisible="(create_meter == False)"/>
+                                    <field name="operational_number" invisible="(create_meter == False)" required="(create_meter == True)"/>
                                 </group>
                             </group>
                         </page>
@@ -55,14 +55,14 @@
                             <group string="اختيار المحول">
                                 <group>
                                     <field name="use_private_transformer"/>
-                                    <field name="private_transformer_existing_id" options="{'no_create': True}" attrs="{'invisible': [('use_private_transformer', '=', False)]}"/>
+                                    <field name="private_transformer_existing_id" options="{'no_create': True}" invisible="(use_private_transformer == False)"/>
                                 </group>
                             </group>
 
-                            <group string="بيانات المحول الجديد" attrs="{'invisible': ['|', ('use_private_transformer', '=', False), ('private_transformer_existing_id', '!=', False)]}">
+                            <group string="بيانات المحول الجديد" invisible="((use_private_transformer == False) or (private_transformer_existing_id != False))">
                                 <group>
-                                    <field name="transformer_name" attrs="{'required': [('use_private_transformer', '=', True), ('private_transformer_existing_id', '=', False)]}"/>
-                                    <field name="transformer_code" attrs="{'required': [('use_private_transformer', '=', True), ('private_transformer_existing_id', '=', False)]}"/>
+                                    <field name="transformer_name" required="(use_private_transformer == True) and (private_transformer_existing_id == False)"/>
+                                    <field name="transformer_code" required="(use_private_transformer == True) and (private_transformer_existing_id == False)"/>
                                     <field name="transformer_capacity"/>
                                     <field name="transformer_phase"/>
                                     <field name="transformer_manufacturer"/>
@@ -76,7 +76,7 @@
                                 </group>
                             </group>
 
-                            <div class="alert alert-info" role="alert" attrs="{'invisible': [('use_private_transformer', '=', False)]}">
+                            <div class="alert alert-info" role="alert" invisible="(use_private_transformer == False)">
                                 <strong>ملاحظة:</strong>
                                 سيتم اعتماد عداد المشترك الحالي كعداد الربط الرئيسي لهذا المحول تلقائياً لمنع التكرار.
                             </div>

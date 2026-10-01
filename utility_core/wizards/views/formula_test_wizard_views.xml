@@ -10,7 +10,7 @@
                     <field name="formula_id"/>
                     <field name="template_id"/>
                 </group>
-                <group attrs="{'invisible': [('state', '!=', 'input')]}">
+                <group invisible="(state != 'input')">
                     <group string="قيم الاختبار">
                         <field name="consumption"/>
                         <field name="previous_reading"/>
@@ -18,24 +18,21 @@
                         <field name="discount_first_units"/>
                     </group>
                 </group>
-                <group attrs="{'invisible': [('state', '!=', 'result')]}">
+                <group invisible="(state != 'result')">
                     <group string="النتيجة">
                         <field name="result" readonly="1"/>
                         <field name="computed_name" readonly="1"/>
                     </group>
                     <div class="alert alert-danger" role="alert"
-                         attrs="{'invisible': [('error_message', '=', False)]}"
-                         style="margin-top: 15px;">
+                         style="margin-top: 15px;" invisible="(error_message == False)">
                         <i class="fa fa-exclamation-triangle" title="خطأ"/>
                         <strong>خطأ:</strong>
                         <field name="error_message" nolabel="1"/>
                     </div>
                 </group>
                 <footer>
-                    <button name="action_run" string="تشغيل" type="object" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'input')]}"/>
-                    <button name="action_reset" string="إعادة" type="object" class="btn-secondary"
-                            attrs="{'invisible': [('state', '!=', 'result')]}"/>
+                    <button name="action_run" string="تشغيل" type="object" class="oe_highlight" invisible="(state != 'input')"/>
+                    <button name="action_reset" string="إعادة" type="object" class="btn-secondary" invisible="(state != 'result')"/>
                     <button string="إغلاق" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>

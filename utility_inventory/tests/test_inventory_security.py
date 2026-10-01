@@ -10,7 +10,7 @@ class TestUtilityInventorySecurity(TransactionCase):
         self.category = self.env['product.category'].create({'name': 'Security Test Category'})
         self.product = self.env['product.product'].create({
             'name': 'Security Test Meter Product',
-            'type': 'product',
+            'type': 'consu',
             'tracking': 'serial',
             'categ_id': self.category.id,
         })

@@ -1,6 +1,6 @@
 {
     'name': 'Utility Core',
-    'version': '16.0.1.19.0',
+    'version': '18.0.1.0.0',
     'category': 'Utility ERP',
     'summary': 'Core Master Data for Utility ERP Platform',
     'description': """

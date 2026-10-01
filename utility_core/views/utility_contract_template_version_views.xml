@@ -5,7 +5,7 @@
         <field name="name">utility.contract.template.version.tree</field>
         <field name="model">utility.contract.template.version</field>
         <field name="arch" type="xml">
-            <tree create="false" delete="false" edit="false" decoration-muted="is_used_in_billing == True">
+            <list create="false" delete="false" edit="false" decoration-muted="is_used_in_billing == True">
                 <field name="version_code"/>
                 <field name="template_id"/>
                 <field name="version_number"/>
@@ -16,7 +16,7 @@
                 <field name="max_charge"/>
                 <field name="is_used_in_billing" widget="boolean_toggle"/>
                 <field name="create_date" string="تاريخ الإصدار"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -67,7 +67,7 @@
     <record id="action_utility_contract_template_version" model="ir.actions.act_window">
         <field name="name">إصدارات قوالب العقود</field>
         <field name="res_model">utility.contract.template.version</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 لا توجد إصدارات لقوالب العقود بعد.

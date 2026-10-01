@@ -8,8 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
                 <button name="action_open_utility_customer_registration" type="object"
-                        class="oe_stat_button" icon="fa-bolt"
-                        attrs="{'invisible': [('has_utility_customer', '=', False)]}">
+                        class="oe_stat_button" icon="fa-bolt" invisible="(has_utility_customer == False)">
                     <div class="o_stat_info">
                         <span class="o_stat_text">فتح حساب الكهرباء</span>
                     </div>
@@ -18,8 +17,7 @@
             <xpath expr="//sheet" position="before">
                 <header>
                     <button name="action_open_utility_customer_registration" type="object" 
-                            string="تفعيل كمشترك كهرباء" class="oe_highlight" 
-                            attrs="{'invisible': ['|', ('utility_partner_type', '!=', 'subscriber'), ('has_utility_customer', '=', True)]}"/>
+                            string="تفعيل كمشترك كهرباء" class="oe_highlight" invisible="((utility_partner_type != 'subscriber') or (has_utility_customer == True))"/>
                 </header>
             </xpath>
             <xpath expr="//field[@name='vat']" position="after">
@@ -30,15 +28,15 @@
                 <field name="subscriber_no" placeholder="الرقم الجديد"/>
                 <field name="utility_partner_type"/>
                 <field name="is_subscriber" invisible="1"/>
-                <field name="subscriber_status" attrs="{'invisible': [('utility_partner_type', '!=', 'subscriber')]}" widget="radio" options="{'horizontal': true}"/>
-                <field name="subscriber_active_status" attrs="{'invisible': [('utility_partner_type', '!=', 'subscriber')]}" widget="radio" options="{'horizontal': true}"/>
-                <field name="subscriber_id" attrs="{'invisible': [('utility_partner_type', '!=', 'subscriber')]}" options="{'no_create': True}"/>
-                <field name="sector_id" attrs="{'invisible': [('utility_partner_type', '!=', 'subscriber')]}" options="{'no_create': True}"/>
+                <field name="subscriber_status" widget="radio" options="{'horizontal': true}" invisible="(utility_partner_type != 'subscriber')"/>
+                <field name="subscriber_active_status" widget="radio" options="{'horizontal': true}" invisible="(utility_partner_type != 'subscriber')"/>
+                <field name="subscriber_id" options="{'no_create': True}" invisible="(utility_partner_type != 'subscriber')"/>
+                <field name="sector_id" options="{'no_create': True}" invisible="(utility_partner_type != 'subscriber')"/>
                 <field name="sale_type" options="{'no_create': True}"/>
             </xpath>
 
             <notebook position="inside">
-                <page name="utility_technical_details" string="البيانات الفنية للكهرباء" attrs="{'invisible': [('utility_partner_type', '!=', 'subscriber')]}">
+                <page name="utility_technical_details" string="البيانات الفنية للكهرباء" invisible="(utility_partner_type != 'subscriber')">
                     <group>
                         <group string="التسلسل الجغرافي للشبكة (NUTS)">
                             <field name="utility_region_id" options="{'no_create': True}"/>
@@ -60,8 +58,8 @@
                             <field name="register_number"/>
                             <field name="open_balance"/>
                             <field name="is_credit_raised"/>
-                            <field name="pec_credit" attrs="{'invisible': [('is_credit_raised', '=', False)]}"/>
-                            <field name="credit_raise_date" attrs="{'invisible': [('is_credit_raised', '=', False)]}"/>
+                            <field name="pec_credit" invisible="(is_credit_raised == False)"/>
+                            <field name="credit_raise_date" invisible="(is_credit_raised == False)"/>
                         </group>
                         <group string="السجل المالي والمحاسبي">
                             <field name="last_payment"/>

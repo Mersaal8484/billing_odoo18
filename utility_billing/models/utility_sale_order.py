@@ -165,7 +165,7 @@ class UtilitySaleOrder(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('فواتير الحساب المحاسبية'),
             'res_model': 'account.move',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('id', 'in', invoices.ids)],
             'context': {'create': False},
         }
@@ -176,7 +176,7 @@ class UtilitySaleOrder(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('دفعات الفاتورة'),
             'res_model': 'account.payment',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('utility_sale_order_id', '=', self.id)],
             'context': {
                 'default_utility_sale_order_id': self.id,
@@ -190,7 +190,7 @@ class UtilitySaleOrder(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('تعديلات الفوترة'),
             'res_model': 'utility.billing.adjustment',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('sale_order_id', '=', self.id)],
             'context': {'default_sale_order_id': self.id},
         }
@@ -225,7 +225,7 @@ class UtilitySaleOrder(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('مكونات استهلاك الفاتورة'),
             'res_model': 'utility.bill.reading.component',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('sale_order_id', '=', self.id)],
             'context': {'create': False, 'delete': False},
         }

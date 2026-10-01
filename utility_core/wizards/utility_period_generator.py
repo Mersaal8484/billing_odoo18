@@ -128,7 +128,7 @@ class UtilityPeriodGenerator(models.TransientModel):
             'type': 'ir.actions.act_window',
             'name': _('الدورات الموحّدة المنشأة'),
             'res_model': 'date.range',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('id', 'in', generated_periods.ids)],
         }
 

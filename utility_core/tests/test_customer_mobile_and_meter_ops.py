@@ -67,7 +67,8 @@ class TestCustomerMobileAndMeterOperationalNumber(TransactionCase):
         })
         self.assertEqual(meter.operational_number, 'OP-001')
         self.assertIn('[OP-001] OPS-METER-001', meter.display_name)
-        self.assertIn(meter.id, self.env['utility.meter']._name_search('OP-001'))
+        matches = self.env['utility.meter'].name_search('OP-001')
+        self.assertIn(meter.id, [record_id for record_id, _name in matches])
         meter.write({'operational_number': '   '})
         self.assertFalse(meter.operational_number)
 

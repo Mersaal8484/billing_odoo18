@@ -75,7 +75,7 @@ class UtilityTransformer(models.Model):
     )
     customer_count = fields.Integer(
         'عدد العقود',
-        compute='_compute_customer_ids',
+        compute='_compute_customer_count',
         store=True,
         compute_sudo=True,
     )
@@ -172,9 +172,12 @@ class UtilityTransformer(models.Model):
     @api.depends('route_ids.customer_ids')
     def _compute_customer_ids(self):
         for rec in self:
-            customers = rec.route_ids.mapped('customer_ids')
-            rec.customer_ids = customers
-            rec.customer_count = len(customers)
+            rec.customer_ids = rec.route_ids.mapped('customer_ids')
+
+    @api.depends('route_ids.customer_ids')
+    def _compute_customer_count(self):
+        for rec in self:
+            rec.customer_count = len(rec.route_ids.mapped('customer_ids'))
 
     # ===== Actions =====
     def _get_or_create_default_route(self):

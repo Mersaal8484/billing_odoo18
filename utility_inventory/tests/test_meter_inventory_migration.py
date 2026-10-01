@@ -23,7 +23,7 @@ class TestMeterInventoryMigrationPolicy(TransactionCase):
         super().setUp()
         self.product = self.env['product.product'].create({
             'name': 'عداد ترقية',
-            'type': 'product',
+            'type': 'consu',
             'tracking': 'serial',
         })
 
@@ -57,7 +57,7 @@ class TestMeterInventoryMigrationPolicy(TransactionCase):
         """A legacy meter whose product is not serial-tracked must never block
         the upgrade: it is either safely converted or left unresolved."""
         product = self.env['product.product'].create({
-            'name': 'عداد غير مهدأ', 'type': 'product', 'tracking': 'none',
+            'name': 'عداد غير مهدأ', 'type': 'consu', 'tracking': 'none',
         })
         meter = self._make_legacy_meter('LEGACY-NONSERIAL-1', 'SER-NS-1')
         self.env.cr.execute(

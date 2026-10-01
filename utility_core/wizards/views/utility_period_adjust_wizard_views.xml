@@ -19,43 +19,43 @@
 
                     <notebook>
                         <page string="التواريخ والنوافذ الجديدة" name="new_dates">
-                            <group attrs="{'invisible': [('operation_type', '!=', 'extend_reading_window')]}">
+                            <group invisible="(operation_type != 'extend_reading_window')">
                                 <group string="القيم الحالية">
                                     <field name="current_reading_window_end"/>
                                 </group>
                                 <group string="القيمة الجديدة">
-                                    <field name="new_reading_window_end" attrs="{'required': [('operation_type', '=', 'extend_reading_window')]}"/>
+                                    <field name="new_reading_window_end" required="(operation_type == 'extend_reading_window')"/>
                                 </group>
                             </group>
 
-                            <group attrs="{'invisible': [('operation_type', '!=', 'extend_payment_window')]}">
+                            <group invisible="(operation_type != 'extend_payment_window')">
                                 <group string="القيم الحالية">
                                     <field name="current_payment_window_end"/>
                                 </group>
                                 <group string="القيمة الجديدة">
-                                    <field name="new_payment_window_end" attrs="{'required': [('operation_type', '=', 'extend_payment_window')]}"/>
+                                    <field name="new_payment_window_end" required="(operation_type == 'extend_payment_window')"/>
                                 </group>
                             </group>
 
-                            <group attrs="{'invisible': [('operation_type', '!=', 'change_reading_window')]}">
+                            <group invisible="(operation_type != 'change_reading_window')">
                                 <group string="القيم الحالية">
                                     <field name="current_reading_window_start"/>
                                     <field name="current_reading_window_end"/>
                                 </group>
                                 <group string="القيم الجديدة">
-                                    <field name="new_reading_window_start" attrs="{'required': [('operation_type', '=', 'change_reading_window')]}"/>
-                                    <field name="new_reading_window_end" attrs="{'required': [('operation_type', '=', 'change_reading_window')]}"/>
+                                    <field name="new_reading_window_start" required="(operation_type == 'change_reading_window')"/>
+                                    <field name="new_reading_window_end" required="(operation_type == 'change_reading_window')"/>
                                 </group>
                             </group>
 
-                            <group attrs="{'invisible': [('operation_type', '!=', 'change_consumption_bounds')]}">
+                            <group invisible="(operation_type != 'change_consumption_bounds')">
                                 <group string="القيم الحالية">
                                     <field name="current_consumption_start"/>
                                     <field name="current_consumption_end"/>
                                 </group>
                                 <group string="القيم الجديدة">
-                                    <field name="new_consumption_start" attrs="{'required': [('operation_type', '=', 'change_consumption_bounds')]}"/>
-                                    <field name="new_consumption_end" attrs="{'required': [('operation_type', '=', 'change_consumption_bounds')]}"/>
+                                    <field name="new_consumption_start" required="(operation_type == 'change_consumption_bounds')"/>
+                                    <field name="new_consumption_end" required="(operation_type == 'change_consumption_bounds')"/>
                                 </group>
                             </group>
                         </page>

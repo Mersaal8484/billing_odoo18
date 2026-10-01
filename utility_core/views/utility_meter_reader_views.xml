@@ -8,7 +8,7 @@
         <field name="name">utility.meter.reader.tree</field>
         <field name="model">utility.meter.reader</field>
         <field name="arch" type="xml">
-            <tree decoration-success="active == True" decoration-muted="active == False"
+            <list decoration-success="active == True" decoration-muted="active == False"
                   string="كشافو القراءات">
                 <field name="code" optional="show"/>
                 <field name="name"/>
@@ -18,7 +18,7 @@
                 <field name="route_ids" widget="many2many_tags" optional="show"/>
                 <field name="customer_count" string="عدد المشتركين"/>
                 <field name="active" invisible="1"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -40,7 +40,7 @@
                 <field name="active"/>
                 <field name="image_1920"/>
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click o_kanban_record_has_image_fill">
                             <div class="o_kanban_image d-none d-md-block"
                                  t-attf-style="background-image:url('#{kanban_image('utility.meter.reader', 'image_1920', record.id.raw_value)}')">
@@ -103,8 +103,7 @@
                 <sheet>
                     <field name="active" invisible="1"/>
                     <widget name="web_ribbon" title="معطّل"
-                            bg_color="bg-danger"
-                            attrs="{'invisible': [('active', '=', True)]}"/>
+                            bg_color="bg-danger" invisible="(active == True)"/>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_routes" type="object"
                                 class="oe_stat_button" icon="fa-road">
@@ -157,7 +156,7 @@
                                 </div>
                             </div>
                             <field name="route_ids" nolabel="1">
-                                <tree string="المسارات المخصصة" decoration-muted="active == False">
+                                <list string="المسارات المخصصة" decoration-muted="active == False">
                                     <field name="code"/>
                                     <field name="name"/>
                                     <field name="area_id"/>
@@ -165,12 +164,12 @@
                                     <field name="transformer_id" optional="show"/>
                                     <field name="customer_count" string="عدد المشتركين" sum="إجمالي المشتركين"/>
                                     <field name="active" invisible="1"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="قائمة المشتركين" name="customers">
                             <field name="customer_ids" readonly="1" nolabel="1">
-                                <tree string="مشتركو الكاشف" limit="25">
+                                <list string="مشتركو الكاشف" limit="25">
                                     <field name="customer_number"/>
                                     <field name="partner_id"/>
                                     <field name="route_id"/>
@@ -180,7 +179,7 @@
                                            decoration-success="state == 'active'"
                                            decoration-warning="state in ('suspended', 'disconnected')"
                                            decoration-danger="state == 'closed'"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="ملاحظات" name="notes">
@@ -226,7 +225,7 @@
     <record id="action_utility_meter_reader" model="ir.actions.act_window">
         <field name="name">كشافو قراءة العدادات</field>
         <field name="res_model">utility.meter.reader</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="search_view_id" ref="view_utility_meter_reader_search"/>
         <field name="context">{'search_default_active': 1}</field>
     </record>

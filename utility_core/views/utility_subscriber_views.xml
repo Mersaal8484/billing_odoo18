@@ -4,13 +4,13 @@
         <field name="name">utility.subscriber.tree</field>
         <field name="model">utility.subscriber</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="sequence" widget="handle"/>
                 <field name="code"/>
                 <field name="name"/>
                 <field name="category_id"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -20,7 +20,7 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <widget name="web_ribbon" title="مؤرشف" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <widget name="web_ribbon" title="مؤرشف" bg_color="bg-danger" invisible="(active == True)"/>
                     <div class="oe_title">
                         <label for="name" string="اسم المشترك / الفئة الفرعية"/>
                         <h1><field name="name"/></h1>
@@ -39,10 +39,10 @@
                         <page string="الدعم والخصم">
                             <group>
                                 <field name="subsidized_enabled" widget="boolean_toggle"/>
-                                <field name="sponsor_id" domain="[('utility_partner_type', '=', 'donor')]" attrs="{'invisible': [('subsidized_enabled', '=', False)], 'required': [('subsidized_enabled', '=', True)]}"/>
-                                <field name="subsidized_max_units" attrs="{'invisible': [('subsidized_enabled', '=', False)], 'required': [('subsidized_enabled', '=', True)]}"/>
-                                <field name="subsidized_percentage" attrs="{'invisible': [('subsidized_enabled', '=', False)], 'required': [('subsidized_enabled', '=', True)]}"/>
-                                <field name="subsidized_price_per_kwh" attrs="{'invisible': [('subsidized_enabled', '=', False)]}"/>
+                                <field name="sponsor_id" domain="[('utility_partner_type', '=', 'donor')]" invisible="(subsidized_enabled == False)" required="(subsidized_enabled == True)"/>
+                                <field name="subsidized_max_units" invisible="(subsidized_enabled == False)" required="(subsidized_enabled == True)"/>
+                                <field name="subsidized_percentage" invisible="(subsidized_enabled == False)" required="(subsidized_enabled == True)"/>
+                                <field name="subsidized_price_per_kwh" invisible="(subsidized_enabled == False)"/>
                             </group>
                         </page>
                         <page string="الحسابات المحاسبية">
@@ -69,7 +69,7 @@
     <record id="action_utility_subscriber" model="ir.actions.act_window">
         <field name="name">المشتركين (الأنواع)</field>
         <field name="res_model">utility.subscriber</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <!-- Menu Item (Assuming it will be placed in configuration) -->

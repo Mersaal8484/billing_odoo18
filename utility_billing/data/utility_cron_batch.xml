@@ -8,9 +8,7 @@
         <field name="code">model._cron_generate_bills()</field>
         <field name="interval_number">1</field>
         <field name="interval_type">minutes</field>
-        <field name="numbercall">-1</field>
         <field name="active" eval="True"/>
-        <field name="doall" eval="False"/>
         <field name="utility_managed" eval="True"/>
         <field name="utility_code">batch_reading_bill_generator</field>
         <field name="utility_category">billing</field>
@@ -28,9 +26,7 @@
         <field name="code">model._cron_process_readings()</field>
         <field name="interval_number">10</field>
         <field name="interval_type">minutes</field>
-        <field name="numbercall">-1</field>
         <field name="active" eval="True"/>
-        <field name="doall" eval="False"/>
         <field name="utility_managed" eval="True"/>
         <field name="utility_code">reading_staging_processor</field>
         <field name="utility_category">reading</field>
@@ -48,9 +44,7 @@
         <field name="code">model._cron_cleanup_old_batches()</field>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
-        <field name="numbercall">-1</field>
         <field name="active" eval="True"/>
-        <field name="doall" eval="False"/>
         <field name="utility_managed" eval="True"/>
         <field name="utility_code">batch_file_cleanup</field>
         <field name="utility_category">maintenance</field>

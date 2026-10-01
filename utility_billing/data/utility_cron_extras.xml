@@ -8,7 +8,6 @@
         <field name="user_id" ref="base.user_root"/>
         <field name="interval_number">1</field>
         <field name="interval_type">hours</field>
-        <field name="numbercall">-1</field>
         <field name="active">True</field>
         <field name="utility_managed" eval="True"/>
         <field name="utility_code">contract_recurring_invoice_generator</field>
@@ -27,7 +26,6 @@
         <field name="user_id" ref="base.user_root"/>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
-        <field name="numbercall">-1</field>
         <field name="active">True</field>
         <field name="utility_managed" eval="True"/>
         <field name="utility_code">overdue_bill_updater</field>
@@ -46,7 +44,6 @@
         <field name="user_id" ref="base.user_root"/>
         <field name="interval_number">1</field>
         <field name="interval_type">minutes</field>
-        <field name="numbercall">-1</field>
         <field name="active">True</field>
         <field name="utility_managed" eval="True"/>
         <field name="utility_code">approved_reading_queuer</field>
@@ -65,7 +62,6 @@
         <field name="user_id" ref="base.user_root"/>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
-        <field name="numbercall">-1</field>
         <field name="active">True</field>
         <field name="utility_managed" eval="True"/>
         <field name="utility_code">due_bill_reminder_sender</field>
@@ -84,7 +80,6 @@
         <field name="user_id" ref="base.user_root"/>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
-        <field name="numbercall">-1</field>
         <field name="active">True</field>
         <field name="utility_managed" eval="True"/>
         <field name="utility_code">disconnection_order_creator</field>
@@ -103,7 +98,6 @@
         <field name="user_id" ref="base.user_root"/>
         <field name="interval_number">10</field>
         <field name="interval_type">minutes</field>
-        <field name="numbercall">-1</field>
         <field name="active">True</field>
         <field name="utility_managed" eval="True"/>
         <field name="utility_code">sms_notification_dispatcher</field>

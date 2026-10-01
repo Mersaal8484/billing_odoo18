@@ -1,5 +1,6 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from odoo.osv import expression
 
 
 class SaleOrderType(models.Model):
@@ -227,7 +228,7 @@ class ResPartner(models.Model):
                 'name': _('حسابات الكهرباء المملوكة'),
                 'type': 'ir.actions.act_window',
                 'res_model': 'utility.customer',
-                'view_mode': 'tree,form',
+                'view_mode': 'list,form',
                 'domain': [('id', 'in', customers.ids)],
                 'target': 'current',
                 'context': {'default_partner_id': self.id},
@@ -331,11 +332,12 @@ class ResPartner(models.Model):
                     partner.display_name = f"[{partner.nickname}] {partner.name}"
 
     @api.model
-    def _name_search(self, name='', domain=None, operator='ilike', limit=100, order=None):
-        domain = domain or []
-        if name:
-            domain = ['|', ('name', operator, name), ('nickname', operator, name)] + domain
-        return self._search(domain, limit=limit, order=order)
+    def _search_display_name(self, operator, value):
+        if not value:
+            return super()._search_display_name(operator, value)
+        domains = [[('name', operator, value)], [('nickname', operator, value)]]
+        aggregator = expression.AND if operator in expression.NEGATIVE_TERM_OPERATORS else expression.OR
+        return aggregator(domains)
 
     def _get_partner_balance(self, date_cutoff=None, date_range_id=None, journal_type=None, exclude_journal_type=None, date_range_not_null=False, date_range_is_null=False):
         self.ensure_one()

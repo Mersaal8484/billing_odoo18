@@ -365,7 +365,7 @@ class UtilityCustomerLifecycle(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window', 'name': _('سجل العدادات'),
-            'res_model': 'utility.customer.meter.assignment', 'view_mode': 'tree,form',
+            'res_model': 'utility.customer.meter.assignment', 'view_mode': 'list,form',
             'domain': [('customer_id', '=', self.id)],
         }
 
@@ -373,7 +373,7 @@ class UtilityCustomerLifecycle(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window', 'name': _('سجل دورة الحياة'),
-            'res_model': 'utility.customer.lifecycle.event', 'view_mode': 'tree,form',
+            'res_model': 'utility.customer.lifecycle.event', 'view_mode': 'list,form',
             'domain': [('customer_id', '=', self.id)],
         }
 

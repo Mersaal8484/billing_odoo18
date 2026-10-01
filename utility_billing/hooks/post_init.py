@@ -42,13 +42,14 @@ def _table_columns_exist(cr, table, columns):
     return all(col in existing for col in _column_names(columns))
 
 
-def post_init_hook(cr, registry):
+def post_init_hook(env):
     """Create composite database indexes after module installation.
 
     Each index is created inside a savepoint: a failure is logged and the
     transaction is rolled back to the savepoint so the module install can
     still commit successfully.
     """
+    cr = env.cr
     for index_name, table, columns in _COMPOSITE_INDEXES:
         try:
             if not _table_columns_exist(cr, table, columns):

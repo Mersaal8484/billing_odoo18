@@ -4,7 +4,7 @@
         <field name="name">utility.contract.template.history.tree</field>
         <field name="model">utility.contract.template.history</field>
         <field name="arch" type="xml">
-            <tree decoration-muted="1">
+            <list decoration-muted="1">
                 <field name="template_id"/>
                 <field name="change_date"/>
                 <field name="old_price"/>
@@ -13,7 +13,7 @@
                 <field name="new_service_charge"/>
                 <field name="reason"/>
                 <field name="changed_by"/>
-            </tree>
+            </list>
         </field>
     </record>
 </odoo>

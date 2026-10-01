@@ -6,14 +6,14 @@
             <field name="name">utility.inspection.tree</field>
             <field name="model">utility.inspection</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="name"/>
                     <field name="inspection_type"/>
                     <field name="inspector_id"/>
                     <field name="inspection_date"/>
                     <field name="is_passed"/>
                     <field name="state"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -23,8 +23,8 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button name="action_complete" type="object" string="إكمال المعاينة" class="btn-success" states="scheduled"/>
-                        <button name="action_cancel" type="object" string="إلغاء المعاينة" class="btn-secondary" states="scheduled" confirm="هل أنت متاكد من إلغاء المعاينة؟"/>
+                        <button name="action_complete" type="object" string="إكمال المعاينة" class="btn-success" invisible="state not in ('scheduled')"/>
+                        <button name="action_cancel" type="object" string="إلغاء المعاينة" class="btn-secondary" confirm="هل أنت متاكد من إلغاء المعاينة؟" invisible="state not in ('scheduled')"/>
                         <field name="state" widget="statusbar" statusbar_visible="scheduled,completed,cancelled" options="{'clickable': False}"/>
                     </header>
                     <sheet>
@@ -76,7 +76,7 @@
         <record id="action_utility_inspection" model="ir.actions.act_window">
             <field name="name">المعاينات</field>
             <field name="res_model">utility.inspection</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
             <field name="context">{'search_default_scheduled_inspections': 1}</field>
         </record>
 

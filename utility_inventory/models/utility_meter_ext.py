@@ -70,13 +70,6 @@ class UtilityMeterExt(models.Model):
         return super()._compute_qr_code()
 
     @api.model
-    def _name_search_domain(self, name, operator='ilike'):
-        domain = super()._name_search_domain(name, operator)
-        if name:
-            return ['|', ('lot_id.name', operator, name)] + domain
-        return domain
-
-    @api.model
     def _scan_domain(self, value):
         return ['|', ('meter_number', '=', value), ('lot_id.name', '=', value)]
 

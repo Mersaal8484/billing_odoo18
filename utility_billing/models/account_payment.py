@@ -122,7 +122,7 @@ class AccountPayment(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('تخصيصات الدفعة'),
             'res_model': 'utility.payment.allocation',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('payment_id', '=', self.id)],
             'context': {'default_payment_id': self.id, 'create': False},
         }

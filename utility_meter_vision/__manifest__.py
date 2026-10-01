@@ -1,6 +1,6 @@
 {
     'name': 'Utility Meter Vision',
-    'version': '16.0.0.0.0',
+    'version': '18.0.0.0.0',
     'category': 'Utility ERP',
     'summary': '[قيد التطوير - غير مفعّل] طلبات تحليل صور العدادات بالذكاء الاصطناعي',
     'description': (

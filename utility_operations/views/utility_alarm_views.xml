@@ -6,14 +6,14 @@
             <field name="name">utility.alarm.tree</field>
             <field name="model">utility.alarm</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="alarm_code"/>
                     <field name="alarm_date"/>
                     <field name="alarm_type"/>
                     <field name="severity"/>
                     <field name="customer_id"/>
                     <field name="state"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -23,11 +23,11 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button name="action_acknowledge" string="تأكيد الاستلام" type="object" states="open" class="btn-primary"/>
-                        <button name="action_start" string="بدء التحقيق" type="object" states="acknowledged" class="btn-primary"/>
-                        <button name="action_resolve" string="حل الإنذار" type="object" states="investigating" class="btn-success"/>
-                        <button name="action_close" string="رفض / إغلاق" type="object" states="open,acknowledged,investigating" class="btn-secondary"/>
-                        <button name="action_create_service_order" string="إنشاء أمر خدمة / قضية تلاعب" type="object" states="open,acknowledged,investigating" class="btn-info"/>
+                        <button name="action_acknowledge" string="تأكيد الاستلام" type="object" class="btn-primary" invisible="state not in ('open')"/>
+                        <button name="action_start" string="بدء التحقيق" type="object" class="btn-primary" invisible="state not in ('acknowledged')"/>
+                        <button name="action_resolve" string="حل الإنذار" type="object" class="btn-success" invisible="state not in ('investigating')"/>
+                        <button name="action_close" string="رفض / إغلاق" type="object" class="btn-secondary" invisible="state not in ('open', 'acknowledged', 'investigating')"/>
+                        <button name="action_create_service_order" string="إنشاء أمر خدمة / قضية تلاعب" type="object" class="btn-info" invisible="state not in ('open', 'acknowledged', 'investigating')"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,acknowledged,investigating,resolved,dismissed" options="{'clickable': False}"/>
                     </header>
                     <sheet>
@@ -70,7 +70,7 @@
                                     <field name="resolution"/>
                                     <field name="resolution_date"/>
                                     <field name="service_order_id"/>
-                                    <field name="tamper_case_id" attrs="{'invisible': [('alarm_type', '!=', 'tamper')]}"/>
+                                    <field name="tamper_case_id" invisible="(alarm_type != 'tamper')"/>
                                 </group>
                             </page>
                         </notebook>
@@ -82,7 +82,7 @@
         <record id="action_utility_alarm" model="ir.actions.act_window">
             <field name="name">الإنذارات</field>
             <field name="res_model">utility.alarm</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
             <field name="context">{'search_default_open_alarms': 1}</field>
         </record>
 

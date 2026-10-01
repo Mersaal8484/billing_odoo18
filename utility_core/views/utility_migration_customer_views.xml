@@ -10,7 +10,7 @@
         <field name="name">utility.migration.customer.tree</field>
         <field name="model">utility.migration.customer</field>
         <field name="arch" type="xml">
-            <tree string="بيانات التهيئة"
+            <list string="بيانات التهيئة"
                   decoration-muted="state=='draft'"
                   decoration-info="state=='queued'"
                   decoration-warning="state=='processing'"
@@ -54,7 +54,7 @@
                        decoration-warning="state=='processing'"
                        decoration-success="state=='imported'"
                        decoration-danger="state=='error'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -67,30 +67,21 @@
                     <button name="action_map_codes"
                             string="مطابقة الترميز"
                             type="object"
-                            class="btn-secondary"
-                            attrs="{'invisible': [('state', '=', 'imported')]}"/>
+                            class="btn-secondary" invisible="(state == 'imported')"/>
                     <button name="action_import_data"
                             string="✅ رفع البيانات"
                             type="object"
-                            class="oe_highlight"
-                            attrs="{'invisible': [('state', '=', 'imported')]}"/>
+                            class="oe_highlight" invisible="(state == 'imported')"/>
                     <button name="action_activate_inactive"
                             string="🔄 تفعيل العميل"
                             type="object"
                             class="btn-warning"
-                            confirm="سيتم إنشاء حساب مشترك + عداد + رصيد افتتاحي. هل أنت متأكد؟"
-                            attrs="{'invisible': ['|',
-                                ('state', '!=', 'imported'),
-                                '|',
-                                ('is_active', '=', True),
-                                ('created_customer_id', '!=', False)
-                            ]}"/>
+                            confirm="سيتم إنشاء حساب مشترك + عداد + رصيد افتتاحي. هل أنت متأكد؟" invisible="((state != 'imported') or ((is_active == True) or (created_customer_id != False)))"/>
                     <button name="action_repair_balance_allocation"
                             string="⚖️ تصحيح توزيع الأرصدة"
                             type="object"
                             class="btn-warning"
-                            confirm="سيتم إنشاء قيد تسوية محاسبي دون حذف القيد الأصلي. هل تريد المتابعة؟"
-                            attrs="{'invisible': ['|', ('state', '!=', 'imported'), ('balance_allocation_repaired', '=', True)]}"/>
+                            confirm="سيتم إنشاء قيد تسوية محاسبي دون حذف القيد الأصلي. هل تريد المتابعة؟" invisible="((state != 'imported') or (balance_allocation_repaired == True))"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,queued,processing,imported,error"/>
                 </header>
                 <sheet>
@@ -98,8 +89,7 @@
                         <button name="action_open_customer"
                                 type="object"
                                 class="oe_stat_button"
-                                icon="fa-user"
-                                attrs="{'invisible': [('created_customer_id', '=', False)]}">
+                                icon="fa-user" invisible="(created_customer_id == False)">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">حساب المشترك</span>
                             </div>
@@ -107,8 +97,7 @@
                         <button name="action_open_meter"
                                 type="object"
                                 class="oe_stat_button"
-                                icon="fa-tachometer"
-                                attrs="{'invisible': [('created_meter_id', '=', False)]}">
+                                icon="fa-tachometer" invisible="(created_meter_id == False)">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">العداد</span>
                             </div>
@@ -125,35 +114,27 @@
                             <field name="mobile"/>
                             <field name="national_id"/>
                             <field name="legacy_category"/>
-                            <field name="category_id" attrs="{'readonly': True}"/>
+                            <field name="category_id" readonly="True"/>
                             <field name="legacy_subscriber_type"/>
-                            <field name="subscriber_type_id" attrs="{'readonly': True}"/>
+                            <field name="subscriber_type_id" readonly="True"/>
                             <field name="is_active"/>
-                            <field name="legacy_contract"
-                                   attrs="{'invisible': [('is_active', '=', False)]}"/>
-                            <field name="contract_template_id"
-                                   attrs="{'invisible': [('is_active', '=', False)], 'readonly': True}"/>
+                            <field name="legacy_contract" invisible="(is_active == False)"/>
+                            <field name="contract_template_id" invisible="(is_active == False)" readonly="True"/>
                         </group>
                         <group string="الموقع والعداد">
                             <field name="legacy_region"/>
-                            <field name="region_id" attrs="{'readonly': True}"/>
+                            <field name="region_id" readonly="True"/>
                             <field name="legacy_area"/>
-                            <field name="area_id" attrs="{'readonly': True}"/>
+                            <field name="area_id" readonly="True"/>
                             <field name="legacy_transformer_code"/>
-                            <field name="transformer_id" attrs="{'readonly': True}"/>
-                            <field name="route_id" attrs="{'readonly': True}"/>
-                            <field name="meter_number"
-                                   attrs="{'invisible': [('is_active', '=', False)]}"/>
-                            <field name="last_reading"
-                                   attrs="{'invisible': [('is_active', '=', False)]}"/>
-                            <field name="current_reading"
-                                   attrs="{'invisible': [('is_active', '=', False)]}"/>
-                            <field name="last_reading_date"
-                                   attrs="{'invisible': [('is_active', '=', False)]}"/>
-                            <field name="meter_reading"
-                                   attrs="{'invisible': [('is_active', '=', False)]}"/>
-                            <field name="opening_reading"
-                                   attrs="{'invisible': [('is_active', '=', False)]}"/>
+                            <field name="transformer_id" readonly="True"/>
+                            <field name="route_id" readonly="True"/>
+                            <field name="meter_number" invisible="(is_active == False)"/>
+                            <field name="last_reading" invisible="(is_active == False)"/>
+                            <field name="current_reading" invisible="(is_active == False)"/>
+                            <field name="last_reading_date" invisible="(is_active == False)"/>
+                            <field name="meter_reading" invisible="(is_active == False)"/>
+                            <field name="opening_reading" invisible="(is_active == False)"/>
                             <field name="phase"/>
                             <field name="is_private_transformer"/>
                             <field name="last_batch_id" readonly="1"/>
@@ -170,12 +151,10 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="رسالة الخطأ"
-                              attrs="{'invisible': [('state', '!=', 'error')]}">
+                        <page string="رسالة الخطأ" invisible="(state != 'error')">
                             <field name="error_message" style="color: red;"/>
                         </page>
-                        <page string="الارتباطات المنشأة"
-                              attrs="{'invisible': [('state', '!=', 'imported')]}">
+                        <page string="الارتباطات المنشأة" invisible="(state != 'imported')">
                             <group>
                                 <field name="created_partner_id"/>
                                 <field name="created_customer_id"/>
@@ -242,7 +221,7 @@
     <record id="action_utility_migration_customer" model="ir.actions.act_window">
         <field name="name">تهيئة العملاء</field>
         <field name="res_model">utility.migration.customer</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <menuitem id="menu_utility_migration_root"

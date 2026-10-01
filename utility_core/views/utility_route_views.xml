@@ -4,7 +4,7 @@
         <field name="name">utility.route.tree</field>
         <field name="model">utility.route</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="code"/>
                 <field name="region_id" optional="show"/>
@@ -17,7 +17,7 @@
                 <field name="collector_user_ids" widget="many2many_tags" optional="show"/>
                 <field name="customer_count" string="مشتركون" optional="show"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_utility_route_form" model="ir.ui.view">
@@ -29,7 +29,7 @@
                     <button name="utility_core.action_utility_meter_reader" 
                             type="action" string="تعيين كاشف قراءات" 
                             class="btn-primary" icon="fa-user-circle"
-                            context="{'default_route_ids': [(4, active_id)]}"/>
+                            context="{'default_route_ids': [(4, id)]}"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -107,12 +107,12 @@
                     <notebook>
                         <page name="customers" string="عقود المشتركين">
                             <field name="customer_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="customer_number"/>
                                     <field name="partner_id"/>
                                     <field name="mobile"/>
                                     <field name="state"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -150,7 +150,7 @@
     <record id="action_utility_route" model="ir.actions.act_window">
         <field name="name">مسارات القراءة</field>
         <field name="res_model">utility.route</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_route_search"/>
     </record>
 
@@ -184,14 +184,14 @@
                     <notebook>
                         <page string="قائمة المشتركين المتاحين">
                             <field name="customer_ids" options="{'no_create': True}">
-                                <tree limit="15">
+                                <list limit="15">
                                     <field name="customer_number"/>
                                     <field name="partner_id"/>
                                     <field name="mobile"/>
                                     <field name="meter_id"/>
                                     <field name="area_id" optional="show"/>
                                     <field name="state" widget="badge"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -233,13 +233,13 @@
                     <notebook>
                         <page string="المشتركون المسجلون بالمسار حالياً">
                             <field name="customer_ids" options="{'no_create': True}">
-                                <tree limit="15">
+                                <list limit="15">
                                     <field name="customer_number"/>
                                     <field name="partner_id"/>
                                     <field name="mobile"/>
                                     <field name="meter_id"/>
                                     <field name="state" widget="badge"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>

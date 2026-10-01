@@ -6,7 +6,7 @@
         <field name="name">utility.transformer.tree</field>
         <field name="model">utility.transformer</field>
         <field name="arch" type="xml">
-            <tree decoration-muted="active == False">
+            <list decoration-muted="active == False">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="feeder_id"/>
@@ -20,7 +20,7 @@
                        decoration-muted="status == 'inactive'"/>
                 <field name="customer_count" string="مشتركون" optional="show"/>
                 <field name="active" widget="boolean_toggle"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -38,8 +38,7 @@
                     <field name="status" widget="statusbar" options="{'clickable': '1'}"/>
                 </header>
                 <sheet>
-                    <widget name="web_ribbon" title="مؤرشف" bg_color="bg-danger"
-                            attrs="{'invisible': [('active', '=', True)]}"/>
+                    <widget name="web_ribbon" title="مؤرشف" bg_color="bg-danger" invisible="(active == True)"/>
 
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_routes" type="object"
@@ -72,11 +71,9 @@
                         <group string="الموقع الجغرافي">
                             <field name="zone_region_id" readonly="1"/>
                             <field name="is_private" invisible="1"/>
-                            <field name="region_id" options="{'no_create': True}"
-                                   attrs="{'readonly': [('is_private', '=', True)], 'required': [('is_private', '=', False)]}"/>
+                            <field name="region_id" options="{'no_create': True}" readonly="(is_private == True)" required="(is_private == False)"/>
                             <field name="area_id" options="{'no_create': True}"
-                                   domain="[('type', '=', 'area'), ('parent_id', '=', region_id)]"
-                                   attrs="{'readonly': [('is_private', '=', True)], 'required': [('is_private', '=', False)]}"/>
+                                   domain="[('type', '=', 'area'), ('parent_id', '=', region_id)]" readonly="(is_private == True)" required="(is_private == False)"/>
                             <field name="address"/>
                         </group>
                     </group>
@@ -98,13 +95,13 @@
                         <!-- مسارات التوزيع -->
                         <page name="routes" string="مسارات التوزيع">
                             <field name="route_ids" nolabel="1">
-                                <tree string="مسارات التوزيع" decoration-muted="active == False">
+                                <list string="مسارات التوزيع" decoration-muted="active == False">
                                     <field name="code"/>
                                     <field name="name"/>
                                     <field name="area_id"/>
                                     <field name="customer_count" string="عدد المشتركين" sum="إجمالي المشتركين"/>
                                     <field name="active" invisible="1"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
 
@@ -118,20 +115,20 @@
                                 </group>
                             </group>
                             <field name="meter_ids">
-                                <tree>
+                                <list>
                                     <field name="meter_number"/>
                                     <field name="meter_type_id"/>
                                     <field name="payment_type" widget="badge"/>
                                     <field name="status_id"/>
                                     <field name="customer_id"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
 
                         <!-- عقود المشتركين -->
                         <page name="customers" string="عقود المشتركين">
                             <field name="customer_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="customer_number"/>
                                     <field name="partner_id"/>
                                     <field name="route_id"/>
@@ -140,7 +137,7 @@
                                            decoration-success="state == 'active'"
                                            decoration-warning="state in ('suspended', 'disconnected')"
                                            decoration-danger="state == 'closed'"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
 
@@ -196,7 +193,7 @@
     <record id="action_utility_transformer" model="ir.actions.act_window">
         <field name="name">المحولات</field>
         <field name="res_model">utility.transformer</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_transformer_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

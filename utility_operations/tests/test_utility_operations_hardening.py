@@ -30,7 +30,7 @@ class TestUtilityOperationsHardening(TransactionCase):
         })
         self.product = self.env['product.product'].create({
             'name': 'منتج عداد العمليات',
-            'type': 'product',
+            'type': 'consu',
             'tracking': 'serial',
         })
         self.lot = self.env['stock.lot'].create({

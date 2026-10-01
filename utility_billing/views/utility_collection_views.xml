@@ -4,7 +4,7 @@
         <field name="name">utility.collection.tree</field>
         <field name="model">utility.collection</field>
         <field name="arch" type="xml">
-            <tree string="تحصيلات الكهرباء" default_order="collection_date desc">
+            <list string="تحصيلات الكهرباء" default_order="collection_date desc">
                 <field name="name"/>
                 <field name="collection_date"/>
                 <field name="utility_customer_id"/>
@@ -17,7 +17,7 @@
                        decoration-success="state == 'settled'"
                        decoration-warning="state in ('posted', 'included_in_settlement')"
                        decoration-muted="state in ('draft', 'cancelled')"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -28,9 +28,8 @@
             <form string="تحصيل كهرباء">
                 <header>
                     <button name="action_confirm" type="object" string="تأكيد"
-                            class="btn-primary" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-                    <button name="action_cancel" type="object" string="إلغاء"
-                            attrs="{'invisible': [('state', 'not in', ('draft', 'confirmed'))]}"/>
+                            class="btn-primary" invisible="(state != 'draft')"/>
+                    <button name="action_cancel" type="object" string="إلغاء" invisible="(state not in ('draft', 'confirmed'))"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,confirmed,posted,included_in_settlement,settled"/>
                 </header>
@@ -40,8 +39,7 @@
                             <field name="name"/>
                             <field name="collection_date"/>
                             <field name="collection_method"/>
-                            <field name="collector_id"
-                                   attrs="{'required': [('collection_method', 'in', ('field_collector', 'external_collection'))]}"/>
+                            <field name="collector_id" required="(collection_method in ('field_collector', 'external_collection'))"/>
                         </group>
                         <group string="الفاتورة والدفعة">
                             <field name="payment_id"/>
@@ -64,11 +62,11 @@
                     <notebook>
                         <page string="تسوية المحصل">
                             <field name="settlement_line_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="settlement_id"/>
                                     <field name="amount" widget="monetary"/>
                                     <field name="actual_settled_amount" widget="monetary"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="المحاسبة">
@@ -116,7 +114,7 @@
         <field name="name">utility.collection.settlement.tree</field>
         <field name="model">utility.collection.settlement</field>
         <field name="arch" type="xml">
-            <tree string="تسويات المحصلين" default_order="settlement_date desc">
+            <list string="تسويات المحصلين" default_order="settlement_date desc">
                 <field name="name"/>
                 <field name="settlement_date"/>
                 <field name="collector_id"/>
@@ -129,7 +127,7 @@
                        decoration-success="state == 'reconciled'"
                        decoration-warning="state in ('posted', 'deposited')"
                        decoration-muted="state in ('draft', 'cancelled')"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -140,7 +138,7 @@
             <form string="تسوية عهدة محصل">
                 <header>
                     <button name="action_confirm" type="object" string="تأكيد"
-                            class="btn-primary" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                            class="btn-primary" invisible="(state != 'draft')"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,confirmed,posted,deposited,reconciled"/>
                 </header>
@@ -166,12 +164,12 @@
                     </group>
                     <notebook>
                         <page string="التحصيلات">
-                            <field name="line_ids" attrs="{'readonly': [('state', '!=', 'draft')]}" context="{'default_currency_id': currency_id}">
-                                <tree editable="bottom">
+                            <field name="line_ids" context="{'default_currency_id': currency_id}" readonly="(state != 'draft')">
+                                <list editable="bottom">
                                     <field name="collection_id"/>
                                     <field name="amount" widget="monetary"/>
                                     <field name="actual_settled_amount" widget="monetary" readonly="1"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="المحاسبة">
@@ -212,13 +210,13 @@
     <record id="action_utility_collection" model="ir.actions.act_window">
         <field name="name">تحصيلات الكهرباء</field>
         <field name="res_model">utility.collection</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_collection_search"/>
     </record>
     <record id="action_utility_collection_settlement" model="ir.actions.act_window">
         <field name="name">تسويات المحصلين</field>
         <field name="res_model">utility.collection.settlement</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="view_id" ref="view_utility_collection_settlement_tree"/>
         <field name="search_view_id" ref="view_utility_collection_settlement_search"/>
     </record>

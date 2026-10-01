@@ -4,13 +4,13 @@
         <field name="name">utility.staff.tree</field>
         <field name="model">utility.staff</field>
         <field name="arch" type="xml">
-            <tree decoration-success="active == True" decoration-muted="active == False">
+            <list decoration-success="active == True" decoration-muted="active == False">
                 <field name="employee_code"/>
                 <field name="name"/>
                 <field name="user_id"/>
                 <field name="mobile" optional="show"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -39,7 +39,7 @@
                             <field name="phone" placeholder="01XXXXXX"/>
                         </group>
                     </group>
-                    <group string="الصلاحيات والنطاق التنظيمي" attrs="{'invisible': [('user_id', '=', False)]}">
+                    <group string="الصلاحيات والنطاق التنظيمي" invisible="(user_id == False)">
                         <group string="النطاق التنظيمي" col="2">
                             <field name="user_scope_mode" readonly="1"/>
                             <field name="user_assigned_region_ids" widget="many2many_tags" readonly="1"/>
@@ -99,7 +99,7 @@
     <record id="action_utility_staff" model="ir.actions.act_window">
         <field name="name">ملفات الموظفين</field>
         <field name="res_model">utility.staff</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_staff_search"/>
     </record>
 </odoo>

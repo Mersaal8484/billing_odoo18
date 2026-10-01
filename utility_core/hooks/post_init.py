@@ -127,8 +127,9 @@ def _ensure_extra_sequences(cr):
             )
 
 
-def post_init_hook(cr, registry):
+def post_init_hook(env):
     """Create composite database indexes and tune sequences after install."""
+    cr = env.cr
     # utility_reading is defined in utility_core itself, so its columns are
     # guaranteed to exist at this point.
     _create_composite_indexes(cr, [
@@ -146,5 +147,4 @@ def post_init_hook(cr, registry):
     # permissions view while modules are being installed. Rebuild it after
     # utility_core is fully installed so the standard permissions return in
     # their normal application/category layout.
-    env = api.Environment(cr, SUPERUSER_ID, {})
     env['res.groups'].with_context(lang=None)._update_user_groups_view()

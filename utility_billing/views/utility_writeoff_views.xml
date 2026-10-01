@@ -4,14 +4,14 @@
         <field name="name">utility.writeoff.tree</field>
         <field name="model">utility.writeoff</field>
         <field name="arch" type="xml">
-            <tree decoration-info="state == 'draft'" decoration-success="state == 'applied'" decoration-warning="state == 'approved'">
+            <list decoration-info="state == 'draft'" decoration-success="state == 'applied'" decoration-warning="state == 'approved'">
                 <field name="writeoff_number"/>
                 <field name="customer_id"/>
                 <field name="sale_order_id"/>
                 <field name="amount" sum="الإجمالي"/>
                 <field name="date"/>
                 <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'applied'" decoration-warning="state == 'approved'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -21,23 +21,21 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_approve" type="object" string="اعتماد الإعفاء" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}" groups="utility_core.group_utility_admin"/>
-                    <button name="action_apply" type="object" string="تطبيق الخصم" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'approved')]}" groups="utility_core.group_utility_admin"/>
-                    <button name="action_draft" type="object" string="إعادة للمسودة" attrs="{'invisible': [('state', '!=', 'approved')]}" groups="utility_core.group_utility_billing_manager"/>
+                    <button name="action_approve" type="object" string="اعتماد الإعفاء" class="oe_highlight" groups="utility_core.group_utility_admin" invisible="(state != 'draft')"/>
+                    <button name="action_apply" type="object" string="تطبيق الخصم" class="oe_highlight" groups="utility_core.group_utility_admin" invisible="(state != 'approved')"/>
+                    <button name="action_draft" type="object" string="إعادة للمسودة" groups="utility_core.group_utility_billing_manager" invisible="(state != 'approved')"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,approved,applied" options="{'clickable': False}"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_credit_note" type="object"
-                                class="oe_stat_button" icon="fa-file-text-o"
-                                attrs="{'invisible': [('move_id', '=', False)]}">
+                                class="oe_stat_button" icon="fa-file-text-o" invisible="(move_id == False)">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">إشعار الدائن</span>
                             </div>
                         </button>
                     </div>
-                    <div class="alert alert-success" role="alert"
-                         attrs="{'invisible': [('state', '!=', 'applied')]}">
+                    <div class="alert alert-success" role="alert" invisible="(state != 'applied')">
                         <i class="fa fa-check-circle me-2" title="تم التطبيق"/>
                         <strong>تم تطبيق الإعفاء ماليًا.</strong>
                         تم إنشاء إشعار الدائن المرتبط ولا يمكن إعادة فتح السجل.
@@ -53,20 +51,20 @@
                     </div>
                     <group>
                         <group string="بيانات العميل والفاتورة">
-                            <field name="customer_id" options="{'no_create': True}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="customer_id" options="{'no_create': True}" readonly="(state != 'draft')"/>
                             <field name="account_id" invisible="1"/>
                             <field name="move_id" invisible="1"/>
-                            <field name="sale_order_id" options="{'no_create': True}" domain="[('customer_id', '=', customer_id)]" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="sale_order_id" options="{'no_create': True}" domain="[('customer_id', '=', customer_id)]" readonly="(state != 'draft')"/>
                         </group>
                         <group string="التفاصيل المالية والاعتماد">
-                            <field name="amount" widget="monetary" decoration-bf="1" decoration-danger="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="approved_by" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                            <field name="amount" widget="monetary" decoration-bf="1" decoration-danger="1" readonly="(state != 'draft')"/>
+                            <field name="date" readonly="(state != 'draft')"/>
+                            <field name="approved_by" invisible="(state == 'draft')"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="سبب الإعفاء (المبررات)">
-                            <field name="reason" placeholder="اكتب مبررات الإعفاء أو الخصم هنا..." nolabel="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="reason" placeholder="اكتب مبررات الإعفاء أو الخصم هنا..." nolabel="1" readonly="(state != 'draft')"/>
                         </page>
                     </notebook>
                 </sheet>

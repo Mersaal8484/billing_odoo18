@@ -22,7 +22,7 @@
                     </group>
 
                     <field name="is_loss_warning" invisible="1"/>
-                    <div class="alert alert-danger" role="alert" attrs="{'invisible': [('is_loss_warning', '=', False)]}">
+                    <div class="alert alert-danger" role="alert" invisible="(is_loss_warning == False)">
                         <strong>تحذير:</strong>
                         نسبة الفاقد تجاوزت الحد المحدد لهذا التقرير.
                     </div>
@@ -30,18 +30,18 @@
                     <notebook>
                         <page string="عدادات الربط">
                             <field name="coupling_meter_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="meter_number"/>
                                     <field name="installation_date"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="عدادات المشتركين">
                             <field name="child_meter_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="meter_number"/>
                                     <field name="customer_id"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>

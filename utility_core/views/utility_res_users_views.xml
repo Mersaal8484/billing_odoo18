@@ -13,12 +13,10 @@
                         <group>
                             <field name="assigned_region_ids" widget="many2many_tags"
                                    options="{'no_create': True}"
-                                   placeholder="اختر المناطق..."
-                                   attrs="{'readonly': [('scope_mode', '=', 'global')]}"/>
+                                   placeholder="اختر المناطق..." readonly="(scope_mode == 'global')"/>
                             <field name="assigned_branch_ids" widget="many2many_tags"
                                    options="{'no_create': True}"
-                                   placeholder="اختر الفروع..."
-                                   attrs="{'readonly': [('scope_mode', '=', 'global')]}"/>
+                                   placeholder="اختر الفروع..." readonly="(scope_mode == 'global')"/>
                             <field name="assigned_route_ids" widget="many2many_tags"
                                    options="{'no_create': True}"
                                    placeholder="اختر خطوط السير..."/>
@@ -31,7 +29,7 @@
                                placeholder="اختر دورًا أو أكثر..."/>
                         <div class="text-muted">تُطبّق الصلاحيات تلقائيًا حسب الأدوار المختارة.</div>
                     </group>
-                    <group attrs="{'invisible': [('has_collection_role', '=', False)]}">
+                    <group invisible="(has_collection_role == False)">
                         <group string="إعدادات التحصيل النقدية">
                             <label for="collection_journal_id"/>
                             <div class="o_row">
@@ -41,8 +39,7 @@
                                         type="object"
                                         string="إنشاء يومية"
                                         class="btn btn-primary oe_inline"
-                                        attrs="{'invisible': [('collection_journal_id', '!=', False)]}"
-                                        confirm="سيتم إنشاء يومية نقدية مستقلة وربطها بهذا المستخدم. هل تريد المتابعة؟"/>
+                                        confirm="سيتم إنشاء يومية نقدية مستقلة وربطها بهذا المستخدم. هل تريد المتابعة؟" invisible="(collection_journal_id != False)"/>
                             </div>
                             <field name="collector_block_code" placeholder="مثال: A, B, C..."/>
                         </group>

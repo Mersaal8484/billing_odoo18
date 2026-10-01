@@ -5,7 +5,7 @@
         <field name="name">utility.reading.batch.tree</field>
         <field name="model">utility.reading.batch</field>
         <field name="arch" type="xml">
-            <tree decoration-success="state == 'done'"
+            <list decoration-success="state == 'done'"
                   decoration-warning="state == 'processing'"
                   decoration-danger="state in ('error', 'partial')">
                 <field name="name" string="رقم الدفعة"/>
@@ -23,7 +23,7 @@
                        decoration-warning="state in ('processing', 'uploaded')"
                        decoration-danger="state in ('error', 'partial')"
                        string="الحالة"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -37,12 +37,10 @@
                 <header>
                     <button name="action_confirm" type="object"
                             string="تأكيد وبدء المعالجة" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'uploaded')]}"
-                            groups="utility_core.group_utility_billing_manager"/>
+                            groups="utility_core.group_utility_billing_manager" invisible="(state != 'uploaded')"/>
                     <button name="action_reset_to_uploaded" type="object"
                             string="إعادة المعالجة" class="oe_highlight"
-                            attrs="{'invisible': [('state', 'not in', ('error', 'partial'))]}"
-                            groups="utility_core.group_utility_billing_manager"/>
+                            groups="utility_core.group_utility_billing_manager" invisible="(state not in ('error', 'partial'))"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="uploaded,processing,done,partial,error"
                            options="{'clickable': False}"/>
@@ -80,9 +78,9 @@
                     </group>
 
                     <notebook>
-                        <page string="القراءات المُنشأة" attrs="{'invisible': [('processed_count', '=', 0)]}">
+                        <page string="القراءات المُنشأة" invisible="(processed_count == 0)">
                             <field name="reading_ids" readonly="1">
-                                <tree default_order="reading_date desc">
+                                <list default_order="reading_date desc">
                                     <field name="reading_id"/>
                                     <field name="reading_purpose" widget="badge"/>
                                     <field name="meter_id"/>
@@ -90,19 +88,19 @@
                                     <field name="reading_value"/>
                                     <field name="consumption"/>
                                     <field name="state" widget="badge"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="الصور المرفقة">
                             <field name="image_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="file_size"/>
                                     <field name="create_date"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
-                        <page string="سجل الأخطاء" attrs="{'invisible': [('error_log', '=', False)]}">
+                        <page string="سجل الأخطاء" invisible="(error_log == False)">
                             <field name="error_log" readonly="1"/>
                         </page>
                     </notebook>
@@ -150,7 +148,7 @@
     <record id="action_utility_reading_batch" model="ir.actions.act_window">
         <field name="name">دفعات القراءات</field>
         <field name="res_model">utility.reading.batch</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_reading_batch_search"/>
         <field name="context">{'search_default_active_batches': 1}</field>
         <field name="help" type="html">

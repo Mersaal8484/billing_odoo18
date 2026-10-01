@@ -4,14 +4,14 @@
         <field name="name">utility.office.tree</field>
         <field name="model">utility.office</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="code"/>
                 <field name="area_id"/>
                 <field name="phone"/>
                 <field name="manager_id"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_utility_office_form" model="ir.ui.view">
@@ -61,7 +61,7 @@
     <record id="action_utility_office" model="ir.actions.act_window">
         <field name="name">المكاتب</field>
         <field name="res_model">utility.office</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_office_search"/>
     </record>
 </odoo>

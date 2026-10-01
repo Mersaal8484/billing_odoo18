@@ -4,11 +4,11 @@
         <field name="name">utility.penalty.type.tree</field>
         <field name="model">utility.penalty.type</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="code"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -18,7 +18,7 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <widget name="web_ribbon" title="مؤرشف" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <widget name="web_ribbon" title="مؤرشف" bg_color="bg-danger" invisible="(active == True)"/>
                     <div class="oe_title">
                         <label for="name" string="اسم الغرامة"/>
                         <h1><field name="name"/></h1>

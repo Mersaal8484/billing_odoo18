@@ -10,7 +10,7 @@ class TestMeterStockIntegrity(TransactionCase):
         self.category = self.env['product.category'].create({'name': 'عدادات كهربائية'})
         self.product_serial = self.env['product.product'].create({
             'name': 'عداد رقمي ذكي',
-            'type': 'product',
+            'type': 'consu',
             'tracking': 'serial',
             'categ_id': self.category.id,
         })
@@ -34,7 +34,7 @@ class TestMeterStockIntegrity(TransactionCase):
         """Test that assigning a lot from product A to meter with product B raises ValidationError."""
         product_other = self.env['product.product'].create({
             'name': 'عداد ميكانيكي',
-            'type': 'product',
+            'type': 'consu',
             'tracking': 'serial',
         })
         with self.assertRaises(ValidationError):

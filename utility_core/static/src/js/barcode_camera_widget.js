@@ -2,8 +2,7 @@
 
 import { registry } from "@web/core/registry";
 import { CharField } from "@web/views/fields/char/char_field";
-
-const { useState, onWillUnmount } = owl;
+import { onWillUnmount, useState } from "@odoo/owl";
 
 export class BarcodeCameraWidget extends CharField {
     setup() {

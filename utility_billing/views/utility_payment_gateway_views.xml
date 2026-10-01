@@ -4,7 +4,7 @@
         <field name="name">utility.payment.gateway.transaction.tree</field>
         <field name="model">utility.payment.gateway.transaction</field>
         <field name="arch" type="xml">
-            <tree decoration-success="state == 'done'" decoration-danger="state == 'failed'">
+            <list decoration-success="state == 'done'" decoration-danger="state == 'failed'">
                 <field name="create_date"/>
                 <field name="name"/>
                 <field name="provider_id"/>
@@ -15,7 +15,7 @@
                 <field name="amount"/>
                 <field name="state" widget="badge"/>
                 <field name="payment_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -25,8 +25,8 @@
         <field name="arch" type="xml">
             <form string="معاملة دفع / استرداد">
                 <header>
-                    <button name="action_mark_pending" type="object" string="إرسال للمزود" states="draft" class="btn-primary"/>
-                    <button name="action_confirm_payment" type="object" string="تأكيد يدوي" states="pending" class="btn-secondary"/>
+                    <button name="action_mark_pending" type="object" string="إرسال للمزود" class="btn-primary" invisible="state not in ('draft')"/>
+                    <button name="action_confirm_payment" type="object" string="تأكيد يدوي" class="btn-secondary" invisible="state not in ('pending')"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,pending,done,failed"/>
                 </header>
                 <sheet>
@@ -52,7 +52,7 @@
                         </page>
                         <page string="رد المزود">
                             <field name="callback_payload" nolabel="1"/>
-                            <field name="error_message" nolabel="1" attrs="{'invisible': [('error_message', '=', False)]}"/>
+                            <field name="error_message" nolabel="1" invisible="(error_message == False)"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -89,7 +89,7 @@
     <record id="action_utility_payment_gateway_transaction" model="ir.actions.act_window">
         <field name="name">معاملات بوابة الدفع</field>
         <field name="res_model">utility.payment.gateway.transaction</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_payment_gateway_transaction_search"/>
     </record>
 

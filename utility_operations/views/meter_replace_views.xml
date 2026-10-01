@@ -5,7 +5,7 @@
         <field name="name">utility.meter.replacement.tree</field>
         <field name="model">utility.meter.replacement</field>
         <field name="arch" type="xml">
-            <tree decoration-success="state == 'done'">
+            <list decoration-success="state == 'done'">
                 <field name="company_id" invisible="1"/>
                 <field name="name"/>
                 <field name="utility_account_id"/>
@@ -15,7 +15,7 @@
                 <field name="replacement_date"/>
                 <field name="unbilled_consumption"/>
                 <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'done'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -31,8 +31,7 @@
                 <header>
                     <button name="action_complete_replacement" type="object"
                             string="إكمال الاستبدال" class="oe_highlight"
-                            attrs="{'invisible': [('state', '=', 'done')]}"
-                            confirm="سيؤدي هذا الإجراء إلى تنفيذ حركات المخزون وتحديث حالة العدادين. هل تريد المتابعة؟"/>
+                            confirm="سيؤدي هذا الإجراء إلى تنفيذ حركات المخزون وتحديث حالة العدادين. هل تريد المتابعة؟" invisible="(state == 'done')"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" options="{'clickable': False}"/>
                 </header>
                 <sheet>
@@ -43,22 +42,20 @@
                             <field string="حركات المخزون" name="picking_count" widget="statinfo"/>
                         </button>
                         <button class="oe_stat_button" type="object" name="action_view_closing_reading"
-                                icon="fa-tachometer"
-                                attrs="{'invisible': [('closing_reading_id', '=', False)]}">
+                                icon="fa-tachometer" invisible="(closing_reading_id == False)">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">القراءة الختامية</span>
                             </div>
                         </button>
                         <button class="oe_stat_button" type="object" name="action_view_opening_reading"
-                                icon="fa-power-off"
-                                attrs="{'invisible': [('opening_reading_id', '=', False)]}">
+                                icon="fa-power-off" invisible="(opening_reading_id == False)">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">القراءة الافتتاحية</span>
                             </div>
                         </button>
                     </div>
 
-                    <div class="alert alert-info text-center" role="alert" attrs="{'invisible': [('state', '!=', 'done')]}">
+                    <div class="alert alert-info text-center" role="alert" invisible="(state != 'done')">
                         <i class="fa fa-info-circle me-2" title="تنبيه"/>
                         <strong>تم الاستبدال واكتمال حركات المخزون!</strong>
                         الاستهلاك غير المفوتر المرحل للعداد القديم: 
@@ -71,27 +68,27 @@
                     </div>
                     <group>
                         <group string="معلومات الاشتراك">
-                            <field name="utility_account_id" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="utility_account_id" readonly="(state == 'done')"/>
                             <field name="partner_id"/>
                         </group>
                         <group string="تفاصيل العدادات والتاريخ">
-                            <field name="old_meter_id" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="new_meter_id" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="replacement_date" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="old_meter_id" readonly="(state == 'done')"/>
+                            <field name="new_meter_id" readonly="(state == 'done')"/>
+                            <field name="replacement_date" readonly="(state == 'done')"/>
                         </group>
                     </group>
                     <group string="قراءات الاستبدال والاستهلاك غير المفوتر">
                         <group>
-                            <field name="old_meter_final_reading" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="new_meter_initial_reading" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="old_meter_final_reading" readonly="(state == 'done')"/>
+                            <field name="new_meter_initial_reading" readonly="(state == 'done')"/>
                         </group>
                         <group>
                             <field name="unbilled_consumption" readonly="1"/>
                         </group>
                     </group>
                     <group string="تفاصيل إضافية وملاحظات">
-                        <field name="reason" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                        <field name="replacement_notes" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                        <field name="reason" readonly="(state == 'done')"/>
+                        <field name="replacement_notes" readonly="(state == 'done')"/>
                     </group>
                 </sheet>
             </form>
@@ -133,7 +130,7 @@
     <record id="action_utility_meter_replacement" model="ir.actions.act_window">
         <field name="name">استبدال العدادات</field>
         <field name="res_model">utility.meter.replacement</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <record id="action_utility_meter_replace_wizard" model="ir.actions.act_window">

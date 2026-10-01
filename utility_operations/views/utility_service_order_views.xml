@@ -6,7 +6,7 @@
             <field name="name">utility.service.order.tree</field>
             <field name="model">utility.service.order</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="order_number"/>
                     <field name="date_requested"/>
                     <field name="service_type"/>
@@ -16,7 +16,7 @@
                     <field name="technician_id"/>
                     <field name="state"/>
                     <field name="date_scheduled"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -27,16 +27,11 @@
                 <form>
                     <header>
                         <field name="state" widget="statusbar" options="{'clickable': False}"/>
-                        <button name="action_approve" string="اعتماد" type="object"
-                                states="draft" class="btn-primary"/>
-                        <button name="action_schedule" string="جدولة" type="object"
-                                states="approved" class="btn-primary"/>
-                        <button name="action_start" string="بدء" type="object"
-                                states="scheduled" class="btn-primary"/>
-                        <button name="action_complete" string="إكمال" type="object"
-                                states="in_progress" class="btn-primary"/>
-                        <button name="action_cancel" string="إلغاء" type="object"
-                                states="draft,approved,scheduled" class="btn-secondary"/>
+                        <button name="action_approve" string="اعتماد" type="object" class="btn-primary" invisible="state not in ('draft')"/>
+                        <button name="action_schedule" string="جدولة" type="object" class="btn-primary" invisible="state not in ('approved')"/>
+                        <button name="action_start" string="بدء" type="object" class="btn-primary" invisible="state not in ('scheduled')"/>
+                        <button name="action_complete" string="إكمال" type="object" class="btn-primary" invisible="state not in ('in_progress')"/>
+                        <button name="action_cancel" string="إلغاء" type="object" class="btn-secondary" invisible="state not in ('draft', 'approved', 'scheduled')"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
@@ -145,7 +140,7 @@
         <record id="action_utility_service_order" model="ir.actions.act_window">
             <field name="name">أوامر الخدمة</field>
             <field name="res_model">utility.service.order</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
             <field name="search_view_id" ref="view_utility_service_order_search"/>
             <field name="context">{'search_default_open_orders': 1}</field>
             <field name="help" type="html">

@@ -6,7 +6,7 @@
         <field name="name">utility.feeder.tree</field>
         <field name="model">utility.feeder</field>
         <field name="arch" type="xml">
-            <tree decoration-muted="active == False">
+            <list decoration-muted="active == False">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="feeder_type"/>
@@ -19,7 +19,7 @@
                 <field name="transformer_count" string="محولات" optional="show"/>
                 <field name="supplied_kwh" string="مزوّد (kWh)" optional="show"/>
                 <field name="active" widget="boolean_toggle"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -82,7 +82,7 @@
                                 <group string="عداد الربط الرئيسي">
                                     <field name="coupling_meter_id"
                                            options="{'no_create': True}"
-                                           domain="[('feeder_id', '=', active_id)]"/>
+                                           domain="[('feeder_id', '=', id)]"/>
                                 </group>
                                 <group string="إحصائيات">
                                     <field name="supplied_kwh" readonly="1"/>
@@ -94,7 +94,7 @@
                         <!-- صفحة 2: قراءات عداد الربط -->
                         <page name="coupling_readings" string="قراءات الربط">
                             <field name="coupling_reading_ids">
-                                <tree editable="bottom"
+                                <list editable="bottom"
                                       decoration-success="state == 'approved'"
                                       decoration-danger="state == 'error'">
                                     <field name="reading_id" readonly="1"/>
@@ -109,16 +109,15 @@
                                     <field name="image_state" widget="badge" optional="show"/>
                                     <field name="state" widget="badge"/>
                                     <button name="action_submit_review" type="object"
-                                            string="إرسال للمراجعة" icon="fa-check"
-                                            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-                                </tree>
+                                            string="إرسال للمراجعة" icon="fa-check" invisible="(state != 'draft')"/>
+                                </list>
                             </field>
                         </page>
 
                         <!-- صفحة 3: قراءات الفيدر -->
                         <page name="feeder_readings" string="قراءات الفيدر">
                             <field name="feeder_reading_ids">
-                                <tree editable="bottom"
+                                <list editable="bottom"
                                       decoration-success="state == 'approved'"
                                       decoration-danger="state == 'error'">
                                     <field name="reading_id" readonly="1"/>
@@ -131,20 +130,20 @@
                                     <field name="consumption" readonly="1"/>
                                     <field name="date_range_id" options="{'no_create': True}"/>
                                     <field name="state" widget="badge"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
 
                         <!-- صفحة 4: المحولات -->
                         <page name="transformers" string="المحولات">
                             <field name="transformer_ids">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="code"/>
                                     <field name="capacity"/>
                                     <field name="phase"/>
                                     <field name="status"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
 
@@ -200,7 +199,7 @@
     <record id="action_utility_feeder" model="ir.actions.act_window">
         <field name="name">الفيدرات / الخلايا</field>
         <field name="res_model">utility.feeder</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_feeder_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

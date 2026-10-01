@@ -5,7 +5,7 @@
         <field name="name">utility.bill.pricing.snapshot.tree</field>
         <field name="model">utility.bill.pricing.snapshot</field>
         <field name="arch" type="xml">
-            <tree create="false" edit="false" delete="false" decoration-info="pricing_mode in ('block', 'tier')">
+            <list create="false" edit="false" delete="false" decoration-info="pricing_mode in ('block', 'tier')">
                 <field name="created_at" string="تاريخ اللقطة"/>
                 <field name="sale_order_id"/>
                 <field name="customer_id"/>
@@ -19,7 +19,7 @@
                 <field name="amount_discount" sum="إجمالي الخصومات"/>
                 <field name="calculated_total" sum="المجموع الكلي"/>
                 <field name="snapshot_origin" widget="badge"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -74,9 +74,9 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="أدلة الشرائح المطبقة (Applied Pricing Blocks)" attrs="{'invisible': [('pricing_mode', 'not in', ['block', 'tier', 'flat'])]}">
+                        <page string="أدلة الشرائح المطبقة (Applied Pricing Blocks)" invisible="(pricing_mode not in ['block', 'tier', 'flat'])">
                             <field name="block_ids" readonly="1">
-                                <tree create="false" edit="false" delete="false">
+                                <list create="false" edit="false" delete="false">
                                     <field name="sequence"/>
                                     <field name="block_name"/>
                                     <field name="from_kwh"/>
@@ -85,10 +85,10 @@
                                     <field name="price_per_kwh"/>
                                     <field name="amount" sum="إجمالي مبالغ الشرائح"/>
                                     <field name="is_discount" widget="boolean_toggle"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
-                        <page string="بيانات الخصم والدعم ومعادلات الاحتساب" attrs="{'invisible': [('discount_units', '=', 0), ('amount_discount', '=', 0)]}">
+                        <page string="بيانات الخصم والدعم ومعادلات الاحتساب" invisible="(discount_units == 0) and (amount_discount == 0)">
                             <group>
                                 <group string="معادلة الخصم">
                                     <field name="discount_formula_id" readonly="1"/>
@@ -118,7 +118,7 @@
     <record id="action_utility_bill_pricing_snapshot" model="ir.actions.act_window">
         <field name="name">لقطات التسعير التاريخية (Pricing Snapshots)</field>
         <field name="res_model">utility.bill.pricing.snapshot</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 لا توجد لقطات تسعير مسجلة بعد.

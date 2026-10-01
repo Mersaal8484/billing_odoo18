@@ -38,18 +38,15 @@
                                 <button name="action_download_customer_template"
                                         string="⬇ تحميل قالب المشتركين"
                                         type="object"
-                                        class="btn btn-link btn-sm p-0 me-3"
-                                        attrs="{'invisible': [('import_type', '!=', 'customer')]}"/>
+                                        class="btn btn-link btn-sm p-0 me-3" invisible="(import_type != 'customer')"/>
                                 <button name="action_download_feeder_template"
                                         string="⬇ تحميل قالب الفيدرات والخلايا"
                                         type="object"
-                                        class="btn btn-link btn-sm p-0 me-3"
-                                        attrs="{'invisible': [('import_type', '!=', 'feeder')]}"/>
+                                        class="btn btn-link btn-sm p-0 me-3" invisible="(import_type != 'feeder')"/>
                                 <button name="action_download_transformer_template"
                                         string="⬇ تحميل قالب المحولات"
                                         type="object"
-                                        class="btn btn-link btn-sm p-0 me-3"
-                                        attrs="{'invisible': [('import_type', '!=', 'transformer')]}"/>
+                                        class="btn btn-link btn-sm p-0 me-3" invisible="(import_type != 'transformer')"/>
                             </div>
                         </div>
                     </div>

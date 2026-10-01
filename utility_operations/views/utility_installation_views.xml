@@ -6,14 +6,14 @@
             <field name="name">utility.installation.tree</field>
             <field name="model">utility.installation</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="name"/>
                     <field name="customer_id"/>
                     <field name="meter_id"/>
                     <field name="installation_date"/>
                     <field name="installer_id"/>
                     <field name="state"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -23,9 +23,9 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button name="action_install" type="object" string="تنفيذ التركيب" class="btn-primary" states="draft"/>
-                        <button name="action_verify" type="object" string="التحقق من التركيب" class="btn-success" states="installed"/>
-                        <button name="action_fail" type="object" string="تسجيل فشل" class="btn-danger" states="draft,installed" confirm="هل أنت متاكد من تسجيل فشل هذه التركيبة؟"/>
+                        <button name="action_install" type="object" string="تنفيذ التركيب" class="btn-primary" invisible="state not in ('draft')"/>
+                        <button name="action_verify" type="object" string="التحقق من التركيب" class="btn-success" invisible="state not in ('installed')"/>
+                        <button name="action_fail" type="object" string="تسجيل فشل" class="btn-danger" confirm="هل أنت متاكد من تسجيل فشل هذه التركيبة؟" invisible="state not in ('draft', 'installed')"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,installed,verified,failed" options="{'clickable': False}"/>
                     </header>
                     <sheet>
@@ -64,7 +64,7 @@
         <record id="action_utility_installation" model="ir.actions.act_window">
             <field name="name">التركيبات</field>
             <field name="res_model">utility.installation</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
             <field name="context">{'search_default_pending_installations': 1}</field>
         </record>
 

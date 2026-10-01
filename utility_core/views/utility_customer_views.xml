@@ -5,7 +5,7 @@
         <field name="name">utility.customer.tree</field>
         <field name="model">utility.customer</field>
         <field name="arch" type="xml">
-            <tree decoration-muted="state == 'closed'" 
+            <list decoration-muted="state == 'closed'"
                   decoration-warning="state in ('suspended', 'disconnected')" 
                   decoration-success="state == 'active'">
                 <field name="customer_number"/>
@@ -23,7 +23,7 @@
                 <field name="accounting_balance" optional="show" sum="Total Balance" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
                 <field name="current_balance" optional="show" sum="Total Current"/>
                 <field name="active" optional="hide"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -105,13 +105,13 @@
                                     <field name="company_currency_id" invisible="1"/>
                                     <field name="opening_balance"/>
                                     <field name="current_balance"/>
-                                    <field name="accounting_balance" widget="monetary" options="{'currency_field': 'company_currency_id'}" attrs="{'invisible': [('payment_type', '!=', 'postpaid')]}"/>
+                                    <field name="accounting_balance" widget="monetary" options="{'currency_field': 'company_currency_id'}" invisible="(payment_type != 'postpaid')"/>
                                 </group>
                             </group>
                         </page>
                         
                         <!-- صفحة 2: الاشتراك المتكرر -->
-                        <page name="recurring_contract" string="الاشتراك المتكرر" attrs="{'invisible': [('payment_type', '=', 'prepaid')]}">
+                        <page name="recurring_contract" string="الاشتراك المتكرر" invisible="(payment_type == 'prepaid')">
                             <group>
                                 <group string="قالب العقد والتواريخ">
                                     <field name="available_contract_template_ids" invisible="1"/>
@@ -134,20 +134,20 @@
                             <group>
                                 <group string="الربط بالشبكة">
                                     <field name="is_private_transformer" invisible="1"/>
-                                    <field name="cell_id" options="{'no_create': True}" attrs="{'invisible': [('is_private_transformer', '=', False)]}"/>
+                                    <field name="cell_id" options="{'no_create': True}" invisible="(is_private_transformer == False)"/>
                                     <field name="transformer_id" options="{'no_create': True}"/>
-                                    <field name="cell_coupling_meter_id" readonly="1" attrs="{'invisible': [('is_private_transformer', '=', False)]}"/>
+                                    <field name="cell_coupling_meter_id" readonly="1" invisible="(is_private_transformer == False)"/>
                                 </group>
-                                <group string="رسوم المحول الخاص" attrs="{'invisible': [('is_private_transformer', '=', False)]}">
+                                <group string="رسوم المحول الخاص" invisible="(is_private_transformer == False)">
                                     <field name="private_transformer_fee" widget="monetary" string="رسوم المحول الخاص لكل دورة"/>
                                 </group>
                             </group>
                         </page>
 
-                        <page name="readings" string="القراءات" attrs="{'invisible': [('payment_type', '=', 'prepaid')]}">
+                        <page name="readings" string="القراءات" invisible="(payment_type == 'prepaid')">
                             <separator string="القراءات المرفوعة"/>
                             <field name="uploaded_reading_ids" nolabel="1" readonly="1">
-                                <tree limit="20" readonly="1" default_order="reading_date desc">
+                                <list limit="20" readonly="1" default_order="reading_date desc">
                                     <field name="reading_id"/>
                                     <field name="reading_purpose" widget="badge"/>
                                     <field name="reading_date"/>
@@ -155,18 +155,18 @@
                                     <field name="consumption"/>
                                     <field name="state" widget="badge"/>
                                     <field name="date_range_id"/>
-                                </tree>
+                                </list>
                             </field>
                             <separator string="القراءات المفوتـرة"/>
                             <field name="billed_reading_ids" nolabel="1" readonly="1">
-                                <tree limit="20" readonly="1" default_order="reading_date desc">
+                                <list limit="20" readonly="1" default_order="reading_date desc">
                                     <field name="reading_id"/>
                                     <field name="reading_purpose" widget="badge"/>
                                     <field name="reading_date"/>
                                     <field name="reading_value"/>
                                     <field name="consumption"/>
                                     <field name="date_range_id"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
 
@@ -230,7 +230,7 @@
     <record id="action_utility_customer" model="ir.actions.act_window">
         <field name="name">العملاء</field>
         <field name="res_model">utility.customer</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_customer_search"/>
     </record>
 
@@ -238,7 +238,7 @@
     <record id="action_utility_subscriber_partners" model="ir.actions.act_window">
         <field name="name">عملاء المشتركين</field>
         <field name="res_model">res.partner</field>
-        <field name="view_mode">tree,form,kanban</field>
+        <field name="view_mode">list,form,kanban</field>
         <field name="domain">[('utility_partner_type', '=', 'subscriber')]</field>
         <field name="context">{'default_utility_partner_type': 'subscriber', 'default_is_subscriber': True, 'default_customer_rank': 1}</field>
         <field name="help" type="html">

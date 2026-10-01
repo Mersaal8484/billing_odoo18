@@ -40,13 +40,13 @@
                         </group>
                     </group>
 
-                    <group string="التجاوز والنطاق الجغرافي للقالب الجديد" attrs="{'invisible': [('copy_scope', '=', False)]}">
+                    <group string="التجاوز والنطاق الجغرافي للقالب الجديد" invisible="(copy_scope == False)">
                         <group>
                             <field name="target_scope" widget="radio" options="{'horizontal': true}"/>
                         </group>
                         <group>
-                            <field name="target_region_ids" widget="many2many_tags" placeholder="اختر المناطق الرئيسية..." attrs="{'invisible': [('target_scope', '!=', 'restricted')], 'required': [('target_scope', '=', 'restricted')]}"/>
-                            <field name="target_area_ids" widget="many2many_tags" placeholder="اختر المناطق الفرعية/الفروع..." attrs="{'invisible': [('target_scope', '!=', 'restricted')], 'required': [('target_scope', '=', 'restricted')]}"/>
+                            <field name="target_region_ids" widget="many2many_tags" placeholder="اختر المناطق الرئيسية..." invisible="(target_scope != 'restricted')" required="(target_scope == 'restricted')"/>
+                            <field name="target_area_ids" widget="many2many_tags" placeholder="اختر المناطق الفرعية/الفروع..." invisible="(target_scope != 'restricted')" required="(target_scope == 'restricted')"/>
                         </group>
                     </group>
                 </sheet>

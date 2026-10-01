@@ -5,7 +5,7 @@
         <field name="name">utility.financial.settlement.tree</field>
         <field name="model">utility.financial.settlement</field>
         <field name="arch" type="xml">
-            <tree decoration-success="state == 'applied'"
+            <list decoration-success="state == 'applied'"
                   decoration-info="state in ('submitted', 'approved')"
                   decoration-muted="state in ('draft', 'cancelled')"
                   default_order="date desc">
@@ -21,7 +21,7 @@
                        decoration-info="state in ('submitted', 'approved')"
                        decoration-muted="state in ('draft', 'cancelled')"/>
                 <field name="company_id" groups="base.group_multi_company"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -33,25 +33,20 @@
             <form>
                 <header>
                     <button name="action_submit" type="object"
-                            string="تقديم للاعتماد" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                            string="تقديم للاعتماد" class="oe_highlight" invisible="(state != 'draft')"/>
                     <button name="action_approve" type="object"
-                            string="اعتماد التسوية" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'submitted')]}"/>
+                            string="اعتماد التسوية" class="oe_highlight" invisible="(state != 'submitted')"/>
                     <button name="action_apply_settlement" type="object"
-                            string="تطبيق التسوية المالية" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'approved')]}"/>
+                            string="تطبيق التسوية المالية" class="oe_highlight" invisible="(state != 'approved')"/>
                     <button name="action_cancel" type="object"
-                            string="إلغاء"
-                            attrs="{'invisible': [('state', 'in', ('applied', 'cancelled'))]}"/>
+                            string="إلغاء" invisible="(state in ('applied', 'cancelled'))"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,submitted,approved,applied"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_move" type="object"
-                                class="oe_stat_button" icon="fa-file-text-o"
-                                attrs="{'invisible': [('move_id', '=', False)]}">
+                                class="oe_stat_button" icon="fa-file-text-o" invisible="(move_id == False)">
                             <div class="o_form_label">القيد المحاسبي</div>
                             <div class="o_stat_info o_form_field">
                                 <field name="move_id" class="o_stat_text"/>
@@ -64,21 +59,21 @@
                     </div>
                     <group>
                         <group string="معلومات الحساب">
-                            <field name="account_id" options="{'no_create': True}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="account_id" options="{'no_create': True}" readonly="(state != 'draft')"/>
                             <field name="partner_id" readonly="1"/>
                             <field name="region_id" readonly="1"/>
                             <field name="area_id" readonly="1"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group string="تفاصيل التسوية">
-                            <field name="settlement_type" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="settlement_type" readonly="(state != 'draft')"/>
                             <field name="currency_id" invisible="1"/>
-                            <field name="amount" widget="monetary" options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="amount" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="(state != 'draft')"/>
+                            <field name="date" readonly="(state != 'draft')"/>
                         </group>
                     </group>
                     <group string="السبب">
-                        <field name="reason" placeholder="اذكر سبب التسوية المالية بالتفصيل..." attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                        <field name="reason" placeholder="اذكر سبب التسوية المالية بالتفصيل..." readonly="(state != 'draft')"/>
                     </group>
                     <group string="سجل الإجراءات والتدقيق">
                         <group>
@@ -90,9 +85,9 @@
                         <group>
                             <field name="applied_by_id"/>
                             <field name="applied_date"/>
-                            <field name="cancelled_by_id" attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
-                            <field name="cancelled_date" attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
-                            <field name="cancel_reason" attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
+                            <field name="cancelled_by_id" invisible="(state != 'cancelled')"/>
+                            <field name="cancelled_date" invisible="(state != 'cancelled')"/>
+                            <field name="cancel_reason" invisible="(state != 'cancelled')"/>
                         </group>
                     </group>
                 </sheet>
@@ -134,7 +129,7 @@
     <record id="action_utility_financial_settlement" model="ir.actions.act_window">
         <field name="name">التسويات المالية</field>
         <field name="res_model">utility.financial.settlement</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_financial_settlement_search"/>
     </record>
 

@@ -91,7 +91,7 @@ class UtilityFormula(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('بنود نماذج العقود'),
             'res_model': 'utility.contract.template.line',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('qty_formula_id', '=', self.id)],
             'context': {'default_qty_formula_id': self.id},
         }

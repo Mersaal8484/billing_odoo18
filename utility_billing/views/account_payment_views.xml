@@ -8,26 +8,24 @@
             <xpath expr="//sheet" position="inside">
                 <div class="oe_button_box" name="utility_allocation_button_box">
                     <button name="action_view_utility_allocations" type="object"
-                            class="oe_stat_button" icon="fa-money"
-                            attrs="{'invisible': [('allocation_count', '=', 0)]}">
+                            class="oe_stat_button" icon="fa-money" invisible="(allocation_count == 0)">
                         <field name="allocation_count" string="التخصيصات" widget="statinfo"/>
                     </button>
                 </div>
             </xpath>
             <xpath expr="//sheet/group" position="inside">
-                <group string="تفاصيل الكهرباء" attrs="{'invisible': [('utility_sale_order_id', '=', False), ('service_charge_id', '=', False)]}">
-                    <field name="utility_sale_order_id" readonly="1" attrs="{'invisible': [('utility_sale_order_id', '=', False)]}"/>
-                    <field name="utility_customer_id" readonly="1" attrs="{'invisible': [('utility_customer_id', '=', False)]}"/>
-                    <field name="utility_invoice_id"
-                           attrs="{'invisible': [('utility_sale_order_id', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
-                    <field name="service_charge_id" readonly="1" attrs="{'invisible': [('service_charge_id', '=', False)]}"/>
-                    <field name="utility_payment_method" readonly="1" attrs="{'invisible': [('utility_sale_order_id', '=', False)]}"/>
-                    <field name="collector_id" attrs="{'invisible': ['|', ('utility_sale_order_id', '=', False), ('utility_payment_method', '!=', 'cash')], 'readonly': [('state', '!=', 'draft')]}"/>
-                    <field name="electronic_doc_no" readonly="1" attrs="{'invisible': [('utility_sale_order_id', '=', False)]}"/>
-                    <field name="is_invoice_verified" readonly="1" attrs="{'invisible': [('utility_sale_order_id', '=', False)]}"/>
-                    <field name="date_range_id" readonly="1" attrs="{'invisible': [('date_range_id', '=', False)]}"/>
-                    <field name="qr_code_url" readonly="1" attrs="{'invisible': [('qr_code_url', '=', False)]}"/>
-                    <field name="allocation_count" readonly="1" attrs="{'invisible': [('allocation_count', '=', 0)]}"/>
+                <group string="تفاصيل الكهرباء" invisible="(utility_sale_order_id == False) and (service_charge_id == False)">
+                    <field name="utility_sale_order_id" readonly="1" invisible="(utility_sale_order_id == False)"/>
+                    <field name="utility_customer_id" readonly="1" invisible="(utility_customer_id == False)"/>
+                    <field name="utility_invoice_id" invisible="(utility_sale_order_id == False)" readonly="(state != 'draft')"/>
+                    <field name="service_charge_id" readonly="1" invisible="(service_charge_id == False)"/>
+                    <field name="utility_payment_method" readonly="1" invisible="(utility_sale_order_id == False)"/>
+                    <field name="collector_id" invisible="((utility_sale_order_id == False) or (utility_payment_method != 'cash'))" readonly="(state != 'draft')"/>
+                    <field name="electronic_doc_no" readonly="1" invisible="(utility_sale_order_id == False)"/>
+                    <field name="is_invoice_verified" readonly="1" invisible="(utility_sale_order_id == False)"/>
+                    <field name="date_range_id" readonly="1" invisible="(date_range_id == False)"/>
+                    <field name="qr_code_url" readonly="1" invisible="(qr_code_url == False)"/>
+                    <field name="allocation_count" readonly="1" invisible="(allocation_count == 0)"/>
                 </group>
             </xpath>
         </field>

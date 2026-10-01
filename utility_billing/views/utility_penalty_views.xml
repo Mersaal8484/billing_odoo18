@@ -4,14 +4,14 @@
         <field name="name">utility.penalty.tree</field>
         <field name="model">utility.penalty</field>
         <field name="arch" type="xml">
-            <tree decoration-info="state=='calculated'" decoration-success="state=='applied'" decoration-muted="state=='waived'">
+            <list decoration-info="state=='calculated'" decoration-success="state=='applied'" decoration-muted="state=='waived'">
                 <field name="name"/>
                 <field name="customer_id"/>
                 <field name="penalty_type_id"/>
                 <field name="calculated_date"/>
                 <field name="amount" sum="الإجمالي"/>
                 <field name="state"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -21,8 +21,8 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_apply_penalty" type="object" string="تطبيق وإصدار فاتورة" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'calculated')]}"/>
-                    <button name="action_waive_penalty" type="object" string="إعفاء من الغرامة" attrs="{'invisible': [('state', '!=', 'calculated')]}"/>
+                    <button name="action_apply_penalty" type="object" string="تطبيق وإصدار فاتورة" class="oe_highlight" invisible="(state != 'calculated')"/>
+                    <button name="action_waive_penalty" type="object" string="إعفاء من الغرامة" invisible="(state != 'calculated')"/>
                     <field name="state" widget="statusbar" statusbar_visible="calculated,applied,waived"/>
                 </header>
                 <sheet>
@@ -43,9 +43,9 @@
                     </group>
                     <group string="المحاسبة والإعفاء">
                         <group>
-                            <field name="move_id" attrs="{'invisible': [('move_id', '=', False)]}"/>
-                            <field name="waived" attrs="{'invisible': [('waived', '=', False)]}"/>
-                            <field name="waived_by" attrs="{'invisible': [('waived_by', '=', False)]}"/>
+                            <field name="move_id" invisible="(move_id == False)"/>
+                            <field name="waived" invisible="(waived == False)"/>
+                            <field name="waived_by" invisible="(waived_by == False)"/>
                         </group>
                     </group>
                     <notebook>

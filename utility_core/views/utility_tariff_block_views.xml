@@ -4,14 +4,14 @@
         <field name="name">utility.tariff.block.tree</field>
         <field name="model">utility.tariff.block</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="tariff_id"/>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="from_kwh"/>
                 <field name="to_kwh"/>
                 <field name="price_per_kwh"/>
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_utility_tariff_block_form" model="ir.ui.view">
@@ -49,6 +49,6 @@
     <record id="action_utility_tariff_block" model="ir.actions.act_window">
         <field name="name">شرائح التعرفة</field>
         <field name="res_model">utility.tariff.block</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 </odoo>

@@ -4,14 +4,14 @@
         <field name="name">utility.deposit.tree</field>
         <field name="model">utility.deposit</field>
         <field name="arch" type="xml">
-            <tree decoration-info="status=='draft'" decoration-success="status=='released'" decoration-warning="status=='held'" decoration-danger="status=='forfeited'">
+            <list decoration-info="status=='draft'" decoration-success="status=='released'" decoration-warning="status=='held'" decoration-danger="status=='forfeited'">
                 <field name="deposit_number"/>
                 <field name="customer_id"/>
                 <field name="deposit_date"/>
                 <field name="amount" sum="الإجمالي"/>
                 <field name="deposit_type"/>
                 <field name="status"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -21,9 +21,9 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_receive_deposit" type="object" string="استلام الوديعة" class="oe_highlight" attrs="{'invisible': [('status', '!=', 'draft')]}"/>
-                    <button name="action_release_deposit" type="object" string="استرداد الوديعة" attrs="{'invisible': [('status', '!=', 'held')]}"/>
-                    <button name="action_forfeit_deposit" type="object" string="مصادرة الوديعة" attrs="{'invisible': [('status', '!=', 'held')]}"/>
+                    <button name="action_receive_deposit" type="object" string="استلام الوديعة" class="oe_highlight" invisible="(status != 'draft')"/>
+                    <button name="action_release_deposit" type="object" string="استرداد الوديعة" invisible="(status != 'held')"/>
+                    <button name="action_forfeit_deposit" type="object" string="مصادرة الوديعة" invisible="(status != 'held')"/>
                     <field name="status" widget="statusbar" statusbar_visible="draft,held,released,forfeited"/>
                 </header>
                 <sheet>
@@ -45,12 +45,12 @@
                     </group>
                     <group string="القيود المحاسبية">
                         <group>
-                            <field name="receipt_move_id" attrs="{'invisible': [('receipt_move_id', '=', False)]}"/>
-                            <field name="release_move_id" attrs="{'invisible': [('release_move_id', '=', False)]}"/>
-                            <field name="forfeit_move_id" attrs="{'invisible': [('forfeit_move_id', '=', False)]}"/>
-                            <field name="release_date" attrs="{'invisible': [('status', '!=', 'released')]}"/>
-                            <field name="payment_id" attrs="{'invisible': [('payment_id', '=', False)]}"/>
-                            <field name="move_id" attrs="{'invisible': [('move_id', '=', False)]}"/>
+                            <field name="receipt_move_id" invisible="(receipt_move_id == False)"/>
+                            <field name="release_move_id" invisible="(release_move_id == False)"/>
+                            <field name="forfeit_move_id" invisible="(forfeit_move_id == False)"/>
+                            <field name="release_date" invisible="(status != 'released')"/>
+                            <field name="payment_id" invisible="(payment_id == False)"/>
+                            <field name="move_id" invisible="(move_id == False)"/>
                         </group>
                     </group>
                     <notebook>

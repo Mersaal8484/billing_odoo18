@@ -28,7 +28,7 @@ class TestOperationsStockDelegation(TransactionCase):
 
         self.product_serial = self.env['product.product'].create({
             'name': 'عداد عمليات ذكي',
-            'type': 'product',
+            'type': 'consu',
             'tracking': 'serial',
         })
         self.lot_1 = self.env['stock.lot'].create({

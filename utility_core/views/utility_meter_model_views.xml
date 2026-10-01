@@ -4,7 +4,7 @@
         <field name="name">utility.meter.model.tree</field>
         <field name="model">utility.meter.model</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="manufacturer" optional="show" />
                 <field name="meter_type_id" />
@@ -13,7 +13,7 @@
                 <field name="current_rating" />
                 <field name="power_rating" />
                 <field name="sts_supported" widget="boolean_toggle" />
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_utility_meter_model_search" model="ir.ui.view">
@@ -66,6 +66,6 @@
     <record id="action_utility_meter_model" model="ir.actions.act_window">
         <field name="name">موديلات العدادات</field>
         <field name="res_model">utility.meter.model</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 </odoo>

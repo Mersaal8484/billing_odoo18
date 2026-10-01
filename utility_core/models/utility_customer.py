@@ -1,5 +1,6 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import AccessError, ValidationError
+from odoo.osv import expression
 from .utility_date_range import normalize_billing_cadence
 import logging
 
@@ -443,25 +444,25 @@ class UtilityCustomer(models.Model):
                             % template.name
                         )
 
-    def name_get(self):
-        res = []
+    @api.depends('customer_number', 'partner_id', 'partner_id.name')
+    def _compute_display_name(self):
         for rec in self:
-            res.append((rec.id, f'[{rec.customer_number}] {rec.partner_id.name}'))
-        return res
+            rec.display_name = f'[{rec.customer_number}] {rec.partner_id.name or ""}'
 
     @api.model
-    def _name_search(self, name='', args=None, operator='ilike', limit=100, name_get_uid=None):
-        """Preserve customer search fields and add the external QR reference."""
-        args = args or []
-        domain = []
-        if name:
-            domain = ['|', '|', '|', '|',
-                      ('customer_number', operator, name),
-                      ('external_qr_reference', operator, name),
-                      ('partner_id.name', operator, name),
-                      ('partner_id.national_id', operator, name),
-                      ('meter_id.meter_number', operator, name)]
-        return self._search(domain + args, limit=limit, access_rights_uid=name_get_uid)
+    def _search_display_name(self, operator, value):
+        """Search relational fields and the external QR reference by display name."""
+        if not value:
+            return super()._search_display_name(operator, value)
+        domains = [[(field, operator, value)] for field in (
+            'customer_number',
+            'external_qr_reference',
+            'partner_id.name',
+            'partner_id.national_id',
+            'meter_id.meter_number',
+        )]
+        aggregator = expression.AND if operator in expression.NEGATIVE_TERM_OPERATORS else expression.OR
+        return aggregator(domains)
 
     @api.model
     def _resolve_identifiers(self, customer_id=None, customer_number=None,

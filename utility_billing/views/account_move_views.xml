@@ -6,17 +6,17 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
-                <page string="تفاصيل الكهرباء" attrs="{'invisible': [('utility_sale_order_id', '=', False), ('service_charge_id', '=', False)]}">
+                <page string="تفاصيل الكهرباء" invisible="(utility_sale_order_id == False) and (service_charge_id == False)">
                     <group>
                         <group>
-                            <field name="utility_sale_order_id" readonly="1" attrs="{'invisible': [('utility_sale_order_id', '=', False)]}"/>
-                            <field name="utility_customer_id" readonly="1" attrs="{'invisible': [('utility_customer_id', '=', False)]}"/>
-                            <field name="service_charge_id" readonly="1" attrs="{'invisible': [('service_charge_id', '=', False)]}"/>
-                            <field name="utility_adjustment_id" readonly="1" attrs="{'invisible': [('utility_adjustment_id', '=', False)]}"/>
-                            <field name="utility_replacement_of_id" readonly="1" attrs="{'invisible': [('utility_replacement_of_id', '=', False)]}"/>
-                            <field name="meter_number" readonly="1" attrs="{'invisible': [('utility_sale_order_id', '=', False)]}"/>
+                            <field name="utility_sale_order_id" readonly="1" invisible="(utility_sale_order_id == False)"/>
+                            <field name="utility_customer_id" readonly="1" invisible="(utility_customer_id == False)"/>
+                            <field name="service_charge_id" readonly="1" invisible="(service_charge_id == False)"/>
+                            <field name="utility_adjustment_id" readonly="1" invisible="(utility_adjustment_id == False)"/>
+                            <field name="utility_replacement_of_id" readonly="1" invisible="(utility_replacement_of_id == False)"/>
+                            <field name="meter_number" readonly="1" invisible="(utility_sale_order_id == False)"/>
                         </group>
-                        <group attrs="{'invisible': [('utility_sale_order_id', '=', False)]}">
+                        <group invisible="(utility_sale_order_id == False)">
                             <field name="current_meter_reading" readonly="1"/>
                             <field name="consumption_units" readonly="1"/>
                             <field name="consumption_alert" readonly="1"/>

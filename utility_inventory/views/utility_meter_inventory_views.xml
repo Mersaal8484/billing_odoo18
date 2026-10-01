@@ -50,7 +50,7 @@
         <field name="inherit_id" ref="utility_core.view_utility_meter_model_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_open_product" type="object" class="oe_stat_button" icon="fa-cube" attrs="{'invisible': [('product_id', '=', False)]}">
+                <button name="action_open_product" type="object" class="oe_stat_button" icon="fa-cube" invisible="(product_id == False)">
                     <span class="o_stat_text">فتح المنتج</span>
                 </button>
             </xpath>

@@ -5,7 +5,7 @@
         <field name="name">utility.reading.settlement.tree</field>
         <field name="model">utility.reading.settlement</field>
         <field name="arch" type="xml">
-            <tree decoration-muted="state == 'cancelled'"
+            <list decoration-muted="state == 'cancelled'"
                   decoration-info="state in ('submitted', 'technically_approved')"
                   decoration-success="state == 'processed'">
                 <field name="name"/>
@@ -24,7 +24,7 @@
                        decoration-info="state in ('submitted', 'technically_approved')"
                        decoration-success="state == 'processed'"
                        decoration-muted="state == 'cancelled'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -36,17 +36,13 @@
             <form>
                 <header>
                     <button name="action_submit" type="object"
-                            string="تقديم للمراجعة التقنية" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                            string="تقديم للمراجعة التقنية" class="oe_highlight" invisible="(state != 'draft')"/>
                     <button name="action_technically_approve" type="object"
-                            string="اعتماد تقني" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'submitted')]}"/>
+                            string="اعتماد تقني" class="oe_highlight" invisible="(state != 'submitted')"/>
                     <button name="action_process" type="object"
-                            string="إحالة للفوترة" class="oe_highlight"
-                            attrs="{'invisible': [('state', '!=', 'technically_approved')]}"/>
+                            string="إحالة للفوترة" class="oe_highlight" invisible="(state != 'technically_approved')"/>
                     <button name="action_cancel" type="object"
-                            string="إلغاء"
-                            attrs="{'invisible': [('state', 'in', ('processed', 'cancelled'))]}"/>
+                            string="إلغاء" invisible="(state in ('processed', 'cancelled'))"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,submitted,technically_approved,processed"/>
                 </header>
@@ -59,21 +55,21 @@
                     </div>
                     <group>
                         <group string="معلومات القراءة الأصلية">
-                            <field name="reading_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="reading_id" readonly="(state != 'draft')"/>
                             <field name="meter_id"/>
                             <field name="account_id"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group string="بيانات التصحيح التقني">
                             <field name="original_reading_value"/>
-                            <field name="corrected_reading_value" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="corrected_reading_value" readonly="(state != 'draft')"/>
                             <field name="original_consumption"/>
                             <field name="corrected_consumption"/>
                             <field name="delta_consumption"/>
                         </group>
                     </group>
                     <group string="سبب التصحيح التقني">
-                        <field name="reason" nolabel="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                        <field name="reason" nolabel="1" readonly="(state != 'draft')"/>
                     </group>
                     <group string="سجل الإجراءات والتدقيق">
                         <group>
@@ -85,10 +81,10 @@
                         <group>
                             <field name="processed_by_id"/>
                             <field name="processed_date"/>
-                            <field name="cancelled_by_id" attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
-                            <field name="cancelled_date" attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
-                            <field name="cancel_reason" attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
-                            <field name="correction_move_id" attrs="{'invisible': [('correction_move_id', '=', False)]}"/>
+                            <field name="cancelled_by_id" invisible="(state != 'cancelled')"/>
+                            <field name="cancelled_date" invisible="(state != 'cancelled')"/>
+                            <field name="cancel_reason" invisible="(state != 'cancelled')"/>
+                            <field name="correction_move_id" invisible="(correction_move_id == False)"/>
                         </group>
                     </group>
                 </sheet>
@@ -125,7 +121,7 @@
     <record id="action_utility_readings_settlement" model="ir.actions.act_window">
         <field name="name">تسوية قراءات العدادات (تقني)</field>
         <field name="res_model">utility.reading.settlement</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_utility_reading_settlement_search"/>
     </record>
 </odoo>

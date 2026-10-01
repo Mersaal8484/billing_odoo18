@@ -9,8 +9,6 @@
             <!-- Run frequently enough to drain high-volume execution history. -->
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
-            <field name="numbercall">-1</field>
-            <field name="doall" eval="False"/>
             <field name="active" eval="True"/>
             <field name="utility_managed" eval="True"/>
             <field name="utility_code">cron_execution_history_cleanup</field>
