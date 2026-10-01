@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <!-- Compatibility update: the legacy cashier role now belongs to prepaid. -->
-    <record id="utility_core.role_cashier" model="utility.user.role">
-        <field name="name">كاشير دفع مسبق</field>
-        <field name="group_ids" eval="[(3, ref('utility_core.group_utility_cashier')), (4, ref('utility_prepaid.group_utility_prepaid_cashier'))]"/>
-    </record>
-</odoo>

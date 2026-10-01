@@ -1,1 +1,0 @@
-customers = env['utility.customer'].search([('route_id', '=', 2)]); print({'count': len(customers)})
