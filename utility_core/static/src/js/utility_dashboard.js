@@ -1,6 +1,7 @@
 /** @odoo-module */
 
 import { registry } from "@web/core/registry";
+import { rpc } from "@web/core/network/rpc";
 import { useService } from "@web/core/utils/hooks";
 import { Component, onWillStart, onWillUnmount, useState, onMounted, useRef } from "@odoo/owl";
 import { loadJS } from "@web/core/assets";

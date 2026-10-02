@@ -1,6 +1,7 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
+import { loadJS } from "@web/core/assets";
 import { CharField } from "@web/views/fields/char/char_field";
 import { onWillUnmount, useState } from "@odoo/owl";
 
@@ -24,9 +25,10 @@ export class BarcodeCameraWidget extends CharField {
         });
     }
 
-    startScanning() {
+    async startScanning() {
         this.state.isScanning = true;
         this.state.errorMessage = false;
+        await loadJS("/utility_core/static/src/js/lib/html5-qrcode.min.js");
         
         // Wait for DOM to render the reader div
         this.scannerStartTimeout = setTimeout(() => {
