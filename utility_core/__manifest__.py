@@ -117,7 +117,7 @@ User Role.
     'assets': {
         'web.assets_backend': [
             'utility_core/static/src/scss/utility_list_layout.scss',
-            'utility_core/static/src/js/lib/html5-qrcode.min.js',
+            'utility_core/static/lib/html5-qrcode.min.js',
             'utility_core/static/src/js/barcode_camera_widget.js',
             'utility_core/static/src/js/error_dialog_clipboard.js',
             'utility_core/static/src/xml/barcode_camera_widget.xml',
