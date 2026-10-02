@@ -551,8 +551,11 @@ class UtilityReadingReviewService(models.AbstractModel):
         }
 
     @api.model
-    def action_reject_review(self, reading_ids, rejection_reason=_('مرفوضة من قبل المراجع'), review_notes=''):
+    def action_reject_review(self, reading_ids, rejection_reason=None, review_notes=''):
         """رفض قراءة أو مجموعة قراءات عبر النموذج الموحد action_reject()"""
+        if rejection_reason is None:
+            rejection_reason = _('مرفوضة من قبل المراجع')
+
         if not reading_ids:
             return {'status': 'error', 'message': _('لم يتم تحديد أي قراءة للرفض.')}
 
