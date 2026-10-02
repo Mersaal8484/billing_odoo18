@@ -4,13 +4,13 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { Component, onWillStart, onWillUnmount, useState, onMounted, useRef } from "@odoo/owl";
 import { loadJS } from "@web/core/assets";
+import { rpc } from "@web/core/network/rpc";
 import { standardActionServiceProps } from "@web/webclient/actions/action_service";
 
 class UtilityDashboard extends Component {
     static props = { ...standardActionServiceProps };
 
     setup() {
-        this.rpc = useService("rpc");
         this.action = useService("action");
         this.orm = useService("orm");
         this.state = useState({
@@ -66,7 +66,7 @@ class UtilityDashboard extends Component {
     async loadKPI(regionId) {
         this.state.isLoading = true;
         try {
-            const res = await this.rpc("/utility/dashboard/kpi", { region_id: regionId || false });
+            const res = await rpc("/utility/dashboard/kpi", { region_id: regionId || false });
             if (res) {
                 this.state.kpi = res;
                 this.state.isDataLoaded = true;
