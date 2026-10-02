@@ -67,7 +67,7 @@
                             <field name="execution_count" widget="statinfo" string="سجل التشغيل"/>
                         </button>
                         <button name="action_view_failures" type="object" class="oe_stat_button" icon="fa-exclamation-triangle">
-                            <field name="failure_count" widget="statinfo" string="الإخفاقات"/>
+                            <field name="utility_failure_count" widget="statinfo" string="الإخفاقات"/>
                         </button>
                     </div>
 

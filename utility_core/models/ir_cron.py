@@ -127,7 +127,7 @@ class IrCron(models.Model):
         string='إجمالي مرات التنفيذ / Total Executions',
         compute='_compute_execution_metrics',
     )
-    failure_count = fields.Integer(
+    utility_failure_count = fields.Integer(
         string='مرات الفشل / Total Failures',
         compute='_compute_execution_metrics',
     )
@@ -140,6 +140,15 @@ class IrCron(models.Model):
     _sql_constraints = [
         ('uniq_utility_code', 'unique(utility_code)', 'رمز المهمة المجدولة يجب أن يكون فريداً! / Utility Job Code must be unique!')
     ]
+
+    def init(self):
+        """Restore the standard scheduler counter for databases with NULLs."""
+        self.env.cr.execute("""
+            UPDATE ir_cron
+               SET failure_count = 0,
+                   first_failure_date = NULL
+             WHERE failure_count IS NULL
+        """)
 
     @api.constrains('utility_code', 'utility_managed')
     def _check_utility_code(self):
@@ -164,14 +173,16 @@ class IrCron(models.Model):
             rec.last_error_message = False
             rec.consecutive_failure_count = 0
             rec.execution_count = 0
-            rec.failure_count = 0
+            rec.utility_failure_count = 0
 
             logs = Execution.search([('cron_id', '=', rec.id)], order='started_at desc, id desc', limit=50)
             if not logs:
                 continue
 
             rec.execution_count = Execution.search_count([('cron_id', '=', rec.id)])
-            rec.failure_count = Execution.search_count([('cron_id', '=', rec.id), ('status', '=', 'failed')])
+            rec.utility_failure_count = Execution.search_count([
+                ('cron_id', '=', rec.id), ('status', '=', 'failed')
+            ])
 
             latest = logs[0]
             rec.last_started_at = latest.started_at
