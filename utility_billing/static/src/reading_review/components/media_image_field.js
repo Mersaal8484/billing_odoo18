@@ -10,4 +10,7 @@ UtilityMediaImageField.template = "utility_billing.UtilityMediaImageField";
 UtilityMediaImageField.supportedTypes = ["char"];
 UtilityMediaImageField.props = standardFieldProps;
 
-registry.category("fields").add("utility_media_image", UtilityMediaImageField);
+registry.category("fields").add("utility_media_image", {
+    component: UtilityMediaImageField,
+    supportedTypes: ["char"],
+});

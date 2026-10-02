@@ -71,4 +71,7 @@ BarcodeCameraWidget.components = {
     ...CharField.components,
 };
 
-registry.category("fields").add("barcode_camera", BarcodeCameraWidget);
+registry.category("fields").add("barcode_camera", {
+    component: BarcodeCameraWidget,
+    supportedTypes: ["char"],
+});
