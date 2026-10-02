@@ -89,14 +89,14 @@ class TestReaderAndWebhookAPIHttp(HttpCase):
         # Setup Receivable Account & Partner
         rec_acc = self.env['account.account'].search([
             ('account_type', '=', 'asset_receivable'),
-            ('company_id', 'in', (self.company.id, False))
+            ('company_ids', 'in', [self.company.id])
         ], limit=1)
         if not rec_acc:
             rec_acc = self.env['account.account'].create({
                 'name': 'مدينو مشتركين اختبار',
                 'code': '110000.TEST',
                 'account_type': 'asset_receivable',
-                'company_id': self.company.id,
+                'company_ids': [(6, 0, [self.company.id])],
             })
         self.partner = self.env['res.partner'].create({
             'name': 'شريك دفع إلكتروني HTTP',
@@ -144,14 +144,14 @@ class TestReaderAndWebhookAPIHttp(HttpCase):
         # Setup Product & Income Account
         income_acc = self.env['account.account'].search([
             ('account_type', '=', 'income'),
-            ('company_id', 'in', (self.company.id, False))
+            ('company_ids', 'in', [self.company.id])
         ], limit=1)
         if not income_acc:
             income_acc = self.env['account.account'].create({
                 'name': 'إيرادات كهرباء HTTP',
                 'code': '400000.HTTP',
                 'account_type': 'income',
-                'company_id': self.company.id,
+                'company_ids': [(6, 0, [self.company.id])],
             })
         self.product = self.env['product.product'].create({
             'name': 'خدمة كهرباء HTTP',

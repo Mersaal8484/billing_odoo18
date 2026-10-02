@@ -10,7 +10,7 @@ class TestPaymentAllocationConcurrency(TransactionCase):
         self.company = self.env.company
         receivable_account = self.env['account.account'].search([
             ('account_type', '=', 'asset_receivable'),
-            ('company_id', 'in', (self.env.company.id, False))
+            ('company_ids', 'in', [self.env.company.id])
         ], limit=1)
         if not receivable_account:
             receivable_account = self.env['account.account'].create({
@@ -18,7 +18,7 @@ class TestPaymentAllocationConcurrency(TransactionCase):
                 'code': '110000.TEST',
                 'account_type': 'asset_receivable',
                 'reconcile': True,
-                'company_id': self.env.company.id,
+                'company_ids': [(6, 0, [self.env.company.id])],
             })
         self.partner = self.env['res.partner'].create({
             'name': 'اختبار تخصيص الدفعات',
@@ -88,14 +88,14 @@ class TestPaymentAllocationConcurrency(TransactionCase):
         })
         income_account = self.env['account.account'].search([
             ('account_type', '=', 'income'),
-            ('company_id', 'in', (self.env.company.id, False))
+            ('company_ids', 'in', [self.env.company.id])
         ], limit=1)
         if not income_account:
             income_account = self.env['account.account'].create({
                 'name': 'إيرادات مبيعات الكهرباء للاختبار',
                 'code': '400000.TEST',
                 'account_type': 'income',
-                'company_id': self.env.company.id,
+                'company_ids': [(6, 0, [self.env.company.id])],
             })
         self.product = self.env['product.product'].create({
             'name': 'خدمة كهرباء - تخصيص',

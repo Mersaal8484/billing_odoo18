@@ -12,7 +12,7 @@ class TestPaymentConcurrency(TransactionCase):
         self.company = self.env.company
         receivable_account = self.env['account.account'].search([
             ('account_type', '=', 'asset_receivable'),
-            ('company_id', 'in', (self.env.company.id, False))
+            ('company_ids', 'in', [self.env.company.id])
         ], limit=1)
         if not receivable_account:
             receivable_account = self.env['account.account'].create({
@@ -20,7 +20,7 @@ class TestPaymentConcurrency(TransactionCase):
                 'code': '110000.TEST',
                 'account_type': 'asset_receivable',
                 'reconcile': True,
-                'company_id': self.env.company.id,
+                'company_ids': [(6, 0, [self.env.company.id])],
             })
         self.partner = self.env['res.partner'].create({
             'name': 'اختبار التزامن الخالي من التداخل',
@@ -121,14 +121,14 @@ class TestPaymentConcurrency(TransactionCase):
             })
         income_account = self.env['account.account'].search([
             ('account_type', '=', 'income'),
-            ('company_id', 'in', (self.env.company.id, False))
+            ('company_ids', 'in', [self.env.company.id])
         ], limit=1)
         if not income_account:
             income_account = self.env['account.account'].create({
                 'name': 'إيرادات مبيعات الكهرباء للاختبار',
                 'code': '400000.TEST',
                 'account_type': 'income',
-                'company_id': self.env.company.id,
+                'company_ids': [(6, 0, [self.env.company.id])],
             })
         self.product = self.env['product.product'].create({
             'name': 'طاقة كهربائية - تزامن موثوق',
@@ -248,7 +248,7 @@ class TestPaymentConcurrency(TransactionCase):
         setup_cr = registry.cursor()
         try:
             setup_env = self.env(cr=setup_cr)
-            rec_acc = setup_env['account.account'].search([('account_type', '=', 'asset_receivable'), ('company_id', '=', company_id)], limit=1)
+            rec_acc = setup_env['account.account'].search([('account_type', '=', 'asset_receivable'), ('company_ids', 'in', [company_id])], limit=1)
             partner = setup_env['res.partner'].create({'name': 'شريك تزامن خيوط'})
             partner.with_company(company_id).property_account_receivable_id = rec_acc.id
             cat = setup_env['utility.subscriber.category'].search([('code', '=', 'TH_CAT_01'), ('company_id', '=', company_id)], limit=1)
@@ -290,7 +290,7 @@ class TestPaymentConcurrency(TransactionCase):
                     'date_start': '2026-01-01', 'date_end': '2026-01-31',
                     'period_role': 'payment', 'reading_period_id': dr.id, 'state': 'open',
                 })
-            inc_acc = setup_env['account.account'].search([('account_type', '=', 'income'), ('company_id', '=', company_id)], limit=1)
+            inc_acc = setup_env['account.account'].search([('account_type', '=', 'income'), ('company_ids', 'in', [company_id])], limit=1)
             prod = setup_env['product.product'].create({'name': 'طاقة خيوط', 'type': 'service', 'property_account_income_id': inc_acc.id})
             order = setup_env['sale.order'].search([('customer_id', '=', cust.id), ('date_range_id', '=', dr.id)], limit=1)
             if not order:

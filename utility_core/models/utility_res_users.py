@@ -97,7 +97,7 @@ class ResUsers(models.Model):
 
         company = self.company_id or self.env.company
         Journal = self.env['account.journal'].sudo()
-        Account = self.env['account.account'].sudo()
+        Account = self.env['account.account'].with_company(company).sudo()
         code_base = 'UC%03d' % self.id
         code = code_base[:5]
         suffix = 1
@@ -107,7 +107,7 @@ class ResUsers(models.Model):
 
         journal_name = _('يومية تحصيل - %s') % self.name
         cash_account = Account.search([
-            ('company_id', '=', company.id),
+            ('company_ids', 'in', [company.id]),
             ('name', '=', _('حساب صندوق - %s') % self.name),
         ], limit=1)
         if not cash_account:
@@ -115,7 +115,7 @@ class ResUsers(models.Model):
             account_code = account_code[-6:]
             account_suffix = 1
             while Account.search([
-                ('company_id', '=', company.id),
+                ('company_ids', 'in', [company.id]),
                 ('code', '=', account_code),
             ], limit=1):
                 account_code = ('101%03d' % (self.id + account_suffix))[-6:]
@@ -124,7 +124,7 @@ class ResUsers(models.Model):
                 'name': _('حساب صندوق - %s') % self.name,
                 'code': account_code,
                 'account_type': 'asset_cash',
-                'company_id': company.id,
+                'company_ids': [(6, 0, [company.id])],
             })
 
         journal = Journal.create({

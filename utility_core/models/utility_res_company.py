@@ -124,7 +124,13 @@ class ResCompany(models.Model):
         for company in companies:
             vals = {}
             def is_compat(rec):
-                return rec and (not getattr(rec, 'company_id', False) or rec.company_id == company)
+                if not rec:
+                    return False
+                if 'company_ids' in rec._fields:
+                    return company in rec.company_ids
+                if 'company_id' in rec._fields:
+                    return not rec.company_id or rec.company_id == company
+                return True
 
             if not company.opening_journal_id:
                 j_open = self.env.ref('utility_core.journal_opening_balance', raise_if_not_found=False)
@@ -132,7 +138,7 @@ class ResCompany(models.Model):
                     vals['opening_journal_id'] = j_open.id
             if not company.opening_clearing_account_id:
                 acc_open = self.env['account.account'].search([
-                    ('company_id', 'in', (company.id, False)),
+                    ('company_ids', 'in', [company.id]),
                     ('deprecated', '=', False),
                     '|', ('code', 'in', ('999999', '300000', '399999')),
                     '|', ('name', 'ilike', 'افتتاح'),
@@ -184,17 +190,17 @@ class ResCompany(models.Model):
             if not company.account_journal_payment_debit_account_id or not company.account_journal_payment_credit_account_id:
                 outstanding_acc = self.env['account.account'].search([
                     ('name', 'ilike', 'مستحق'),
-                    ('company_id', 'in', (company.id, False))
+                    ('company_ids', 'in', [company.id])
                 ], limit=1) or self.env['account.account'].search([
                     ('account_type', 'in', ('asset_current', 'asset_cash')),
-                    ('company_id', 'in', (company.id, False))
+                    ('company_ids', 'in', [company.id])
                 ], limit=1)
                 if not outstanding_acc:
                     outstanding_acc = self.env['account.account'].create({
                         'name': 'حساب الإيصالات والدفعات المستحقة',
                         'code': '101200',
                         'account_type': 'asset_current',
-                        'company_id': company.id,
+                        'company_ids': [(6, 0, [company.id])],
                     })
                 if not company.account_journal_payment_debit_account_id:
                     vals['account_journal_payment_debit_account_id'] = outstanding_acc.id

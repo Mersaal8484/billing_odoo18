@@ -42,11 +42,11 @@ class TestPaymentIntegrityRegression(TransactionCase):
         })
 
         cls.receivable = cls.Account.search([
-            ('company_id', '=', cls.env.company.id),
+            ('company_ids', 'in', [cls.env.company.id]),
             ('account_type', '=', 'asset_receivable'),
         ], limit=1)
         cls.income = cls.Account.search([
-            ('company_id', '=', cls.env.company.id),
+            ('company_ids', 'in', [cls.env.company.id]),
             ('account_type', '=', 'income'),
         ], limit=1)
         cls.bank_journal = cls.Journal.search([

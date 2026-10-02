@@ -47,7 +47,7 @@ class TestDepositAccounting(TransactionCase):
 
         # Chart of accounts setup for deposits
         cls.cash_account = cls.Account.search([
-            ('company_id', '=', cls.env.company.id),
+            ('company_ids', 'in', [cls.env.company.id]),
             ('account_type', '=', 'asset_cash'),
         ], limit=1)
         if not cls.cash_account:
@@ -55,21 +55,21 @@ class TestDepositAccounting(TransactionCase):
                 'name': 'صندوق التأمينات',
                 'code': '101999',
                 'account_type': 'asset_cash',
-                'company_id': cls.env.company.id,
+                'company_ids': [(6, 0, [cls.env.company.id])],
             })
 
         cls.deposit_liability_account = cls.Account.create({
             'name': 'التزامات تأمينات المشتركين',
             'code': '201999',
             'account_type': 'liability_current',
-            'company_id': cls.env.company.id,
+            'company_ids': [(6, 0, [cls.env.company.id])],
         })
 
         cls.fine_revenue_account = cls.Account.create({
             'name': 'إيرادات مصادرة التأمينات والغرامات',
             'code': '401999',
             'account_type': 'income',
-            'company_id': cls.env.company.id,
+            'company_ids': [(6, 0, [cls.env.company.id])],
         })
 
         cls.deposit_journal = cls.Journal.create({
@@ -188,7 +188,7 @@ class TestDepositAccounting(TransactionCase):
         receivable_acc = self.partner.property_account_receivable_id
         if not receivable_acc:
             receivable_acc = self.Account.search([
-                ('company_id', '=', self.env.company.id),
+                ('company_ids', 'in', [self.env.company.id]),
                 ('account_type', '=', 'asset_receivable'),
             ], limit=1)
 

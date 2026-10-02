@@ -365,15 +365,15 @@ class UtilityMigrationCustomer(models.Model):
             or self.env['account.journal'].search([('type', '=', 'general'), ('company_id', '=', company_id)], limit=1)
         )
         account_receivable = partner.with_company(company_id).property_account_receivable_id
-        if not account_receivable or account_receivable.company_id.id not in (company_id, False):
+        if not account_receivable or company_id not in account_receivable.company_ids.ids:
             account_receivable = (
                 self.env['account.account'].search([
                     ('account_type', '=', 'asset_receivable'),
-                    ('company_id', '=', company_id)
+                    ('company_ids', 'in', [company_id])
                 ], limit=1)
                 or self.env['account.account'].search([
                     ('code', '=like', '12%'),
-                    ('company_id', '=', company_id)
+                    ('company_ids', 'in', [company_id])
                 ], limit=1)
             )
             if not account_receivable:
@@ -381,7 +381,7 @@ class UtilityMigrationCustomer(models.Model):
                     'name': 'حساب العملاء والذمم المدينة',
                     'code': '120000',
                     'account_type': 'asset_receivable',
-                    'company_id': company_id,
+                    'company_ids': [(6, 0, [company_id])],
                     'reconcile': True,
                 })
             partner.sudo().with_company(company_id).write({'property_account_receivable_id': account_receivable.id})
@@ -391,11 +391,11 @@ class UtilityMigrationCustomer(models.Model):
             or company.account_journal_suspense_account_id
             or self.env['account.account'].search([
                 ('account_type', 'in', ('equity', 'equity_unaffected')),
-                ('company_id', '=', company_id)
+                ('company_ids', 'in', [company_id])
             ], limit=1)
             or self.env['account.account'].search([
                 ('code', '=like', '3%'),
-                ('company_id', '=', company_id)
+                ('company_ids', 'in', [company_id])
             ], limit=1)
         )
         if not account_suspense:
@@ -403,7 +403,7 @@ class UtilityMigrationCustomer(models.Model):
                 'name': 'حساب الأرصدة الافتتاحية (حقوق ملكية)',
                 'code': '300000',
                 'account_type': 'equity',
-                'company_id': company_id,
+                'company_ids': [(6, 0, [company_id])],
             })
         if not journal:
             raise UserError(_('لا توجد يومية عمليات (General Journal) معرّفة في النظام للشركة المحددة.'))

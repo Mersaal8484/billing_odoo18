@@ -29,7 +29,7 @@ class TestWave7FinancialUAT(TransactionCase):
             'category_id': cls.category.id,
         })
         cls.income = cls.Account.search([
-            ('company_id', '=', cls.env.company.id),
+            ('company_ids', 'in', [cls.env.company.id]),
             ('account_type', '=', 'income'),
         ], limit=1)
         cls.sale_journal = cls.env['account.journal'].search([
@@ -51,7 +51,7 @@ class TestWave7FinancialUAT(TransactionCase):
                 'code': 'W7DEP01',
                 'account_type': 'asset_current',
                 'reconcile': True,
-                'company_id': cls.company.id,
+                'company_ids': [(6, 0, [cls.company.id])],
             })
             cls.company.deposit_clearing_account_id = cls.deposit_clearing
         elif not cls.deposit_clearing.reconcile:

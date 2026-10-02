@@ -122,6 +122,7 @@ class TestUtilityInfrastructureSettings(TransactionCase):
     def test_09_populate_missing_defaults(self):
         """9. اختبار زر توليد وتعبئة الحسابات والمنتجات وموديلات العدادات الافتراضية الناقصة تلقائياً."""
         company = self.env.company
+        settings = self.env['res.config.settings'].create({})
 
         # Clear settings to simulate empty company
         company.electricity_product_id = False
@@ -131,7 +132,6 @@ class TestUtilityInfrastructureSettings(TransactionCase):
         company.legacy_single_phase_meter_model_id = False
         company.legacy_three_phase_meter_model_id = False
 
-        settings = self.env['res.config.settings'].create({})
         res = settings.action_populate_missing_defaults()
 
         self.assertEqual(res['type'], 'ir.actions.client')

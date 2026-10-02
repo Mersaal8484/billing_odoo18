@@ -296,7 +296,7 @@ class UtilityDeposit(models.Model):
             receivable_account = partner.property_account_receivable_id or rec.company_id.account_default_pos_receivable_account_id
             if not receivable_account:
                 receivable_account = self.env['account.account'].search([
-                    ('company_id', '=', rec.company_id.id),
+                    ('company_ids', 'in', [rec.company_id.id]),
                     ('account_type', '=', 'asset_receivable'),
                 ], limit=1)
 

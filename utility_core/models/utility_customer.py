@@ -540,7 +540,7 @@ class UtilityCustomer(models.Model):
         company_ids = list(set(rec.company_id.id for rec in self if rec.company_id))
         receivable_accounts = self.env['account.account'].search([
             ('account_type', '=', 'asset_receivable'),
-            ('company_id', 'in', company_ids),
+            ('company_ids', 'in', company_ids),
         ])
         if not receivable_accounts:
             for rec in self:
@@ -571,7 +571,7 @@ class UtilityCustomer(models.Model):
             return 0.0
         accounts = self.env['account.account'].search([
             ('account_type', '=', 'asset_receivable'),
-            ('company_id', '=', self.company_id.id),
+            ('company_ids', 'in', [self.company_id.id]),
         ])
         if not accounts:
             return 0.0

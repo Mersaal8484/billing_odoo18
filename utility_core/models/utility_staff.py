@@ -340,7 +340,7 @@ class UtilityStaff(models.Model):
             acc_name = 'حساب صندوق - %s' % self.name
             cash_acc = self.env['account.account'].search([
                 ('name', '=', acc_name),
-                ('company_id', '=', company.id),
+                ('company_ids', 'in', [company.id]),
             ], limit=1)
             if not cash_acc:
                 code_num = str(self.id or 1).zfill(3)
@@ -348,7 +348,7 @@ class UtilityStaff(models.Model):
                     'name': acc_name,
                     'code': '101%s' % code_num[-3:],
                     'account_type': 'asset_cash',
-                    'company_id': company.id,
+                    'company_ids': [(6, 0, [company.id])],
                 })
             existing_journal = self.env['account.journal'].create({
                 'name': journal_name,
@@ -428,7 +428,7 @@ class UtilityStaff(models.Model):
             acc_name = 'حساب صندوق - %s' % self.name
             cash_acc = self.env['account.account'].search([
                 ('name', '=', acc_name),
-                ('company_id', '=', company.id),
+                ('company_ids', 'in', [company.id]),
             ], limit=1)
             if not cash_acc:
                 code_num = str(self.id or 1).zfill(3)
@@ -436,7 +436,7 @@ class UtilityStaff(models.Model):
                     'name': acc_name,
                     'code': '101%s' % code_num[-3:],
                     'account_type': 'asset_cash',
-                    'company_id': company.id,
+                    'company_ids': [(6, 0, [company.id])],
                 })
             existing_journal = self.env['account.journal'].create({
                 'name': journal_name,

@@ -14,7 +14,7 @@ class TestPaymentAllocationReversal(TransactionCase):
 
         receivable_account = self.env['account.account'].search([
             ('account_type', '=', 'asset_receivable'),
-            ('company_id', 'in', (self.company.id, False))
+            ('company_ids', 'in', [self.company.id])
         ], limit=1)
         if not receivable_account:
             receivable_account = self.env['account.account'].create({
@@ -22,19 +22,19 @@ class TestPaymentAllocationReversal(TransactionCase):
                 'code': '110000.PAR',
                 'account_type': 'asset_receivable',
                 'reconcile': True,
-                'company_id': self.company.id,
+                'company_ids': [(6, 0, [self.company.id])],
             })
 
         income_account = self.env['account.account'].search([
             ('account_type', '=', 'income'),
-            ('company_id', 'in', (self.company.id, False))
+            ('company_ids', 'in', [self.company.id])
         ], limit=1)
         if not income_account:
             income_account = self.env['account.account'].create({
                 'name': 'إيرادات مبيعات للاختبار',
                 'code': '400000.PAR',
                 'account_type': 'income',
-                'company_id': self.company.id,
+                'company_ids': [(6, 0, [self.company.id])],
             })
 
         self.partner = self.env['res.partner'].create({

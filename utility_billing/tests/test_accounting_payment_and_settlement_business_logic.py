@@ -34,7 +34,7 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
 
         # حساب المدينين (Receivable)
         cls.receivable_account = cls.Account.search([
-            ('company_id', '=', cls.company.id),
+            ('company_ids', 'in', [cls.company.id]),
             ('account_type', '=', 'asset_receivable'),
         ], limit=1)
         if not cls.receivable_account:
@@ -43,12 +43,12 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
                 'code': '120999',
                 'account_type': 'asset_receivable',
                 'reconcile': True,
-                'company_id': cls.company.id,
+                'company_ids': [(6, 0, [cls.company.id])],
             })
 
         # حساب الإيرادات
         cls.income_account = cls.Account.search([
-            ('company_id', '=', cls.company.id),
+            ('company_ids', 'in', [cls.company.id]),
             ('account_type', '=', 'income'),
         ], limit=1)
         if not cls.income_account:
@@ -56,7 +56,7 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
                 'name': 'إيرادات كهرباء تجريبية',
                 'code': '400999',
                 'account_type': 'income',
-                'company_id': cls.company.id,
+                'company_ids': [(6, 0, [cls.company.id])],
             })
 
         # يوميات المبيعات والبنك
@@ -79,7 +79,7 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
                 'name': 'حساب ديون معدومة وإعفاءات',
                 'code': '600999',
                 'account_type': 'expense',
-                'company_id': cls.company.id,
+                'company_ids': [(6, 0, [cls.company.id])],
             })
         cls.writeoff_journal = cls.Journal.search([
             ('company_id', '=', cls.company.id),

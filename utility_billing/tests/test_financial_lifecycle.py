@@ -10,7 +10,7 @@ class TestFinancialLifecycle(TransactionCase):
         self.company = self.env.company
         receivable_account = self.env['account.account'].search([
             ('account_type', '=', 'asset_receivable'),
-            ('company_id', 'in', (self.env.company.id, False))
+            ('company_ids', 'in', [self.env.company.id])
         ], limit=1)
         if not receivable_account:
             receivable_account = self.env['account.account'].create({
@@ -18,7 +18,7 @@ class TestFinancialLifecycle(TransactionCase):
                 'code': '110000.TEST',
                 'account_type': 'asset_receivable',
                 'reconcile': True,
-                'company_id': self.env.company.id,
+                'company_ids': [(6, 0, [self.env.company.id])],
             })
         self.partner = self.env['res.partner'].create({
             'name': 'مشترك دورة مالية كاملة',
@@ -88,14 +88,14 @@ class TestFinancialLifecycle(TransactionCase):
         })
         income_account = self.env['account.account'].search([
             ('account_type', '=', 'income'),
-            ('company_id', 'in', (self.env.company.id, False))
+            ('company_ids', 'in', [self.env.company.id])
         ], limit=1)
         if not income_account:
             income_account = self.env['account.account'].create({
                 'name': 'إيرادات مبيعات الكهرباء للاختبار',
                 'code': '400000.TEST',
                 'account_type': 'income',
-                'company_id': self.env.company.id,
+                'company_ids': [(6, 0, [self.env.company.id])],
             })
         self.product = self.env['product.product'].create({
             'name': 'خدمة استهلاك كهرباء - مالية',
@@ -198,14 +198,14 @@ class TestFinancialLifecycle(TransactionCase):
         })
         expense_account = self.env['account.account'].search([
             ('account_type', '=', 'expense'),
-            ('company_id', 'in', (self.company.id, False))
+            ('company_ids', 'in', [self.company.id])
         ], limit=1)
         if not expense_account:
             expense_account = self.env['account.account'].create({
                 'name': 'مصروفات الإثباتات والديون المعدومة',
                 'code': '690000.TEST',
                 'account_type': 'expense',
-                'company_id': self.company.id,
+                'company_ids': [(6, 0, [self.company.id])],
             })
 
         self.company.write({
@@ -270,14 +270,14 @@ class TestFinancialLifecycle(TransactionCase):
         })
         account = self.env['account.account'].search([
             ('account_type', '=', 'expense'),
-            ('company_id', 'in', (self.company.id, False)),
+            ('company_ids', 'in', [self.company.id]),
         ], limit=1)
         if not account:
             account = self.env['account.account'].create({
                 'name': 'حساب اختبار idempotency',
                 'code': '690001.TEST',
                 'account_type': 'expense',
-                'company_id': self.company.id,
+                'company_ids': [(6, 0, [self.company.id])],
             })
         self.company.write({
             'writeoff_journal_id': journal.id,

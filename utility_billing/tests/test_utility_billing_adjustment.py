@@ -25,7 +25,7 @@ class TestUtilityBillingAdjustment(TransactionCase):
             'category_id': cls.category.id,
         })
         cls.income = cls.Account.search([
-            ('company_id', '=', cls.env.company.id),
+            ('company_ids', 'in', [cls.env.company.id]),
             ('account_type', '=', 'income'),
         ], limit=1)
         cls.journal = cls.env['account.journal'].search([

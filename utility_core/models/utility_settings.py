@@ -278,7 +278,7 @@ class ResConfigSettings(models.TransientModel):
         company = self.company_id or self.env.company
         product_obj = self.env['product.product']
         journal_obj = self.env['account.journal']
-        account_obj = self.env['account.account']
+        account_obj = self.env['account.account'].with_company(company)
         model_obj = self.env['utility.meter.model']
 
         # Helper to get or create product
@@ -348,42 +348,42 @@ class ResConfigSettings(models.TransientModel):
             acc = False
             if xml_ref:
                 rec = self.env.ref(xml_ref, raise_if_not_found=False)
-                if rec and (not getattr(rec, 'company_id', False) or rec.company_id == company):
+                if rec and company in rec.company_ids:
                     acc = rec
             if not acc and search_domain:
                 acc = account_obj.search([
-                    ('company_id', 'in', (company.id, False)),
+                    ('company_ids', 'in', [company.id]),
                     ('deprecated', '=', False)
                 ] + search_domain, limit=1)
             if not acc:
                 acc = account_obj.search([
                     ('code', '=', default_code),
-                    ('company_id', 'in', (company.id, False)),
+                    ('company_ids', 'in', [company.id]),
                     ('deprecated', '=', False)
                 ], limit=1)
             if not acc:
                 acc = account_obj.search([
                     ('name', 'ilike', name),
-                    ('company_id', 'in', (company.id, False)),
+                    ('company_ids', 'in', [company.id]),
                     ('deprecated', '=', False)
                 ], limit=1)
             if not acc and acc_type:
                 acc = account_obj.search([
                     ('account_type', '=', acc_type),
-                    ('company_id', 'in', (company.id, False)),
+                    ('company_ids', 'in', [company.id]),
                     ('deprecated', '=', False)
                 ], limit=1)
             if not acc:
                 code = default_code
                 suffix = 1
-                while account_obj.search([('code', '=', code), ('company_id', 'in', (company.id, False))], limit=1):
+                while account_obj.search([('code', '=', code), ('company_ids', 'in', [company.id])], limit=1):
                     code = f"{default_code[:5]}{suffix}"
                     suffix += 1
                 acc = account_obj.create({
                     'name': name,
                     'code': code,
                     'account_type': acc_type,
-                    'company_id': company.id,
+                    'company_ids': [(6, 0, [company.id])],
                 })
             setattr(company, field_name, acc)
             return acc

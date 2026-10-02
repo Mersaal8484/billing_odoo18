@@ -112,11 +112,11 @@ class TestUtilityAccountingPartnerIsolation(TransactionCase):
             ('type', '=', 'general'),
         ], limit=1)
         receivable = self.env['account.account'].search([
-            ('company_id', '=', self.env.company.id),
+            ('company_ids', 'in', [self.env.company.id]),
             ('account_type', '=', 'asset_receivable'),
         ], limit=1)
         income = self.env['account.account'].search([
-            ('company_id', '=', self.env.company.id),
+            ('company_ids', 'in', [self.env.company.id]),
             ('account_type', '=', 'income'),
         ], limit=1)
         if not journal or not receivable or not income:
