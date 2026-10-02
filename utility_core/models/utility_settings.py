@@ -47,7 +47,7 @@ class ResConfigSettings(models.TransientModel):
     )
     group_discount_per_so_line = fields.Boolean(
         string='خصومات بنود أوامر البيع',
-        implied_group='product.group_discount_per_so_line',
+        implied_group='sale.group_discount_per_so_line',
     )
     module_delivery = fields.Boolean(
         string='طرق التوصيل والشحن',
