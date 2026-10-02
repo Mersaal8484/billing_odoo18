@@ -12,9 +12,14 @@ export class BarcodeCameraWidget extends CharField {
             errorMessage: false,
         });
         this.html5QrcodeScanner = null;
+        this.scannerStartTimeout = null;
         this.readerId = `reader_${this.props.record.resModel}_${this.props.name}_${this.props.record.resId || 'new'}`;
 
         onWillUnmount(() => {
+            if (this.scannerStartTimeout) {
+                clearTimeout(this.scannerStartTimeout);
+                this.scannerStartTimeout = null;
+            }
             this.stopScanning();
         });
     }
@@ -24,16 +29,21 @@ export class BarcodeCameraWidget extends CharField {
         this.state.errorMessage = false;
         
         // Wait for DOM to render the reader div
-        setTimeout(() => {
+        this.scannerStartTimeout = setTimeout(() => {
+            this.scannerStartTimeout = null;
             try {
                 this.html5QrcodeScanner = new Html5Qrcode(this.readerId);
                 this.html5QrcodeScanner.start(
                     { facingMode: "environment" },
                     { fps: 10, qrbox: {width: 250, height: 250} },
-                    (decodedText, decodedResult) => {
-                        // Success
-                        this.props.update(decodedText);
-                        this.stopScanning();
+                    async (decodedText) => {
+                        try {
+                            await this.props.record.update({ [this.props.name]: decodedText });
+                            this.stopScanning();
+                        } catch (error) {
+                            console.error("Unable to apply scanned value:", error);
+                            this.state.errorMessage = error.message || "تعذر حفظ قيمة الباركود.";
+                        }
                     },
                     (errorMessage) => {
                         // Ignore standard scan errors (happens when no barcode found)

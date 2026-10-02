@@ -2,9 +2,9 @@
 <templates xml:space="preserve">
     <t t-name="utility_billing.UtilityMediaImageField" owl="1">
         <div class="o_utility_media_image_field">
-            <t t-if="props.value">
-                <img t-att-src="props.value"
-                     t-att-alt="props.name || 'Meter image'"
+            <t t-if="state.value">
+                <img t-att-src="state.value"
+                     alt="Meter image"
                      class="img-fluid rounded border shadow-sm"
                      style="max-width:100%;
                             max-height:320px;

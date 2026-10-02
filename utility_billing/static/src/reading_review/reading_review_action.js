@@ -1,13 +1,16 @@
 /** @odoo-module **/
 
-import { Component, useState, onWillStart, onMounted, onWillUnmount } from "@odoo/owl";
+import { Component, useState, onWillStart, onWillUnmount } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
+import { standardActionServiceProps } from "@web/webclient/actions/action_service";
 import { ReadingRejectionDialog } from "./components/rejection_dialog";
 import { ReadingImageLightbox } from "./components/image_lightbox";
 
 export class ReadingReviewWorkspaceAction extends Component {
+    static props = { ...standardActionServiceProps };
+
     setup() {
         this.orm = useService("orm");
         this.notification = useService("notification");
@@ -48,7 +51,12 @@ export class ReadingReviewWorkspaceAction extends Component {
             await Promise.all([this.loadMasterData(), this.loadQueue(0, true)]);
         });
 
-        onMounted(() => {});
+        onWillUnmount(() => {
+            if (this.debounceSearchTimeout) {
+                clearTimeout(this.debounceSearchTimeout);
+                this.debounceSearchTimeout = null;
+            }
+        });
     }
 
     applyActionContext() {

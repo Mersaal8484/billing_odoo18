@@ -2,10 +2,13 @@
 
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { Component, onWillStart, useState, onMounted, useRef } from "@odoo/owl";
+import { Component, onWillStart, onWillUnmount, useState, onMounted, useRef } from "@odoo/owl";
 import { loadJS } from "@web/core/assets";
+import { standardActionServiceProps } from "@web/webclient/actions/action_service";
 
 class UtilityDashboard extends Component {
+    static props = { ...standardActionServiceProps };
+
     setup() {
         this.rpc = useService("rpc");
         this.action = useService("action");
@@ -35,6 +38,7 @@ class UtilityDashboard extends Component {
         this.regionChartCanvasRef = useRef("regionChartCanvas");
         this.chart = null;
         this.regionChart = null;
+        this.renderTimeout = null;
 
         onWillStart(async () => {
             const regions = await this.orm.searchRead("utility.region", [["type", "=", "region"]], ["id", "name"], { order: "name" });
@@ -49,6 +53,14 @@ class UtilityDashboard extends Component {
                 this.renderRegionChart();
             }
         });
+
+        onWillUnmount(() => {
+            if (this.renderTimeout) {
+                clearTimeout(this.renderTimeout);
+                this.renderTimeout = null;
+            }
+            this.destroyCharts();
+        });
     }
 
     async loadKPI(regionId) {
@@ -59,15 +71,12 @@ class UtilityDashboard extends Component {
                 this.state.kpi = res;
                 this.state.isDataLoaded = true;
             }
-            if (this.chart) {
-                this.chart.destroy();
-                this.chart = null;
+            this.destroyCharts();
+            if (this.renderTimeout) {
+                clearTimeout(this.renderTimeout);
             }
-            if (this.regionChart) {
-                this.regionChart.destroy();
-                this.regionChart = null;
-            }
-            setTimeout(() => {
+            this.renderTimeout = setTimeout(() => {
+                this.renderTimeout = null;
                 this.renderChart();
                 this.renderRegionChart();
             }, 100);
@@ -86,6 +95,17 @@ class UtilityDashboard extends Component {
 
     formatMoney(val) {
         return new Intl.NumberFormat('ar-YE', { maximumFractionDigits: 2 }).format(val || 0);
+    }
+
+    destroyCharts() {
+        if (this.chart) {
+            this.chart.destroy();
+            this.chart = null;
+        }
+        if (this.regionChart) {
+            this.regionChart.destroy();
+            this.regionChart = null;
+        }
     }
 
     renderChart() {
@@ -117,35 +137,33 @@ class UtilityDashboard extends Component {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                legend: {
-                    rtl: true,
-                    textDirection: 'rtl',
-                    labels: {
-                        fontFamily: 'Cairo, Segoe UI, sans-serif',
-                        fontSize: 12
-                    }
-                },
-                tooltips: {
-                    rtl: true,
-                    textDirection: 'rtl',
-                    callbacks: {
-                        label: (tooltipItem, data) => {
-                            const datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
-                            const value = tooltipItem.yLabel || 0;
-                            return `${datasetLabel}: ${this.formatMoney(value)} ريال`;
-                        }
-                    }
+                plugins: {
+                    legend: {
+                        rtl: true,
+                        labels: {
+                            font: { family: 'Cairo, Segoe UI, sans-serif', size: 12 },
+                        },
+                    },
+                    tooltip: {
+                        rtl: true,
+                        callbacks: {
+                            label: (context) => {
+                                const datasetLabel = context.dataset.label || '';
+                                return `${datasetLabel}: ${this.formatMoney(context.parsed.y)} ريال`;
+                            },
+                        },
+                    },
                 },
                 scales: {
-                    xAxes: [{
+                    x: {
                         ticks: {
-                            fontFamily: 'Cairo, Segoe UI, sans-serif'
-                        }
-                    }],
-                    yAxes: [{
-                        ticks: { beginAtZero: true },
-                        position: 'right'
-                    }]
+                            font: { family: 'Cairo, Segoe UI, sans-serif' },
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        position: 'right',
+                    },
                 }
             }
         });
@@ -174,35 +192,33 @@ class UtilityDashboard extends Component {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                legend: {
-                    rtl: true,
-                    textDirection: 'rtl',
-                    labels: {
-                        fontFamily: 'Cairo, Segoe UI, sans-serif',
-                        fontSize: 12
-                    }
-                },
-                tooltips: {
-                    rtl: true,
-                    textDirection: 'rtl',
-                    callbacks: {
-                        label: (tooltipItem, data) => {
-                            const datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
-                            const value = tooltipItem.yLabel || 0;
-                            return `${datasetLabel}: ${this.formatMoney(value)}`;
-                        }
-                    }
+                plugins: {
+                    legend: {
+                        rtl: true,
+                        labels: {
+                            font: { family: 'Cairo, Segoe UI, sans-serif', size: 12 },
+                        },
+                    },
+                    tooltip: {
+                        rtl: true,
+                        callbacks: {
+                            label: (context) => {
+                                const datasetLabel = context.dataset.label || '';
+                                return `${datasetLabel}: ${this.formatMoney(context.parsed.y)}`;
+                            },
+                        },
+                    },
                 },
                 scales: {
-                    xAxes: [{
+                    x: {
                         ticks: {
-                            fontFamily: 'Cairo, Segoe UI, sans-serif'
-                        }
-                    }],
-                    yAxes: [{
-                        ticks: { beginAtZero: true },
-                        position: 'right'
-                    }],
+                            font: { family: 'Cairo, Segoe UI, sans-serif' },
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        position: 'right',
+                    },
                 },
             },
         });
@@ -218,8 +234,8 @@ class UtilityDashboard extends Component {
             type: 'ir.actions.act_window',
             name: rid ? 'مشتركو المنطقة (دفع آجل)' : 'إجمالي مشتركي الدفع الآجل',
             res_model: 'utility.customer',
-            views: [[false, 'tree'], [false, 'form']],
-            view_mode: 'tree,form',
+            views: [[false, 'list'], [false, 'form']],
+            view_mode: 'list,form',
             domain: domain,
             context: {'group_by': 'region_id'},
         });
@@ -237,8 +253,8 @@ class UtilityDashboard extends Component {
             type: 'ir.actions.act_window',
             name: 'فواتير الدفع الآجل القائمة',
             res_model: 'sale.order',
-            views: [[false, 'tree'], [false, 'form']],
-            view_mode: 'tree,form',
+            views: [[false, 'list'], [false, 'form']],
+            view_mode: 'list,form',
             domain: domain,
         });
     }
@@ -255,8 +271,8 @@ class UtilityDashboard extends Component {
             type: 'ir.actions.act_window',
             name: 'فواتير الدفع الآجل المتأخرة',
             res_model: 'sale.order',
-            views: [[false, 'tree'], [false, 'form']],
-            view_mode: 'tree,form',
+            views: [[false, 'list'], [false, 'form']],
+            view_mode: 'list,form',
             domain: domain,
         });
     }
@@ -273,8 +289,8 @@ class UtilityDashboard extends Component {
             type: 'ir.actions.act_window',
             name: 'تحصيلات اليوم (دفع آجل)',
             res_model: 'account.payment',
-            views: [[false, 'tree'], [false, 'form']],
-            view_mode: 'tree,form',
+            views: [[false, 'list'], [false, 'form']],
+            view_mode: 'list,form',
             domain: domain,
         });
     }

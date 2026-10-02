@@ -5,12 +5,12 @@
             <t t-if="!state.isScanning">
                 <div class="d-flex align-items-center">
                     <!-- Standard Char Field input -->
-                    <input class="o_input" 
-                           t-att-type="props.type" 
+                    <input class="o_input"
+                           type="text"
                            t-att-value="formattedValue"
-                           t-on-change="(ev) => props.update(ev.target.value)"
                            t-att-disabled="props.readonly"
-                           t-att-id="props.id"/>
+                           t-att-id="props.id"
+                           t-ref="input"/>
                     <!-- Camera Button -->
                     <t t-if="!props.readonly">
                         <button type="button" class="btn btn-secondary ms-2" t-on-click="startScanning" title="مسح باركود بالكاميرا">
