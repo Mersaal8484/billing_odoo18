@@ -219,14 +219,9 @@ class UtilityMigrationCustomer(models.Model):
                     missing.append(f"MISSING_CONTRACT_MAPPING: لم يتم العثور على ترميز قالب العقد ({rec.legacy_contract})")
 
             if rec.legacy_transformer_code:
-                transformers = self.env['utility.transformer'].search([
-                    ('company_id', '=', company_id),
-                    ('code', '=', rec.legacy_transformer_code.strip()),
-                ])
-                if len(transformers) > 1:
-                    raise ValidationError(_('AMBIGUOUS_TRANSFORMER_IDENTITY: تعددت المحولات بنفس الرمز (%s) داخل الشركة.') % rec.legacy_transformer_code)
-                if transformers:
-                    rec.transformer_id = transformers[0].id
+                transformer = rec._resolve_legacy_transformer(company_id, cache)
+                if transformer:
+                    rec.transformer_id = transformer.id
                 else:
                     missing.append(f"MISSING_TRANSFORMER_CODE: لم يتم العثور على محول بالرمز ({rec.legacy_transformer_code})؛ يجب رفع بيانات المحول قبل ربط العميل به.")
 
@@ -244,6 +239,48 @@ class UtilityMigrationCustomer(models.Model):
     # -------------------------------------------------------------------------
     # Private helpers
     # -------------------------------------------------------------------------
+
+    def _resolve_legacy_transformer(self, company_id, cache=None):
+        """Resolve a customer transformer code to its canonical transformer.
+
+        Customer files use the legacy ``transformer_code``.  Transformer
+        migration may preserve a different ``reference`` as the canonical
+        ``utility.transformer.code``, so fall back to the imported transformer
+        staging record and use its recorded canonical target.
+        """
+        self.ensure_one()
+        code = (self.legacy_transformer_code or '').strip()
+        if not code:
+            return self.env['utility.transformer']
+
+        cache_key = ('legacy_transformer', company_id, code)
+        if cache is not None and cache_key in cache:
+            return cache[cache_key]
+
+        transformers = self.env['utility.transformer'].search([
+            ('company_id', '=', company_id),
+            ('code', '=', code),
+        ])
+        if not transformers:
+            staged = self.env['utility.migration.transformer'].search([
+                ('company_id', '=', company_id),
+                ('state', '=', 'imported'),
+                '|', '|',
+                ('transformer_code', '=', code),
+                ('reference', '=', code),
+                ('legacy_analytic_id', '=', code),
+            ])
+            transformers = staged.mapped('created_transformer_id')
+
+        if len(transformers) > 1:
+            raise ValidationError(_(
+                'AMBIGUOUS_TRANSFORMER_IDENTITY: تعددت المحولات بنفس الرمز (%s) داخل الشركة.'
+            ) % code)
+
+        transformer = transformers[:1]
+        if cache is not None:
+            cache[cache_key] = transformer
+        return transformer
 
     def _resolve_meter_model(self):
         """تحديد موديل العداد بأمان وفقًا للمعمارية الحالية (الطور readonly projection من الموديل)."""
@@ -578,13 +615,7 @@ class UtilityMigrationCustomer(models.Model):
         if self.legacy_transformer_code:
             transformer = self.transformer_id
             if not transformer:
-                transformers = self.env['utility.transformer'].search([
-                    ('company_id', '=', company_id),
-                    ('code', '=', self.legacy_transformer_code.strip()),
-                ])
-                if len(transformers) > 1:
-                    raise ValidationError(_('AMBIGUOUS_TRANSFORMER_IDENTITY: تعددت المحولات بنفس الرمز (%s) داخل الشركة.') % self.legacy_transformer_code)
-                transformer = transformers[:1]
+                transformer = self._resolve_legacy_transformer(company_id)
             if not transformer:
                 raise ValidationError(_(
                     'MISSING_TRANSFORMER_CODE: لم يتم العثور على محول بالرمز (%s) للعميل %s. '
@@ -702,8 +733,12 @@ class UtilityMigrationCustomer(models.Model):
 
             if not existing_reading:
                 existing_reading = self.env['utility.reading'].create(reading_vals)
-            else:
+            elif existing_reading.state != 'billed':
                 existing_reading.write(reading_vals)
+
+            # A billed reading is financial history and is intentionally immutable.
+            # Retrying a migration must restore missing master-data links without
+            # rewriting an opening reading that was already billed.
 
             self.created_reading_id = existing_reading.id
 

@@ -256,7 +256,10 @@ class UtilityMeter(models.Model):
             self.env.cr.execute(
                 'SELECT id FROM utility_meter WHERE id IN %s ORDER BY id FOR UPDATE',
                 [tuple(self.ids)])
-        self.invalidate_cache()
+        # ``invalidate_cache`` was removed in Odoo 18.  Refresh only this
+        # recordset after acquiring the row lock, without an unnecessary
+        # second flush (the method already called ``flush_all`` above).
+        self.invalidate_recordset(flush=False)
 
     def action_view_readings(self):
         self.ensure_one()
