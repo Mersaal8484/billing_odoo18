@@ -502,13 +502,18 @@ class IrCron(models.Model):
                 self.utility_code or self.name, self.consecutive_failure_count, self.last_error_message
             )
 
-    @api.model
-    def _callback(self, cron_name, server_action_id, job_id):
-        """Intercept Odoo scheduler execution for Utility-managed scheduled actions."""
-        cron = self.browse(job_id)
-        if cron.exists() and cron.utility_managed:
-            return cron._execute_utility_managed_cron(trigger_type='scheduled')
-        return super()._callback(cron_name, server_action_id, job_id)
+    def _callback(self, cron_name, server_action_id):
+        """Intercept Odoo 18 scheduler execution for Utility-managed actions.
+
+        Odoo 18 invokes this method on the cron record with exactly two
+        positional arguments after ``self``.  Keeping the old three-argument
+        Odoo 16-style signature made the scheduler fail before the migration
+        handler could run, leaving every queued batch untouched.
+        """
+        self.ensure_one()
+        if self.utility_managed:
+            return self._execute_utility_managed_cron(trigger_type='scheduled')
+        return super()._callback(cron_name, server_action_id)
 
     def method_direct_trigger(self):
         """Intercept direct manual triggers for Utility-managed scheduled actions."""

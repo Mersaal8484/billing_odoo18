@@ -1,11 +1,15 @@
 import logging
 from datetime import timedelta
-from psycopg2 import OperationalError
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
+
+# Use a dedicated PostgreSQL advisory-lock namespace for migration batches.
+# This avoids transaction-aborting ``FOR UPDATE NOWAIT`` failures while still
+# ensuring that two cron workers can never import the same batch concurrently.
+_MIGRATION_BATCH_LOCK_NAMESPACE = 178302709
 
 
 class UtilityMigrationBatch(models.Model):
@@ -272,7 +276,14 @@ class UtilityMigrationBatch(models.Model):
 
     @api.model
     def cron_process_pending_batches(self):
-        """Cron function processing queued or stuck processing migration batches in background."""
+        """Process queued migration batches safely and report progress to Odoo's cron.
+
+        The cron scheduler may run more than one worker.  A non-blocking advisory
+        lock gives one worker ownership of each batch without poisoning the current
+        transaction when another worker is already handling it.  Reporting progress
+        lets Odoo immediately schedule the next bounded chunk instead of treating a
+        partially imported batch as complete.
+        """
         stuck_threshold = fields.Datetime.now() - timedelta(minutes=15)
         domain = [
             '|',
@@ -280,24 +291,30 @@ class UtilityMigrationBatch(models.Model):
             '&', ('state', '=', 'processing'), ('started_at', '<', stuck_threshold)
         ]
         pending = self.search(domain, order='id asc', limit=10)
+        processed_batches = 0
         for batch in pending:
-            try:
-                self.env.cr.execute(
-                    "SELECT id FROM utility_migration_batch WHERE id = %s FOR UPDATE NOWAIT",
-                    (batch.id,)
+            self.env.cr.execute(
+                "SELECT pg_try_advisory_xact_lock(%s, %s)",
+                (_MIGRATION_BATCH_LOCK_NAMESPACE, batch.id),
+            )
+            locked = self.env.cr.fetchone()[0]
+            if not locked:
+                _logger.info(
+                    "Migration batch %s (%s) is already being processed by another worker.",
+                    batch.id,
+                    batch.name,
                 )
-                # Keep cron transactions short. Customer migration creates a
-                # partner, account, meter, reading and accounting entry per row.
-                # Processing 1,000 rows in one cron transaction can prevent the
-                # scheduler from reaching its next cycle on Windows/PostgreSQL.
-                batch.action_process_batch(max_records_per_run=100)
-            except OperationalError as e:
-                if getattr(e, 'pgcode', None) == '55P03':
-                    _logger.debug("Batch %s (%s) is currently locked by another worker process (55P03).", batch.id, batch.name)
-                else:
-                    _logger.warning("OperationalError locking batch %s (%s): %s", batch.id, batch.name, e)
                 continue
-            except Exception as e:
-                _logger.error("Unexpected error processing migration batch %s (%s): %s", batch.id, batch.name, e)
-                continue
+
+            # Keep cron transactions bounded. A customer row can create a partner,
+            # account, meter, reading and accounting entry, so processing all rows in
+            # one transaction can starve the scheduler on Windows/PostgreSQL.
+            batch.action_process_batch(max_records_per_run=100)
+            processed_batches += 1
+
+        remaining_batches = self.search_count(domain)
+        self.env['ir.cron']._notify_progress(
+            done=processed_batches,
+            remaining=remaining_batches,
+        )
 
