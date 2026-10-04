@@ -30,69 +30,263 @@
         <field name="paperformat_id" ref="utility_billing.paperformat_utility_receipt"/>
     </record>
 
-    <!-- قالب فاتورة الاشتراك: محاكاة مباشرة للنموذج الورقي المعتمد. -->
+    <!-- قالب فاتورة الاشتراك: مطابق للنموذج الورقي المعتمد بدقة عالية -->
     <template id="report_electricity_bill">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="values" t-value="report_data.get(o.id, {})"/>
-                <div class="article" style="width:100%; margin:0; padding:0; page-break-after:always;" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id" t-att-data-oe-lang="o.env.context.get('lang')">
-                    <div dir="rtl" style="box-sizing:border-box; width:100%; min-height:130mm; border:0.75pt solid #000; padding:2mm; background:#fff; color:#151515; font-family:Tahoma, Arial, sans-serif; font-size:8pt; line-height:1.3;">
-                        <table style="width:100%; border-collapse:collapse; table-layout:fixed; margin:0 0 1.5mm;">
+                <div class="article" style="width:100%; margin:0; padding:0; page-break-after:always;"
+                     t-att-data-oe-model="o._name" t-att-data-oe-id="o.id" t-att-data-oe-lang="o.env.context.get('lang')">
+
+                    <div dir="rtl" style="
+                        box-sizing:border-box;
+                        width:100%;
+                        min-height:130mm;
+                        border:1pt solid #222;
+                        padding:2mm 2.5mm;
+                        background:#fff;
+                        color:#111;
+                        font-family:Tahoma, Arial, sans-serif;
+                        font-size:7.5pt;
+                        line-height:1.35;
+                    ">
+
+                        <!-- ======================================================== -->
+                        <!-- الهيدر: 3 أعمدة — بيانات المشترك | الشعار | بيانات العداد -->
+                        <!-- ======================================================== -->
+                        <table style="width:100%; border-collapse:collapse; table-layout:fixed; margin-bottom:1.5mm;">
                             <tr>
-                                <td style="width:35%; vertical-align:top; padding:0 1.5mm 0 0;">
-                                    <div style="color:#075aa5; font-weight:bold; font-size:8.5pt;">المشترك: <span style="color:#111; font-weight:normal;" t-esc="(o.partner_id.name or '--') + (' - ' + o.customer_id.customer_number if o.customer_id.customer_number else '')"/></div>
-                                    <div style="color:#075aa5;">العنوان: <span style="color:#111;" t-esc="o.partner_id.contact_address or o.partner_id.street or '--'"/></div>
-                                    <div style="color:#075aa5;">الجوال: <span style="color:#111; direction:ltr; unicode-bidi:embed;" t-esc="o.customer_id.mobile or o.partner_id.mobile or o.partner_id.phone or '--'"/></div>
-                                    <div style="color:#075aa5;">الفترة: <span style="color:#111;" t-esc="o.date_range_id.name or '--'"/></div>
-                                    <div style="color:#075aa5;">التعرفة: <span style="color:#111;" t-esc="o.contract_template_id.name or '--'"/></div>
-                                    <div style="color:#075aa5;">الحرف: <span style="color:#111;" t-esc="o.customer_id.subscriber_id.name or '--'"/></div>
-                                    <div style="color:#075aa5;">الفئة: <span style="color:#111;" t-esc="o.customer_id.category_id.name or '--'"/></div>
+                                <!-- العمود الأيمن: بيانات المشترك -->
+                                <td style="width:38%; vertical-align:top; padding:0 1mm 0 0;">
+                                    <div style="margin-bottom:0.3mm;">
+                                        <span style="color:#075aa5; font-weight:bold;">المشترك: </span>
+                                        <span style="font-weight:bold;" t-esc="o.partner_id.name or '--'"/>
+                                    </div>
+                                    <div style="margin-bottom:0.3mm;">
+                                        <span style="color:#075aa5; font-weight:bold;">العنوان: </span>
+                                        <span t-esc="o.partner_id.contact_address or o.partner_id.street or '--'"/>
+                                    </div>
+                                    <div style="margin-bottom:0.3mm;">
+                                        <span style="color:#075aa5; font-weight:bold;">الجوال: </span>
+                                        <span style="direction:ltr; unicode-bidi:embed;" t-esc="o.customer_id.mobile or o.partner_id.mobile or o.partner_id.phone or '--'"/>
+                                    </div>
+                                    <div style="margin-bottom:0.3mm;">
+                                        <span style="color:#075aa5; font-weight:bold;">الفترة: </span>
+                                        <span t-esc="o.date_range_id.name or '--'"/>
+                                    </div>
+                                    <div style="margin-bottom:0.3mm;">
+                                        <span style="color:#075aa5; font-weight:bold;">التعرفة: </span>
+                                        <span t-esc="o.contract_template_id.name or '--'"/>
+                                    </div>
+                                    <div style="margin-bottom:0.3mm;">
+                                        <span style="color:#075aa5; font-weight:bold;">الحرف: </span>
+                                        <span t-esc="o.customer_id.subscriber_id.name or '--'"/>
+                                    </div>
+                                    <div>
+                                        <span style="color:#075aa5; font-weight:bold;">الفئة: </span>
+                                        <span t-esc="o.customer_id.category_id.name or '--'"/>
+                                    </div>
                                 </td>
-                                <td style="width:30%; vertical-align:top; text-align:center; padding:0 1mm;">
-                                    <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)" style="display:block; margin:0 auto .5mm; max-height:20mm; max-width:36mm;" alt="Logo"/>
-                                    <div style="color:#075aa5; font-weight:bold; font-size:10pt;" t-esc="res_company.name"/>
-                                    <div style="color:#075aa5; font-size:8.5pt;" t-if="o.region_id" t-esc="o.region_id.name"/>
-                                    <div style="color:#075aa5; font-weight:bold; font-size:11pt; margin-top:1mm;">فــــاتـــورة كــــهـــربــــاء</div>
+
+                                <!-- العمود الأوسط: شعار الشركة والعنوان -->
+                                <td style="width:24%; vertical-align:top; text-align:center; padding:0 1mm;">
+                                    <t t-if="res_company.logo">
+                                        <img t-att-src="image_data_uri(res_company.logo)"
+                                             style="display:block; margin:0 auto 1mm; max-height:18mm; max-width:32mm;" alt="Logo"/>
+                                    </t>
+                                    <div style="color:#075aa5; font-weight:bold; font-size:8pt; margin-bottom:0.5mm;" t-esc="res_company.name"/>
+                                    <t t-if="o.region_id">
+                                        <div style="color:#075aa5; font-size:7.5pt; margin-bottom:0.5mm;" t-esc="o.region_id.name"/>
+                                    </t>
+                                    <div style="color:#075aa5; font-weight:bold; font-size:10pt; margin-top:1mm; letter-spacing:0.5pt;">
+                                        فــاتـورة كـهـربـاء
+                                    </div>
                                 </td>
-                                <td style="width:35%; vertical-align:top; direction:rtl; padding:0 0 0 1.5mm;">
-                                    <div style="color:#075aa5;">رقم العداد: <span style="color:#111; direction:ltr; unicode-bidi:embed;" t-esc="o.meter_id.meter_number or '--'"/></div>
-                                    <div style="color:#075aa5;">رقم المشترك: <span style="color:#111; direction:ltr; unicode-bidi:embed;" t-esc="o.customer_id.customer_number or '--'"/></div>
-                                    <div style="color:#075aa5;">رقم الفاتورة: <span style="color:#111; direction:ltr; unicode-bidi:embed;" t-esc="o.name or '--'"/></div>
-                                    <div style="color:#075aa5;">تاريخ الإصدار: <span style="color:#111; direction:ltr; unicode-bidi:embed;" t-esc="o.date_order.strftime('%d/%m/%Y') if o.date_order else '--'"/></div>
-                                    <div style="color:#075aa5;">معامل الضرب: <span style="color:#111;" t-esc="o.meter_id.multiplier or 1.0"/></div>
-                                    <div style="color:#075aa5;">المحول: <span style="color:#111;" t-esc="o.meter_id.transformer_id.name or o.customer_id.transformer_id.name or '--'"/></div>
-                                    <div style="color:#075aa5;">المحصل: <span style="color:#111;" t-esc="values.get('collector_name') or '--'"/></div>
+
+                                <!-- العمود الأيسر: بيانات العداد والفاتورة -->
+                                <td style="width:38%; vertical-align:top; padding:0 0 0 1mm;">
+                                    <div style="margin-bottom:0.3mm;">
+                                        <span style="color:#075aa5; font-weight:bold;">رقم العداد: </span>
+                                        <span style="direction:ltr; unicode-bidi:embed;" t-esc="o.meter_id.meter_number or '--'"/>
+                                    </div>
+                                    <div style="margin-bottom:0.3mm;">
+                                        <span style="color:#075aa5; font-weight:bold;">رقم المشترك: </span>
+                                        <span style="direction:ltr; unicode-bidi:embed;" t-esc="o.customer_id.customer_number or '--'"/>
+                                    </div>
+                                    <div style="margin-bottom:0.3mm;">
+                                        <span style="color:#075aa5; font-weight:bold;">رقم الفاتورة: </span>
+                                        <span style="direction:ltr; unicode-bidi:embed;" t-esc="o.name or '--'"/>
+                                    </div>
+                                    <div style="margin-bottom:0.3mm;">
+                                        <span style="color:#075aa5; font-weight:bold;">تاريخ الإصدار: </span>
+                                        <span style="direction:ltr; unicode-bidi:embed;"
+                                              t-esc="o.date_order.strftime('%d/%m/%Y') if o.date_order else '--'"/>
+                                    </div>
+                                    <div style="margin-bottom:0.3mm;">
+                                        <span style="color:#075aa5; font-weight:bold;">معامل الضرب: </span>
+                                        <span t-esc="o.meter_id.multiplier or 1.0"/>
+                                    </div>
+                                    <div style="margin-bottom:0.3mm;">
+                                        <span style="color:#075aa5; font-weight:bold;">المحول: </span>
+                                        <span t-esc="o.meter_id.transformer_id.name or o.customer_id.transformer_id.name or '--'"/>
+                                    </div>
+                                    <div>
+                                        <span style="color:#075aa5; font-weight:bold;">المحصل: </span>
+                                        <span t-esc="values.get('collector_name') or '--'"/>
+                                    </div>
                                 </td>
                             </tr>
                         </table>
+
+                        <!-- ======================================================== -->
+                        <!-- الجدول الأول: القراءة السابقة / الحالية / الاستهلاك / القيمة -->
+                        <!-- ======================================================== -->
                         <table style="width:100%; border-collapse:collapse; table-layout:fixed; text-align:center; margin:0; color:#c4161c;">
                             <tr style="background:#d7f3f5; font-weight:bold;">
-                                <td style="border:.5pt solid #c4161c; padding:1.2mm .5mm;">القراءة السابقة</td>
-                                <td style="border:.5pt solid #c4161c; padding:1.2mm .5mm;">القراءة الحالية</td>
-                                <td style="border:.5pt solid #c4161c; padding:1.2mm .5mm;">الاستهلاك (ك.و)</td>
-                                <td style="border:.5pt solid #c4161c; padding:1.2mm .5mm;">قيمة الاستهلاك</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1.3mm 0.5mm; width:25%;">القراءة السابقة</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1.3mm 0.5mm; width:25%;">القراءة الحالية</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1.3mm 0.5mm; width:25%;">الاستهلاك (ك.و)</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1.3mm 0.5mm; width:25%;">
+                                    قيمة الاستهلاك<br/>
+                                    <span style="font-size:7pt; font-weight:normal; color:#c4161c;">ر.ي</span>
+                                </td>
                             </tr>
-                            <tr style="font-weight:bold; font-size:9pt;">
-                                <td style="border:.5pt solid #c4161c; padding:1.2mm .5mm;"><span t-esc="o.previous_reading"/></td>
-                                <td style="border:.5pt solid #c4161c; padding:1.2mm .5mm;"><span t-esc="o.current_reading"/></td>
-                                <td style="border:.5pt solid #c4161c; padding:1.2mm .5mm;"><span t-esc="o.consumption"/></td>
-                                <td style="border:.5pt solid #c4161c; padding:1.2mm .5mm;"><span t-esc="o.amount_energy" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td>
+                            <tr style="font-weight:bold; font-size:8.5pt;">
+                                <td style="border:0.75pt solid #c4161c; padding:1.3mm 0.5mm;">
+                                    <span t-esc="o.previous_reading"/>
+                                </td>
+                                <td style="border:0.75pt solid #c4161c; padding:1.3mm 0.5mm;">
+                                    <span t-esc="o.current_reading"/>
+                                </td>
+                                <td style="border:0.75pt solid #c4161c; padding:1.3mm 0.5mm;">
+                                    <span t-esc="o.consumption"/>
+                                </td>
+                                <td style="border:0.75pt solid #c4161c; padding:1.3mm 0.5mm;">
+                                    <span t-esc="o.amount_energy" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
                             </tr>
                         </table>
-                        <table style="width:100%; border-collapse:collapse; table-layout:fixed; text-align:center; margin:1mm 0 0; color:#c4161c;">
+
+                        <!-- ======================================================== -->
+                        <!-- الجدول الثاني: الرسوم والمبالغ — الصفوف الثلاثة          -->
+                        <!-- ======================================================== -->
+                        <table style="width:100%; border-collapse:collapse; table-layout:fixed; text-align:center; margin-top:0.8mm; color:#c4161c;">
+                            <!-- الصف الأول: العناوين -->
                             <tr style="background:#d7f3f5; font-weight:bold;">
-                                <td style="border:.5pt solid #c4161c; padding:1mm .3mm;">رسوم خدمات</td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;">رسوم مجلس محلي</td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;">رسوم نظافة</td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;">صندوق المعلم</td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;">مبلغ الفاتورة الحالية</td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;">المتأخرات السابقة</td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;">المبلغ المستحق</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm; width:14.28%;">رسوم خدمات</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm; width:14.28%;">رسوم مجلس محلي</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm; width:14.28%;">رسوم نظافة</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm; width:14.28%;">صندوق المعلم</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm; width:14.28%;">مبلغ الفاتورة الحالية</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm; width:14.28%;">المتأخرات السابقة</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm; width:14.32%; background:#f8d7d7; color:#c4161c; font-weight:bold;">المبلغ المستحق</td>
+                            </tr>
+                            <!-- الصف الثاني: القيم -->
+                            <tr style="font-weight:bold;">
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">
+                                    <span t-esc="values.get('service_fee', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">
+                                    <span t-esc="values.get('municipality_fee', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">
+                                    <span t-esc="values.get('cleaning_fee', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">
+                                    <span t-esc="values.get('mu_allim_fee', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">
+                                    <span t-esc="o.amount_total" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">
+                                    <span t-esc="o.previous_balance" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm; background:#f8d7d7; font-size:8.5pt; color:#c4161c; font-weight:bold;">
+                                    <span t-esc="o.total_due_amount" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
+                            </tr>
+                            <!-- الصف الثالث: السداد والتسويات والرصيد النهائي -->
+                            <tr style="background:#d7f3f5; font-weight:bold;">
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">سداد الفترة السابقة</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">سداد الفترة الحالية</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">تسويات الفترة السابقة</td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">تسويات الفترة الحالية</td>
+                                <td colspan="3" style="border:0.75pt solid #c4161c; padding:1mm 0.3mm; background:#f8d7d7; color:#c4161c; font-weight:bold; font-size:8pt;">رصيد المشترك النهائي</td>
                             </tr>
                             <tr style="font-weight:bold;">
-                                <td style="border:.5pt solid #c4161c; padding:1mm .3mm;"><span t-esc="values.get('service_fee', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;"><span t-esc="values.get('municipality_fee', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;"><span t-esc="values.get('cleaning_fee', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;"><span t-esc="values.get('mu_allim_fee', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;"><span t-esc="o.amount_total" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;"><span t-esc="o.previous_balance" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;"><span t-esc="o.total_due_amount" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">
+                                    <span t-esc="values.get('previous_payment', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">
+                                    <span t-esc="values.get('current_payment', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">
+                                    <span t-esc="values.get('previous_settlement', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
+                                <td style="border:0.75pt solid #c4161c; padding:1mm 0.3mm;">
+                                    <span t-esc="values.get('current_settlement', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
+                                <td colspan="3" style="border:0.75pt solid #c4161c; padding:1mm 0.3mm; background:#f8d7d7; font-size:8.5pt; color:#c4161c; font-weight:bold;">
+                                    <span t-esc="o.total_due_amount" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/>
+                                </td>
                             </tr>
                         </table>
-                        <table style="width:71.43%; border-collapse:collapse; table-layout:fixed; text-align:center; margin:1mm 0 0 auto; color:#c4161c;">
-                            <tr style="background:#d7f3f5; font-weight:bold;"><td style="border:.5pt solid #c4161c; padding:1mm .3mm;">سداد الفترة السابقة</td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;">سداد الفترة الحالية</td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;">تسويات الفترة السابقة</td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;">تسويات الفترة الحالية</td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;">رصيد المشترك النهائي</td></tr>
-                            <tr style="font-weight:bold;"><td style="border:.5pt solid #c4161c; padding:1mm .3mm;"><span t-esc="values.get('previous_payment', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;"><span t-esc="values.get('current_payment', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;"><span t-esc="values.get('previous_settlement', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;"><span t-esc="values.get('current_settlement', 0.0)" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td><td style="border:.5pt solid #c4161c; padding:1mm .3mm;"><span t-esc="o.total_due_amount" t-options='{"widget":"monetary", "display_currency":o.currency_id}'/></td></tr>
+
+                        <!-- ======================================================== -->
+                        <!-- منطقة التنبيهات والاتصال                                  -->
+                        <!-- ======================================================== -->
+                        <div style="margin-top:1.5mm; border-top:0.5pt solid #ccc; padding-top:1mm; font-size:6.8pt; line-height:1.5;">
+                            <strong style="color:#e85c8e;">تنبيـــه هام: </strong>
+                            <span>عزيزي المشترك يجب أخذ سند التحصيل من المختص عند السداد وكذلك التأكد من وصول رسالة SMS لرقم هاتفك بالمبلغ المسدد، بدون ذلك لا تتحمل المؤسسة أو المنطقة أي مسؤولية.</span>
+                            <br/>
+                            <span> — لاستمرار الخدمة وتجنباً لفصل التيار يرجى السداد فور استلام الفاتورة عبر التحصيل الآلي أو مكاتب التحصيل.</span>
+                            <br/>
+                            <span> — يجب تسديد الفاتورة بعد استلامها خلال مدة لا تتجاوز اليومين وفي حال التأخير سوف تضطر أسفين لفصل الخدمة.</span>
+                        </div>
+
+                        <!-- ======================================================== -->
+                        <!-- سطر الاتصال وطباعة QR + معلومات الطباعة                  -->
+                        <!-- ======================================================== -->
+                        <table style="width:100%; border-collapse:collapse; table-layout:fixed; margin-top:1mm; font-size:6.8pt;">
+                            <tr>
+                                <!-- QR كود -->
+                                <td style="width:17%; text-align:right; vertical-align:bottom; padding:0;">
+                                    <t t-if="o.qr_code_url">
+                                        <img t-att-src="o.qr_code_url"
+                                             style="width:18mm; height:18mm;" alt="QR"/>
+                                    </t>
+                                </td>
+                                <!-- أرقام الاتصال -->
+                                <td style="width:50%; text-align:center; vertical-align:middle; padding:0 1mm;">
+                                    <div style="color:#075aa5; font-weight:bold; font-size:7pt; margin-bottom:0.5mm;">
+                                        للشكاوى والمقترحات يرجى التواصل على الأرقام التالية:
+                                        <span style="direction:ltr; unicode-bidi:embed; color:#c4161c;">
+                                            <t t-esc="res_company.phone or '01604666 - 780240480'"/>
+                                        </span>
+                                    </div>
+                                    <div style="color:#075aa5; font-weight:bold; font-size:7.5pt;">
+                                        خدمة الجمهور /
+                                        <span style="direction:ltr; unicode-bidi:embed; color:#c4161c;">8000144</span>
+                                    </div>
+                                </td>
+                                <!-- معلومات الطابع والوقت -->
+                                <td style="width:33%; vertical-align:middle; padding:0 0 0 1mm; color:#e85c8e; font-size:6.8pt;">
+                                    <div>
+                                        <strong>طبع بواسطة: </strong>
+                                        <span t-esc="user.name"/>
+                                        <t t-if="values.get('collector_name')">
+                                            - <span t-esc="values.get('collector_name')"/>
+                                        </t>
+                                    </div>
+                                    <div>
+                                        <strong>وقت الطباعة: </strong>
+                                        <span style="direction:ltr; unicode-bidi:embed;"
+                                              t-esc="context_timestamp(datetime.datetime.now()).strftime('%H:%M %d-%m-%Y')"/>
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
-                        <div style="margin-top:2mm; padding:1mm 0; border-top:.5pt solid #c8c8c8; font-size:7pt;"><strong style="color:#e85c8e;">تنبيه هام:</strong> <span>المشترك مسؤول عن سداد فاتورته في الموعد المحدد، ويرجى عدم تسليم رقم المشترك أو رابط السداد لأي جهة غير معتمدة.</span></div>
-                        <table style="width:100%; border-collapse:collapse; table-layout:fixed; margin-top:1mm; font-size:7pt;"><tr><td style="width:22%; text-align:right; direction:ltr;"><img t-if="o.qr_code_url" t-att-src="o.qr_code_url" style="width:19mm; height:19mm;" alt="QR Code"/></td><td style="width:50%; text-align:center; vertical-align:middle; color:#075aa5; font-weight:bold;"><div t-if="res_company.phone"><span t-esc="res_company.phone"/></div><div t-if="res_company.email"><span t-esc="res_company.email"/></div><div t-if="res_company.website"><span t-esc="res_company.website"/></div></td><td style="width:28%; vertical-align:middle; color:#e85c8e;"><div>طبع بواسطة: <span t-esc="user.name"/></div><div>تاريخ الطباعة: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/></div></td></tr></table>
+
                     </div>
                 </div>
             </t>
