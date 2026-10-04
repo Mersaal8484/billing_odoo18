@@ -105,6 +105,52 @@
         <field name="binding_type">report</field>
     </record>
 
+    <!-- 4b. Server Action on res.partner — يظهر في قائمة الإجراءات لصفحة المشترك -->
+    <record id="action_partner_customer_statement_server" model="ir.actions.server">
+        <field name="name">كشف حساب المشترك</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code">
+partner = records[0] if records else None
+customer = env['utility.customer'].search([('partner_id', '=', partner.id)], limit=1) if partner else None
+if customer:
+    wizard = env['utility.customer.statement.wizard'].create({
+        'customer_id': customer.id,
+        'date_to': fields.Date.context_today(env['utility.customer.statement.wizard']),
+    })
+    action = {
+        'type': 'ir.actions.act_window',
+        'name': 'كشف حساب المشترك',
+        'res_model': 'utility.customer.statement.wizard',
+        'view_mode': 'form',
+        'res_id': wizard.id,
+        'target': 'new',
+    }
+        </field>
+    </record>
+
+    <!-- 4c. Smart button on res.partner form (عملاء المشتركين) -->
+    <record id="view_res_partner_statement_button" model="ir.ui.view">
+        <field name="name">res.partner.statement.button</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_statement_wizard"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-file-text-o"
+                        invisible="not has_utility_customer">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">كشف الحساب</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
     <!-- 5. QWeb Report Template — مطابق للنموذج المرجعي بدقة عالية -->
     <template id="report_customer_statement">
         <t t-call="web.html_container">

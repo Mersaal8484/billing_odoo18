@@ -106,6 +106,27 @@ class ResPartner(models.Model):
             ], limit=1)
             partner.has_utility_customer = bool(customer)
 
+    def action_open_statement_wizard(self):
+        """يفتح نافذة كشف الحساب مباشرةً من نموذج الشريك."""
+        self.ensure_one()
+        customer = self.env['utility.customer'].search(
+            [('partner_id', '=', self.id)], limit=1
+        )
+        if not customer:
+            raise UserError(_('لا يوجد حساب مشترك مرتبط بهذا الشريك.'))
+        wizard = self.env['utility.customer.statement.wizard'].create({
+            'customer_id': customer.id,
+            'date_to': fields.Date.context_today(self),
+        })
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('كشف حساب المشترك'),
+            'res_model': 'utility.customer.statement.wizard',
+            'view_mode': 'form',
+            'res_id': wizard.id,
+            'target': 'new',
+        }
+
     def _compute_utility_balances(self):
         for partner in self:
             customers = self.env['utility.customer'].search([
