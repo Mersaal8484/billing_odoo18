@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- 1. Wizard Form View (Organized 2-Column Card Layout) -->
+    <!-- 1. Wizard Form View -->
     <record id="view_utility_customer_statement_wizard_form" model="ir.ui.view">
         <field name="name">utility.customer.statement.wizard.form</field>
         <field name="model">utility.customer.statement.wizard</field>
@@ -105,196 +105,254 @@
         <field name="binding_type">report</field>
     </record>
 
-    <!-- 5. QWeb Report Template with Full Arabic RTL Support -->
+    <!-- 5. QWeb Report Template — مطابق للنموذج المرجعي بدقة عالية -->
     <template id="report_customer_statement">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="web.external_layout">
-                    <t t-set="statement" t-value="doc._prepare_report_values()"/>
-                    <t t-set="totals" t-value="statement['totals']"/>
-                    <t t-set="lines" t-value="statement['lines']"/>
-                    <t t-set="customer" t-value="statement['customer']"/>
-                    <t t-set="partner" t-value="statement['partner']"/>
+                <t t-set="statement" t-value="doc._prepare_report_values()"/>
+                <t t-set="totals"   t-value="statement['totals']"/>
+                <t t-set="lines"    t-value="statement['lines']"/>
+                <t t-set="customer" t-value="statement['customer']"/>
+                <t t-set="partner"  t-value="statement['partner']"/>
 
-                    <div class="page" dir="rtl" style="font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif; font-size: 11px; color: #222;">
-                        
-                        <!-- Header Title -->
-                        <div style="text-align: center; border-bottom: 2.5px solid #0056b3; padding-bottom: 6px; margin-bottom: 12px;">
-                            <h2 style="margin: 0; color: #0056b3; font-weight: bold; font-size: 20px;">كشف حساب مشترك كهرباء</h2>
-                            <span style="font-size: 11px; color: #555;">Customer Account Statement</span>
+                <div class="article" style="width:100%; margin:0; padding:0; page-break-after:always;">
+                    <div dir="rtl" style="
+                        box-sizing:border-box;
+                        width:100%;
+                        padding:8mm 8mm 4mm;
+                        background:#fff;
+                        color:#111;
+                        font-family:Tahoma, Arial, sans-serif;
+                        font-size:9pt;
+                        line-height:1.5;
+                    ">
+
+                        <!-- ======================================================== -->
+                        <!-- رأس الصفحة: الجهة الحكومية + الشعار                       -->
+                        <!-- ======================================================== -->
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:3mm;">
+                            <tr>
+                                <!-- اليسار: اسم الجمهورية/الوزارة -->
+                                <td style="width:40%; vertical-align:top; text-align:right; padding:0;">
+                                    <div style="font-size:8.5pt; color:#111;">الجمهورية اليمنية وزارة الكهرباء والطاقة</div>
+                                </td>
+                                <!-- الوسط: فراغ -->
+                                <td style="width:20%;"></td>
+                                <!-- اليمين: شعار الشركة -->
+                                <td style="width:40%; vertical-align:top; text-align:left; padding:0;">
+                                    <t t-if="res_company.logo">
+                                        <img t-att-src="image_data_uri(res_company.logo)"
+                                             style="display:block; margin-right:auto; max-height:16mm; max-width:30mm;" alt="Logo"/>
+                                    </t>
+                                    <div style="font-size:8pt; color:#075aa5; font-weight:bold; text-align:left;" t-esc="res_company.name"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- خط فاصل -->
+                        <div style="border-top:1pt solid #333; margin-bottom:6mm;"></div>
+
+                        <!-- ======================================================== -->
+                        <!-- بيانات المشترك — يمين الصفحة                              -->
+                        <!-- ======================================================== -->
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:4mm;">
+                            <tr>
+                                <td style="width:60%; vertical-align:top;"></td>
+                                <td style="width:40%; vertical-align:top; text-align:right;">
+                                    <div style="font-size:9.5pt; margin-bottom:1mm;">
+                                        <span t-esc="partner.name or '--'"/>
+                                        <t t-if="customer.customer_number">
+                                            - <span t-esc="customer.customer_number"/>
+                                        </t>
+                                    </div>
+                                    <div style="font-size:9pt; margin-bottom:0.5mm;">
+                                        م.الراهد <span t-esc="customer.route_id.name or '--'"/>
+                                    </div>
+                                    <div style="font-size:9pt;">
+                                        عداد على <span t-esc="customer.meter_id.meter_number or '--'"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- ======================================================== -->
+                        <!-- عنوان الكشف                                               -->
+                        <!-- ======================================================== -->
+                        <div style="text-align:center; margin-bottom:4mm;">
+                            <span style="color:#0056b3; font-weight:bold; font-size:13pt; border-bottom:1.5pt solid #0056b3; padding-bottom:1mm;">
+                                كشف حساب
+                            </span>
                         </div>
 
-                        <!-- Subscriber & Period Information Cards -->
-                        <table style="width: 100%; margin-bottom: 12px; border-collapse: collapse; background-color: #f8f9fa; border: 1px solid #dee2e6;">
-                            <tr>
-                                <td style="width: 50%; padding: 8px; vertical-align: top; border-left: 1px solid #dee2e6;">
-                                    <div style="font-size: 12px; font-weight: bold; color: #0056b3; margin-bottom: 4px;">بيانات المشترك</div>
-                                    <table style="width: 100%; border-collapse: collapse;">
-                                        <tr>
-                                            <td style="padding: 2px 0; width: 35%; font-weight: bold;">رقم الحساب:</td>
-                                            <td style="padding: 2px 0;"><span t-esc="customer.customer_number or '--'"/></td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 0; font-weight: bold;">اسم المشترك:</td>
-                                            <td style="padding: 2px 0;"><span t-esc="partner.name or '--'"/></td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 0; font-weight: bold;">رقم العداد:</td>
-                                            <td style="padding: 2px 0;"><span t-esc="customer.meter_id.meter_number or '--'"/></td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 0; font-weight: bold;">رقم الهاتف:</td>
-                                            <td style="padding: 2px 0;"><span t-esc="partner.phone or partner.mobile or '--'"/></td>
-                                        </tr>
-                                    </table>
-                                </td>
-                                <td style="width: 50%; padding: 8px; vertical-align: top;">
-                                    <div style="font-size: 12px; font-weight: bold; color: #0056b3; margin-bottom: 4px;">تفاصيل الفترة والمنطقة</div>
-                                    <table style="width: 100%; border-collapse: collapse;">
-                                        <tr>
-                                            <td style="padding: 2px 0; width: 35%; font-weight: bold;">من تاريخ:</td>
-                                            <td style="padding: 2px 0;"><span t-esc="doc.date_from or 'البداية'"/></td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 0; font-weight: bold;">إلى تاريخ:</td>
-                                            <td style="padding: 2px 0;"><span t-esc="doc.date_to or 'اليوم'"/></td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 0; font-weight: bold;">الفئة / العقد:</td>
-                                            <td style="padding: 2px 0;"><span t-esc="customer.category_id.name or customer.contract_template_id.name or '--'"/></td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 0; font-weight: bold;">خط السير:</td>
-                                            <td style="padding: 2px 0;"><span t-esc="customer.route_id.name or '--'"/></td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
+                        <!-- ======================================================== -->
+                        <!-- التاريخ والمنطقة                                          -->
+                        <!-- ======================================================== -->
+                        <div style="margin-bottom:1mm; font-size:9pt;">
+                            <strong>التاريخ: </strong>
+                            <span t-esc="doc.date_to"/>
+                        </div>
+                        <div style="margin-bottom:3mm; font-size:9pt;">
+                            <strong>المنطقة: </strong>
+                            <span t-esc="customer.area_id.name or customer.region_id.name or '--'"/>
+                        </div>
 
-                        <!-- Summary Cards (KPIs) -->
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; text-align: center;">
-                            <tr>
-                                <td style="width: 25%; padding: 8px; background-color: #e9ecef; border: 1px solid #ced4da;">
-                                    <div style="font-size: 10px; color: #495057;">الرصيد الافتتاحي</div>
-                                    <div style="font-size: 13px; font-weight: bold; color: #212529;">
-                                        <span t-esc="'{:,.2f}'.format(totals['opening'])"/>
-                                    </div>
-                                </td>
-                                <td style="width: 25%; padding: 8px; background-color: #fff3cd; border: 1px solid #ffeeba;">
-                                    <div style="font-size: 10px; color: #856404;">إجمالي الفواتير (مدين)</div>
-                                    <div style="font-size: 13px; font-weight: bold; color: #856404;">
-                                        <span t-esc="'{:,.2f}'.format(totals['debit'])"/>
-                                    </div>
-                                </td>
-                                <td style="width: 25%; padding: 8px; background-color: #d4edda; border: 1px solid #c3e6cb;">
-                                    <div style="font-size: 10px; color: #155724;">إجمالي السدادات (دائن)</div>
-                                    <div style="font-size: 13px; font-weight: bold; color: #155724;">
-                                        <span t-esc="'{:,.2f}'.format(totals['credit'])"/>
-                                    </div>
-                                </td>
-                                <td style="width: 25%; padding: 8px; background-color: #d1ecf1; border: 1px solid #bee5eb;">
-                                    <div style="font-size: 10px; color: #0c5460;">الرصيد النهائي المستحق</div>
-                                    <div style="font-size: 13px; font-weight: bold; color: #0c5460;">
-                                        <span t-esc="'{:,.2f}'.format(totals['closing'])"/>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
+                        <!-- ======================================================== -->
+                        <!-- نص معلومات الفترة                                         -->
+                        <!-- ======================================================== -->
+                        <div style="margin-bottom:2mm; font-size:9pt;">
+                            <t t-if="doc.date_from">
+                                <span t-esc="doc.date_from"/>
+                                <span> and </span>
+                                <span t-esc="doc.date_to"/>
+                                <span> كشف الحساب بين تاريخين </span>
+                                in <span t-esc="doc.customer_id.partner_id.property_account_receivable_id.currency_id.name or res_company.currency_id.name"/>:
+                            </t>
+                            <t t-else="">
+                                <span>كشف الحساب حتى تاريخ </span>
+                                <span t-esc="doc.date_to"/>
+                                in <span t-esc="res_company.currency_id.name"/>:
+                            </t>
+                        </div>
 
-                        <!-- Main Statement Table -->
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; border: 1px solid #dee2e6;" border="1">
+                        <!-- ======================================================== -->
+                        <!-- الجدول الرئيسي                                            -->
+                        <!-- ======================================================== -->
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:5mm; font-size:8.5pt;" border="1">
                             <thead>
-                                <tr style="background-color: #0056b3; color: white; text-align: center; font-size: 11px;">
-                                    <th style="width: 12%; padding: 6px;">التاريخ</th>
-                                    <th style="width: 18%; padding: 6px;">المرجع / المستند</th>
-                                    <th style="width: 34%; padding: 6px;">البيان والتفاصيل</th>
-                                    <th style="width: 12%; padding: 6px;">مدين (فاتورة)</th>
-                                    <th style="width: 12%; padding: 6px;">دائن (سداد/إعفاء)</th>
-                                    <th style="width: 12%; padding: 6px;">الرصيد التراكمي</th>
+                                <tr style="background:#eee; text-align:center; font-weight:bold;">
+                                    <th style="border:0.5pt solid #888; padding:1.5mm 1mm; width:14%;">رقم المرجع/السند</th>
+                                    <th style="border:0.5pt solid #888; padding:1.5mm 1mm; width:10%;">التاريخ</th>
+                                    <th style="border:0.5pt solid #888; padding:1.5mm 1mm;">البيان</th>
+                                    <th style="border:0.5pt solid #888; padding:1.5mm 1mm; width:10%;">القراءة السابقة</th>
+                                    <th style="border:0.5pt solid #888; padding:1.5mm 1mm; width:10%;">القراءة الحالية</th>
+                                    <th style="border:0.5pt solid #888; padding:1.5mm 1mm; width:8%;">الاستهلاك</th>
+                                    <th style="border:0.5pt solid #888; padding:1.5mm 1mm; width:13%;">المبلغ</th>
+                                    <th style="border:0.5pt solid #888; padding:1.5mm 1mm; width:13%;">الرصيد</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Opening Balance Row -->
-                                <tr style="background-color: #e9ecef; font-weight: bold;">
-                                    <td style="text-align: center; padding: 5px;"><span t-esc="doc.date_from or '--'"/></td>
-                                    <td style="text-align: center; padding: 5px;">--</td>
-                                    <td style="padding: 5px;"><strong>الرصيد الافتتاحي (Opening Balance)</strong></td>
-                                    <td style="text-align: left; padding: 5px;">--</td>
-                                    <td style="text-align: left; padding: 5px;">--</td>
-                                    <td style="text-align: left; padding: 5px; color: #0056b3;">
-                                        <span t-esc="'{:,.2f}'.format(totals['opening'])"/>
-                                    </td>
-                                </tr>
-
-                                <!-- Transaction Lines -->
-                                <t t-foreach="lines" t-as="line">
-                                    <tr>
-                                        <td style="text-align: center; padding: 5px;">
-                                            <span t-esc="line['date'] or '--'"/>
+                                <!-- صف الرصيد الافتتاحي -->
+                                <t t-if="doc.date_from">
+                                    <tr style="font-weight:bold; background:#f9f9f9;">
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:center;"></td>
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:center;">
+                                            <span t-esc="doc.date_from"/>
                                         </td>
-                                        <td style="text-align: center; padding: 5px;">
-                                            <span t-esc="line['ref'] or '--'"/>
-                                        </td>
-                                        <td style="padding: 5px;">
-                                            <span t-esc="line['description']"/>
-                                        </td>
-                                        <td style="text-align: left; padding: 5px;">
-                                            <span t-if="line['debit'] &gt; 0" t-esc="'{:,.2f}'.format(line['debit'])"/>
-                                            <span t-else="">--</span>
-                                        </td>
-                                        <td style="text-align: left; padding: 5px;">
-                                            <span t-if="line['credit'] &gt; 0" t-esc="'{:,.2f}'.format(line['credit'])"/>
-                                            <span t-else="">--</span>
-                                        </td>
-                                        <td style="text-align: left; padding: 5px; font-weight: bold;">
-                                            <span t-esc="'{:,.2f}'.format(line['balance'])"/>
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm;">Balance Forward</td>
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:center;"></td>
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:center;"></td>
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:center;"></td>
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:left; direction:ltr;"></td>
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:left; direction:ltr;">
+                                            <span t-esc="'{:,.2f}'.format(totals['opening'])"/>
+                                            <span style="font-size:7pt;"> ر.ي</span>
                                         </td>
                                     </tr>
                                 </t>
-                            </tbody>
-                            <tfoot>
-                                <tr style="background-color: #f1f3f5; font-weight: bold; font-size: 11px;">
-                                    <td colspan="3" style="text-align: right; padding: 6px;">الإجمالي العام للفترة</td>
-                                    <td style="text-align: left; padding: 6px; color: #856404;">
-                                        <span t-esc="'{:,.2f}'.format(totals['debit'])"/>
+
+                                <!-- صفوف الحركات -->
+                                <t t-foreach="lines" t-as="line">
+                                    <tr t-attf-style="background:{{ 'white' if line_index % 2 == 0 else '#fafafa' }};">
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:center; direction:ltr; unicode-bidi:embed;">
+                                            <span t-esc="line.get('ref') or ''"/>
+                                        </td>
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:center; direction:ltr; unicode-bidi:embed;">
+                                            <span t-esc="line.get('date') or ''"/>
+                                        </td>
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm;">
+                                            <span t-esc="line.get('description') or ''"/>
+                                        </td>
+                                        <!-- القراءة السابقة - تظهر فقط للفواتير -->
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:center;">
+                                            <t t-if="line.get('kind') == 'invoice'">
+                                                <span t-esc="line.get('prev_reading', '')"/>
+                                            </t>
+                                        </td>
+                                        <!-- القراءة الحالية -->
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:center;">
+                                            <t t-if="line.get('kind') == 'invoice'">
+                                                <span t-esc="line.get('curr_reading', '')"/>
+                                            </t>
+                                        </td>
+                                        <!-- الاستهلاك -->
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:center;">
+                                            <t t-if="line.get('kind') == 'invoice'">
+                                                <span t-esc="line.get('consumption', '')"/>
+                                            </t>
+                                        </td>
+                                        <!-- المبلغ: مدين أو دائن -->
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:left; direction:ltr; unicode-bidi:embed;">
+                                            <t t-if="line.get('debit', 0) > 0">
+                                                <span t-esc="'{:,.2f}'.format(line['debit'])"/>
+                                                <span style="font-size:7pt;"> ر.ي</span>
+                                            </t>
+                                            <t t-elif="line.get('credit', 0) > 0">
+                                                <span style="color:#c4161c;">-<span t-esc="'{:,.2f}'.format(line['credit'])"/></span>
+                                                <span style="font-size:7pt;"> ر.ي</span>
+                                            </t>
+                                        </td>
+                                        <!-- الرصيد التراكمي -->
+                                        <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:left; direction:ltr; unicode-bidi:embed; font-weight:bold;">
+                                            <span t-esc="'{:,.2f}'.format(line.get('balance', 0))"/>
+                                            <span style="font-size:7pt;"> ر.ي</span>
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <!-- صف الرصيد النهائي -->
+                                <tr style="font-weight:bold; background:#f0f0f0;">
+                                    <td colspan="2" style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:center;">
+                                        <span t-esc="doc.date_to"/>
                                     </td>
-                                    <td style="text-align: left; padding: 6px; color: #155724;">
-                                        <span t-esc="'{:,.2f}'.format(totals['credit'])"/>
+                                    <td style="border:0.5pt solid #888; padding:1.5mm 1mm; color:#0056b3; font-weight:bold;">
+                                        الرصيد النهائي
                                     </td>
-                                    <td style="text-align: left; padding: 6px; color: #0056b3; font-size: 12px;">
+                                    <td style="border:0.5pt solid #888; padding:1.5mm 1mm;"></td>
+                                    <td style="border:0.5pt solid #888; padding:1.5mm 1mm;"></td>
+                                    <td style="border:0.5pt solid #888; padding:1.5mm 1mm;"></td>
+                                    <td style="border:0.5pt solid #888; padding:1.5mm 1mm;"></td>
+                                    <td style="border:0.5pt solid #888; padding:1.5mm 1mm; text-align:left; direction:ltr; unicode-bidi:embed; font-size:10pt; color:#0056b3;">
                                         <span t-esc="'{:,.2f}'.format(totals['closing'])"/>
+                                        <span style="font-size:7pt;"> ر.ي</span>
                                     </td>
                                 </tr>
-                            </tfoot>
+                            </tbody>
                         </table>
 
-                        <!-- Footer Notice & Signature Blocks -->
-                        <div style="margin-top: 15px; font-size: 10px; color: #555;">
-                            <div style="border-top: 1px dashed #ccc; padding-top: 5px; text-align: center; margin-bottom: 15px;">
-                                تنبيه: كشف الحساب هذا يعتبر إشعاراً رسمياً بالرصيد المستحق. يرجى مراجعته وموافاتنا بأي ملاحظات خلال 15 يوماً من تاريخه.
-                            </div>
-                            <table style="width: 100%; border-collapse: collapse; text-align: center; margin-top: 10px;">
+                        <!-- ======================================================== -->
+                        <!-- قسم Aging Report                                          -->
+                        <!-- ======================================================== -->
+                        <div style="margin-bottom:3mm; font-size:9pt;">
+                            <span>Aging Report at </span>
+                            <span t-esc="doc.date_to"/>
+                            <span> in </span>
+                            <span t-esc="res_company.currency_id.name"/>:
+                        </div>
+
+                        <!-- ======================================================== -->
+                        <!-- خط فاصل سفلي وتذييل الصفحة                               -->
+                        <!-- ======================================================== -->
+                        <div style="position:fixed; bottom:5mm; left:8mm; right:8mm; border-top:1pt solid #333; padding-top:2mm;">
+                            <table style="width:100%; border-collapse:collapse; font-size:8pt;">
                                 <tr>
-                                    <td style="width: 33%;"><strong>توقيع المحصل / الموظف المختص</strong></td>
-                                    <td style="width: 33%;"><strong>توقيع رئيس قسم الفوترة</strong></td>
-                                    <td style="width: 33%;"><strong>توقيع المشترك بالاستلام</strong></td>
-                                </tr>
-                                <tr>
-                                    <td style="height: 35px;"></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>........................................</td>
-                                    <td>........................................</td>
-                                    <td>........................................</td>
+                                    <td style="text-align:right; color:#555;">
+                                        <span>تاريخ ووقت الطباعة: </span>
+                                        <span style="direction:ltr; unicode-bidi:embed;"
+                                              t-esc="context_timestamp(datetime.datetime.now()).strftime('%H:%M %d-%m-%Y')"/>
+                                    </td>
+                                    <td style="text-align:center; color:#555;">
+                                        <span>طبع بواسطة: </span>
+                                        <span t-esc="user.name"/>
+                                    </td>
+                                    <td style="text-align:left; color:#555;">
+                                        <span>1 / 1 بصفحة</span>
+                                    </td>
                                 </tr>
                             </table>
                         </div>
 
                     </div>
-                </t>
+                </div>
             </t>
         </t>
     </template>

@@ -131,6 +131,9 @@ class UtilityCustomerStatementWizard(models.TransientModel):
                 'description': _('فاتورة كهرباء رقم %s') % (order.name or ''),
                 'debit': order.amount_total,
                 'credit': 0.0,
+                'prev_reading': order.previous_reading or '',
+                'curr_reading': order.current_reading or '',
+                'consumption': order.consumption or '',
             })
 
         payments = self.env['account.payment'].search(self._payment_domain(), order='date, id')
