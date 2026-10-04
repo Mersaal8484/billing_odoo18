@@ -259,7 +259,9 @@ class UtilityReadingReviewService(models.AbstractModel):
             'state': reading.state,
             'image_state': reading.image_state or 'none',
             'consumption_alert': reading.consumption_alert or 'normal',
-            'asset_uuid': asset_uuid,
+            # Asset is optional for legacy readings that still use only an
+            # attachment.  Keep the DTO valid for both storage paths.
+            'asset_uuid': asset.asset_uuid if asset else False,
             'thumbnail_url': thumb_url,
             'review_url': review_url,
             'original_url': orig_url,
