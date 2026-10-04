@@ -192,6 +192,7 @@ class MockAssignmentRepository implements AssignmentRepository {
       id: a.id,
       meter: a.meter,
       customer: a.customer,
+      periodId: a.periodId,
       status: status,
       scheduledAt: a.scheduledAt,
       averageConsumption: a.averageConsumption,

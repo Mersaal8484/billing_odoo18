@@ -54,7 +54,9 @@ void main() {
       final repo1 = OdooAssignmentRepository(null, db);
 
       final x = _assignment(
-          customerId: 1, meterId: 100, meterNumber: 'M-100',
+          customerId: 1,
+          meterId: 100,
+          meterNumber: 'M-100',
           lastReadingValue: 1234.5);
       await repo1.debugSimulateSuccessfulSync([x], 55);
 
@@ -69,6 +71,7 @@ void main() {
       expect(result, isNotNull);
       expect(result!.customer.lastReadingValue, 1234.5);
       expect(result.meter.meterNumber, 'M-100');
+      expect(result.periodId, 55);
 
       await db.close();
     },

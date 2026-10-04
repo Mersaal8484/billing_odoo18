@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
+
 import '../../features/readings/data/drift_reading_repository.dart';
 import '../../features/readings/domain/reading.dart';
 import '../database/app_database.dart';
@@ -50,6 +53,7 @@ class SyncEngine {
   final AppDatabase db;
   final SyncSettingsService settingsService;
   final ReadingApiService readingApi;
+  final Connectivity _connectivityProbe;
 
   SyncSnapshot _last = const SyncSnapshot(
     connectivity: ConnectivityState.online,
@@ -58,10 +62,18 @@ class SyncEngine {
 
   final _ctrl = StreamController<SyncSnapshot>.broadcast();
   Timer? _timer;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+  Future<void>? _activeSync;
   ConnectivityState _connectivity = ConnectivityState.online;
   DateTime? _lastSuccess;
 
-  SyncEngine(this.readingRepository, this.db, this.settingsService, this.readingApi);
+  SyncEngine(
+    this.readingRepository,
+    this.db,
+    this.settingsService,
+    this.readingApi, {
+    Connectivity? connectivity,
+  }) : _connectivityProbe = connectivity ?? Connectivity();
 
   Stream<SyncSnapshot> get snapshots async* {
     yield _last;
@@ -69,17 +81,36 @@ class SyncEngine {
   }
 
   void setConnectivity(ConnectivityState state) {
+    final changed = _connectivity != state;
     _connectivity = state;
     _publish();
-    if (state == ConnectivityState.online) _tick();
+    if (changed && state == ConnectivityState.online) {
+      unawaited(syncNow());
+    }
   }
 
   void start() {
-    _timer = Timer.periodic(const Duration(seconds: 15), (_) => _tick());
+    _timer ??= Timer.periodic(const Duration(seconds: 15), (_) {
+      unawaited(_refreshConnectivity());
+      unawaited(_tick());
+    });
+    if (_connectivitySubscription == null) {
+      // Do not upload a pending queue before the device transport is checked.
+      // The initial successful check transitions to online and starts sync now.
+      _connectivity = ConnectivityState.offline;
+      _connectivitySubscription =
+          _connectivityProbe.onConnectivityChanged.listen(_applyConnectivity);
+    }
+    unawaited(_refreshConnectivity());
     _publish();
   }
 
-  void stop() => _timer?.cancel();
+  void stop() {
+    _timer?.cancel();
+    _timer = null;
+    _connectivitySubscription?.cancel();
+    _connectivitySubscription = null;
+  }
 
   void dispose() {
     stop();
@@ -93,8 +124,9 @@ class SyncEngine {
     _publish();
 
     final mode = await settingsService.getSyncMode();
-    if (mode == SyncMode.immediate && _connectivity == ConnectivityState.online) {
-      await _upload([reading]);
+    if (mode == SyncMode.immediate &&
+        _connectivity == ConnectivityState.online) {
+      await syncNow();
       return;
     }
     await _checkThreshold();
@@ -112,24 +144,50 @@ class SyncEngine {
 
   /// زر "مزامنة الآن" في sync_center_screen
   Future<void> syncNow() async {
-    final mode = await settingsService.getSyncMode();
-    if (mode == SyncMode.immediate) {
-      await _uploadPendingSingles();
-    } else {
-      await _buildAndUploadBatch();
-    }
+    if (_connectivity == ConnectivityState.offline) return;
+    await _runSingleFlight(() async {
+      final mode = await settingsService.getSyncMode();
+      if (mode == SyncMode.immediate) {
+        await _uploadPendingSingles();
+      } else {
+        await _buildAndUploadBatch();
+      }
+    });
   }
 
   // ── Pipeline internals ────────────────────────────────────────────────────
 
   Future<void> _tick() async {
     if (_connectivity == ConnectivityState.offline) return;
-    final mode = await settingsService.getSyncMode();
-    if (mode == SyncMode.immediate) {
-      await _uploadPendingSingles();
-    } else {
-      await _checkThreshold();
-    }
+    await _runSingleFlight(() async {
+      final mode = await settingsService.getSyncMode();
+      if (mode == SyncMode.immediate) {
+        await _uploadPendingSingles();
+      } else {
+        await _checkThreshold();
+      }
+    });
+  }
+
+  Future<void> _refreshConnectivity() async {
+    final transports = await _connectivityProbe.checkConnectivity();
+    _applyConnectivity(transports);
+  }
+
+  void _applyConnectivity(List<ConnectivityResult> transports) {
+    final hasNetwork = transports.isNotEmpty &&
+        !transports.every((transport) => transport == ConnectivityResult.none);
+    setConnectivity(
+        hasNetwork ? ConnectivityState.online : ConnectivityState.offline);
+  }
+
+  Future<void> _runSingleFlight(Future<void> Function() operation) {
+    final active = _activeSync;
+    if (active != null) return active;
+
+    final future = operation();
+    _activeSync = future.whenComplete(() => _activeSync = null);
+    return _activeSync!;
   }
 
   Future<void> _checkThreshold() async {
@@ -180,13 +238,12 @@ class SyncEngine {
 
       // ── فلترة "بصمة الفترة" ──────────────────────────────────────────
       // قراءة أُخذت ميدانياً في فترة أُغلقت لاحقاً (لم تُزامَن في وقتها)
-      // لا يجب أن تُلصق تلقائياً بالفترة المفتوحة الآن. القراءات القديمة
-      // (قبل إضافة هذا الحقل، capturedPeriodId == null) تُعامل كما كانت
-      // سابقاً حفاظاً على التوافق مع البيانات المحفوظة مسبقاً.
+      // لا يجب أن تُلصق تلقائياً بالفترة المفتوحة الآن. القراءة التي بلا
+      // بصمة لا يمكن نسبتها بأمان إلى فترة مفتوحة لاحقة، لذلك لا تُرفع آلياً.
       final upload = <MeterReading>[];
       final staleReadings = <MeterReading>[];
       for (final r in readings) {
-        if (r.capturedPeriodId != null && r.capturedPeriodId != periodId) {
+        if (r.capturedPeriodId == null || r.capturedPeriodId != periodId) {
           staleReadings.add(r);
         } else {
           upload.add(r);
@@ -198,10 +255,13 @@ class SyncEngine {
           await readingRepository.updateSyncStatus(
             r.id,
             ReadingSyncStatus.error,
-            error:
-                'هذه القراءة أُخذت في فترة مغلقة (رقم ${r.capturedPeriodId}) '
-                'وليست الفترة المفتوحة حالياً (رقم $periodId). لم تُرفع '
-                'تلقائياً — راجعها من طابور المزامنة قبل إعادة المحاولة.',
+            error: r.capturedPeriodId == null
+                ? 'هذه القراءة لا تحمل بصمة فترة الالتقاط، لذلك لم تُرفع '
+                    'تلقائياً إلى الفترة المفتوحة حالياً (رقم $periodId). '
+                    'راجعها من طابور المزامنة.'
+                : 'هذه القراءة أُخذت في فترة مغلقة (رقم ${r.capturedPeriodId}) '
+                    'وليست الفترة المفتوحة حالياً (رقم $periodId). لم تُرفع '
+                    'تلقائياً — راجعها من طابور المزامنة قبل إعادة المحاولة.',
           );
         }
       }
@@ -234,10 +294,9 @@ class SyncEngine {
           readingDate: reading.readingDate,
           readingCategory: reading.category.name,
           clientReadingUuid: reading.id,
-          imageFilename:
-              imageFile?.uri.pathSegments.isNotEmpty == true
-                  ? imageFile!.uri.pathSegments.last
-                  : null,
+          imageFilename: imageFile?.uri.pathSegments.isNotEmpty == true
+              ? imageFile!.uri.pathSegments.last
+              : null,
         ));
       }
       await readingApi.uploadData(batchId: batchId, readings: payloads);
@@ -260,7 +319,8 @@ class SyncEngine {
       // تحديث الحالة إلى synced — فقط للقراءات التي فعلاً رُفعت
       // (القراءات المتأخرة عن فترة مغلقة وُسمت بخطأ واضح أعلاه ولا تُلمس هنا)
       for (final r in readingsToUpload) {
-        await readingRepository.updateSyncStatus(r.id, ReadingSyncStatus.synced);
+        await readingRepository.updateSyncStatus(
+            r.id, ReadingSyncStatus.synced);
       }
       _lastSuccess = DateTime.now();
       _publish();
@@ -268,8 +328,8 @@ class SyncEngine {
       // فقط القراءات التي كانت قيد الرفع الفعلي؛ قراءات الفترة المغلقة
       // (إن فُلترت قبل هذا الفشل) تحتفظ برسالتها التفصيلية الخاصة بها.
       for (final r in readingsToUpload) {
-        await readingRepository.updateSyncStatus(
-            r.id, ReadingSyncStatus.error, error: e.toString());
+        await readingRepository.updateSyncStatus(r.id, ReadingSyncStatus.error,
+            error: e.toString());
       }
       // أبلغ الـ UI بانتهاء الجلسة → يُعيد التوجيه لشاشة تسجيل الدخول
       _last = SyncSnapshot(
@@ -279,13 +339,51 @@ class SyncEngine {
         sessionExpired: true,
       );
       _ctrl.add(_last);
-    } catch (e) {
-      for (final r in readingsToUpload) {
-        await readingRepository.updateSyncStatus(
-            r.id, ReadingSyncStatus.error, error: e.toString());
+    } on DioException catch (e) {
+      if (_isNetworkFailure(e)) {
+        await _deferUntilNetworkReturns(readingsToUpload);
+      } else {
+        await _markUploadFailed(readingsToUpload, e);
       }
-      _publish();
+    } on SocketException {
+      await _deferUntilNetworkReturns(readingsToUpload);
+    } catch (e) {
+      await _markUploadFailed(readingsToUpload, e);
     }
+  }
+
+  bool _isNetworkFailure(DioException error) {
+    return error.type == DioExceptionType.connectionError ||
+        error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioExceptionType.receiveTimeout ||
+        error.error is SocketException;
+  }
+
+  /// A transport failure is not a rejected reading.  Keep it pending locally
+  /// and wait for the connectivity watcher to resume the same upload.
+  Future<void> _deferUntilNetworkReturns(List<MeterReading> readings) async {
+    for (final reading in readings) {
+      await readingRepository.updateSyncStatus(
+        reading.id,
+        ReadingSyncStatus.pendingDataSync,
+      );
+    }
+    _connectivity = ConnectivityState.offline;
+    _publish();
+  }
+
+  Future<void> _markUploadFailed(
+    List<MeterReading> readings,
+    Object error,
+  ) async {
+    for (final reading in readings) {
+      await readingRepository.updateSyncStatus(
+        reading.id,
+        ReadingSyncStatus.error,
+        error: error.toString(),
+      );
+    }
+    _publish();
   }
 
   void _publish() async {

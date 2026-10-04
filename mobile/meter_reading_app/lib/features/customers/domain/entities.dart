@@ -68,6 +68,9 @@ class ReadingAssignment {
   final String id;
   final Meter meter;
   final Customer customer;
+
+  /// Identity of the reading period downloaded with this assignment.
+  final int? periodId;
   final AssignmentStatus status;
   final DateTime scheduledAt;
   final double averageConsumption;
@@ -76,6 +79,7 @@ class ReadingAssignment {
     required this.id,
     required this.meter,
     required this.customer,
+    this.periodId,
     required this.status,
     required this.scheduledAt,
     required this.averageConsumption,

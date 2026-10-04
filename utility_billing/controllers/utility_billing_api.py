@@ -417,7 +417,6 @@ class UtilityBillingAPI(http.Controller):
                     'payment_method_line_id': method_line.id,
                     'collection_request_key': request_key,
                     'collection_request_user_id': request.env.user.id,
-                    'ref': 'MOBILE-COLLECT:%s' % request_key,
                 })
         except IntegrityError as exc:
             if getattr(exc, 'pgcode', None) != '23505':

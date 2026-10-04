@@ -31,13 +31,13 @@ class OdooAssignmentRepository implements AssignmentRepository {
 
   Future<ReadingAssignmentSyncResult> _fetchDataInternal() async {
     try {
-      final response = await _client!.postJson('/api/v1/utility/reader/subscribers', {});
+      final response =
+          await _client!.postJson('/api/v1/utility/reader/subscribers', {});
       if (response['success'] == true) {
         final subs = response['subscribers'] as List<dynamic>? ?? const [];
         final rawPeriod = response['period'];
-        final period = rawPeriod is Map
-            ? Map<String, dynamic>.from(rawPeriod)
-            : null;
+        final period =
+            rawPeriod is Map ? Map<String, dynamic>.from(rawPeriod) : null;
         // ✅ مؤكَّد من كود الـ backend: period_data = {'id': current_period.id, ...}
         final periodId = period != null
             ? int.tryParse(period['id']?.toString() ?? '')
@@ -90,6 +90,7 @@ class OdooAssignmentRepository implements AssignmentRepository {
             id: 'assign-$cId',
             meter: meter,
             customer: customer,
+            periodId: periodId,
             status: _assignmentStatusFromApi(s['reading_status']),
             scheduledAt: now,
             averageConsumption: 0.0,
@@ -116,7 +117,8 @@ class OdooAssignmentRepository implements AssignmentRepository {
           message: response['message']?.toString(),
         );
       } else {
-        _lastError = response['error']?.toString() ?? 'API returned success=false';
+        _lastError =
+            response['error']?.toString() ?? 'API returned success=false';
         _notifyListeners();
         return ReadingAssignmentSyncResult(
           success: false,
@@ -335,6 +337,7 @@ class OdooAssignmentRepository implements AssignmentRepository {
         id: row.id,
         meter: meter,
         customer: customer,
+        periodId: row.periodId,
         status: AssignmentStatus.values.firstWhere(
           (s) => s.name == row.status,
           orElse: () => AssignmentStatus.pending,
@@ -382,7 +385,8 @@ class OdooAssignmentRepository implements AssignmentRepository {
   }
 
   @override
-  Stream<List<ReadingAssignment>> watchAssignments({String? query, AssignmentStatus? filter}) {
+  Stream<List<ReadingAssignment>> watchAssignments(
+      {String? query, AssignmentStatus? filter}) {
     return Stream<List<ReadingAssignment>>.multi((controller) {
       if (!_initialized) {
         _initialized = true;
@@ -393,7 +397,8 @@ class OdooAssignmentRepository implements AssignmentRepository {
         }));
       }
       try {
-        controller.add(_applyFilters(List.unmodifiable(_all), query: query, filter: filter));
+        controller.add(_applyFilters(List.unmodifiable(_all),
+            query: query, filter: filter));
       } catch (e, st) {
         controller.addError(e, st);
       }
@@ -461,6 +466,7 @@ class OdooAssignmentRepository implements AssignmentRepository {
       id: a.id,
       meter: a.meter,
       customer: a.customer,
+      periodId: a.periodId,
       status: status,
       scheduledAt: a.scheduledAt,
       averageConsumption: a.averageConsumption,

@@ -14,7 +14,6 @@ import 'package:uuid/uuid.dart';
 import '../../../app/providers.dart';
 import '../../../core/network/odoo_api_client.dart';
 import '../../../shared/widgets/state_widgets.dart';
-import '../../customers/data/mock_assignment_repository.dart';
 import '../../customers/domain/entities.dart';
 import '../domain/reading.dart';
 
@@ -144,7 +143,8 @@ Uint8List? _watermarkInIsolate(_WatermarkArgs args) {
   const int maxBytes = 65 * 1024; // 65 KB
 
   // Probe at quality=75 first
-  Uint8List compressed = Uint8List.fromList(img.encodeJpg(working, quality: 75));
+  Uint8List compressed =
+      Uint8List.fromList(img.encodeJpg(working, quality: 75));
 
   if (compressed.lengthInBytes > maxBytes) {
     // Estimate quality needed: newQ ≈ 75 × (maxBytes / probeSize), clamped [30, 70]
@@ -154,8 +154,10 @@ Uint8List? _watermarkInIsolate(_WatermarkArgs args) {
 
     if (compressed.lengthInBytes > maxBytes) {
       // Still over — shrink to 70% width and try again
-      final narrowed = img.copyResize(working, width: (working.width * 0.7).toInt());
-      final attempt3 = Uint8List.fromList(img.encodeJpg(narrowed, quality: estQ));
+      final narrowed =
+          img.copyResize(working, width: (working.width * 0.7).toInt());
+      final attempt3 =
+          Uint8List.fromList(img.encodeJpg(narrowed, quality: estQ));
       if (attempt3.lengthInBytes < compressed.lengthInBytes) {
         compressed = attempt3;
       }
@@ -211,8 +213,7 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
       final repo = ref.read(assignmentRepositoryProvider);
 
       // استخدام getById أولاً، ثم البحث برقم العداد أو QR
-      resolvedAssignment =
-          await repo.getById(widget.assignmentId) ??
+      resolvedAssignment = await repo.getById(widget.assignmentId) ??
           await repo.lookupByMeterNumber(widget.assignmentId) ??
           await repo.resolveQr(widget.assignmentId);
       final assignment = resolvedAssignment;
@@ -236,7 +237,9 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
       });
 
       // ── منع القراءة المكررة ──────────────────────────────────────────────
-      if (meterInfo.alreadyReadThisPeriod && !meterInfo.canResubmit && mounted) {
+      if (meterInfo.alreadyReadThisPeriod &&
+          !meterInfo.canResubmit &&
+          mounted) {
         await showDialog(
           context: context,
           barrierDismissible: false,
@@ -280,10 +283,9 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
     final periods = (periodResult['periods'] as List?) ?? [];
     int? currentPeriodId;
     if (periods.isNotEmpty) {
-      final current = periods
-          .cast<Map<String, dynamic>>()
-          .firstWhere((p) => p['is_current'] == true,
-              orElse: () => periods.first as Map<String, dynamic>);
+      final current = periods.cast<Map<String, dynamic>>().firstWhere(
+          (p) => p['is_current'] == true,
+          orElse: () => periods.first as Map<String, dynamic>);
       currentPeriodId = current['id'] as int?;
     }
 
@@ -304,8 +306,8 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
     String? rejectionReason;
     if (currentPeriodId != null) {
       try {
-        final checkResult = await client.postJson(
-            '/api/v1/utility/reading/check_period_reading', {
+        final checkResult = await client
+            .postJson('/api/v1/utility/reading/check_period_reading', {
           'meter_code': meterNumber,
           'period_id': currentPeriodId,
         });
@@ -337,7 +339,8 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
       return;
     }
     if (!mounted) return;
-    await Future<void>.delayed(Duration.zero); // تأكد من اكتمال أي dispose معلق للماسح قبل فتح الكاميرا
+    await Future<void>.delayed(Duration
+        .zero); // تأكد من اكتمال أي dispose معلق للماسح قبل فتح الكاميرا
     final result = await Navigator.of(context).push<File>(
       MaterialPageRoute(builder: (_) => _CameraScreen(camera: cameras.first)),
     );
@@ -366,7 +369,6 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
     await outFile.writeAsBytes(compressed);
     return outFile;
   }
-
 
   // ── حفظ القراءة ──────────────────────────────────────────────────────────
 
@@ -406,15 +408,14 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
         readingDate: DateTime.now(),
         category: ReadingCategory.customer,
         isEstimated: false,
-        remarks: _remarksCtrl.text.trim().isEmpty
-            ? null
-            : _remarksCtrl.text.trim(),
+        remarks:
+            _remarksCtrl.text.trim().isEmpty ? null : _remarksCtrl.text.trim(),
         imageLocalPath: _capturedImage!.path,
         photoUuid: const Uuid().v4(),
         syncStatus: ReadingSyncStatus.draft,
         // بصمة الفترة المفتوحة الآن — يقارنها SyncEngine بالفترة المفتوحة
         // وقت الرفع لاحقاً، فلا تُلصق قراءة قديمة بفترة جديدة بالخطأ.
-        capturedPeriodId: _meterInfo?.currentPeriodId,
+        capturedPeriodId: _meterInfo?.currentPeriodId ?? assignment.periodId,
       );
 
       // 1. حفظ محلي
@@ -471,8 +472,7 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
           // بطاقة المشترك
           Card(
             child: ListTile(
-              leading:
-                  const CircleAvatar(child: Icon(Icons.person_outline)),
+              leading: const CircleAvatar(child: Icon(Icons.person_outline)),
               title: Text(assignment.customer.name,
                   style: const TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text(
@@ -526,8 +526,7 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
                           children: [
                             Text('${meterInfo.lastReadingValue} kWh',
                                 style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold)),
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
                             if (meterInfo.avgConsumption > 0) ...[
                               const SizedBox(width: 12),
                               Text(
@@ -540,8 +539,8 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
                         ),
                         if (meterInfo.isOffline)
                           Text('⚠ تعذّر التحقق من التكرار — غير متصل',
-                              style: TextStyle(
-                                  color: scheme.error, fontSize: 11)),
+                              style:
+                                  TextStyle(color: scheme.error, fontSize: 11)),
                       ],
                     ),
                   ),
@@ -563,15 +562,14 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _readingCtrl,
-                    keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
                       hintText: 'أدخل قراءة العداد',
                       suffixText: 'kWh',
                       border: const OutlineInputBorder(),
                       filled: true,
-                      fillColor:
-                          scheme.surfaceVariant.withOpacity(0.3),
+                      fillColor: scheme.surfaceVariant.withOpacity(0.3),
                     ),
                     style: const TextStyle(
                         fontSize: 22, fontWeight: FontWeight.bold),
@@ -601,8 +599,7 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
                   Row(
                     children: [
                       Text('صورة العداد',
-                          style:
-                              Theme.of(context).textTheme.titleMedium),
+                          style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -672,12 +669,10 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
 
           // زر الحفظ
           FilledButton.icon(
-            onPressed:
-                (_savingReading ||
-                        (meterInfo.alreadyReadThisPeriod &&
-                            !meterInfo.canResubmit))
-                    ? null
-                    : _saveReading,
+            onPressed: (_savingReading ||
+                    (meterInfo.alreadyReadThisPeriod && !meterInfo.canResubmit))
+                ? null
+                : _saveReading,
             icon: _savingReading
                 ? const SizedBox(
                     width: 18,
@@ -688,8 +683,8 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
             label: Text(_savingReading
                 ? 'جاري الحفظ...'
                 : 'حفظ القراءة وإضافتها للرفع'),
-            style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(52)),
+            style:
+                FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
           ),
 
           if (meterInfo.isOffline)
@@ -702,8 +697,7 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
                   const SizedBox(width: 4),
                   Text(
                     'وضع غير متصل — تُرفع عند توفر الشبكة',
-                    style:
-                        TextStyle(fontSize: 11, color: scheme.outline),
+                    style: TextStyle(fontSize: 11, color: scheme.outline),
                   ),
                 ],
               ),
@@ -718,8 +712,7 @@ class _ReadingEntryScreenState extends ConsumerState<ReadingEntryScreen> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(msg),
-      backgroundColor:
-          isError ? Theme.of(context).colorScheme.error : null,
+      backgroundColor: isError ? Theme.of(context).colorScheme.error : null,
     ));
   }
 }
@@ -775,7 +768,8 @@ class _CameraScreenState extends State<_CameraScreen>
     super.dispose();
   }
 
-  Future<void> _onTapFocus(TapUpDetails details, BoxConstraints constraints) async {
+  Future<void> _onTapFocus(
+      TapUpDetails details, BoxConstraints constraints) async {
     final offset = Offset(
       details.localPosition.dx / constraints.maxWidth,
       details.localPosition.dy / constraints.maxHeight,
@@ -853,8 +847,8 @@ class _CameraScreenState extends State<_CameraScreen>
                 right: 0,
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: Row(
                       children: [
                         IconButton(
@@ -883,8 +877,8 @@ class _CameraScreenState extends State<_CameraScreen>
                 right: 16,
                 child: Center(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: Colors.black54,
                       borderRadius: BorderRadius.circular(20),
@@ -944,8 +938,7 @@ class _CameraScreenState extends State<_CameraScreen>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white,
-                        border: Border.all(
-                            color: Colors.white70, width: 4),
+                        border: Border.all(color: Colors.white70, width: 4),
                         boxShadow: const [
                           BoxShadow(
                               color: Colors.black45,
@@ -957,8 +950,7 @@ class _CameraScreenState extends State<_CameraScreen>
                           ? const Padding(
                               padding: EdgeInsets.all(18),
                               child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.black))
+                                  strokeWidth: 2, color: Colors.black))
                           : const Icon(Icons.camera_alt,
                               size: 36, color: Colors.black),
                     ),
@@ -1037,20 +1029,25 @@ class _OverlayPainter extends CustomPainter {
     canvas.drawLine(r.topLeft, r.topLeft + const Offset(cLen, 0), cornerPaint);
     canvas.drawLine(r.topLeft, r.topLeft + const Offset(0, cLen), cornerPaint);
     // زاوية يمين أعلى
-    canvas.drawLine(r.topRight, r.topRight + const Offset(-cLen, 0), cornerPaint);
-    canvas.drawLine(r.topRight, r.topRight + const Offset(0, cLen), cornerPaint);
+    canvas.drawLine(
+        r.topRight, r.topRight + const Offset(-cLen, 0), cornerPaint);
+    canvas.drawLine(
+        r.topRight, r.topRight + const Offset(0, cLen), cornerPaint);
     // زاوية يسار أسفل
-    canvas.drawLine(r.bottomLeft, r.bottomLeft + const Offset(cLen, 0), cornerPaint);
-    canvas.drawLine(r.bottomLeft, r.bottomLeft + const Offset(0, -cLen), cornerPaint);
+    canvas.drawLine(
+        r.bottomLeft, r.bottomLeft + const Offset(cLen, 0), cornerPaint);
+    canvas.drawLine(
+        r.bottomLeft, r.bottomLeft + const Offset(0, -cLen), cornerPaint);
     // زاوية يمين أسفل
-    canvas.drawLine(r.bottomRight, r.bottomRight + const Offset(-cLen, 0), cornerPaint);
-    canvas.drawLine(r.bottomRight, r.bottomRight + const Offset(0, -cLen), cornerPaint);
+    canvas.drawLine(
+        r.bottomRight, r.bottomRight + const Offset(-cLen, 0), cornerPaint);
+    canvas.drawLine(
+        r.bottomRight, r.bottomRight + const Offset(0, -cLen), cornerPaint);
   }
 
   @override
   bool shouldRepaint(_OverlayPainter old) => old.frameRect != frameRect;
 }
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // خطأ
