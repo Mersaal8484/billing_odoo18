@@ -547,11 +547,34 @@ class UtilityReaderAPI(http.Controller):
             ('state', 'in', ['approved', 'billed']),
         ], order='reading_date desc, id desc', limit=1)
 
-        last_reading_value = last_reading.reading_value if last_reading else 0.0
-        last_reading_date = (
-            last_reading.reading_date.isoformat()
-            if last_reading and last_reading.reading_date else None
+        # Migrated accounts commonly carry their opening/last reading on the
+        # meter and customer without a historical ``utility.reading`` record.
+        # Do not turn that valid operational baseline into zero merely because
+        # there is no canonical reading history yet.  When both sources exist,
+        # use the most recent dated value.
+        meter_baseline_value = meter.last_reading_value
+        meter_baseline_date = meter.last_read_date
+        if not meter_baseline_date and customer:
+            meter_baseline_value = customer.last_reading_value
+            meter_baseline_date = customer.last_reading_date
+
+        use_historical_reading = bool(last_reading) and (
+            not meter_baseline_date
+            or not last_reading.reading_date
+            or last_reading.reading_date >= meter_baseline_date
         )
+        if use_historical_reading:
+            last_reading_value = last_reading.reading_value
+            last_reading_date = (
+                last_reading.reading_date.isoformat()
+                if last_reading.reading_date else None
+            )
+        else:
+            last_reading_value = meter_baseline_value or 0.0
+            last_reading_date = (
+                meter_baseline_date.isoformat()
+                if meter_baseline_date else None
+            )
 
         # حساب متوسط الاستهلاك من آخر 6 قراءات معتمدة
         recent_readings = request.env['utility.reading'].sudo().search([

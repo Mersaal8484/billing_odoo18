@@ -117,6 +117,26 @@ class TestMeterOperationalBillingAPI(TransactionCase):
         self.assertEqual(result['meter']['id'], meter.id)
         self.assertEqual(result['meter']['operational_number'], meter.operational_number)
 
+    def test_reader_lookup_uses_migrated_meter_baseline_without_history(self):
+        meter, customer = self._meter_and_customer('MIGRATED-BASELINE')
+        meter.write({
+            'last_reading_value': 91859.0,
+            'last_read_date': '2026-09-15 00:00:00',
+        })
+        customer.write({
+            'last_reading_value': 91859.0,
+            'last_reading_date': '2026-09-15 00:00:00',
+        })
+
+        controller = utility_reader_api.UtilityReaderAPI()
+        with patch.object(utility_reader_api, 'request', self._request({
+                'meter_number': meter.meter_number})):
+            result = controller.meter_lookup(meter_number=meter.meter_number)
+
+        self.assertTrue(result['success'])
+        self.assertEqual(result['last_reading_value'], 91859.0)
+        self.assertEqual(result['last_reading_date'], '2026-09-15T00:00:00')
+
     def test_reader_lookup_conflicting_identifiers_is_rejected(self):
         first, _customer = self._meter_and_customer('MISMATCH-A')
         second, _customer = self._meter_and_customer('MISMATCH-B')
