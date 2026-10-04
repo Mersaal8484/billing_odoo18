@@ -24,10 +24,14 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _syncAssignments());
+    // Load the cached assignments immediately.  A background refresh is useful
+    // when connected, but an expected offline state must not interrupt field
+    // work with a transport exception banner.
+    WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _syncAssignments(silentWhenOffline: true));
   }
 
-  Future<void> _syncAssignments() async {
+  Future<void> _syncAssignments({bool silentWhenOffline = false}) async {
     if (_syncing) return;
     setState(() => _syncing = true);
 
@@ -44,8 +48,10 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
       _syncing = false;
     });
 
+    if (silentWhenOffline && !result.success) return;
+
     final message = !result.success
-        ? 'تعذر تحديث مهام الكاشف: ${result.message ?? 'خطأ غير معروف'}'
+        ? 'لا يوجد اتصال بالخادم الآن؛ يمكنك متابعة العمل بالمهام المحفوظة وسيتم رفع القراءات لاحقًا.'
         : result.hasOpenPeriod
             ? 'تم تنزيل ${result.count} مشترك للفترة: ${result.periodName ?? ''}'
             : _periodMessage!;
