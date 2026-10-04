@@ -18,8 +18,9 @@ debt management, collections, and online payment gateway integration.
         'security/ir.model.access.csv',
         'security/utility_billing_security.xml',
         'data/utility_sequence.xml',
-        'data/utility_billing_account_data.xml',
-        'data/utility_billing_product_data.xml',
+        # Accounts and products are owned and loaded by utility_core.  The
+        # former duplicate files attempted cross-module XML-ID updates, which
+        # prevents a safe utility_billing upgrade on Odoo 18.
         'data/utility_billing_defaults.xml',
         'data/utility_cron.xml',
         'data/utility_cron_extras.xml',

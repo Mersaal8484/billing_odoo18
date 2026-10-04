@@ -18,6 +18,7 @@ class OdooSessionExpiredException implements Exception {
 /// Thrown for any other Odoo JSON-RPC error (validation, access rights, etc).
 class OdooApiException implements Exception {
   final String message;
+
   /// JSON-RPC uses a numeric code, while the business API returns stable
   /// string codes such as `READER_SCOPE_NOT_ASSIGNED`.
   final Object? code;
@@ -45,12 +46,12 @@ class OdooApiClient {
   /// Call this once at app startup (e.g. in a provider) and await it
   /// before making any requests, so the cookie jar is ready.
   static Future<OdooApiClient> create({
-    String defaultBaseUrl = 'http://10.0.2.2:8069',
+    required String defaultBaseUrl,
     FlutterSecureStorage? storage,
   }) async {
     final secureStorage = storage ?? const FlutterSecureStorage();
     final savedUrl = await secureStorage.read(key: _baseUrlKey);
-    final baseUrl = savedUrl ?? defaultBaseUrl;
+    final baseUrl = _normaliseBaseUrl(savedUrl ?? defaultBaseUrl);
 
     final dio = Dio(BaseOptions(
       baseUrl: baseUrl,
@@ -74,11 +75,24 @@ class OdooApiClient {
 
   String get baseUrl => _baseUrl;
 
+  static String _normaliseBaseUrl(String value) {
+    final uri = Uri.tryParse(value.trim());
+    if (uri == null || !uri.hasScheme || uri.host.isEmpty) {
+      throw ArgumentError.value(
+        value,
+        'baseUrl',
+        'A complete server URL is required.',
+      );
+    }
+    return value.trim().replaceFirst(RegExp(r'/+$'), '');
+  }
+
   /// Update the server address at runtime (Settings screen) and persist it.
   Future<void> setBaseUrl(String newBaseUrl) async {
-    _baseUrl = newBaseUrl;
-    dio.options.baseUrl = newBaseUrl;
-    await _storage.write(key: _baseUrlKey, value: newBaseUrl);
+    final baseUrl = _normaliseBaseUrl(newBaseUrl);
+    _baseUrl = baseUrl;
+    dio.options.baseUrl = baseUrl;
+    await _storage.write(key: _baseUrlKey, value: baseUrl);
   }
 
   /// Clears the session cookie (used on logout / session-expired).

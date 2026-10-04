@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../core/network/billing_api_service.dart';
 import '../../customers/domain/entities.dart';
@@ -221,8 +222,8 @@ class OdooCollectionRepository implements CollectionRepository {
     // Persist before sending. If the connection times out after the server
     // posts the payment, the next attempt reuses this exact key and receives
     // the original receipt instead of creating a second collection.
-    final requestKey = await _storage.read(key: pendingKey) ??
-        'MC-${DateTime.now().microsecondsSinceEpoch}-$accountId';
+    final requestKey =
+        await _storage.read(key: pendingKey) ?? 'MC-${const Uuid().v4()}';
     await _storage.write(key: pendingKey, value: requestKey);
     final result = await _billing.collectCash(
       orderId: invoice.orderId,

@@ -1,14 +1,30 @@
-# Meter Reading App — Phase 1 (UI / Offline Architecture)
+# Meter Reading App — Odoo 18
 
-Flutter, offline-first field application for meter readers, built as a
-future extension of the existing **Odoo 16 Utility ERP**
-(`utility_core` + `utility_billing` + `utility_operations`).
+Flutter offline-first application for meter readers and collectors, integrated
+with the Odoo 18 Utility ERP (`utility_core`, `utility_billing`, and
+`utility_operations`). The app preserves the local Drift queue and separates
+reading data synchronization from image synchronization.
 
-This phase deliberately excludes backend integration. Every place the
-real ERP will eventually be called is isolated behind an interface in
-`lib/features/*/domain/` and implemented today by a `Mock*Repository` in
-`lib/features/*/data/`. Swapping the mock for a real implementation is
-the only change required later — no UI code depends on the mock directly.
+The production providers use the Odoo API repositories. `Mock*Repository`
+implementations are retained only for isolated UI and unit tests; UI code must
+continue to depend on domain interfaces rather than a concrete data source.
+
+## Environment configuration
+
+The local Odoo 18 defaults are set centrally in `lib/core/config/app_config.dart`:
+
+```text
+http://192.168.8.134:9001
+invoice_odoo18_db
+```
+
+Do not hard-code a server address or database name elsewhere. A non-local
+build must override both values explicitly:
+
+```text
+--dart-define=ODOO_BASE_URL=https://erp.example.com
+--dart-define=ODOO_DATABASE=your_odoo_database
+```
 
 ## Run
 
@@ -16,6 +32,12 @@ the only change required later — no UI code depends on the mock directly.
 flutter pub get
 flutter pub run build_runner build --delete-conflicting-outputs   # generates app_database.g.dart
 flutter run
+```
+
+Release APKs split by Android ABI:
+
+```text
+flutter build apk --release --split-per-abi --target-platform android-arm,android-arm64
 ```
 
 ## Structure

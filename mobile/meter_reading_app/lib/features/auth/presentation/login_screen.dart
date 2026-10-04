@@ -167,7 +167,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final auth = ref.read(authServiceProvider);
       final userInfo = await auth.login(
-        db: kOdooDb,
+        db: AppConfig.odooDatabase,
         login: _userCtrl.text.trim(),
         password: _passCtrl.text,
       );

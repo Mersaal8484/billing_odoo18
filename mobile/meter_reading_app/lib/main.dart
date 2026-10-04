@@ -6,6 +6,7 @@ import 'package:workmanager/workmanager.dart';
 
 import 'app/app.dart';
 import 'app/providers.dart';
+import 'core/config/app_config.dart';
 import 'core/database/app_database.dart';
 import 'core/network/auth_service.dart';
 import 'core/network/odoo_api_client.dart';
@@ -20,7 +21,6 @@ import 'features/readings/data/drift_reading_repository.dart';
 //   • جهاز حقيقي على نفس الشبكة ← 'http://192.168.1.XX:8069'
 //   • سيرفر إنتاج ← 'https://erp.example.com'
 // ──────────────────────────────────────────────────────────────────────────────
-const _kOdooBaseUrl = 'http://37.60.243.200:8069';
 
 // ملاحظة: اسم قاعدة البيانات (kOdooDb) انتقل إلى core/config/app_config.dart
 // حتى يستورده LoginScreen من نفس المصدر بدل كتابته يدوياً كنص منفصل.
@@ -36,7 +36,7 @@ void callbackDispatcher() {
       // (لا يوجد ProviderScope هنا)
       final db = AppDatabase();
       final apiClient = await OdooApiClient.create(
-        defaultBaseUrl: _kOdooBaseUrl,
+        defaultBaseUrl: AppConfig.odooBaseUrl,
       );
       final repo = DriftReadingRepository(db);
       final readingApi = ReadingApiService(apiClient);
@@ -74,7 +74,7 @@ void main() {
 
     // 1️⃣ بناء HTTP client (يحمّل cookie jar المحفوظ من آخر جلسة)
     final apiClient = await OdooApiClient.create(
-      defaultBaseUrl: _kOdooBaseUrl,
+      defaultBaseUrl: AppConfig.odooBaseUrl,
     );
 
     // 2️⃣ فتح قاعدة البيانات المحلية

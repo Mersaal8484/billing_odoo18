@@ -31,6 +31,24 @@ final routerProvider = Provider<GoRouter>((ref) {
       final onLogin = state.matchedLocation == '/login';
       if (!loggedIn && !onLogin) return '/login';
       if (loggedIn && onLogin) return '/dashboard';
+
+      // Navigation visibility is not an authorization boundary (Odoo enforces
+      // that server-side), but direct/deep links must still honour the latest
+      // capabilities returned for this signed-in user.
+      final roles =
+          ref.read(currentUserProvider)?.roles ?? const <String, bool>{};
+      final location = state.matchedLocation;
+      final readerRoute = location == '/customers' ||
+          location.startsWith('/customers/') ||
+          location.startsWith('/readings/');
+      final collectorRoute =
+          location == '/collector' || location.startsWith('/collector/');
+      final supervisorRoute = location == '/supervisor';
+      if ((readerRoute && roles['is_meter_reader'] != true) ||
+          (collectorRoute && roles['is_collector'] != true) ||
+          (supervisorRoute && roles['is_supervisor'] != true)) {
+        return '/dashboard';
+      }
       return null;
     },
     routes: [

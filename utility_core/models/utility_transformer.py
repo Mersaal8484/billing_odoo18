@@ -203,7 +203,11 @@ class UtilityTransformer(models.Model):
             'name': f'عقود {self.name}',
             'res_model': 'utility.customer',
             'domain': [('route_id', 'in', self.route_ids.ids)],
-            'views': [(False, 'tree'), (False, 'form')],
+            # Odoo 18 renamed the list view type from ``tree`` to ``list``.
+            # Returning the legacy type makes the web client reject this
+            # smart-button action before the target records can be displayed.
+            'view_mode': 'list,form',
+            'views': [(False, 'list'), (False, 'form')],
             'context': {
                 'default_route_id': self.route_ids[:1].id if self.route_ids else False,
             },
@@ -216,7 +220,8 @@ class UtilityTransformer(models.Model):
             'name': f'مسارات {self.name}',
             'res_model': 'utility.route',
             'domain': [('id', 'in', self.route_ids.ids)],
-            'views': [(False, 'tree'), (False, 'form')],
+            'view_mode': 'list,form',
+            'views': [(False, 'list'), (False, 'form')],
             'context': {'default_transformer_id': self.id},
         }
 
