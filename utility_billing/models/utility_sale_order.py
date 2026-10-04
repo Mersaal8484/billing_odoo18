@@ -421,6 +421,17 @@ class UtilitySaleOrder(models.Model):
                 if vals.get('partner_id') and vals['partner_id'] != expected_partner_id:
                     raise ValidationError(_('شريك أمر البيع يجب أن يطابق شريك الحساب الكهربائي.'))
                 vals['partner_id'] = expected_partner_id
+
+                # Do not let the generic Sales USD pricelist leak into utility
+                # bills. Electricity billing uses the customer's contract
+                # pricelist, then falls back to the company's utility default.
+                if not vals.get('pricelist_id'):
+                    pricelist = (
+                        customer.contract_template_id.pricelist_id
+                        or customer.company_id.utility_default_pricelist_id
+                    )
+                    if pricelist:
+                        vals['pricelist_id'] = pricelist.id
             period_id = vals.get('date_range_id')
             if period_id and not self.env.context.get('allow_billing_adjustment'):
                 period = self.env['date.range'].browse(period_id).exists()
