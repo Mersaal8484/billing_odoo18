@@ -5,9 +5,8 @@ with the Odoo 18 Utility ERP (`utility_core`, `utility_billing`, and
 `utility_operations`). The app preserves the local Drift queue and separates
 reading data synchronization from image synchronization.
 
-The production providers use the Odoo API repositories. `Mock*Repository`
-implementations are retained only for isolated UI and unit tests; UI code must
-continue to depend on domain interfaces rather than a concrete data source.
+The production providers use the Odoo API repositories and the local Drift
+cache. The application contains no demo customer, reading, or collection data.
 
 ## Environment configuration
 
@@ -51,9 +50,9 @@ lib/
     image/             on-device JPEG compression (<=60KB, no metadata/GPS)
     security/          (placeholder — secure storage wiring comes with auth phase)
   features/
-    auth/               login (mock session only)
+  auth/               Odoo session login
     dashboard/          reader home, progress, quick actions
-    customers/          assignment list + detail (mock ERP customer/meter data)
+  customers/          assignment list + detail (Odoo API + local cache)
     readings/           reading entry, photo capture, local validation
     sync/               sync center + per-item queue monitor
     settings/           profile, sync prefs, logout

@@ -4,8 +4,7 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 import '../../../core/database/app_database.dart' hide Customer, Meter;
 import '../../../core/network/odoo_api_client.dart';
 import '../domain/entities.dart';
-import 'mock_assignment_repository.dart'
-    show AssignmentRepository, ReadingAssignmentSyncResult;
+import 'assignment_repository.dart';
 
 class OdooAssignmentRepository implements AssignmentRepository {
   // nullable فقط لتسهيل الاختبارات (تجنّب بناء OdooApiClient حقيقي الذي

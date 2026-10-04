@@ -11,7 +11,7 @@ import '../core/sync/sync_engine.dart';
 import '../core/sync/sync_settings_service.dart';
 import '../features/collections/data/odoo_collection_repository.dart';
 import '../features/collections/domain/collection_models.dart';
-import '../features/customers/data/mock_assignment_repository.dart';
+import '../features/customers/data/assignment_repository.dart';
 import '../features/customers/data/odoo_assignment_repository.dart';
 import '../features/customers/domain/entities.dart';
 import '../features/readings/data/drift_reading_repository.dart';

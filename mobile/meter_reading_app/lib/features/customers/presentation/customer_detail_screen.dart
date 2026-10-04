@@ -113,21 +113,6 @@ class CustomerDetailScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              Text('سجل القراءات السابق',
-                  style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 8),
-              _HistoryTile(
-                  date: DateTime.now().subtract(const Duration(days: 30)),
-                  value: assignment.customer.lastReadingValue ?? 0),
-              _HistoryTile(
-                  date: DateTime.now().subtract(const Duration(days: 60)),
-                  value: (assignment.customer.lastReadingValue ?? 500) -
-                      assignment.averageConsumption),
-              _HistoryTile(
-                  date: DateTime.now().subtract(const Duration(days: 90)),
-                  value: (assignment.customer.lastReadingValue ?? 500) -
-                      assignment.averageConsumption * 2),
               const SizedBox(height: 20),
               if (assignment.status == AssignmentStatus.read ||
                   assignment.status == AssignmentStatus.pendingDecision)
@@ -187,24 +172,4 @@ class CustomerDetailScreen extends ConsumerWidget {
         AssignmentStatus.escalated => Colors.deepPurple,
         AssignmentStatus.skipped => Colors.grey,
       };
-}
-
-class _HistoryTile extends StatelessWidget {
-  final DateTime date;
-  final double value;
-
-  const _HistoryTile({required this.date, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: const Icon(Icons.timeline_rounded),
-        title: Text('${value.toStringAsFixed(0)} kWh'),
-        subtitle: Text(
-            '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}'),
-        trailing: const Icon(Icons.photo_outlined),
-      ),
-    );
-  }
 }

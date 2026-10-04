@@ -6,7 +6,7 @@ import '../../../app/providers.dart';
 import '../../../shared/widgets/state_widgets.dart';
 import '../domain/collection_models.dart';
 
-/// Live collector inquiry. No cached/mock balance is presented as payable.
+/// Live collector inquiry. No locally cached balance is presented as payable.
 class CollectionAccountScreen extends ConsumerStatefulWidget {
   const CollectionAccountScreen({super.key, required this.accountId});
   final String accountId;

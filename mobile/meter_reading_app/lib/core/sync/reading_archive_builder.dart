@@ -125,7 +125,7 @@ class ReadingArchiveBuilder {
     SyncBatchPolicy policy,
   ) async {
     final path = item.reading.imageLocalPath;
-    if (path == null || path.startsWith('mock://')) {
+    if (path == null) {
       return null;
     }
 
