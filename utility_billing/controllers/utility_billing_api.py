@@ -347,6 +347,27 @@ class UtilityBillingAPI(http.Controller):
                 'The selected invoice does not belong to this bill or is not posted.',
             )
         invoice = authorized_invoices[:1]
+        customer = order.customer_id
+
+        # Older migrated accounting moves can carry the validated utility bill
+        # link while the denormalized customer link is empty.  The payment
+        # allocator deliberately requires both links so it can never reconcile
+        # a payment to a different electricity account.  Repair only that
+        # narrowly-defined legacy case after proving that the order and partner
+        # already identify the same customer; never overwrite a conflicting
+        # customer link.
+        if not invoice.utility_customer_id:
+            if invoice.partner_id != customer.partner_id:
+                return self._error(
+                    'INVOICE_CUSTOMER_MISMATCH',
+                    'The selected invoice partner does not match the electricity account.',
+                )
+            invoice.sudo().write({'utility_customer_id': customer.id})
+        elif invoice.utility_customer_id != customer:
+            return self._error(
+                'INVOICE_CUSTOMER_MISMATCH',
+                'The selected invoice belongs to a different electricity account.',
+            )
 
         Payment = request.env['account.payment'].sudo().with_company(order.company_id)
         existing = Payment.search([
@@ -362,15 +383,45 @@ class UtilityBillingAPI(http.Controller):
                     'IDEMPOTENCY_KEY_REUSED',
                     'This idempotency key belongs to a different collection request.',
                 )
+            # A previous request may have created a draft payment before this
+            # Odoo 18 migration repair was deployed.  Its source order is
+            # already verified above, so backfill only an absent computed
+            # customer link and let the same idempotency key resume safely.
+            if not existing.utility_customer_id:
+                existing.write({'utility_customer_id': customer.id})
+            elif existing.utility_customer_id != customer:
+                return self._error(
+                    'PAYMENT_CUSTOMER_MISMATCH',
+                    'The original collection request belongs to a different electricity account.',
+                )
             collection = request.env['utility.collection'].sudo().search(
                 [('payment_id', '=', existing.id)], limit=1)
             if existing.state != 'posted':
                 try:
-                    existing.action_post()
-                except (AccessError, UserError, ValidationError):
+                    # Keep the posting and its allocation/custody side effects
+                    # atomic.  A failed retry must not leave a draft payment
+                    # that permanently reserves this idempotency key.
+                    with request.env.cr.savepoint():
+                        existing.action_post()
+                except (AccessError, UserError, ValidationError) as exc:
+                    _logger.warning(
+                        'collect_cash retry rejected key=%s order=%s invoice=%s: %s',
+                        request_key, order.id, invoice.id, exc, exc_info=True,
+                    )
+                    existing.invalidate_recordset()
+                    collection = request.env['utility.collection'].sudo().search(
+                        [('payment_id', '=', existing.id)], limit=1)
+                    allocations = request.env['utility.payment.allocation'].sudo().search(
+                        [('payment_id', '=', existing.id)], limit=1)
+                    # A draft without any accounting move, allocation, or
+                    # custody record was left by an older failed request and
+                    # is safe to discard.  Posted or otherwise evidenced
+                    # financial artifacts are never deleted here.
+                    if (existing.state == 'draft' and not existing.move_id
+                            and not collection and not allocations):
+                        existing.unlink()
                     return self._error(
-                        'COLLECTION_IN_PROGRESS',
-                        'The original collection request is still being processed.',
+                        'COLLECTION_REJECTED', str(exc),
                     )
                 collection = request.env['utility.collection'].sudo().search(
                     [('payment_id', '=', existing.id)], limit=1)
@@ -411,6 +462,10 @@ class UtilityBillingAPI(http.Controller):
                     'currency_id': invoice.currency_id.id,
                     'journal_id': collector.collection_journal_id.id,
                     'utility_sale_order_id': order.id,
+                    # Set this explicitly as well as through the stored
+                    # compute.  It avoids an incomplete-payment window while
+                    # Odoo evaluates create constraints for migrated data.
+                    'utility_customer_id': customer.id,
                     'utility_invoice_id': invoice.id,
                     'utility_payment_method': 'cash',
                     'collector_id': collector.id,
@@ -418,6 +473,10 @@ class UtilityBillingAPI(http.Controller):
                     'collection_request_key': request_key,
                     'collection_request_user_id': request.env.user.id,
                 })
+                # ``action_post`` creates the exact allocation and the field
+                # custody record.  It must share the creation savepoint so a
+                # validation failure rolls back the draft payment as well.
+                payment.action_post()
         except IntegrityError as exc:
             if getattr(exc, 'pgcode', None) != '23505':
                 raise
@@ -431,9 +490,22 @@ class UtilityBillingAPI(http.Controller):
                 [('payment_id', '=', payment.id)], limit=1)
             if payment.state != 'posted':
                 try:
-                    payment.action_post()
-                except (AccessError, UserError, ValidationError):
-                    return self._error('COLLECTION_IN_PROGRESS', 'The original request is still being processed.')
+                    with request.env.cr.savepoint():
+                        payment.action_post()
+                except (AccessError, UserError, ValidationError) as exc:
+                    _logger.warning(
+                        'collect_cash concurrent retry rejected key=%s order=%s invoice=%s: %s',
+                        request_key, order.id, invoice.id, exc, exc_info=True,
+                    )
+                    payment.invalidate_recordset()
+                    collection = request.env['utility.collection'].sudo().search(
+                        [('payment_id', '=', payment.id)], limit=1)
+                    allocations = request.env['utility.payment.allocation'].sudo().search(
+                        [('payment_id', '=', payment.id)], limit=1)
+                    if (payment.state == 'draft' and not payment.move_id
+                            and not collection and not allocations):
+                        payment.unlink()
+                    return self._error('COLLECTION_REJECTED', str(exc))
                 collection = request.env['utility.collection'].sudo().search(
                     [('payment_id', '=', payment.id)], limit=1)
             if not collection:
@@ -446,9 +518,11 @@ class UtilityBillingAPI(http.Controller):
                 return self._collection_receipt_payload(payment, collection, duplicate=True)
             return self._error('COLLECTION_IN_PROGRESS', 'The original request is still being processed.')
 
-        try:
-            payment.action_post()
         except (AccessError, UserError, ValidationError) as exc:
+            _logger.warning(
+                'collect_cash rejected key=%s order=%s invoice=%s: %s',
+                request_key, order.id, invoice.id, exc, exc_info=True,
+            )
             return self._error('COLLECTION_REJECTED', str(exc))
         collection = request.env['utility.collection'].sudo().search(
             [('payment_id', '=', payment.id)], limit=1)

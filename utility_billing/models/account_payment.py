@@ -337,6 +337,11 @@ class AccountPayment(models.Model):
                 if vals.get('partner_id') and vals['partner_id'] != expected_partner_id:
                     raise ValidationError(_('شريك الدفعة يجب أن يطابق شريك الحساب الكهربائي.'))
                 vals['partner_id'] = expected_partner_id
+                # Keep the stored computed link available while create
+                # constraints and payment posting run.  The authoritative
+                # source remains ``utility_sale_order_id.customer_id`` and
+                # the compute will keep it synchronized afterwards.
+                vals['utility_customer_id'] = order.customer_id.id
                 self._prepare_field_collector_payment(vals, order)
                 payment_period = self._get_payment_period_for_order(order)
                 if not payment_period:
