@@ -146,7 +146,7 @@ class UtilityPaymentAllocation(models.Model):
             raise ValidationError(_('بيانات الدفعة الكهربائية غير مكتملة للتخصيص.'))
         if payment.payment_type != 'inbound':
             raise ValidationError(_('تخصيص الدفعات الصادرة خارج نطاق تحصيل الكهرباء.'))
-        if require_posted and payment.state != 'posted':
+        if require_posted and not payment._is_utility_posted():
             raise ValidationError(_('لا يمكن تخصيص دفعة غير مرحلة.'))
         if (invoice.utility_sale_order_id != order
                 or invoice.utility_customer_id != customer
@@ -224,7 +224,7 @@ class UtilityPaymentAllocation(models.Model):
                     'تم تسجيل المرجع الخارجي %s مسبقًا لهذه الدفعة.'
                 ) % external_reference)
 
-        if (payment.state != 'posted' or not customer or not invoice
+        if (not payment._is_utility_posted() or not customer or not invoice
                 or (not order and not payment.utility_opening_move_id)):
             raise ValidationError(_('بيانات الدفعة الكهربائية غير مكتملة للتخصيص.'))
         if payment.payment_type != 'inbound':

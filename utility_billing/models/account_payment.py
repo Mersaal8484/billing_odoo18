@@ -482,6 +482,17 @@ class AccountPayment(models.Model):
         collection.action_post()
         return collection
 
+    def _is_utility_posted(self):
+        """Whether the accounting entry behind this payment is posted.
+
+        ``account.payment.state`` changed in Odoo 18: a successfully posted
+        payment is normally reported as ``paid`` (or ``in_process``), not
+        ``posted``.  Utility allocation and field-cash custody must therefore
+        use the accounting move as the financial source of truth.
+        """
+        self.ensure_one()
+        return bool(self.move_id and self.move_id.state == 'posted')
+
     def action_post(self):
         # FIX-15: منع ترحيل دفعة على فاتورة ملغاة أو مدفوعة بالكامل
         for payment in self.filtered(lambda p: p.utility_sale_order_id or p.utility_opening_move_id):

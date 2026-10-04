@@ -106,7 +106,8 @@ class UtilityCollection(models.Model):
         for record in records:
             if record.payment_id.company_id != record.company_id:
                 raise ValidationError(_('شركة التحصيل يجب أن تطابق شركة الدفعة.'))
-            if record.payment_id.state != 'posted' or record.allocation_id.state != 'reconciled':
+            if (not record.payment_id._is_utility_posted()
+                    or record.allocation_id.state != 'reconciled'):
                 raise ValidationError(
                     _('لا يمكن إنشاء تحصيل قبل ترحيل الدفعة وتسوية تخصيصها.'))
             if record.allocation_id.payment_id != record.payment_id:

@@ -396,7 +396,7 @@ class UtilityBillingAPI(http.Controller):
                 )
             collection = request.env['utility.collection'].sudo().search(
                 [('payment_id', '=', existing.id)], limit=1)
-            if existing.state != 'posted':
+            if not existing._is_utility_posted():
                 try:
                     # Keep the posting and its allocation/custody side effects
                     # atomic.  A failed retry must not leave a draft payment
@@ -431,7 +431,7 @@ class UtilityBillingAPI(http.Controller):
                     existing._create_field_collection_from_allocation(allocation)
                 collection = request.env['utility.collection'].sudo().search(
                     [('payment_id', '=', existing.id)], limit=1)
-            if not collection or existing.state != 'posted':
+            if not collection or not existing._is_utility_posted():
                 return self._error(
                     'COLLECTION_IN_PROGRESS',
                     'The original collection request is still being processed.',
@@ -488,7 +488,7 @@ class UtilityBillingAPI(http.Controller):
                 raise
             collection = request.env['utility.collection'].sudo().search(
                 [('payment_id', '=', payment.id)], limit=1)
-            if payment.state != 'posted':
+            if not payment._is_utility_posted():
                 try:
                     with request.env.cr.savepoint():
                         payment.action_post()
@@ -514,7 +514,7 @@ class UtilityBillingAPI(http.Controller):
                     payment._create_field_collection_from_allocation(allocation)
                 collection = request.env['utility.collection'].sudo().search(
                     [('payment_id', '=', payment.id)], limit=1)
-            if payment.state == 'posted' and collection:
+            if payment._is_utility_posted() and collection:
                 return self._collection_receipt_payload(payment, collection, duplicate=True)
             return self._error('COLLECTION_IN_PROGRESS', 'The original request is still being processed.')
 
@@ -526,7 +526,8 @@ class UtilityBillingAPI(http.Controller):
             return self._error('COLLECTION_REJECTED', str(exc))
         collection = request.env['utility.collection'].sudo().search(
             [('payment_id', '=', payment.id)], limit=1)
-        if payment.state != 'posted' or not collection or collection.state != 'posted':
+        if (not payment._is_utility_posted()
+                or not collection or collection.state != 'posted'):
             # This indicates an unexpected programming/configuration fault.
             # It must roll back rather than create a receipt for partial work.
             raise ValidationError('Field collection did not reach a posted custody state.')
