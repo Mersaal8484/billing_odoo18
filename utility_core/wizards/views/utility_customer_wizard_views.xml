@@ -32,7 +32,10 @@
                             <group string="الموقع التشغيلي">
                                 <group>
                                     <field name="utility_region_id" options="{'no_create': True}"/>
-                                    <field name="utility_area_id" options="{'no_create': True}"/>
+                                    <field name="available_area_ids" invisible="1"/>
+                                    <field name="utility_area_id"
+                                           domain="[('id', 'in', available_area_ids)]"
+                                           options="{'no_create': True}"/>
                                     <field name="contract_template_id" options="{'no_create': True}"/>
                                     <field name="route_id" options="{'no_create': True}"/>
                                 </group>

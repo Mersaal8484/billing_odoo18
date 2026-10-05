@@ -77,7 +77,7 @@ class UtilityStaff(models.Model):
         domain="[('type', '=', 'region')]", tracking=True)
     area_id = fields.Many2one(
         'utility.region', string='الفرع / المنطقة الفرعية',
-        domain="[('type', '=', 'area')]", tracking=True)
+        domain="[('type', '=', 'area'), ('parent_id', '=', region_id)]", tracking=True)
     phone = fields.Char('الهاتف', tracking=True)
     mobile = fields.Char('الجوال', tracking=True)
     collection_journal_id = fields.Many2one(
@@ -110,6 +110,14 @@ class UtilityStaff(models.Model):
         for rec in self:
             if rec.area_id and rec.region_id and rec.area_id.parent_id != rec.region_id:
                 rec.area_id = False
+
+    @api.constrains('region_id', 'area_id')
+    def _check_region_area_consistency(self):
+        for staff in self:
+            if staff.region_id and staff.area_id and staff.area_id.parent_id != staff.region_id:
+                raise ValidationError(_(
+                    'الفرع "%s" لا يتبع المنطقة "%s".'
+                ) % (staff.area_id.display_name, staff.region_id.display_name))
 
     def _compute_route_count(self):
         for record in self:

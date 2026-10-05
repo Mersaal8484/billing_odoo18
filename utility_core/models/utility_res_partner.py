@@ -1,5 +1,5 @@
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.osv import expression
 
 
@@ -94,10 +94,35 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     region_id = fields.Many2one('utility.region', string='المنطقة', domain="[('type', '=', 'region')]")
-    area_id = fields.Many2one('utility.region', string='المنطقة الفرعية', domain="[('type', '=', 'area')]")
+    area_id = fields.Many2one(
+        'utility.region', string='المنطقة الفرعية',
+        domain="[('type', '=', 'area'), ('parent_id', '=', region_id)]",
+    )
     zone_id = fields.Many2one('utility.region', string='المنطقة التفصيلية', domain="[('type', '=', 'zone')]")
     utility_postpaid_balance = fields.Monetary(string="مديونية آجل (فواتير)", compute='_compute_utility_balances')
     has_utility_customer = fields.Boolean(string="لديه حساب مشترك", compute='_compute_has_utility_customer')
+
+    @api.onchange('region_id')
+    def _onchange_region_id_clear_foreign_area(self):
+        for partner in self:
+            if partner.region_id and partner.area_id and partner.area_id.parent_id != partner.region_id:
+                partner.area_id = False
+
+    @api.constrains('region_id', 'area_id')
+    def _check_region_area_consistency(self):
+        for partner in self:
+            if partner.region_id and partner.region_id.type != 'region':
+                raise ValidationError(_('يجب أن تكون المنطقة المختارة من نوع منطقة رئيسية.'))
+            if partner.area_id and partner.area_id.type != 'area':
+                raise ValidationError(_('يجب أن يكون الفرع المختار من نوع فرع.'))
+            if (
+                partner.region_id
+                and partner.area_id
+                and partner.area_id.parent_id != partner.region_id
+            ):
+                raise ValidationError(_(
+                    'الفرع "%s" لا يتبع المنطقة "%s".'
+                ) % (partner.area_id.display_name, partner.region_id.display_name))
 
     def _compute_has_utility_customer(self):
         for partner in self:
@@ -303,10 +328,36 @@ class ResPartner(models.Model):
         }
 
     utility_region_id = fields.Many2one('utility.region', string="المنطقة التشغيلية", domain="[('type', '=', 'region')]")
-    utility_area_id = fields.Many2one('utility.region', string="الفرع التشغيلي", domain="[('type', '=', 'area')]")
-    direct_branch_id = fields.Many2one('utility.region', string="فرع الخدمة المباشر", domain="[('type', '=', 'area')]")
+    utility_area_id = fields.Many2one(
+        'utility.region', string="الفرع التشغيلي",
+        domain="[('type', '=', 'area'), ('parent_id', '=', utility_region_id)]",
+    )
+    direct_branch_id = fields.Many2one(
+        'utility.region', string="فرع الخدمة المباشر",
+        domain="[('type', '=', 'area'), ('parent_id', '=', utility_region_id)]",
+    )
     transformer_zone_id = fields.Many2one('utility.region', string="نطاق المحول", domain="[('type', '=', 'zone')]")
     residential_compound_id = fields.Many2one('utility.region', string="الحي أو المجمع السكني", domain="[('type', '=', 'zone')]")
+
+    @api.onchange('utility_region_id')
+    def _onchange_utility_region_id_clear_foreign_branches(self):
+        for partner in self:
+            branches = partner.utility_area_id | partner.direct_branch_id
+            if branches.filtered(lambda branch: branch.parent_id != partner.utility_region_id):
+                partner.utility_area_id = False
+                partner.direct_branch_id = False
+
+    @api.constrains('utility_region_id', 'utility_area_id', 'direct_branch_id')
+    def _check_operational_branch_consistency(self):
+        for partner in self:
+            region = partner.utility_region_id
+            if not region:
+                continue
+            for branch in partner.utility_area_id | partner.direct_branch_id:
+                if branch.parent_id != region:
+                    raise ValidationError(_(
+                        'الفرع التشغيلي "%s" لا يتبع المنطقة التشغيلية "%s".'
+                    ) % (branch.display_name, region.display_name))
 
     payment_token_id = fields.Many2one(
         'payment.token',

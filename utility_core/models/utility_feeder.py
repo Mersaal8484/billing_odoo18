@@ -21,7 +21,11 @@ class UtilityFeeder(models.Model):
     # ===== الموقع في الشبكة =====
     substation_id = fields.Many2one('utility.substation', 'المحطة', index=True)
     region_id = fields.Many2one('utility.region', 'المنطقة', domain="[('type', '=', 'region')]", tracking=True)
-    area_id = fields.Many2one('utility.region', 'المنطقة الفرعية / الفرع', domain="[('type', '=', 'area')]", tracking=True)
+    area_id = fields.Many2one(
+        'utility.region', 'المنطقة الفرعية / الفرع',
+        domain="[('type', '=', 'area'), ('parent_id', '=', region_id)]",
+        tracking=True,
+    )
 
     # ===== المواصفات الكهربائية =====
     voltage_level = fields.Selection([
@@ -81,6 +85,19 @@ class UtilityFeeder(models.Model):
     def _onchange_substation_id(self):
         if self.substation_id:
             self.company_id = self.substation_id.company_id
+
+    @api.onchange('region_id')
+    def _onchange_region_id_clear_foreign_area(self):
+        if self.region_id and self.area_id and self.area_id.parent_id != self.region_id:
+            self.area_id = False
+
+    @api.constrains('region_id', 'area_id')
+    def _check_region_area_consistency(self):
+        for feeder in self:
+            if feeder.region_id and feeder.area_id and feeder.area_id.parent_id != feeder.region_id:
+                raise ValidationError(_(
+                    'الفرع "%s" لا يتبع المنطقة "%s".'
+                ) % (feeder.area_id.display_name, feeder.region_id.display_name))
 
     @api.model_create_multi
     def create(self, vals_list):
