@@ -1,4 +1,4 @@
 interface:
   display_name: "Utility Odoo OWL Frontend"
   short_description: "تطوير واجهات Odoo OWL بالعربية"
-  default_prompt: "Use $utility-frontend-owl to change an Odoo 16 OWL component, action, field widget, template, or backend asset."
+  default_prompt: "Use $utility-frontend-owl to change an Odoo 18 OWL component, action, field widget, template, or backend asset."

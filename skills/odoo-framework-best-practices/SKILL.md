@@ -1,14 +1,14 @@
 ---
 name: odoo-framework-best-practices
 description: >-
-  Technical Odoo 16 ORM standards, OCA code quality rules, N+1 query prevention,
+  Technical Odoo 18 ORM standards, OCA code quality rules, N+1 query prevention,
   safe sudo() scoping, multi-company/branch record rules, XML load ordering, and
   OWL JS component best practices for Utility ERP.
 ---
 
-# Odoo 16 Framework & OCA Best Practices
+# Odoo 18 Framework & OCA Best Practices
 
-This skill defines technical engineering guardrails, ORM performance patterns, security boundaries, and OCA quality standards for developing and maintaining Odoo 16 addons in `utility_erp`.
+This skill defines technical engineering guardrails, ORM performance patterns, security boundaries, and OCA quality standards for developing and maintaining Odoo 18 addons in `utility_erp`. Check the live Odoo 18 source and current repository code before applying a framework pattern; the V1 baseline documents an earlier implementation snapshot, not proof of this port's runtime behavior.
 
 ---
 
@@ -78,7 +78,8 @@ This skill defines technical engineering guardrails, ORM performance patterns, s
 
 - **Odoo-Native Views**:
   - Statusbar for state fields (`widget="statusbar"`).
-  - Clear workflow action buttons with `states` or `attrs` visibility guards.
+  - Clear workflow action buttons with Odoo 18 expression attributes such as `invisible="state != 'draft'"` and `readonly="state != 'draft'"`. Keep the referenced fields in the view and enforce transitions in server actions; do not use legacy `attrs` or `states` modifiers.
+  - Use `<list>` for list view roots and `list` in action view modes; check existing inherited view targets before changing XML.
   - Search views must include relevant `filters`, `group_by`, and search fields.
 - **Arabic Translation**:
   - Wrap user-facing string literals in `_('String')` for translation support.

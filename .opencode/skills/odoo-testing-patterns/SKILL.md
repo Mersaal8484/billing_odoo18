@@ -1,6 +1,6 @@
 ---
 name: odoo-testing-patterns
-description: Use for writing, reviewing, or repairing Odoo 16 backend, ORM, HTTP, cron, and failure-path tests. Do not use for browser-only visual QA or load testing.
+description: Use for writing, reviewing, or repairing Odoo 18 backend, ORM, HTTP, cron, and failure-path tests. Do not use for browser-only visual QA or load testing.
 ---
 
 # Odoo testing patterns
@@ -16,8 +16,7 @@ Use this skill to turn an Odoo behavior or regression into focused, deterministi
 
 ## Select the right base case
 
-- Use `TransactionCase` for ordinary ORM workflows, constraints, access rules, and record lifecycle tests that need isolated transactions.
-- Use `SavepointCase` when a class shares expensive setup safely and each test can be isolated by a savepoint. Do not mutate class-level fixtures in a way that leaks between tests.
+- Use `TransactionCase` for ordinary ORM workflows, constraints, access rules, and record lifecycle tests. Odoo 18 runs its test methods in savepoints; use `setUpClass` for expensive shared fixtures and avoid mutations that leak between tests. `SavepointCase` is not available in the local Odoo 18 test framework.
 - Use `HttpCase` only for actual controller, session, route, or browser integration behavior. Prefer ORM tests when the behavior is purely model-side.
 
 ## ORM and database evidence

@@ -1,11 +1,11 @@
 ---
 name: utility-frontend-owl
-description: Use when changing Odoo 16 backend JavaScript, OWL components, client actions, field widgets, templates, asset bundles, responsive layouts, scrolling, frontend services, or RTL/Arabic UX in Utility ERP.
+description: Use when changing Odoo 18 backend JavaScript, OWL components, client actions, field widgets, templates, asset bundles, responsive layouts, scrolling, frontend services, or RTL/Arabic UX in Utility ERP.
 ---
 
 # Utility Odoo OWL frontend
 
-Use Odoo 16 frontend conventions for the existing Utility ERP components. Keep UI behavior aligned with server-side permissions, workflow actions, API contracts, and the repository's Arabic/RTL requirements.
+Use Odoo 18 frontend conventions for the existing Utility ERP components. Check the local Odoo 18 web source and the actual component before applying an API pattern. Keep UI behavior aligned with server-side permissions, workflow actions, API contracts, and the repository's Arabic/RTL requirements.
 
 ## Read first
 
@@ -20,7 +20,7 @@ Use Odoo 16 frontend conventions for the existing Utility ERP components. Keep U
 
 ## Current project patterns
 
-- Odoo 16 assets are declared in `web.assets_backend` in module manifests.
+- Backend assets are declared in `web.assets_backend` in module manifests; inspect the relevant bundle and load order before editing.
 - Existing OWL surfaces include the Utility dashboard, barcode camera field, reading review action, image lightbox, rejection dialog, and media image field.
 - Preserve `/** @odoo-module **/`, Odoo module imports, registry categories, `standardFieldProps`, and existing template names unless a migration is explicitly required.
 - Treat Chart.js and `html5-qrcode` as explicit asset dependencies; do not replace or duplicate vendor libraries casually.
@@ -28,7 +28,7 @@ Use Odoo 16 frontend conventions for the existing Utility ERP components. Keep U
 ## Rules
 
 - Keep business authorization and state transitions on the server. A hidden button, disabled control, or client-side state is not a security boundary.
-- Use `useService("orm")`, `useService("rpc")`, `useService("action")`, `useService("notification")`, and OWL lifecycle hooks consistently with Odoo 16.
+- Use Odoo 18 `useService` and OWL lifecycle hooks according to the local web source. Prefer `orm` for model methods; use `rpc` for controller routes, and the `action` and `notification` services where needed.
 - Keep component state local and minimal; cancel or ignore stale async results when filters, dialogs, or actions change context.
 - Show loading, empty, error, retry, disabled, and terminal workflow states. Never swallow an exception or report success before the server confirms it.
 - Use `_t()` for user-facing strings, Arabic/RTL-friendly layout and keyboard behavior, and accessible labels/focus handling.
@@ -80,9 +80,9 @@ When a form contains dependent business selections, show only values compatible 
 
 ## Visual design system
 
-- Use Odoo 16's native backend language and Bootstrap utilities as the base. Borrow Material Design principles—clear hierarchy, semantic color, predictable spacing, elevation, motion, and accessibility—without replacing Odoo's components with a separate design system.
+- Use Odoo 18's native backend language and available Bootstrap utilities as the base. Borrow Material Design principles—clear hierarchy, semantic color, predictable spacing, elevation, motion, and accessibility—without replacing Odoo's components with a separate design system.
 - Define semantic design tokens at the component/module root or SCSS variables: `surface`, `surface-muted`, `text`, `text-muted`, `border`, `primary`, `info`, `success`, `warning`, `danger`, focus ring, radius, shadow, and spacing. Reuse tokens instead of inventing one-off hex values, font sizes, shadows, or radii in templates.
-- Prefer Bootstrap/Odoo classes and CSS custom properties where supported. Keep fallbacks for the actual Odoo 16 asset environment; do not assume Bootstrap 5.3-only utilities or color-mode APIs are available.
+- Prefer Bootstrap/Odoo classes and CSS custom properties where supported. Verify utility classes and color-mode APIs in the installed Odoo 18 asset environment before using them.
 - Use color semantically and consistently: primary for navigation/normal actions, info for neutral context, success for confirmed/approved, warning for review/attention, danger for rejection/failure, and neutral tones for surfaces and disabled states. Never communicate state by color alone; include text, icon, shape, or status label.
 - Check text, icon, border, and focus contrast against their actual background. Target WCAG AA contrast, preserve visible focus, and avoid low-contrast muted text on light cards.
 - Keep one typography scale per surface: Cairo (with system fallbacks) for Arabic, a readable body size, a small number of heading sizes, consistent line-height, and at most two weights for normal UI. Do not use font size, bold, or uppercase as the only status signal.
@@ -102,12 +102,14 @@ When a form contains dependent business selections, show only values compatible 
 
 1. Trace the XML template, component/action registration, asset manifest, server method/controller, ACL/record rules, and tests before editing.
 2. Define the component contract: props, services, state, events, server response/error shape, lifecycle cleanup, and RTL behavior.
-3. Implement the narrowest component change using existing Odoo 16 patterns. Keep backend validation authoritative.
+3. Implement the narrowest component change using the existing component and Odoo 18 patterns. Keep backend validation authoritative.
 4. Add or update frontend tests when the harness exists; otherwise add focused server/UAT coverage and document unavailable browser evidence.
 5. Validate asset loading, template names, action/field registry resolution, loading/error/empty states, keyboard and RTL behavior, duplicate-click/retry behavior, responsive breakpoints, scroll ownership, focus behavior, visual tokens, contrast, and component states.
 6. Test at minimum: narrow phone-like width, tablet width, normal desktop, long Arabic text, mixed identifiers, large numbers, high zoom, empty data, slow data, large page, and a user scrolled away from the latest item.
 7. Compare the result with adjacent Odoo/Bootstrap patterns, then run focused Odoo module tests and static checks; report runtime browser/device evidence separately from source inspection.
 
-## Do not confuse versions
+## Odoo 18 view and asset compatibility
 
-Do not apply Odoo 17/18 conventions such as changed view syntax or newer OWL APIs to this Odoo 16 project without an explicit migration decision.
+- Use `<list>` and `list` action view modes for list views. Use direct Python expressions in `invisible`, `readonly`, and `required`; legacy `attrs` and `states` modifiers do not belong in Odoo 18 views.
+- Keep fields used by view expressions present in the relevant view, even if hidden. Confirm inherited XPath targets against the installed Odoo 18 view.
+- Preserve working `/** @odoo-module **/` annotations, imports, registries, and templates. Validate against the local web assets before adopting newer examples from another Odoo version.

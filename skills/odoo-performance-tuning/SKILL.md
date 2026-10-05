@@ -1,6 +1,6 @@
 ---
 name: odoo-performance-tuning
-description: Use for measured Odoo 16 ORM, PostgreSQL query, computed-field, cron, or server-action performance diagnosis and optimization. Do not use for speculative refactoring or capacity planning without measurements.
+description: Use for measured Odoo 18 ORM, PostgreSQL query, computed-field, cron, or server-action performance diagnosis and optimization. Do not use for speculative refactoring or capacity planning without measurements.
 ---
 
 # Odoo performance tuning
