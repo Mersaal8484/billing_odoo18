@@ -35,10 +35,10 @@ class UtilityBillingAPI(http.Controller):
         return params if isinstance(params, dict) else payload
 
     def _get_authorized_accounts(self):
-        """Ø¥Ø±Ø¬Ø§Ø¹ recordset Ù„Ø­Ø³Ø§Ø¨Ø§Øª Ø§Ù„ÙƒÙ‡Ø±Ø¨Ø§Ø¡ Ø§Ù„Ù…Ø³Ù…ÙˆØ­ Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø­Ø§Ù„ÙŠ Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ù„ÙŠÙ‡Ø§.
+        """Return customer accounts the authenticated user may access.
 
-        Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙŠÙ† Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠÙŠÙ†: ÙƒÙ„ Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª.
-        Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙŠ Ø§Ù„Ø¨ÙˆØ§Ø¨Ø©: Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª Ø§Ù„Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ù€ partner Ø§Ù„Ø®Ø§Øµ Ø¨Ù‡Ù… ÙÙ‚Ø·.
+        Internal users are filtered by normal ACLs and record rules; portal
+        users are restricted to their own partner-linked accounts.
         """
         user = request.env.user
         Customer = request.env['utility.customer']
@@ -51,7 +51,7 @@ class UtilityBillingAPI(http.Controller):
         ])
 
     def _authorize_account(self, customer_number):
-        """Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ù…Ù„ÙƒÙŠØ© Ø­Ø³Ø§Ø¨ Ø§Ù„ÙƒÙ‡Ø±Ø¨Ø§Ø¡ ÙˆØ¥Ø±Ø¬Ø§Ø¹Ù‡ Ø¥Ù† ÙˆØ¬Ø¯."""
+        """Return an authorized electricity account by its customer number."""
         accounts = self._get_authorized_accounts()
         return accounts.filtered(lambda a: a.customer_number == customer_number)[:1]
 
@@ -140,16 +140,16 @@ class UtilityBillingAPI(http.Controller):
         customer, error_code = self._resolve_authorized_customer(
             self._request_params(kwargs))
         if error_code == 'CUSTOMER_IDENTIFIER_MISMATCH':
-            return self._error(error_code, 'Ù…Ø¹Ø±ÙØ§Øª Ø§Ù„Ø­Ø³Ø§Ø¨ Ù…ØªØ¹Ø§Ø±Ø¶Ø©')
+            return self._error(error_code, 'معرّفات الحساب متعارضة.')
         if error_code == 'CUSTOMER_IDENTIFIER_REQUIRED':
             return self._error(
                 error_code,
                 'A customer, meter, QR, or lookup identifier is required',
             )
         if error_code == 'CUSTOMER_IDENTIFIER_AMBIGUOUS':
-            return self._error(error_code, 'Ø§Ù„Ù…Ø¹Ø±Ù Ø§Ù„Ù…Ø¯Ø®Ù„ ÙŠØ·Ø§Ø¨Ù‚ Ø£ÙƒØ«Ø± Ù…Ù† Ø­Ø³Ø§Ø¨.')
+            return self._error(error_code, 'المعرّف المدخل يطابق أكثر من حساب.')
         if not customer:
-            return self._error(error_code or 'CUSTOMER_NOT_FOUND', 'Ø§Ù„Ø­Ø³Ø§Ø¨ ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯')
+            return self._error(error_code or 'CUSTOMER_NOT_FOUND', 'الحساب غير موجود.')
         return {'success': True, 'customer': self._customer_payload(customer)}
 
     @http.route('/api/v1/utility/customer/qr_reference', type='json', auth='user', methods=['POST'])
@@ -158,14 +158,14 @@ class UtilityBillingAPI(http.Controller):
         params = self._request_params(kwargs)
         customer, error_code = self._resolve_authorized_customer(params)
         if error_code == 'CUSTOMER_IDENTIFIER_MISMATCH':
-            return self._error(error_code, 'Ù…Ø¹Ø±ÙØ§Øª Ø§Ù„Ø­Ø³Ø§Ø¨ Ù…ØªØ¹Ø§Ø±Ø¶Ø©')
+            return self._error(error_code, 'معرّفات الحساب متعارضة.')
         if error_code == 'CUSTOMER_IDENTIFIER_REQUIRED':
             return self._error(
                 error_code,
                 'customer_id, customer_number or external_qr_reference is required',
             )
         if not customer:
-            return self._error(error_code or 'CUSTOMER_NOT_FOUND', 'Ø§Ù„Ø­Ø³Ø§Ø¨ ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯')
+            return self._error(error_code or 'CUSTOMER_NOT_FOUND', 'الحساب غير موجود.')
         target_key = (
             'new_external_qr_reference'
             if 'new_external_qr_reference' in params
@@ -185,7 +185,7 @@ class UtilityBillingAPI(http.Controller):
         if owner:
             return self._error(
                 'QR_REFERENCE_ALREADY_ASSIGNED',
-                'Ù…Ø¹Ø±Ù QR Ø§Ù„Ø®Ø§Ø±Ø¬ÙŠ Ù…Ø³ØªØ®Ø¯Ù… Ø¨Ø§Ù„ÙØ¹Ù„ Ù„Ø¯Ù‰ Ø­Ø³Ø§Ø¨ Ø¢Ø®Ø±',
+                'معرّف QR الخارجي مستخدم بالفعل لحساب آخر.',
             )
         try:
             with request.env.cr.savepoint():
@@ -193,16 +193,15 @@ class UtilityBillingAPI(http.Controller):
         except IntegrityError:
             return self._error(
                 'QR_REFERENCE_ALREADY_ASSIGNED',
-                'Ù…Ø¹Ø±Ù QR Ø§Ù„Ø®Ø§Ø±Ø¬ÙŠ Ù…Ø³ØªØ®Ø¯Ù… Ø¨Ø§Ù„ÙØ¹Ù„ Ù„Ø¯Ù‰ Ø­Ø³Ø§Ø¨ Ø¢Ø®Ø±',
+                'معرّف QR الخارجي مستخدم بالفعل لحساب آخر.',
             )
         return {'success': True, 'customer': self._customer_payload(customer)}
 
     def _authorize_order(self, order_id):
-        """Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ù…Ù„ÙƒÙŠØ© Ø§Ù„ÙØ§ØªÙˆØ±Ø© ÙˆØ¥Ø±Ø¬Ø§Ø¹Ù‡Ø§ Ø¶Ù…Ù† Ù†Ø·Ø§Ù‚ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø§Ù„Ù…ØµØ±Ø­ Ù„Ù‡.
+        """Return an authorized bill within the caller's customer scope.
 
-        Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙŠÙ† Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠÙŠÙ† ØªÙØ·Ø¨Ù‘Ù‚ Record Rules ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ Ø¹Ø¨Ø± Ø¨ÙŠØ¦Ø© ORM Ø§Ù„Ø¹Ø§Ø¯ÙŠØ©ØŒ
-        ÙˆÙŠÙØ¶Ø§Ù Ø´Ø±Ø· Ù…Ù„ÙƒÙŠØ© Ø§Ù„Ø­Ø³Ø§Ø¨ Ø¨ÙˆØµÙÙ‡ Ù‚ÙŠØ¯Ø§Ù‹ Ø®Ø§ØµØ§Ù‹ Ø¨Ø§Ù„Ù€ endpoint.
-        Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙŠ Ø§Ù„Ø¨ÙˆØ§Ø¨Ø© ÙŠÙØ³ØªØ®Ø¯Ù… sudo Ù„Ù‚Ø±Ø§Ø¡Ø© Ø§Ù„ÙØ§ØªÙˆØ±Ø© Ø¨Ø¹Ø¯ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ù…Ù„ÙƒÙŠØ©.
+        Internal users remain subject to ACLs and record rules; portal users
+        are restricted to a bill belonging to their linked customer account.
         """
         try:
             order_id = int(order_id)
@@ -647,7 +646,7 @@ class UtilityBillingAPI(http.Controller):
 
     @http.route('/api/v1/utility/billing/pay', type='json', auth='user', methods=['POST'])
     def billing_pay(self, **kwargs):
-        """ØªÙ… ØªØ¹Ø·ÙŠÙ„ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ù…Ø¨Ø§Ø´Ø± Ù…Ù† Ø§Ù„Ø¨ÙˆØ§Ø¨Ø©. Ø§Ø³ØªØ®Ø¯Ù… /api/v1/utility/billing/payment_intent Ø¨Ø¯Ù„Ø§Ù‹ Ù…Ù†Ù‡."""
+        """Direct gateway payment is disabled; use the payment-intent endpoint."""
         return self._error(
             'ENDPOINT_DISABLED',
             'Direct payment creation is disabled. Use /api/v1/utility/billing/payment_intent instead.',
@@ -816,10 +815,10 @@ class UtilityBillingAPI(http.Controller):
 
     @http.route('/api/v1/utility/operations/service_request', type='json', auth='user', methods=['POST'])
     def service_request(self, **kwargs):
-        """Ø¥Ù†Ø´Ø§Ø¡ Ø·Ù„Ø¨ Ø®Ø¯Ù…Ø©.  Ø§Ù„ØªÙÙˆÙŠØ¶ ÙŠØ³Ø¨Ù‚ Ø£ÙŠ ÙˆØµÙˆÙ„ Ù„Ù„Ø³Ø¬Ù„:
-        - Ù†Ø­Ø¯Ø¯ Ø£ÙˆÙ„Ø§Ù‹ Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª Ø§Ù„Ù…ØµØ±Ø­ Ø¨Ù‡Ø§ Ù„Ù‡Ø°Ø§ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… (ORM Record Rules + Ù…Ù„ÙƒÙŠØ© Ø­Ø³Ø§Ø¨).
-        - Ù†Ø¨Ø­Ø« Ø¶Ù…Ù† ØªÙ„Ùƒ Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª ÙÙ‚Ø· â€” Ù„Ø§ sudo().browse() Ù‚Ø¨Ù„ Ø§Ù„ØªÙÙˆÙŠØ¶.
-        - Ø¨Ø¹Ø¯ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ù‡ÙˆÙŠØ© ÙˆØ§Ù„Ù…Ù„ÙƒÙŠØ©ØŒ ÙŠÙÙ†Ø´Ø£ Ø£Ù…Ø± Ø§Ù„Ø®Ø¯Ù…Ø©.
+        """Create a service request after identity and ownership checks.
+
+        The controller resolves the authorized account before using the
+        deliberate scoped ``sudo`` required to create the service order.
         """
         params = self._request_params(kwargs)
         customer_id = params.get('customer_id')

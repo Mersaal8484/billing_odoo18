@@ -80,6 +80,25 @@ class ResUsers(models.Model):
                 )
             user.has_collection_role = has_role
 
+    def _get_mobile_role_flags(self):
+        """Return field-mobile capabilities from explicit roles and groups.
+
+        Role names are translated display labels, so they cannot be a stable
+        authorization contract.  The mobile API consumes these flags only
+        after checking ``utility.user.role.code`` and canonical Odoo groups.
+        """
+        self.ensure_one()
+        role_codes = set(self.utility_role_ids.mapped('code'))
+        return {
+            'is_meter_reader': bool({'meter_reader'} & role_codes) or self.has_group(
+                'utility_core.group_utility_meter_reader'),
+            'is_collector': bool({'collector', 'cashier'} & role_codes) or self.has_group(
+                'utility_core.group_utility_collector') or self.has_group(
+                'utility_core.group_utility_cashier'),
+            'is_supervisor': bool({'supervisor', 'manager'} & role_codes) or self.has_group(
+                'utility_core.group_utility_supervisor'),
+        }
+
     def action_create_collection_journal(self):
         """Create and assign a dedicated cash journal for the current user."""
         self.ensure_one()

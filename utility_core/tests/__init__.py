@@ -26,3 +26,4 @@ from . import test_collector_no_coa_autocreate
 from . import test_staff_scope_sync
 from . import test_utility_infrastructure_settings
 from . import test_geographic_scope_consistency
+from . import test_mobile_role_flags
