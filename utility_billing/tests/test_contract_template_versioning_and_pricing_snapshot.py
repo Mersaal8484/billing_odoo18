@@ -443,3 +443,82 @@ class TestContractTemplateVersioningAndPricingSnapshot(TransactionCase):
         # Calculate discount blocks using v1 - must return empty list and not the template's new discount block
         calc_d_blocks = order._get_discount_blocks_for_calculation(template, version=v1)
         self.assertEqual(calc_d_blocks, [], 'اللقطة التاريخية الفارغة يجب أن تُحترم وألا ترجع للقالب الحي.')
+
+    def test_14_zero_local_fees_not_added_to_order_lines(self):
+        """
+        التحقق من أن الرسوم المحلية (المعلم / النظافة / المجالس المحلية) لا تُضاف لسطور الفاتورة إذا كانت قيمتها صفراً.
+        """
+        template = self.env['utility.contract.template'].create({
+            'name': 'تعرفة اختبار الرسوم المحلية',
+            'code': 'TPL-ZERO-LOCAL-FEES',
+            'pricing_mode': 'flat',
+            'price_per_kwh': 100.0,
+            'service_charge': 500.0,
+            'local_fee_mu_allim': 0.0,
+            'local_fee_cleaning': 0.0,
+            'local_fee_per_kwh': 0.0,
+            'subscriber_category_ids': [(6, 0, self.category.ids)],
+            'subscriber_ids': [(6, 0, self.subscriber.ids)],
+            'scope': 'global',
+        })
+        # إضافة بنود الرسوم يدوياً في القالب بأسعار صفرية كما في بيانات التهيئة
+        prod = self.env['product.product'].search([('type', '=', 'service')], limit=1)
+        self.env['utility.contract.template.line'].create([
+            {
+                'template_id': template.id,
+                'name': 'رسم المعلم',
+                'meter_line_type': 'mu_allim',
+                'specific_price': 0.0,
+                'product_id': prod.id,
+            },
+            {
+                'template_id': template.id,
+                'name': 'رسم النظافة',
+                'meter_line_type': 'cleaning',
+                'specific_price': 0.0,
+                'product_id': prod.id,
+            },
+            {
+                'template_id': template.id,
+                'name': 'رسم المجالس المحلية',
+                'meter_line_type': 'municipality',
+                'specific_price': 0.0,
+                'product_id': prod.id,
+            },
+        ])
+
+        order = self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+            'customer_id': self.customer.id,
+            'date_range_id': self.period.id,
+            'consumption': 1000.0,
+            'contract_template_id': template.id,
+        })
+        order._calculate_amounts()
+
+        # التحقق من عدم وجود أي بند للرسوم المحلية الصفرية في سطور الفاتورة
+        local_fee_lines = order.order_line.filtered(
+            lambda l: l.meter_line_type in ('local_fee', 'mu_allim', 'cleaning', 'municipality')
+        )
+        self.assertEqual(len(local_fee_lines), 0, 'الرسوم المحلية الصفرية لا يجب أن تظهر في سطور الفاتورة.')
+        self.assertEqual(order.amount_local_fee, 0.0)
+
+        # عند تحديد قيمة لرسم النظافة فقط (مثلاً 50 ريال لكل ك.و.س)
+        template.write({'local_fee_cleaning': 50.0})
+        # مزامنة السعر المحدد في سطر القالب
+        cleaning_line = template.line_ids.filtered(lambda l: l.meter_line_type == 'cleaning')
+        cleaning_line.write({'specific_price': 50.0})
+        v2 = template._get_or_create_active_version()
+        order.write({'contract_template_version_id': v2.id})
+        order._calculate_amounts()
+
+        # الآن يجب أن يظهر رسم النظافة فقط، بينما المعلم والمجالس لا يزالان مستبعدين
+        local_fee_lines_after = order.order_line.filtered(
+            lambda l: l.meter_line_type in ('local_fee', 'mu_allim', 'cleaning', 'municipality')
+        )
+        self.assertEqual(len(local_fee_lines_after), 1)
+        self.assertEqual(local_fee_lines_after[0].meter_line_type, 'cleaning')
+        self.assertEqual(local_fee_lines_after[0].price_unit, 50.0)
+        self.assertEqual(local_fee_lines_after[0].product_uom_qty, 1000.0)
+        self.assertEqual(order.amount_local_fee, 50000.0)
+

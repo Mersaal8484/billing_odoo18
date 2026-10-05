@@ -144,6 +144,8 @@ class UtilitySaleOrderBilling(models.Model):
                 )
                 if not qty and not price:
                     continue
+                if line.meter_line_type in ('local_fee', 'mu_allim', 'cleaning', 'municipality') and (not price or price <= 0 or not qty or qty <= 0):
+                    continue
                 amount = qty * price
                 lines.append((0, 0, {
                     'product_id': product_id or kwh_product.id if kwh_product else False,
