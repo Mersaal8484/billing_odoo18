@@ -42,4 +42,4 @@ Use this skill to turn an Odoo behavior or regression into focused, deterministi
 
 ## Validation
 
-Run the narrowest affected module test suite first using the repository command convention. Report static validation separately from runtime Odoo test evidence, and state any unavailable database or service dependency plainly.
+Run the narrowest affected module test suite first using the repository command convention. Confirm from the test log that the intended module loaded and at least one test actually ran; a successful process exit with zero selected tests is not test evidence. Use an isolated disposable database for installation or upgrade tests and never use production data as a test target. Report static validation separately from runtime Odoo test evidence, and state any unavailable database or service dependency plainly.

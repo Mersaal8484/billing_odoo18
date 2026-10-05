@@ -10,6 +10,14 @@ description: >-
 
 This skill defines technical engineering guardrails, ORM performance patterns, security boundaries, and OCA quality standards for developing and maintaining Odoo 18 addons in `utility_erp`. Check the live Odoo 18 source and current repository code before applying a framework pattern; the V1 baseline documents an earlier implementation snapshot, not proof of this port's runtime behavior.
 
+## Source-first workflow
+
+- Confirm the target Odoo version from the local core checkout (`odoo/release.py`) and the repository's `AGENTS.md`; resolve disagreements before using version-specific guidance.
+- Before changing a model method, field, XML view, OWL component, or migration, trace its definition and extension points in the local Odoo core and installed addons. Check inheritance order, callers, manifest load order, view XPath anchors, XML IDs, ACLs, and record rules as relevant to the change.
+- Keep a compact evidence note with `file:line` references for the framework behaviors that drive the change. Mark missing or ambiguous symbols as unverified instead of guessing.
+- Use external Odoo 18 skill packs as lookup material only. Confirm each relevant claim against the local source and keep Utility ERP ownership, scope, security, and V1/V2 rules from `AGENTS.md` and the canonical docs authoritative.
+- Scale tracing to risk: a label-only change needs little investigation; schema changes, overridden workflows, access changes, accounting/stock effects, and public APIs need their full call and dependency path.
+
 ---
 
 ## 1. ORM Performance & Query Optimization
