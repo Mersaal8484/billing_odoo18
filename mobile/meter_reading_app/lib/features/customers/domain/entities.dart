@@ -85,3 +85,21 @@ class ReadingAssignment {
     required this.averageConsumption,
   });
 }
+
+/// A real, server-sourced meter reading retained locally after a successful
+/// lookup.  It is never inferred from consumption or generated dates.
+class MeterReadingHistoryItem {
+  final String entryKey;
+  final int meterRemoteId;
+  final double readingValue;
+  final DateTime readingDate;
+  final String source;
+
+  const MeterReadingHistoryItem({
+    required this.entryKey,
+    required this.meterRemoteId,
+    required this.readingValue,
+    required this.readingDate,
+    required this.source,
+  });
+}

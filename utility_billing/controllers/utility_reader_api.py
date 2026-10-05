@@ -582,6 +582,42 @@ class UtilityReaderAPI(http.Controller):
             ('state', 'in', ['approved', 'billed']),
         ], order='reading_date desc, id desc', limit=6)
 
+        # This is intentionally a bounded, server-authoritative history for
+        # the mobile detail screen.  The client stores a successful response
+        # locally so a reader can revisit it without connectivity; it must
+        # never manufacture dates or values from an average consumption.
+        history_readings = request.env['utility.reading'].sudo().search([
+            ('meter_id', '=', meter.id),
+            ('state', 'in', ['approved', 'billed']),
+        ], order='reading_date desc, id desc', limit=50)
+        reading_history = [
+            {
+                'key': 'reading:%s' % reading.id,
+                'reading_id': reading.id,
+                'reading_value': reading.reading_value,
+                'reading_date': reading.reading_date.isoformat()
+                if reading.reading_date else None,
+                'source': 'reading',
+            }
+            for reading in history_readings
+            if reading.reading_date
+        ]
+        if meter_baseline_date and not any(
+            item['reading_date'] == meter_baseline_date.isoformat()
+            and item['reading_value'] == meter_baseline_value
+            for item in reading_history
+        ):
+            reading_history.append({
+                'key': 'baseline:%s:%s:%s' % (
+                    meter.id, meter_baseline_date.isoformat(), meter_baseline_value,
+                ),
+                'reading_id': None,
+                'reading_value': meter_baseline_value,
+                'reading_date': meter_baseline_date.isoformat(),
+                'source': 'migration_baseline',
+            })
+        reading_history.sort(key=lambda item: item['reading_date'], reverse=True)
+
         avg_consumption = 0.0
         if len(recent_readings) >= 2:
             readings_list = sorted(recent_readings, key=lambda r: r.reading_date)
@@ -605,6 +641,7 @@ class UtilityReaderAPI(http.Controller):
             },
             'last_reading_value': last_reading_value,
             'last_reading_date': last_reading_date,
+            'reading_history': reading_history,
             'avg_consumption': avg_consumption,
         }
 
@@ -791,6 +828,11 @@ class UtilityReaderAPI(http.Controller):
                 'meter_id': meter.id if meter else None,
                 'meter_number': meter.meter_number if meter else '',
                 'last_reading_value': getattr(meter, 'last_reading_value', 0) if meter else 0,
+                'last_reading_date': (
+                    (meter.last_read_date or c.last_reading_date).isoformat()
+                    if meter and (meter.last_read_date or c.last_reading_date)
+                    else None
+                ),
                 'reading_status': reading_status,
                 'resubmit_reading_id': current_reading.id if is_returned_for_correction else None,
                 'rejection_reason': current_reading.rejection_reason if is_returned_for_correction else None,

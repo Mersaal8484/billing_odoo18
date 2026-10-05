@@ -118,7 +118,7 @@ customer = env['utility.customer'].search([('partner_id', '=', partner.id)], lim
 if customer:
     wizard = env['utility.customer.statement.wizard'].create({
         'customer_id': customer.id,
-        'date_to': fields.Date.context_today(env['utility.customer.statement.wizard']),
+        'date_to': datetime.date.today(),
     })
     action = {
         'type': 'ir.actions.act_window',

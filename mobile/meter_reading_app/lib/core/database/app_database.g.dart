@@ -2906,6 +2906,368 @@ class ReadingsCompanion extends UpdateCompanion<Reading> {
   }
 }
 
+class $MeterReadingHistoriesTable extends MeterReadingHistories
+    with TableInfo<$MeterReadingHistoriesTable, MeterReadingHistory> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MeterReadingHistoriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _entryKeyMeta =
+      const VerificationMeta('entryKey');
+  @override
+  late final GeneratedColumn<String> entryKey = GeneratedColumn<String>(
+      'entry_key', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _meterRemoteIdMeta =
+      const VerificationMeta('meterRemoteId');
+  @override
+  late final GeneratedColumn<int> meterRemoteId = GeneratedColumn<int>(
+      'meter_remote_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _readingValueMeta =
+      const VerificationMeta('readingValue');
+  @override
+  late final GeneratedColumn<double> readingValue = GeneratedColumn<double>(
+      'reading_value', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _readingDateMeta =
+      const VerificationMeta('readingDate');
+  @override
+  late final GeneratedColumn<DateTime> readingDate = GeneratedColumn<DateTime>(
+      'reading_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+      'source', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _syncedAtMeta =
+      const VerificationMeta('syncedAt');
+  @override
+  late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
+      'synced_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [entryKey, meterRemoteId, readingValue, readingDate, source, syncedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'meter_reading_histories';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<MeterReadingHistory> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('entry_key')) {
+      context.handle(_entryKeyMeta,
+          entryKey.isAcceptableOrUnknown(data['entry_key']!, _entryKeyMeta));
+    } else if (isInserting) {
+      context.missing(_entryKeyMeta);
+    }
+    if (data.containsKey('meter_remote_id')) {
+      context.handle(
+          _meterRemoteIdMeta,
+          meterRemoteId.isAcceptableOrUnknown(
+              data['meter_remote_id']!, _meterRemoteIdMeta));
+    } else if (isInserting) {
+      context.missing(_meterRemoteIdMeta);
+    }
+    if (data.containsKey('reading_value')) {
+      context.handle(
+          _readingValueMeta,
+          readingValue.isAcceptableOrUnknown(
+              data['reading_value']!, _readingValueMeta));
+    } else if (isInserting) {
+      context.missing(_readingValueMeta);
+    }
+    if (data.containsKey('reading_date')) {
+      context.handle(
+          _readingDateMeta,
+          readingDate.isAcceptableOrUnknown(
+              data['reading_date']!, _readingDateMeta));
+    } else if (isInserting) {
+      context.missing(_readingDateMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(_sourceMeta,
+          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('synced_at')) {
+      context.handle(_syncedAtMeta,
+          syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta));
+    } else if (isInserting) {
+      context.missing(_syncedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {entryKey};
+  @override
+  MeterReadingHistory map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MeterReadingHistory(
+      entryKey: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}entry_key'])!,
+      meterRemoteId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}meter_remote_id'])!,
+      readingValue: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}reading_value'])!,
+      readingDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}reading_date'])!,
+      source: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}source'])!,
+      syncedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}synced_at'])!,
+    );
+  }
+
+  @override
+  $MeterReadingHistoriesTable createAlias(String alias) {
+    return $MeterReadingHistoriesTable(attachedDatabase, alias);
+  }
+}
+
+class MeterReadingHistory extends DataClass
+    implements Insertable<MeterReadingHistory> {
+  final String entryKey;
+  final int meterRemoteId;
+  final double readingValue;
+  final DateTime readingDate;
+  final String source;
+  final DateTime syncedAt;
+  const MeterReadingHistory(
+      {required this.entryKey,
+      required this.meterRemoteId,
+      required this.readingValue,
+      required this.readingDate,
+      required this.source,
+      required this.syncedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['entry_key'] = Variable<String>(entryKey);
+    map['meter_remote_id'] = Variable<int>(meterRemoteId);
+    map['reading_value'] = Variable<double>(readingValue);
+    map['reading_date'] = Variable<DateTime>(readingDate);
+    map['source'] = Variable<String>(source);
+    map['synced_at'] = Variable<DateTime>(syncedAt);
+    return map;
+  }
+
+  MeterReadingHistoriesCompanion toCompanion(bool nullToAbsent) {
+    return MeterReadingHistoriesCompanion(
+      entryKey: Value(entryKey),
+      meterRemoteId: Value(meterRemoteId),
+      readingValue: Value(readingValue),
+      readingDate: Value(readingDate),
+      source: Value(source),
+      syncedAt: Value(syncedAt),
+    );
+  }
+
+  factory MeterReadingHistory.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MeterReadingHistory(
+      entryKey: serializer.fromJson<String>(json['entryKey']),
+      meterRemoteId: serializer.fromJson<int>(json['meterRemoteId']),
+      readingValue: serializer.fromJson<double>(json['readingValue']),
+      readingDate: serializer.fromJson<DateTime>(json['readingDate']),
+      source: serializer.fromJson<String>(json['source']),
+      syncedAt: serializer.fromJson<DateTime>(json['syncedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'entryKey': serializer.toJson<String>(entryKey),
+      'meterRemoteId': serializer.toJson<int>(meterRemoteId),
+      'readingValue': serializer.toJson<double>(readingValue),
+      'readingDate': serializer.toJson<DateTime>(readingDate),
+      'source': serializer.toJson<String>(source),
+      'syncedAt': serializer.toJson<DateTime>(syncedAt),
+    };
+  }
+
+  MeterReadingHistory copyWith(
+          {String? entryKey,
+          int? meterRemoteId,
+          double? readingValue,
+          DateTime? readingDate,
+          String? source,
+          DateTime? syncedAt}) =>
+      MeterReadingHistory(
+        entryKey: entryKey ?? this.entryKey,
+        meterRemoteId: meterRemoteId ?? this.meterRemoteId,
+        readingValue: readingValue ?? this.readingValue,
+        readingDate: readingDate ?? this.readingDate,
+        source: source ?? this.source,
+        syncedAt: syncedAt ?? this.syncedAt,
+      );
+  MeterReadingHistory copyWithCompanion(MeterReadingHistoriesCompanion data) {
+    return MeterReadingHistory(
+      entryKey: data.entryKey.present ? data.entryKey.value : this.entryKey,
+      meterRemoteId: data.meterRemoteId.present
+          ? data.meterRemoteId.value
+          : this.meterRemoteId,
+      readingValue: data.readingValue.present
+          ? data.readingValue.value
+          : this.readingValue,
+      readingDate:
+          data.readingDate.present ? data.readingDate.value : this.readingDate,
+      source: data.source.present ? data.source.value : this.source,
+      syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MeterReadingHistory(')
+          ..write('entryKey: $entryKey, ')
+          ..write('meterRemoteId: $meterRemoteId, ')
+          ..write('readingValue: $readingValue, ')
+          ..write('readingDate: $readingDate, ')
+          ..write('source: $source, ')
+          ..write('syncedAt: $syncedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      entryKey, meterRemoteId, readingValue, readingDate, source, syncedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MeterReadingHistory &&
+          other.entryKey == this.entryKey &&
+          other.meterRemoteId == this.meterRemoteId &&
+          other.readingValue == this.readingValue &&
+          other.readingDate == this.readingDate &&
+          other.source == this.source &&
+          other.syncedAt == this.syncedAt);
+}
+
+class MeterReadingHistoriesCompanion
+    extends UpdateCompanion<MeterReadingHistory> {
+  final Value<String> entryKey;
+  final Value<int> meterRemoteId;
+  final Value<double> readingValue;
+  final Value<DateTime> readingDate;
+  final Value<String> source;
+  final Value<DateTime> syncedAt;
+  final Value<int> rowid;
+  const MeterReadingHistoriesCompanion({
+    this.entryKey = const Value.absent(),
+    this.meterRemoteId = const Value.absent(),
+    this.readingValue = const Value.absent(),
+    this.readingDate = const Value.absent(),
+    this.source = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MeterReadingHistoriesCompanion.insert({
+    required String entryKey,
+    required int meterRemoteId,
+    required double readingValue,
+    required DateTime readingDate,
+    required String source,
+    required DateTime syncedAt,
+    this.rowid = const Value.absent(),
+  })  : entryKey = Value(entryKey),
+        meterRemoteId = Value(meterRemoteId),
+        readingValue = Value(readingValue),
+        readingDate = Value(readingDate),
+        source = Value(source),
+        syncedAt = Value(syncedAt);
+  static Insertable<MeterReadingHistory> custom({
+    Expression<String>? entryKey,
+    Expression<int>? meterRemoteId,
+    Expression<double>? readingValue,
+    Expression<DateTime>? readingDate,
+    Expression<String>? source,
+    Expression<DateTime>? syncedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (entryKey != null) 'entry_key': entryKey,
+      if (meterRemoteId != null) 'meter_remote_id': meterRemoteId,
+      if (readingValue != null) 'reading_value': readingValue,
+      if (readingDate != null) 'reading_date': readingDate,
+      if (source != null) 'source': source,
+      if (syncedAt != null) 'synced_at': syncedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MeterReadingHistoriesCompanion copyWith(
+      {Value<String>? entryKey,
+      Value<int>? meterRemoteId,
+      Value<double>? readingValue,
+      Value<DateTime>? readingDate,
+      Value<String>? source,
+      Value<DateTime>? syncedAt,
+      Value<int>? rowid}) {
+    return MeterReadingHistoriesCompanion(
+      entryKey: entryKey ?? this.entryKey,
+      meterRemoteId: meterRemoteId ?? this.meterRemoteId,
+      readingValue: readingValue ?? this.readingValue,
+      readingDate: readingDate ?? this.readingDate,
+      source: source ?? this.source,
+      syncedAt: syncedAt ?? this.syncedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (entryKey.present) {
+      map['entry_key'] = Variable<String>(entryKey.value);
+    }
+    if (meterRemoteId.present) {
+      map['meter_remote_id'] = Variable<int>(meterRemoteId.value);
+    }
+    if (readingValue.present) {
+      map['reading_value'] = Variable<double>(readingValue.value);
+    }
+    if (readingDate.present) {
+      map['reading_date'] = Variable<DateTime>(readingDate.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (syncedAt.present) {
+      map['synced_at'] = Variable<DateTime>(syncedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MeterReadingHistoriesCompanion(')
+          ..write('entryKey: $entryKey, ')
+          ..write('meterRemoteId: $meterRemoteId, ')
+          ..write('readingValue: $readingValue, ')
+          ..write('readingDate: $readingDate, ')
+          ..write('source: $source, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2915,12 +3277,21 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PeriodsTable periods = $PeriodsTable(this);
   late final $SyncBatchesTable syncBatches = $SyncBatchesTable(this);
   late final $ReadingsTable readings = $ReadingsTable(this);
+  late final $MeterReadingHistoriesTable meterReadingHistories =
+      $MeterReadingHistoriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [customers, meters, assignments, periods, syncBatches, readings];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        customers,
+        meters,
+        assignments,
+        periods,
+        syncBatches,
+        readings,
+        meterReadingHistories
+      ];
 }
 
 typedef $$CustomersTableCreateCompanionBuilder = CustomersCompanion Function({
@@ -4993,6 +5364,203 @@ typedef $$ReadingsTableProcessedTableManager = ProcessedTableManager<
     (Reading, $$ReadingsTableReferences),
     Reading,
     PrefetchHooks Function({bool meterRemoteId, bool syncBatchId})>;
+typedef $$MeterReadingHistoriesTableCreateCompanionBuilder
+    = MeterReadingHistoriesCompanion Function({
+  required String entryKey,
+  required int meterRemoteId,
+  required double readingValue,
+  required DateTime readingDate,
+  required String source,
+  required DateTime syncedAt,
+  Value<int> rowid,
+});
+typedef $$MeterReadingHistoriesTableUpdateCompanionBuilder
+    = MeterReadingHistoriesCompanion Function({
+  Value<String> entryKey,
+  Value<int> meterRemoteId,
+  Value<double> readingValue,
+  Value<DateTime> readingDate,
+  Value<String> source,
+  Value<DateTime> syncedAt,
+  Value<int> rowid,
+});
+
+class $$MeterReadingHistoriesTableFilterComposer
+    extends Composer<_$AppDatabase, $MeterReadingHistoriesTable> {
+  $$MeterReadingHistoriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get entryKey => $composableBuilder(
+      column: $table.entryKey, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get meterRemoteId => $composableBuilder(
+      column: $table.meterRemoteId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get readingValue => $composableBuilder(
+      column: $table.readingValue, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get readingDate => $composableBuilder(
+      column: $table.readingDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get syncedAt => $composableBuilder(
+      column: $table.syncedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$MeterReadingHistoriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $MeterReadingHistoriesTable> {
+  $$MeterReadingHistoriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get entryKey => $composableBuilder(
+      column: $table.entryKey, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get meterRemoteId => $composableBuilder(
+      column: $table.meterRemoteId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get readingValue => $composableBuilder(
+      column: $table.readingValue,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get readingDate => $composableBuilder(
+      column: $table.readingDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get syncedAt => $composableBuilder(
+      column: $table.syncedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$MeterReadingHistoriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MeterReadingHistoriesTable> {
+  $$MeterReadingHistoriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get entryKey =>
+      $composableBuilder(column: $table.entryKey, builder: (column) => column);
+
+  GeneratedColumn<int> get meterRemoteId => $composableBuilder(
+      column: $table.meterRemoteId, builder: (column) => column);
+
+  GeneratedColumn<double> get readingValue => $composableBuilder(
+      column: $table.readingValue, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get readingDate => $composableBuilder(
+      column: $table.readingDate, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get syncedAt =>
+      $composableBuilder(column: $table.syncedAt, builder: (column) => column);
+}
+
+class $$MeterReadingHistoriesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $MeterReadingHistoriesTable,
+    MeterReadingHistory,
+    $$MeterReadingHistoriesTableFilterComposer,
+    $$MeterReadingHistoriesTableOrderingComposer,
+    $$MeterReadingHistoriesTableAnnotationComposer,
+    $$MeterReadingHistoriesTableCreateCompanionBuilder,
+    $$MeterReadingHistoriesTableUpdateCompanionBuilder,
+    (
+      MeterReadingHistory,
+      BaseReferences<_$AppDatabase, $MeterReadingHistoriesTable,
+          MeterReadingHistory>
+    ),
+    MeterReadingHistory,
+    PrefetchHooks Function()> {
+  $$MeterReadingHistoriesTableTableManager(
+      _$AppDatabase db, $MeterReadingHistoriesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MeterReadingHistoriesTableFilterComposer(
+                  $db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MeterReadingHistoriesTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MeterReadingHistoriesTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> entryKey = const Value.absent(),
+            Value<int> meterRemoteId = const Value.absent(),
+            Value<double> readingValue = const Value.absent(),
+            Value<DateTime> readingDate = const Value.absent(),
+            Value<String> source = const Value.absent(),
+            Value<DateTime> syncedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              MeterReadingHistoriesCompanion(
+            entryKey: entryKey,
+            meterRemoteId: meterRemoteId,
+            readingValue: readingValue,
+            readingDate: readingDate,
+            source: source,
+            syncedAt: syncedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String entryKey,
+            required int meterRemoteId,
+            required double readingValue,
+            required DateTime readingDate,
+            required String source,
+            required DateTime syncedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              MeterReadingHistoriesCompanion.insert(
+            entryKey: entryKey,
+            meterRemoteId: meterRemoteId,
+            readingValue: readingValue,
+            readingDate: readingDate,
+            source: source,
+            syncedAt: syncedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$MeterReadingHistoriesTableProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDatabase,
+        $MeterReadingHistoriesTable,
+        MeterReadingHistory,
+        $$MeterReadingHistoriesTableFilterComposer,
+        $$MeterReadingHistoriesTableOrderingComposer,
+        $$MeterReadingHistoriesTableAnnotationComposer,
+        $$MeterReadingHistoriesTableCreateCompanionBuilder,
+        $$MeterReadingHistoriesTableUpdateCompanionBuilder,
+        (
+          MeterReadingHistory,
+          BaseReferences<_$AppDatabase, $MeterReadingHistoriesTable,
+              MeterReadingHistory>
+        ),
+        MeterReadingHistory,
+        PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5009,4 +5577,6 @@ class $AppDatabaseManager {
       $$SyncBatchesTableTableManager(_db, _db.syncBatches);
   $$ReadingsTableTableManager get readings =>
       $$ReadingsTableTableManager(_db, _db.readings);
+  $$MeterReadingHistoriesTableTableManager get meterReadingHistories =>
+      $$MeterReadingHistoriesTableTableManager(_db, _db.meterReadingHistories);
 }

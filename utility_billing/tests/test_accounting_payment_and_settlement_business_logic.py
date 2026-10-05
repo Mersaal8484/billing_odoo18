@@ -177,6 +177,52 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
         invoice.action_post()
         return order, invoice
 
+    def _create_opening_receivable(self, amount, suffix='OPENING'):
+        """Create the one explicit migration-style opening receivable move."""
+        journal = self.Journal.search([
+            ('company_id', '=', self.company.id),
+            ('type', '=', 'general'),
+        ], limit=1)
+        if not journal:
+            journal = self.Journal.create({
+                'name': 'Opening balance test journal',
+                'code': 'OPNBAL',
+                'type': 'general',
+                'company_id': self.company.id,
+            })
+        move = self.Move.create({
+            'move_type': 'entry',
+            'journal_id': journal.id,
+            'partner_id': self.partner.id,
+            'utility_customer_id': self.customer.id,
+            'date': date(2026, 8, 1),
+            'ref': 'Opening balance %s' % suffix,
+            'line_ids': [
+                (0, 0, {
+                    'name': 'Opening receivable %s' % suffix,
+                    'partner_id': self.partner.id,
+                    'account_id': self.receivable_account.id,
+                    'debit': amount,
+                    'credit': 0.0,
+                }),
+                (0, 0, {
+                    'name': 'Opening offset %s' % suffix,
+                    'account_id': self.income_account.id,
+                    'debit': 0.0,
+                    'credit': amount,
+                }),
+            ],
+        })
+        move.action_post()
+        self.customer.opening_move_id = move.id
+        return move
+
+    def _opening_residual(self, move):
+        return sum(move.line_ids.filtered(
+            lambda line: line.account_id == self.receivable_account
+            and line.debit > 0 and not line.reconciled
+        ).mapped('amount_residual'))
+
     def test_01_targeted_allocation_multiple_invoices_residual_isolation(self):
         """
         التحقق من التخصيص الدقيق للمدفوعات وعزل الأرصدة:
@@ -344,6 +390,60 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
         self.assertAlmostEqual(current_order.previous_balance, 3000.0, places=2)
         self.assertAlmostEqual(current_order.total_due_amount, 8000.0, places=2)
 
+
+    def test_02d_current_invoice_then_opening_balance(self):
+        """120 settles current 40 then the explicit opening debt by 80."""
+        opening_move = self._create_opening_receivable(100.0, 'CURRENT-FIRST')
+        order, invoice = self._create_posted_bill(40.0, 'CURRENT-OPENING')
+        payment = self.Payment.create({
+            'utility_sale_order_id': order.id,
+            'utility_invoice_id': invoice.id,
+            'partner_id': self.partner.id,
+            'amount': 120.0,
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'utility_payment_method': 'bank',
+            'journal_id': self.bank_journal.id,
+            'date_range_id': self.period.id,
+            'date': date(2026, 9, 20),
+            'electronic_doc_no': 'PAY-OPENING-120',
+        })
+        payment.action_post()
+
+        invoice.invalidate_recordset(['amount_residual'])
+        opening_move.invalidate_recordset(['line_ids'])
+        self.assertAlmostEqual(invoice.amount_residual, 0.0, places=2)
+        self.assertAlmostEqual(self._opening_residual(opening_move), 20.0, places=2)
+        allocations = self.env['utility.payment.allocation'].search(
+            [('payment_id', '=', payment.id)], order='id')
+        self.assertEqual(allocations.mapped('invoice_id'), invoice | opening_move)
+        self.assertAlmostEqual(sum(allocations.mapped('allocated_amount')), 120.0, places=2)
+
+    def test_02e_opening_balance_can_be_paid_directly(self):
+        """Only the exact customer-linked opening move is valid without a bill."""
+        opening_move = self._create_opening_receivable(100.0, 'DIRECT')
+        payment = self.Payment.create({
+            'opening_customer_id': self.customer.id,
+            'utility_opening_move_id': opening_move.id,
+            'utility_invoice_id': opening_move.id,
+            'partner_id': self.partner.id,
+            'amount': 60.0,
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'utility_payment_method': 'bank',
+            'journal_id': self.bank_journal.id,
+            'date': date(2026, 9, 20),
+            'electronic_doc_no': 'PAY-OPENING-DIRECT',
+        })
+        payment.action_post()
+
+        opening_move.invalidate_recordset(['line_ids'])
+        self.assertAlmostEqual(self._opening_residual(opening_move), 40.0, places=2)
+        allocation = self.env['utility.payment.allocation'].search([
+            ('payment_id', '=', payment.id),
+        ], limit=1)
+        self.assertEqual(allocation.invoice_id, opening_move)
+        self.assertAlmostEqual(allocation.allocated_amount, 60.0, places=2)
 
     def test_03_payment_unreconciliation_and_reversal_integrity(self):
         """

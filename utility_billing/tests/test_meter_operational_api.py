@@ -1,3 +1,4 @@
+from datetime import date
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -107,6 +108,73 @@ class TestMeterOperationalBillingAPI(TransactionCase):
         self.assertEqual(invoice.state, 'posted')
         self.assertFalse(customer.mobile)
 
+    def test_collector_account_uses_partner_receivable_for_opening_arrears(self):
+        """Opening-balance move lines must be collectible, not hidden by sync."""
+        if not self.income or not self.journal:
+            self.skipTest('Accounting demo accounts are not available.')
+        meter, customer = self._meter_and_customer('COLLECTOR-ARREARS')
+        receivable = self.env['account.account'].search([
+            ('company_ids', 'in', [self.env.company.id]),
+            ('account_type', '=', 'asset_receivable'),
+        ], limit=1)
+        general_journal = self.env['account.journal'].search([
+            ('company_id', '=', self.env.company.id),
+            ('type', '=', 'general'),
+        ], limit=1)
+        if not receivable or not general_journal:
+            self.skipTest('Required accounting journals are not available.')
+
+        order = self.env['sale.order'].create({
+            'partner_id': customer.partner_id.id,
+            'customer_id': customer.id,
+            'meter_id': meter.id,
+            'date_range_id': self.period.id,
+            'period_start': self.period.date_start,
+            'period_end': self.period.date_end,
+        })
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'journal_id': self.journal.id,
+            'partner_id': customer.partner_id.id,
+            'utility_customer_id': customer.id,
+            'utility_sale_order_id': order.id,
+            'invoice_line_ids': [(0, 0, {
+                'name': 'Current collector bill',
+                'quantity': 1.0,
+                'price_unit': 500.0,
+                'account_id': self.income.id,
+            })],
+        })
+        invoice.action_post()
+        opening = self.env['account.move'].create({
+            'move_type': 'entry',
+            'journal_id': general_journal.id,
+            'date': date(2026, 7, 1),
+            'line_ids': [
+                (0, 0, {
+                    'name': 'Migrated arrears',
+                    'account_id': receivable.id,
+                    'partner_id': customer.partner_id.id,
+                    'debit': 300.0,
+                }),
+                (0, 0, {
+                    'name': 'Migrated arrears offset',
+                    'account_id': self.income.id,
+                    'credit': 300.0,
+                }),
+            ],
+        })
+        opening.action_post()
+
+        controller = utility_billing_api.UtilityBillingAPI()
+        with patch.object(utility_billing_api, 'request', self._request({})):
+            result = controller._collector_account_payload(customer)
+
+        account = result['account']
+        self.assertAlmostEqual(account['current_bill'], 500.0, places=2)
+        self.assertAlmostEqual(account['debt_amount'], 300.0, places=2)
+        self.assertAlmostEqual(account['due_amount'], 800.0, places=2)
+
     def test_reader_lookup_by_operational_number_returns_it(self):
         meter, _customer = self._meter_and_customer('LOOKUP')
         controller = utility_reader_api.UtilityReaderAPI()
@@ -136,6 +204,12 @@ class TestMeterOperationalBillingAPI(TransactionCase):
         self.assertTrue(result['success'])
         self.assertEqual(result['last_reading_value'], 91859.0)
         self.assertEqual(result['last_reading_date'], '2026-09-15T00:00:00')
+        self.assertEqual(len(result['reading_history']), 1)
+        self.assertEqual(result['reading_history'][0]['source'], 'migration_baseline')
+        self.assertEqual(
+            result['reading_history'][0]['reading_date'],
+            '2026-09-15T00:00:00',
+        )
 
     def test_reader_lookup_conflicting_identifiers_is_rejected(self):
         first, _customer = self._meter_and_customer('MISMATCH-A')

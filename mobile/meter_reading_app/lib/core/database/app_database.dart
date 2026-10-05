@@ -120,6 +120,22 @@ class SyncBatches extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Actual historical readings downloaded from Odoo for a meter.  This table
+/// deliberately has no foreign key to [Meters]: assignment caches are
+/// replaced when a new reading period opens, while verified history remains
+/// useful offline for the same physical meter.
+class MeterReadingHistories extends Table {
+  TextColumn get entryKey => text()();
+  IntColumn get meterRemoteId => integer()();
+  RealColumn get readingValue => real()();
+  DateTimeColumn get readingDate => dateTime()();
+  TextColumn get source => text()(); // reading | migration_baseline
+  DateTimeColumn get syncedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {entryKey};
+}
+
 @DriftDatabase(tables: [
   Customers,
   Meters,
@@ -127,6 +143,7 @@ class SyncBatches extends Table {
   Periods,
   Readings,
   SyncBatches,
+  MeterReadingHistories,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -136,7 +153,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(QueryExecutor executor) : super(executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -154,6 +171,9 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from < 3) {
           await m.addColumn(readings, readings.capturedPeriodId);
+        }
+        if (from < 4) {
+          await m.createTable(meterReadingHistories);
         }
       },
     );

@@ -24,7 +24,10 @@ class UtilityPaymentAllocation(models.Model):
     invoice_id = fields.Many2one(
         'account.move', string='الفاتورة المحاسبية', required=True,
         ondelete='restrict', index=True, check_company=True,
-        domain="[('state', '=', 'posted'), ('move_type', '=', 'out_invoice')]" )
+        # An allocation normally targets an invoice.  The single linked
+        # migration opening entry is also an explicit receivable target and is
+        # validated server-side below.
+        domain="[('state', '=', 'posted'), ('move_type', 'in', ('out_invoice', 'entry'))]" )
     partner_id = fields.Many2one(
         'res.partner', related='payment_id.partner_id', string='الشريك المحاسبي',
         store=True, readonly=True, index=True)
@@ -152,6 +155,28 @@ class UtilityPaymentAllocation(models.Model):
             ).mapped('amount_residual'))
         return invoice.amount_residual
 
+    @staticmethod
+    def _is_customer_opening_move(payment, move):
+        """Whether ``move`` is the customer's one linked migration debt."""
+        customer = payment.utility_customer_id
+        return bool(
+            customer
+            and customer.opening_move_id == move
+            and move.move_type == 'entry'
+            and move.state == 'posted'
+            and move.utility_customer_id == customer
+            and move.partner_id == customer.partner_id
+            and move.company_id == payment.company_id
+        )
+
+    @classmethod
+    def _is_opening_target(cls, payment, move):
+        """Validate the direct-opening path against its explicit target."""
+        return bool(
+            payment.utility_opening_move_id == move
+            and cls._is_customer_opening_move(payment, move)
+        )
+
     @api.model
     def prevalidate_payment(self, payment, require_posted=False):
         """Lock and validate the exact invoice before or after payment posting."""
@@ -166,10 +191,13 @@ class UtilityPaymentAllocation(models.Model):
             raise ValidationError(_('تخصيص الدفعات الصادرة خارج نطاق تحصيل الكهرباء.'))
         if require_posted and not payment._is_utility_posted():
             raise ValidationError(_('لا يمكن تخصيص دفعة غير مرحلة.'))
-        if (invoice.utility_sale_order_id != order
+        valid_opening = self._is_opening_target(payment, invoice)
+        valid_invoice = bool(order and invoice.utility_sale_order_id == order)
+        if (not (valid_invoice or valid_opening)
                 or invoice.utility_customer_id != customer
                 or payment.partner_id != customer.partner_id
-                or invoice.partner_id != customer.partner_id):
+                or invoice.partner_id != customer.partner_id
+                or invoice.company_id != payment.company_id):
             raise ValidationError(_('الدفعة والفاتورة لا تخصان نفس حساب الكهرباء.'))
         receivable_lines = invoice.line_ids.filtered(
             lambda line: line.account_id.account_type == 'asset_receivable')
@@ -178,7 +206,6 @@ class UtilityPaymentAllocation(models.Model):
         if payment.currency_id != target_currency:
             raise ValidationError(_('عملة الدفعة يجب أن تطابق عملة الفاتورة المحاسبية.'))
         self._lock_invoice(invoice)
-        valid_opening = bool(opening_move and invoice == opening_move)
         if invoice.state != 'posted' or (
                 invoice.move_type != 'out_invoice' and not valid_opening):
             raise ValidationError(_('المستند المحدد ليس مستند ذمم مدينة ومرحلاً.'))
@@ -196,6 +223,9 @@ class UtilityPaymentAllocation(models.Model):
         the target billing period or older can be treated as arrears.
         """
         customer = payment.utility_customer_id
+        if self._is_opening_target(payment, target_invoice):
+            return target_invoice
+
         target_period = target_invoice.utility_sale_order_id.date_range_id
         candidates = self.env['account.move'].search([
             ('company_id', '=', payment.company_id.id),
@@ -213,6 +243,13 @@ class UtilityPaymentAllocation(models.Model):
                 and move.utility_sale_order_id.date_range_id.date_start
                 < target_period.date_start
             )
+        opening_move = customer.opening_move_id
+        if (opening_move and opening_move != target_invoice
+                and self._is_customer_opening_move(payment, opening_move)
+                and self._target_residual(opening_move, opening=True) > 0):
+            # The explicit migration debt is last: selected invoice first,
+            # then eligible historical invoices, then opening balance.
+            candidates |= opening_move
         return target_invoice | candidates
 
     @staticmethod
@@ -241,7 +278,9 @@ class UtilityPaymentAllocation(models.Model):
         if not common_account_ids:
             raise ValidationError(_('لا يوجد حساب ذمم مشترك بين الدفعة والفاتورة المحددة.'))
 
-        residual_before = self._target_residual(invoice)
+        is_opening_target = self._is_customer_opening_move(payment, invoice)
+        residual_before = self._target_residual(
+            invoice, opening=is_opening_target)
         available_credit = sum(
             abs(line.amount_residual_currency or line.amount_residual)
             for line in payment_lines
@@ -263,7 +302,8 @@ class UtilityPaymentAllocation(models.Model):
             lines.reconcile()
 
         invoice.invalidate_recordset(['amount_residual', 'payment_state'])
-        residual_after = self._target_residual(invoice)
+        residual_after = self._target_residual(
+            invoice, opening=is_opening_target)
         allocated_amount = residual_before - residual_after
         if float_is_zero(allocated_amount, precision_rounding=invoice.currency_id.rounding):
             raise ValidationError(_('تعذر تخصيص أي مبلغ للفاتورة بعد قفلها محاسبيًا.'))
@@ -342,7 +382,12 @@ class UtilityPaymentAllocation(models.Model):
         invoice = self.prevalidate_payment(payment, require_posted=True)
         candidates = self._allocation_candidates(payment, invoice)
         self._lock_invoices(candidates)
-        candidates = candidates.filtered(lambda candidate: candidate.amount_residual > 0)
+        candidates = candidates.filtered(
+            lambda candidate: self._target_residual(
+                candidate,
+                opening=self._is_customer_opening_move(payment, candidate),
+            ) > 0
+        )
         candidates = invoice | (candidates - invoice)
 
         allocations = self.env['utility.payment.allocation']

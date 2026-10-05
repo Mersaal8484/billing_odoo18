@@ -36,11 +36,25 @@
         <t t-call="web.html_container">
             <style>
                 @page { size: 210mm 70mm; margin: 0 !important; }
-                html, body {
+                /*
+                 * Odoo's `web.minimal_layout` puts every PDF body in the
+                 * Bootstrap `container` class.  At wkhtmltopdf's viewport
+                 * width that class receives a responsive max-width.  In an
+                 * RTL document the fixed-width bill is then aligned to the
+                 * right and its left part is clipped.  Reset the container
+                 * here: the printable canvas itself is exactly 210 x 70 mm.
+                 */
+                html,
+                body.o_body_pdf.container {
                     width: 210mm !important;
+                    min-width: 210mm !important;
+                    max-width: 210mm !important;
                     height: 70mm !important;
+                    min-height: 70mm !important;
+                    max-height: 70mm !important;
                     margin: 0 !important;
                     padding: 0 !important;
+                    overflow: hidden !important;
                 }
                 .page.utility-electricity-bill {
                     box-sizing: border-box !important;
@@ -55,14 +69,23 @@
                     overflow: hidden !important;
                     page-break-after: always;
                 }
+                /*
+                 * Measured on the printed PDF: the bill sits 6.34 mm away from
+                 * the right edge of the sheet and its left side is clipped.
+                 * Shift it right by that amount so both borders are inside.
+                 */
+                .page.utility-electricity-bill {
+                    position: relative !important;
+                    left: 6.34mm !important;
+                }
                 .utility-electricity-bill .utility-electricity-bill-content {
                     box-sizing: border-box !important;
-                    width: 210mm !important;
-                    min-width: 210mm !important;
-                    max-width: 210mm !important;
-                    height: 70mm !important;
-                    min-height: 70mm !important;
-                    max-height: 70mm !important;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                    max-width: 100% !important;
+                    height: 100% !important;
+                    min-height: 100% !important;
+                    max-height: 100% !important;
                     margin: 0 !important;
                 }
             </style>
@@ -76,6 +99,7 @@
                     custom 210 x 70 mm geometry remains unchanged.
                 -->
                 <div class="article page utility-electricity-bill" lang="ar" dir="rtl"
+                     style="position:relative; left:6.34mm;"
                      t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
 
                     <div class="utility-electricity-bill-content" dir="rtl" style="

@@ -12,6 +12,7 @@ import '../core/sync/sync_settings_service.dart';
 import '../features/collections/data/odoo_collection_repository.dart';
 import '../features/collections/domain/collection_models.dart';
 import '../features/customers/data/assignment_repository.dart';
+import '../features/customers/data/odoo_meter_history_repository.dart';
 import '../features/customers/data/odoo_assignment_repository.dart';
 import '../features/customers/domain/entities.dart';
 import '../features/readings/data/drift_reading_repository.dart';
@@ -87,6 +88,13 @@ final assignmentRepositoryProvider = Provider<AssignmentRepository>((ref) {
   return repo;
 });
 
+final meterHistoryRepositoryProvider = Provider<OdooMeterHistoryRepository>((ref) {
+  return OdooMeterHistoryRepository(
+    ref.watch(odooApiClientProvider),
+    ref.watch(databaseProvider),
+  );
+});
+
 final collectionRepositoryProvider = Provider<CollectionRepository>((ref) {
   final repo = OdooCollectionRepository(ref.watch(billingApiServiceProvider));
   ref.onDispose(repo.dispose);
@@ -131,6 +139,13 @@ final assignmentsProvider = StreamProvider.autoDispose
   return ref
       .watch(assignmentRepositoryProvider)
       .watchAssignments(query: query.text, filter: query.status);
+});
+
+final meterReadingHistoryProvider = StreamProvider.autoDispose
+    .family<List<MeterReadingHistoryItem>, int>((ref, meterRemoteId) {
+  return ref
+      .watch(meterHistoryRepositoryProvider)
+      .watchHistory(meterRemoteId);
 });
 
 class AssignmentQuery {
