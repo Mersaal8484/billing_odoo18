@@ -25,3 +25,4 @@ from . import test_collector_no_coa_autocreate
 # §2-أ مزامنة النطاق الجغرافي — اختبارات الارتداد الأمنية
 from . import test_staff_scope_sync
 from . import test_utility_infrastructure_settings
+from . import test_mobile_role_flags

@@ -1,6 +1,6 @@
-"""Utility Auth API controller for role and route checks."""
+"""Utility Auth API controller for explicit field-role and scope checks."""
 
-from odoo import http
+from odoo import _, http
 from odoo.http import request
 
 
@@ -14,76 +14,29 @@ class UtilityAuthApi(http.Controller):
         csrf=False,
     )
     def get_user_roles(self, **kwargs):
-        """
-        يُعيد أدوار المستخدم الحالي بناءً على utility.user.role
-        أو مجموعات Odoo المرتبطة بحسابه.
+        """Return explicit field roles and the caller's assigned scope.
 
-        Response:
-            {
-                "success": true,
-                "user": {"id": 5, "name": "كاشف01", "login": "kasher01"},
-                "roles": {
-                    "is_meter_reader": true,
-                    "is_collector": false,
-                    "is_supervisor": false
-                },
-                "assigned_route_ids": [1, 2],
-                "assigned_region_ids": [225]
-            }
+        A user without a recognized field role is rejected.  The endpoint must
+        never make an unassigned user a meter reader by default, because the
+        mobile client uses this response to choose its operating workflow.
         """
         user = request.env.user
-
-        # تحقق من الأدوار عبر utility.user.role إذا موجود
-        is_reader = False
-        is_collector = False
-        is_supervisor = False
-        route_ids = []
-        region_ids = []
-
-        try:
-            # البحث في utility.user.role
-            role = request.env['utility.user.role'].sudo().search(
-                [('user_id', '=', user.id)], limit=1
-            )
-            if role:
-                role_code = role.code if hasattr(role, 'code') else ''
-                role_name = role.name.lower() if role.name else ''
-
-                is_reader = 'كاشف' in role_name or 'reader' in role_name or role_code == '1222'
-                is_collector = 'متحصل' in role_name or 'collector' in role_name
-                is_supervisor = 'مشرف' in role_name or 'supervisor' in role_name
-
-                # جلب المسارات/المناطق المخصصة
-                if hasattr(role, 'route_ids'):
-                    route_ids = role.route_ids.ids
-                if hasattr(role, 'region_ids'):
-                    region_ids = role.region_ids.ids
-        except Exception:
-            pass
-
-        # fallback: التحقق من مجموعات Odoo
-        if not (is_reader or is_collector or is_supervisor):
-            group_names = user.groups_id.mapped('full_name')
-            is_reader = any('meter' in g.lower() or 'reader' in g.lower() or 'كاشف' in g for g in group_names)
-            is_collector = any('collect' in g.lower() or 'متحصل' in g for g in group_names)
-            is_supervisor = any('supervisor' in g.lower() or 'مشرف' in g for g in group_names)
-
-            # إذا لم يُحدد دور → افتراض كاشف
-            if not (is_reader or is_collector or is_supervisor):
-                is_reader = True
-
-        return {
+        roles = user._get_mobile_role_flags()
+        response = {
             'success': True,
             'user': {
                 'id': user.id,
                 'name': user.name,
                 'login': user.login,
             },
-            'roles': {
-                'is_meter_reader': is_reader,
-                'is_collector': is_collector,
-                'is_supervisor': is_supervisor,
-            },
-            'assigned_route_ids': route_ids,
-            'assigned_region_ids': region_ids,
+            'roles': roles,
+            'assigned_route_ids': user.assigned_route_ids.ids,
+            'assigned_region_ids': user.assigned_region_ids.ids,
         }
+        if not any(roles.values()):
+            response.update({
+                'success': False,
+                'code': 'ROLE_NOT_ASSIGNED',
+                'error': _('لا يملك هذا المستخدم دورًا ميدانيًا معتمدًا.'),
+            })
+        return response
