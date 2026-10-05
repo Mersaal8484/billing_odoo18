@@ -7,13 +7,21 @@ import '../../../shared/widgets/info_row.dart';
 import '../../../shared/widgets/state_widgets.dart';
 import '../domain/entities.dart';
 
-class CustomerDetailScreen extends ConsumerWidget {
+class CustomerDetailScreen extends ConsumerStatefulWidget {
   final String assignmentId;
 
   const CustomerDetailScreen({super.key, required this.assignmentId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CustomerDetailScreen> createState() =>
+      _CustomerDetailScreenState();
+}
+
+class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
+  bool _historyRefreshStarted = false;
+
+  @override
+  Widget build(BuildContext context) {
     final assignments = ref.watch(assignmentsProvider(const AssignmentQuery()));
 
     return Scaffold(
@@ -22,12 +30,29 @@ class CustomerDetailScreen extends ConsumerWidget {
         loading: () => const LoadingState(),
         error: (e, _) => ErrorState(message: 'خطأ: $e'),
         data: (list) {
-          final match = list.where((a) => a.id == assignmentId);
+          final match = list.where((a) => a.id == widget.assignmentId);
           if (match.isEmpty) {
             return const EmptyState(
                 icon: Icons.error_outline, title: 'العنصر غير موجود');
           }
           final assignment = match.first;
+          final history = ref.watch(
+            meterReadingHistoryProvider(assignment.meter.remoteId),
+          );
+          if (!_historyRefreshStarted && assignment.meter.remoteId != 0) {
+            _historyRefreshStarted = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              ref
+                  .read(meterHistoryRepositoryProvider)
+                  .syncMeterHistory(
+                    meterRemoteId: assignment.meter.remoteId,
+                    meterNumber: assignment.meter.meterNumber,
+                  )
+                  // Cached rows remain visible if the device is offline.
+                  .catchError((_) {});
+            });
+          }
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -112,6 +137,59 @@ class CustomerDetailScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'سجل القراءات السابقة',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              history.when(
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+                error: (_, __) => const Card(
+                  child: ListTile(
+                    leading: Icon(Icons.cloud_off_outlined),
+                    title: Text('يتعذر تحديث السجل الآن'),
+                    subtitle: Text('ستظهر القراءات المحفوظة عند توفرها.'),
+                  ),
+                ),
+                data: (items) {
+                  if (items.isEmpty) {
+                    return const Card(
+                      child: ListTile(
+                        leading: Icon(Icons.history_toggle_off_outlined),
+                        title: Text('لا توجد قراءات موثقة محفوظة لهذا العداد'),
+                      ),
+                    );
+                  }
+                  return Column(
+                    children: items
+                        .map(
+                          (item) => Card(
+                            child: ListTile(
+                              leading: const Icon(Icons.speed_rounded),
+                              title: Text(
+                                '${item.readingValue.toStringAsFixed(0)} kWh',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              subtitle: Text(_date(item.readingDate)),
+                              trailing: item.source == 'migration_baseline'
+                                  ? const Tooltip(
+                                      message: 'رصيد قراءة مُرحّل من النظام',
+                                      child: Icon(Icons.archive_outlined),
+                                    )
+                                  : const Icon(Icons.verified_outlined),
+                            ),
+                          ),
+                        )
+                        .toList(growable: false),
+                  );
+                },
               ),
               const SizedBox(height: 20),
               if (assignment.status == AssignmentStatus.read ||

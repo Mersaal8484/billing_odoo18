@@ -134,12 +134,12 @@ Provider reference unique per provider.
 
 No silent overpayment.
 
-Policy options:
-- reject.
-- allocate allowed residual and keep explicit unapplied credit document.
-- customer credit process approved by accounting.
-
-No customer wallet.
+The Odoo 18 collector flow posts one standard `account.payment` on the
+customer's Receivable account and partner subledger. It settles the selected
+current invoice first, then that same customer's prior open invoices by oldest
+due date (invoice date, then ID as stable tie-breakers). Any remaining amount
+stays as the standard unreconciled customer credit on that same Receivable
+account and partner. It is neither income nor a parallel customer wallet.
 
 ---
 
@@ -209,3 +209,20 @@ Controlled Reversal
 **CURRENT V1:** exact invoice allocation, payment/invoice locking, reconciliation, allocation records, gateway idempotency, and financial reversal orchestration are implemented in the Billing/Accounting boundary. No partner-wide arbitrary reconciliation is permitted.
 
 **DEFERRED:** “Static implementation includes concurrency controls; runtime proof is separately deferred.”
+
+## V3.3 Current Collector Allocation Policy
+
+The collector app shows the current bill, prior arrears, and total due. A
+payment is always posted against the partner Receivable account, not against a
+separate invoice-only balance. Reconciliation is nevertheless explicit and
+safe: only posted outgoing invoices with the same company, partner,
+utility-customer account, compatible currency, and Receivable account qualify.
+
+Allocation order is:
+
+1. selected current invoice;
+2. prior open invoices from older billing periods, oldest due invoice first;
+3. any excess remains an unapplied receivable credit for that customer.
+
+The policy never reconciles another customer's, company's, currency's, or
+Receivable-account lines, and it retains the per-invoice allocation audit.

@@ -12,7 +12,7 @@
                 <field name="period_end" optional="show"/>
                 <field name="consumption" optional="show"/>
                 <field name="amount_total" sum="الإجمالي"/>
-                <field name="total_due_amount" string="إجمالي المطلوب سداده" widget="monetary" sum="إجمالي المطلوب سداده" decoration-danger="total_due_amount &gt; 0" optional="show"/>
+                <field name="total_due_amount" string="إجمالي المطلوب سداده" widget="monetary" decoration-danger="total_due_amount &gt; 0" optional="show"/>
                 <field name="amount_paid" optional="show"/>
                 <field name="balance_due" optional="show"/>
                 <field name="bill_state" widget="badge" decoration-danger="bill_state in ('overdue','cancelled')" decoration-success="bill_state=='paid'" decoration-warning="bill_state=='draft'"/>

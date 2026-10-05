@@ -220,20 +220,21 @@ class _CollectorHomeScreenState extends ConsumerState<CollectorHomeScreen> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: Row(
               children: [
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: _syncing ? null : _syncPeriodInvoices,
-                    icon: _syncing
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.sync_rounded),
-                    label: Text(
-                      _syncing ? 'جارٍ التحديث...' : 'مزامنة الفواتير',
-                    ),
+                FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(0, 42),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
+                  onPressed: _syncing ? null : _syncPeriodInvoices,
+                  icon: _syncing
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.sync_rounded, size: 18),
+                  label: Text(_syncing ? 'جارٍ التحديث...' : 'مزامنة الفواتير'),
                 ),
                 const SizedBox(width: 8),
                 OutlinedButton.icon(
@@ -425,9 +426,65 @@ class _SyncedInvoiceTile extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            // This is the same payable breakdown used by the collection
+            // screen. The invoice residual alone is not the total due when
+            // the subscriber has arrears from earlier billing periods.
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: colors.primaryContainer.withOpacity(.45),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                children: [
+                  _PayableBreakdownRow(
+                    label: 'الفاتورة الحالية',
+                    amount: account.currentBill,
+                  ),
+                  const SizedBox(height: 3),
+                  _PayableBreakdownRow(
+                    label: 'متأخرات سابقة',
+                    amount: account.debtAmount,
+                  ),
+                  const Divider(height: 12),
+                  _PayableBreakdownRow(
+                    label: 'إجمالي مستحق السداد',
+                    amount: account.dueTotal,
+                    emphasized: true,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _PayableBreakdownRow extends StatelessWidget {
+  const _PayableBreakdownRow({
+    required this.label,
+    required this.amount,
+    this.emphasized = false,
+  });
+
+  final String label;
+  final double amount;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.bodySmall?.copyWith(
+          fontWeight: emphasized ? FontWeight.w800 : FontWeight.w600,
+          fontSize: emphasized ? 13 : null,
+        );
+    return Row(
+      children: [
+        Expanded(child: Text(label, style: style)),
+        Text('${amount.toStringAsFixed(2)} ر.ي', style: style),
+      ],
     );
   }
 }

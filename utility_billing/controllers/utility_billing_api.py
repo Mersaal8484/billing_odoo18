@@ -221,6 +221,9 @@ class UtilityBillingAPI(http.Controller):
 
     @staticmethod
     def _collection_receipt_payload(payment, collection, duplicate=False):
+        allocations = payment.allocation_ids.filtered(
+            lambda allocation: allocation.state == 'reconciled')
+        allocated_amount = sum(allocations.mapped('allocated_amount'))
         return {
             'success': True,
             'duplicate': duplicate,
@@ -229,6 +232,9 @@ class UtilityBillingAPI(http.Controller):
             'reference': collection.name or payment.name,
             'payment_reference': payment.name,
             'amount': payment.amount,
+            'allocated_amount': allocated_amount,
+            'unapplied_credit': max(payment.amount - allocated_amount, 0.0),
+            'allocation_count': len(allocations),
             'paid_at': fields.Datetime.to_string(collection.collection_date),
             'state': collection.state,
         }
@@ -304,7 +310,10 @@ class UtilityBillingAPI(http.Controller):
 
     @http.route('/api/v1/utility/collector/collect_cash', type='json', auth='user', methods=['POST'])
     def collector_collect_cash(self, **kwargs):
-        """Post one idempotent, exact-invoice field cash collection.
+        """Post one idempotent field cash collection.
+
+        The posted payment remains a partner receivable item. Allocation
+        settles the selected current invoice first and then prior receivables.
 
         A successful response exists only after Odoo posted the payment,
         reconciled it against the selected invoice, and created the collector
@@ -447,12 +456,6 @@ class UtilityBillingAPI(http.Controller):
         cash_account = collector.collection_journal_id.default_account_id
         if cash_account and method_line.payment_account_id != cash_account:
             method_line.sudo().write({'payment_account_id': cash_account.id})
-        if amount > invoice.amount_residual:
-            return self._error(
-                'AMOUNT_EXCEEDS_RESIDUAL',
-                'amount cannot exceed the selected invoice residual.',
-            )
-
         try:
             with request.env.cr.savepoint():
                 payment = Payment.create({
@@ -918,6 +921,26 @@ class UtilityBillingAPI(http.Controller):
             offset=max(offset, 0),
         )
 
+        customer_ids = (invoices.mapped('utility_customer_id') |
+                        invoices.mapped('utility_sale_order_id.customer_id')).ids
+        open_by_customer = {}
+        if customer_ids:
+            open_moves = request.env['account.move'].sudo().search([
+                ('company_id', '=', collector.company_id.id),
+                ('state', '=', 'posted'),
+                ('move_type', '=', 'out_invoice'),
+                ('amount_residual', '>', 0),
+                '|',
+                ('utility_customer_id', 'in', customer_ids),
+                ('utility_sale_order_id.customer_id', 'in', customer_ids),
+            ])
+            for open_move in open_moves:
+                open_customer = (open_move.utility_customer_id
+                                 or open_move.utility_sale_order_id.customer_id)
+                if open_customer:
+                    open_by_customer.setdefault(open_customer.id, 0.0)
+                    open_by_customer[open_customer.id] += open_move.amount_residual
+
         invoice_list = []
         for inv in invoices:
             order = inv.utility_sale_order_id
@@ -928,6 +951,7 @@ class UtilityBillingAPI(http.Controller):
                 # customer scope.
                 continue
             meter = order.meter_id if order else False
+            total_due = open_by_customer.get(customer.id, inv.amount_residual)
             invoice_list.append({
                 'customer_id': customer.id,
                 'customer_number': customer.customer_number,
@@ -943,6 +967,9 @@ class UtilityBillingAPI(http.Controller):
                 'invoice_number': inv.name,
                 'amount': inv.amount_total,
                 'amount_residual': inv.amount_residual,
+                'current_bill': inv.amount_residual,
+                'debt_amount': max(total_due - inv.amount_residual, 0.0),
+                'due_amount': total_due,
                 'due_date': str(inv.invoice_date_due) if inv.invoice_date_due else str(inv.invoice_date),
                 'overdue': inv.invoice_date_due and inv.invoice_date_due < request.env.context.get('tz_date', fields.Date.today()),
             })

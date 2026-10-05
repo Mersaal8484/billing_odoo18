@@ -8,10 +8,10 @@
         <field name="page_height">70</field>
         <field name="page_width">210</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">1</field>
-        <field name="margin_bottom">1</field>
-        <field name="margin_left">2</field>
-        <field name="margin_right">2</field>
+        <field name="margin_top">0</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">0</field>
         <field name="header_line" eval="False"/>
         <field name="header_spacing">0</field>
         <field name="dpi">96</field>
@@ -24,7 +24,8 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">utility_billing.report_electricity_bill</field>
         <field name="report_file">utility_billing.report_electricity_bill</field>
-        <field name="print_report_name">'فاتورة - %s' % (object.name)</field>
+        <!-- Add a timestamp so every browser download has a distinct filename. -->
+        <field name="print_report_name">'فاتورة - %s - %s' % (object.name, time.strftime('%Y%m%d-%H%M%S'))</field>
         <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="utility_billing.paperformat_utility_receipt"/>
@@ -33,16 +34,54 @@
     <!-- قالب فاتورة الاشتراك — 210mm × 70mm مضغوط ومطابق للنموذج -->
     <template id="report_electricity_bill">
         <t t-call="web.html_container">
+            <style>
+                @page { size: 210mm 70mm; margin: 0 !important; }
+                html, body {
+                    width: 210mm !important;
+                    height: 70mm !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                .page.utility-electricity-bill {
+                    box-sizing: border-box !important;
+                    width: 210mm !important;
+                    min-width: 210mm !important;
+                    max-width: 210mm !important;
+                    min-height: 70mm !important;
+                    height: 70mm !important;
+                    max-height: 70mm !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    overflow: hidden !important;
+                    page-break-after: always;
+                }
+                .utility-electricity-bill .utility-electricity-bill-content {
+                    box-sizing: border-box !important;
+                    width: 210mm !important;
+                    min-width: 210mm !important;
+                    max-width: 210mm !important;
+                    height: 70mm !important;
+                    min-height: 70mm !important;
+                    max-height: 70mm !important;
+                    margin: 0 !important;
+                }
+            </style>
             <t t-foreach="docs" t-as="o">
                 <t t-set="values" t-value="report_data.get(o.id, {})"/>
-                <div class="article" style="width:100%; margin:0; padding:0; page-break-after:always;"
+                <!--
+                    `article` is required by ir.actions.report._prepare_html.
+                    It makes Odoo rebuild this fragment with web.minimal_layout,
+                    which supplies the UTF-8 HTML head used by wkhtmltopdf.
+                    Keep the page-specific classes on the same element so the
+                    custom 210 x 70 mm geometry remains unchanged.
+                -->
+                <div class="article page utility-electricity-bill" lang="ar" dir="rtl"
                      t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
 
-                    <div dir="rtl" style="
+                    <div class="utility-electricity-bill-content" dir="rtl" style="
                         box-sizing:border-box;
                         width:210mm;
-                        min-height:68mm;
-                        max-height:70mm;
+                        height:70mm;
                         border:0.5pt solid #222;
                         padding:1.2mm 2mm;
                         background:#fff;
@@ -123,8 +162,8 @@
                                 <td style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm;">رسوم نظافة</td>
                                 <td style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm;">صندوق المعلم</td>
                                 <td style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm;">مبلغ الفاتورة</td>
-                                <td style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm;">المتأخرات</td>
-                                <td style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm; background:#f8d7d7; font-weight:bold;">المبلغ المستحق</td>
+                                <td style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm;">متأخرات سابقة</td>
+                                <td style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm; background:#f8d7d7; font-weight:bold;">إجمالي المطلوب سداده</td>
                             </tr>
                             <tr style="font-weight:bold;">
                                 <td style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm;"><span t-esc="values.get('service_fee',0.0)" t-options='{"widget":"monetary","display_currency":o.currency_id}'/></td>
@@ -140,7 +179,7 @@
                                 <td style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm;">سداد الفترة الحالية</td>
                                 <td style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm;">تسويات سابقة</td>
                                 <td style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm;">تسويات حالية</td>
-                                <td colspan="3" style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm; background:#f8d7d7; font-weight:bold; font-size:6.5pt;">رصيد المشترك النهائي</td>
+                                <td colspan="3" style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm; background:#f8d7d7; font-weight:bold; font-size:6.5pt;">الرصيد النهائي (الفاتورة الحالية + المتأخرات)</td>
                             </tr>
                             <tr style="font-weight:bold;">
                                 <td style="border:0.5pt solid #c4161c; padding:0.7mm 0.2mm;"><span t-esc="values.get('previous_payment',0.0)" t-options='{"widget":"monetary","display_currency":o.currency_id}'/></td>
@@ -189,7 +228,7 @@
         <xpath expr="//div[@name='total']//table" position="inside">
             <t t-if="doc.previous_balance &gt; 0">
                 <tr class="border-black o_subtotal">
-                    <td><strong>رصيد المتأخرات (سابق)</strong></td>
+                    <td><strong>متأخرات سابقة</strong></td>
                     <td class="text-end">
                         <span t-field="doc.previous_balance"
                             t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>

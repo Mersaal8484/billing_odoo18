@@ -1,8 +1,6 @@
-from collections import defaultdict
-
 from odoo import api, fields, models, _
 from odoo.exceptions import AccessError, ValidationError
-from odoo.tools.float_utils import float_compare, float_is_zero
+from odoo.tools.float_utils import float_is_zero
 
 
 class UtilityPaymentAllocation(models.Model):
@@ -21,12 +19,12 @@ class UtilityPaymentAllocation(models.Model):
         'utility.customer', related='payment_id.utility_customer_id',
         string='حساب الكهرباء', store=True, readonly=True, index=True)
     sale_order_id = fields.Many2one(
-        'sale.order', related='payment_id.utility_sale_order_id',
+        'sale.order', related='invoice_id.utility_sale_order_id',
         string='فاتورة الكهرباء', store=True, readonly=True, index=True)
     invoice_id = fields.Many2one(
         'account.move', string='الفاتورة المحاسبية', required=True,
         ondelete='restrict', index=True, check_company=True,
-        domain="[('utility_sale_order_id', '=', sale_order_id), ('state', '=', 'posted')]" )
+        domain="[('state', '=', 'posted'), ('move_type', '=', 'out_invoice')]" )
     partner_id = fields.Many2one(
         'res.partner', related='payment_id.partner_id', string='الشريك المحاسبي',
         store=True, readonly=True, index=True)
@@ -71,11 +69,17 @@ class UtilityPaymentAllocation(models.Model):
     error_message = fields.Text('رسالة الخطأ', readonly=True)
 
     def init(self):
+        # A single payment may now create several explicit invoice allocations.
+        # Keep external-reference idempotency per invoice instead of rejecting
+        # the second allocation of the same posted payment.
+        self.env.cr.execute(
+            'DROP INDEX IF EXISTS utility_payment_allocation_ext_uniq'
+        )
         self.env.cr.execute(
             """
             CREATE UNIQUE INDEX IF NOT EXISTS utility_payment_allocation_ext_uniq
                 ON utility_payment_allocation
-                   (source, external_reference, utility_customer_id)
+                   (source, external_reference, utility_customer_id, invoice_id)
              WHERE external_reference IS NOT NULL AND external_reference <> ''
             """
         )
@@ -106,12 +110,12 @@ class UtilityPaymentAllocation(models.Model):
             customer = allocation.utility_customer_id
             if not payment or not invoice or not customer:
                 continue
-            if payment.utility_sale_order_id != invoice.utility_sale_order_id:
-                raise ValidationError(_('الدفعة والفاتورة المحاسبية لا تخصان نفس فاتورة الكهرباء.'))
             if invoice.utility_customer_id != customer:
                 raise ValidationError(_('الفاتورة المحاسبية لا تخص حساب الكهرباء المحدد.'))
             if payment.partner_id != customer.partner_id or invoice.partner_id != customer.partner_id:
                 raise ValidationError(_('الشريك المحاسبي لا يطابق حساب الكهرباء.'))
+            if invoice.company_id != payment.company_id:
+                raise ValidationError(_('الدفعة والفاتورة يجب أن تنتميا إلى نفس الشركة.'))
 
     @staticmethod
     def _partial_ids(lines):
@@ -124,6 +128,20 @@ class UtilityPaymentAllocation(models.Model):
             'SELECT id FROM account_move WHERE id = %s FOR UPDATE', [invoice.id])
         invoice.invalidate_recordset([
             'state', 'partner_id', 'move_type', 'amount_residual', 'payment_state'])
+
+    def _lock_invoices(self, invoices):
+        """Lock allocation candidates in deterministic id order."""
+        invoice_ids = sorted(invoices.ids)
+        if not invoice_ids:
+            return
+        self.env.flush_all()
+        self.env.cr.execute(
+            'SELECT id FROM account_move WHERE id = ANY(%s) ORDER BY id FOR UPDATE',
+            [invoice_ids],
+        )
+        invoices.invalidate_recordset([
+            'state', 'partner_id', 'move_type', 'amount_residual', 'payment_state',
+        ])
 
     @staticmethod
     def _target_residual(invoice, opening=False):
@@ -169,9 +187,95 @@ class UtilityPaymentAllocation(models.Model):
         residual = self._target_residual(invoice, opening=valid_opening)
         if residual <= 0:
             raise ValidationError(_('الفاتورة المحددة مسددة بالكامل.'))
-        if payment.amount > residual:
-            raise ValidationError(_('مبلغ الدفعة يتجاوز المتبقي الحالي للفواتير المحددة.'))
         return invoice
+
+    def _allocation_candidates(self, payment, target_invoice):
+        """Return the target first, then its customer's prior invoices.
+
+        Remaining credit is applied oldest due date first. Only invoices from
+        the target billing period or older can be treated as arrears.
+        """
+        customer = payment.utility_customer_id
+        target_period = target_invoice.utility_sale_order_id.date_range_id
+        candidates = self.env['account.move'].search([
+            ('company_id', '=', payment.company_id.id),
+            ('state', '=', 'posted'),
+            ('move_type', '=', 'out_invoice'),
+            ('utility_customer_id', '=', customer.id),
+            ('partner_id', '=', customer.partner_id.id),
+            ('currency_id', '=', target_invoice.currency_id.id),
+            ('amount_residual', '>', 0),
+            ('id', '!=', target_invoice.id),
+        ], order='invoice_date_due asc, invoice_date asc, id asc')
+        if target_period:
+            candidates = candidates.filtered(
+                lambda move: move.utility_sale_order_id.date_range_id
+                and move.utility_sale_order_id.date_range_id.date_start
+                < target_period.date_start
+            )
+        return target_invoice | candidates
+
+    @staticmethod
+    def _receivable_lines(move, partner, company, currency):
+        return move.line_ids.filtered(
+            lambda line: (
+                not line.reconciled
+                and line.partner_id == partner
+                and line.company_id == company
+                and line.account_id.account_type == 'asset_receivable'
+                and (not line.currency_id or line.currency_id == currency)
+            )
+        )
+
+    def _reconcile_invoice(self, payment, invoice, source, external_reference):
+        """Reconcile the available payment credit against one safe invoice."""
+        payment_lines = self._receivable_lines(
+            payment.move_id, invoice.partner_id, invoice.company_id, invoice.currency_id)
+        invoice_lines = self._receivable_lines(
+            invoice, invoice.partner_id, invoice.company_id, invoice.currency_id)
+        if not payment_lines or not invoice_lines:
+            raise ValidationError(_('تعذر تحديد سطور الذمم المدينة المتوافقة للدفعة والفاتورة.'))
+
+        common_account_ids = set(payment_lines.mapped('account_id').ids) & set(
+            invoice_lines.mapped('account_id').ids)
+        if not common_account_ids:
+            raise ValidationError(_('لا يوجد حساب ذمم مشترك بين الدفعة والفاتورة المحددة.'))
+
+        residual_before = self._target_residual(invoice)
+        available_credit = sum(
+            abs(line.amount_residual_currency or line.amount_residual)
+            for line in payment_lines
+        )
+        allocation = self.with_context(utility_allocation_internal=True).sudo().create({
+            'payment_id': payment.id,
+            'invoice_id': invoice.id,
+            'requested_amount': min(available_credit, residual_before),
+            'residual_before': residual_before,
+            'source': source,
+            'external_reference': external_reference,
+            'created_by': self.env.user.id,
+            'state': 'allocated',
+        })
+        before_partials = self._partial_ids(payment_lines | invoice_lines)
+        for account_id in sorted(common_account_ids):
+            lines = payment_lines.filtered(lambda line: line.account_id.id == account_id)
+            lines |= invoice_lines.filtered(lambda line: line.account_id.id == account_id)
+            lines.reconcile()
+
+        invoice.invalidate_recordset(['amount_residual', 'payment_state'])
+        residual_after = self._target_residual(invoice)
+        allocated_amount = residual_before - residual_after
+        if float_is_zero(allocated_amount, precision_rounding=invoice.currency_id.rounding):
+            raise ValidationError(_('تعذر تخصيص أي مبلغ للفاتورة بعد قفلها محاسبيًا.'))
+        partials = self._partial_ids(payment_lines | invoice_lines) - before_partials
+        allocation.with_context(utility_allocation_internal=True).write({
+            'allocated_amount': allocated_amount,
+            'residual_after': residual_after,
+            'partial_reconcile_ids': [(6, 0, partials.ids)],
+            'reconciliation_reference': ', '.join(map(str, partials.ids)),
+            'state': 'reconciled',
+        })
+        return allocation
 
     def _resolve_source(self, payment):
         source = self.env.context.get('utility_payment_source')
@@ -185,7 +289,12 @@ class UtilityPaymentAllocation(models.Model):
 
     @api.model
     def allocate_payment(self, payment):
-        """Create one auditable allocation and reconcile only its exact invoice."""
+        """Allocate target first, then the customer's oldest prior arrears.
+
+        Any amount left after all eligible invoices is deliberately retained as
+        a standard unreconciled customer credit on the payment receivable line.
+        It is neither income nor a parallel wallet.
+        """
         payment.ensure_one()
         if not payment.utility_sale_order_id and not payment.utility_opening_move_id:
             return self.env['utility.payment.allocation']
@@ -200,7 +309,7 @@ class UtilityPaymentAllocation(models.Model):
         existing = self.search([
             ('payment_id', '=', payment.id),
             ('state', 'in', ('allocated', 'reconciled')),
-        ], limit=1)
+        ])
         if existing:
             return existing
 
@@ -231,77 +340,20 @@ class UtilityPaymentAllocation(models.Model):
             raise ValidationError(_('تخصيص الدفعات الصادرة خارج نطاق تحصيل الكهرباء.'))
 
         invoice = self.prevalidate_payment(payment, require_posted=True)
+        candidates = self._allocation_candidates(payment, invoice)
+        self._lock_invoices(candidates)
+        candidates = candidates.filtered(lambda candidate: candidate.amount_residual > 0)
+        candidates = invoice | (candidates - invoice)
 
-        residual_before = self._target_residual(
-            invoice, opening=bool(payment.utility_opening_move_id))
-        acting_user = self.env.user
-        allocation = self.with_context(
-            utility_allocation_internal=True,
-        ).sudo().create({
-            'payment_id': payment.id,
-            'invoice_id': invoice.id,
-            'requested_amount': payment.amount,
-            'residual_before': residual_before,
-            'source': source,
-            'external_reference': external_reference,
-            'created_by': acting_user.id,
-            'state': 'allocated',
-        })
-
-        payment_lines = payment.move_id.line_ids.filtered(
-            lambda line: (
-                not line.reconciled
-                and line.partner_id == invoice.partner_id
-                and line.account_id.account_type == 'asset_receivable'
-                and line.company_id == invoice.company_id
-                and (not line.currency_id or line.currency_id == invoice.currency_id)
-            ))
-        invoice_lines = invoice.line_ids.filtered(
-            lambda line: (
-                not line.reconciled
-                and line.partner_id == invoice.partner_id
-                and line.account_id.account_type == 'asset_receivable'
-                and line.company_id == invoice.company_id
-                and (not line.currency_id or line.currency_id == invoice.currency_id)
-            ))
-        if not payment_lines or not invoice_lines:
-            raise ValidationError(_('تعذر تحديد سطور الذمم المدينة للدفعة والفاتورة.'))
-
-        before_partials = self._partial_ids(payment_lines | invoice_lines)
-        payment_groups = defaultdict(lambda: self.env['account.move.line'])
-        invoice_groups = defaultdict(lambda: self.env['account.move.line'])
-        for line in payment_lines:
-            payment_groups[(line.account_id.id, line.currency_id.id or invoice.currency_id.id)] |= line
-        for line in invoice_lines:
-            invoice_groups[(line.account_id.id, line.currency_id.id or invoice.currency_id.id)] |= line
-        common_keys = sorted(set(payment_groups) & set(invoice_groups))
-        if not common_keys:
-            raise ValidationError(_('لا يوجد حساب ذمم مشترك بين الدفعة والفاتورة المحددة.'))
-        for key in common_keys:
-            (payment_groups[key] | invoice_groups[key]).reconcile()
-
-        invoice.invalidate_recordset(['amount_residual', 'payment_state'])
-        residual_after = self._target_residual(
-            invoice, opening=bool(payment.utility_opening_move_id))
-        allocated_amount = residual_before - residual_after
-        currency = invoice.currency_id
-        if (float_is_zero(allocated_amount, precision_rounding=currency.rounding)
-                or float_compare(
-                    residual_before - allocated_amount, residual_after,
-                    precision_rounding=currency.rounding) != 0
-                or float_compare(allocated_amount, payment.amount,
-                                 precision_rounding=currency.rounding) != 0):
-            raise ValidationError(_('فشل التحقق من ثابت المبلغ بعد التسوية المحاسبية.'))
-
-        partials = self._partial_ids(payment_lines | invoice_lines) - before_partials
-        allocation.with_context(utility_allocation_internal=True).write({
-            'allocated_amount': allocated_amount,
-            'residual_after': residual_after,
-            'partial_reconcile_ids': [(6, 0, partials.ids)],
-            'reconciliation_reference': ', '.join(map(str, partials.ids)),
-            'state': 'reconciled',
-        })
-        return allocation
+        allocations = self.env['utility.payment.allocation']
+        for candidate in candidates:
+            if not self._receivable_lines(
+                    payment.move_id, customer.partner_id,
+                    payment.company_id, payment.currency_id):
+                break
+            allocations |= self._reconcile_invoice(
+                payment, candidate, source, external_reference)
+        return allocations
 
     def action_reverse(self, reason=None):
         return self.action_reverse_allocation(reason=reason)

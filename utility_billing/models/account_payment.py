@@ -466,6 +466,13 @@ class AccountPayment(models.Model):
         self.ensure_one()
         if self.utility_payment_method != 'cash' or not self.collector_id:
             return self.env['utility.collection']
+        # One field collection represents the cash custody of the full payment.
+        # Its allocation link is the user-selected current invoice; additional
+        # allocations remain fully auditable on the same payment.
+        allocation = allocation.filtered(
+            lambda item: item.invoice_id == self.utility_invoice_id)[:1] or allocation[:1]
+        if not allocation:
+            raise ValidationError(_('لا يمكن إنشاء تحصيل ميداني لدفعة بلا تخصيص محاسبي.'))
         collection_model = self.env['utility.collection']
         existing = collection_model.search([('payment_id', '=', self.id)], limit=1)
         if existing:

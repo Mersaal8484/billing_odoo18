@@ -130,8 +130,15 @@ class UtilitySaleOrder(models.Model):
     balance_due = fields.Monetary('المتبقي', compute='_compute_payment', store=True, index=True, currency_field='currency_id')
     is_overdue = fields.Boolean('متأخر', compute='_compute_payment', store=True, index=True)
 
-    previous_balance = fields.Monetary('رصيد المتأخرات (سابق)', compute='_compute_previous_balance', store=True, currency_field='currency_id')
-    total_due_amount = fields.Monetary('إجمالي المطلوب سداده (فاتورة + متأخرات)', compute='_compute_total_due_amount', store=True, currency_field='currency_id')
+    # These values must always reflect the live Receivable balance.  Keeping
+    # them stored made a bill retain the amount calculated at invoice creation
+    # even after older invoices were paid, reconciled, or newly posted.
+    previous_balance = fields.Monetary(
+        'المتأخرات السابقة', compute='_compute_previous_balance',
+        currency_field='currency_id')
+    total_due_amount = fields.Monetary(
+        'إجمالي المطلوب سداده (الحالية + المتأخرات)',
+        compute='_compute_total_due_amount', currency_field='currency_id')
 
     bill_state = fields.Selection([
         ('draft', 'مسودة'),
@@ -322,21 +329,32 @@ class UtilitySaleOrder(models.Model):
             )
             order.all_qty_delivered = delivered
 
-    @api.depends('partner_id', 'customer_id', 'invoice_ids.state', 'utility_move_ids.state')
+    @api.depends(
+        'partner_id', 'customer_id', 'company_id',
+        'invoice_ids.state', 'invoice_ids.amount_residual',
+        'utility_move_ids.state', 'utility_move_ids.amount_residual')
     def _compute_previous_balance(self):
         for order in self:
             if not order.customer_id:
                 order.previous_balance = 0.0
                 continue
+            # The customer Receivable account is the accounting truth. Remove
+            # only this bill's own posted move(s), leaving prior outstanding
+            # invoices (and any migrated receivable opening balance) as the
+            # arrears shown on the current bill. No arrears are copied into
+            # sale/invoice revenue lines.
             posted_moves = (order.invoice_ids | order.utility_move_ids).filtered(
                 lambda move: move.state == 'posted')
             order.previous_balance = order.customer_id._get_receivable_balance(
                 exclude_move_ids=posted_moves.ids)
 
-    @api.depends('amount_total', 'previous_balance')
+    @api.depends('balance_due', 'previous_balance')
     def _compute_total_due_amount(self):
         for order in self:
-            order.total_due_amount = order.amount_total + order.previous_balance
+            # ``balance_due`` is the unpaid amount of this invoice; therefore
+            # a partially paid current invoice never makes the requested total
+            # include money already collected.
+            order.total_due_amount = order.balance_due + order.previous_balance
 
     @api.constrains('reading_id', 'state')
     def _check_unique_active_reading_bill(self):

@@ -439,16 +439,21 @@ class OdooCollectionRepository implements CollectionRepository {
         paymentType: MeterPaymentType.postpaid,
         connectionStatus: 'connected',
       );
-      final dueAmount = invoices
-          .where((item) => item.status != InvoiceStatus.paid)
-          .fold<double>(0, (sum, item) => sum + item.amountResidual);
+      final dueAmount = _toDouble(first['due_amount']) > 0
+          ? _toDouble(first['due_amount'])
+          : invoices
+              .where((item) => item.status != InvoiceStatus.paid)
+              .fold<double>(0, (sum, item) => sum + item.amountResidual);
+      final currentBill = _toDouble(first['current_bill']) > 0
+          ? _toDouble(first['current_bill'])
+          : (invoices.isEmpty ? 0.0 : invoices.first.amountResidual);
       return CollectionAccount(
         id: customer.customerNumber,
         customer: customer,
         meter: meter,
         balance: 0,
-        debtAmount: 0,
-        currentBill: invoices.isEmpty ? 0 : invoices.first.amountResidual,
+        debtAmount: _toDouble(first['debt_amount']),
+        currentBill: currentBill,
         dueAmount: dueAmount,
         allowPartial: true,
         message: '',

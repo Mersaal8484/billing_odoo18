@@ -8,8 +8,8 @@ import '../../../core/network/odoo_api_client.dart';
 import '../../../shared/widgets/state_widgets.dart';
 import '../domain/collection_models.dart';
 
-/// Posts cash to one exact invoice. A receipt appears only after Odoo confirms
-/// posting, explicit allocation and the collector custody record.
+/// Posts cash to the current invoice then explicitly reconciles any remainder
+/// against the same customer's prior receivables, oldest due invoice first.
 class PaymentScreen extends ConsumerStatefulWidget {
   const PaymentScreen({super.key, required this.accountId, this.initialInvoice});
   final String accountId;
@@ -63,7 +63,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       if (selected == null) {
         throw StateError('لا توجد فاتورة محاسبية قابلة للتحصيل.');
       }
-      _amount.text = selected.amountResidual.toStringAsFixed(2);
+      _amount.text = account.dueTotal.toStringAsFixed(2);
       if (mounted) {
         setState(() {
           _account = account;
@@ -88,9 +88,10 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             title: const Text('تأكيد التحصيل النقدي'),
             content: Text(
               'المشترك: ${account.customer.name}\n'
-              'الفاتورة: ${invoice.invoiceNumber}\n'
+              'فاتورة الفترة الحالية: ${invoice.invoiceNumber}\n'
               'المبلغ: ${amount.toStringAsFixed(2)} ر.ي\n\n'
-              'سيُرحّل التحصيل فوراً إلى عهدتك النقدية.',
+              'يسدد أولاً قيمة الفاتورة الحالية (${account.currentBill.toStringAsFixed(2)} ر.ي)، '
+              'ثم المتأخرات الأقدم. أي زيادة تبقى رصيدًا دائنًا للمشترك.',
             ),
             actions: [
               TextButton(
@@ -148,9 +149,6 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
 
   Widget _form() {
     final account = _account!;
-    final invoices = account.invoices
-        .where((item) => item.amountResidual > 0)
-        .toList();
     return Form(
       key: _formKey,
       child: ListView(
@@ -164,25 +162,36 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          DropdownButtonFormField<CollectionInvoice>(
-            value: _invoice,
-            isExpanded: true,
+          InputDecorator(
             decoration: const InputDecoration(
-                labelText: 'الفاتورة المستهدفة', border: OutlineInputBorder()),
-            items: invoices
-                .map((invoice) => DropdownMenuItem(
-                      value: invoice,
-                      child: Text(
-                          '${invoice.invoiceNumber} — ${invoice.amountResidual.toStringAsFixed(2)} ر.ي'),
-                    ))
-                .toList(),
-            onChanged: _saving
-                ? null
-                : (invoice) => setState(() {
-                      _invoice = invoice;
-                      _amount.text =
-                          invoice?.amountResidual.toStringAsFixed(2) ?? '';
-                    }),
+              labelText: 'فاتورة الفترة الحالية',
+              border: OutlineInputBorder(),
+            ),
+            child: Text(
+              '${_invoice!.invoiceNumber} — ${_invoice!.amountResidual.toStringAsFixed(2)} ر.ي',
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _AmountRow('الفاتورة الحالية', account.currentBill),
+                  const SizedBox(height: 6),
+                  _AmountRow('متأخرات سابقة', account.debtAmount),
+                  const Divider(height: 18),
+                  _AmountRow(
+                    'إجمالي المطلوب',
+                    account.dueTotal,
+                    emphasized: true,
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 16),
           TextFormField(
@@ -200,9 +209,6 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
               final amount = double.tryParse(value ?? '');
               if (amount == null || amount <= 0) {
                 return 'أدخل مبلغاً صحيحاً أكبر من صفر.';
-              }
-              if (_invoice != null && amount > _invoice!.amountResidual) {
-                return 'المبلغ يتجاوز المتبقي في الفاتورة المحددة.';
               }
               return null;
             },
@@ -232,4 +238,26 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       ),
     );
   }
+}
+
+class _AmountRow extends StatelessWidget {
+  const _AmountRow(this.label, this.amount, {this.emphasized = false});
+
+  final String label;
+  final double amount;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) => Row(
+        children: [
+          Expanded(child: Text(label)),
+          Text(
+            '${amount.toStringAsFixed(2)} ر.ي',
+            style: TextStyle(
+              fontWeight: emphasized ? FontWeight.w800 : FontWeight.w600,
+              fontSize: emphasized ? 16 : 14,
+            ),
+          ),
+        ],
+      );
 }

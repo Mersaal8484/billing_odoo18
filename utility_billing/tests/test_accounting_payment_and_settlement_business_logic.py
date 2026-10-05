@@ -10,7 +10,7 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
     """
     اختبارات منطق الأعمال المالي المتقدم:
     - التخصيص الدقيق للمدفوعات وعزل أرصدة الفواتير المتعددة لنفس العميل (Targeted Payment & Residual Isolation)
-    - رفض السداد الزائد على مستوى الفاتورة حتى لو كان العميل مدين بمبالغ أخرى
+    - سداد الفاتورة الحالية أولاً ثم المتأخرات الأقدم من نفس ذمة العميل
     - إلغاء وعكس الدفعة وإعادة الرصيد المستحق بدقة (Unreconciliation & Reversal Integrity)
     - دورة شطب المديونيات والإعفاءات (Write-off) وتوليد إشعار دائن واحد فقط وحصانة السجل المطبق
     - تسوية عهد المحصلين وفصل المهام (Collector Custody Settlement & Segregation of Duties)
@@ -71,7 +71,7 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
 
         # حساب ويومية الإعفاءات والشطب (Write-off)
         cls.writeoff_account = cls.Account.search([
-            ('company_id', '=', cls.company.id),
+            ('company_ids', 'in', [cls.company.id]),
             ('code', '=', '600999'),
         ], limit=1)
         if not cls.writeoff_account:
@@ -147,12 +147,12 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
             'company_id': cls.company.id,
         })
 
-    def _create_posted_bill(self, amount, suffix):
+    def _create_posted_bill(self, amount, suffix, period=None, invoice_date=None):
         """مساعد لإنشاء أمر بيع وفاتورة كهرباء منشورة بمبلغ محدد."""
         order = self.env['sale.order'].create({
             'partner_id': self.partner.id,
             'customer_id': self.customer.id,
-            'date_range_id': self.period.id,
+            'date_range_id': (period or self.period).id,
             'consumption': amount,
             'amount_total': amount,
         })
@@ -162,13 +162,16 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
             'partner_id': self.partner.id,
             'utility_customer_id': self.customer.id,
             'utility_sale_order_id': order.id,
-            'invoice_date': date(2026, 9, 15),
+            'invoice_date': invoice_date or date(2026, 9, 15),
             'invoice_line_ids': [(0, 0, {
                 'product_id': self.kwh_product.id,
                 'name': f'استهلاك كهرباء {suffix}',
                 'quantity': 1.0,
                 'price_unit': amount,
                 'account_id': self.income_account.id,
+                # Keep this accounting-flow test independent from the demo
+                # company's country-specific default sales taxes.
+                'tax_ids': [(5, 0, 0)],
             })],
         })
         invoice.action_post()
@@ -183,7 +186,18 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
         - الفاتورة B تظل برصيدها الكامل 3,000 دون أي تسوية أو تأثير (منع التخصيص العشوائي).
         """
         order_a, invoice_a = self._create_posted_bill(5000.0, 'A')
-        order_b, invoice_b = self._create_posted_bill(3000.0, 'B')
+        prior_period = self.env['date.range'].create({
+            'name': 'فترة اختبار عزل سابقة 2026-08',
+            'type_id': self.period.type_id.id,
+            'date_start': '2026-08-01',
+            'date_end': '2026-08-31',
+            'state': 'open',
+            'period_role': 'reading',
+            'collection_state': 'open',
+            'company_id': self.company.id,
+        })
+        order_b, invoice_b = self._create_posted_bill(
+            3000.0, 'B', period=prior_period, invoice_date=date(2026, 8, 15))
 
         self.assertEqual(invoice_a.amount_residual, 5000.0)
         self.assertEqual(invoice_b.amount_residual, 3000.0)
@@ -218,34 +232,118 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
         self.assertEqual(allocations.invoice_id.id, invoice_a.id)
         self.assertEqual(allocations.allocated_amount, 3500.0)
 
-    def test_02_overpayment_rejected_even_with_other_debts(self):
-        """
-        رفض السداد الزائد (Overpayment Rejection):
-        - العميل عليه مديونية إجمالية 8,000 عبر فاتورتين.
-        - محاولة سداد 6,000 موجهة للفاتورة A (وقيمتها 5,000 فقط) يجب أن ترفض بقيد ValidationError،
-          ولا يتم ترحيل المبلغ الزائد تلقائياً للفاتورة B.
-        """
-        order_a, invoice_a = self._create_posted_bill(5000.0, 'A2')
-        _order_b, _invoice_b = self._create_posted_bill(3000.0, 'B2')
+    def test_02_customer_payment_settles_current_then_oldest_arrears(self):
+        """One receivable payment settles current first, then oldest arrears."""
+        old_period = self.env['date.range'].create({
+            'name': 'فترة سداد سابقة 2026-08',
+            'type_id': self.period.type_id.id,
+            'date_start': '2026-08-01',
+            'date_end': '2026-08-31',
+            # The invoice remains collectible as an arrear; only the old
+            # period's collection window is closed.
+            'state': 'open',
+            'period_role': 'reading',
+            'collection_state': 'reconciled',
+            'company_id': self.company.id,
+        })
+        _old_order_a, old_invoice_a = self._create_posted_bill(
+            3000.0, 'OLD-A', period=old_period, invoice_date=date(2026, 8, 5))
+        older_period = self.env['date.range'].create({
+            'name': 'فترة سداد أقدم 2026-07',
+            'type_id': self.period.type_id.id,
+            'date_start': '2026-07-01',
+            'date_end': '2026-07-31',
+            'state': 'open',
+            'period_role': 'reading',
+            'collection_state': 'reconciled',
+            'company_id': self.company.id,
+        })
+        _old_order_b, old_invoice_b = self._create_posted_bill(
+            2000.0, 'OLD-B', period=older_period, invoice_date=date(2026, 7, 10))
+        current_order, current_invoice = self._create_posted_bill(5000.0, 'CURRENT')
 
-        with self.assertRaises(ValidationError):
-            payment_over = self.Payment.create({
-                'utility_sale_order_id': order_a.id,
-                'utility_invoice_id': invoice_a.id,
-                'partner_id': self.partner.id,
-                'amount': 6000.0,
-                'payment_type': 'inbound',
-                'partner_type': 'customer',
-                'utility_payment_method': 'bank',
-                'journal_id': self.bank_journal.id,
-                'date_range_id': self.period.id,
-                'date': date(2026, 9, 20),
-                'electronic_doc_no': 'PAY-OVER-001',
-            })
-            payment_over.action_post()
+        payment = self.Payment.create({
+            'utility_sale_order_id': current_order.id,
+            'utility_invoice_id': current_invoice.id,
+            'partner_id': self.partner.id,
+            'amount': 9000.0,
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'utility_payment_method': 'bank',
+            'journal_id': self.bank_journal.id,
+            'date_range_id': self.period.id,
+            'date': date(2026, 9, 20),
+            'electronic_doc_no': 'PAY-MULTI-001',
+        })
+        payment.action_post()
 
-        invoice_a.invalidate_recordset()
-        self.assertEqual(invoice_a.amount_residual, 5000.0)
+        current_invoice.invalidate_recordset()
+        old_invoice_a.invalidate_recordset()
+        old_invoice_b.invalidate_recordset()
+        self.assertAlmostEqual(current_invoice.amount_residual, 0.0, places=2)
+        self.assertAlmostEqual(old_invoice_a.amount_residual, 1000.0, places=2)
+        self.assertAlmostEqual(old_invoice_b.amount_residual, 0.0, places=2)
+
+        allocations = self.env['utility.payment.allocation'].search(
+            [('payment_id', '=', payment.id)], order='id')
+        self.assertEqual(len(allocations), 3)
+        self.assertEqual(allocations[0].invoice_id, current_invoice)
+        self.assertEqual(allocations[1].invoice_id, old_invoice_b)
+        self.assertEqual(allocations[2].invoice_id, old_invoice_a)
+        self.assertEqual(sum(allocations.mapped('allocated_amount')), 9000.0)
+        receivable_lines = payment.move_id.line_ids.filtered(
+            lambda line: line.account_id == self.receivable_account)
+        self.assertTrue(receivable_lines)
+        self.assertTrue(all(line.partner_id == self.partner for line in receivable_lines))
+
+    def test_02b_excess_stays_as_partner_receivable_credit(self):
+        order, invoice = self._create_posted_bill(5000.0, 'CREDIT')
+        payment = self.Payment.create({
+            'utility_sale_order_id': order.id,
+            'utility_invoice_id': invoice.id,
+            'partner_id': self.partner.id,
+            'amount': 6000.0,
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'utility_payment_method': 'bank',
+            'journal_id': self.bank_journal.id,
+            'date_range_id': self.period.id,
+            'date': date(2026, 9, 20),
+            'electronic_doc_no': 'PAY-CREDIT-001',
+        })
+        payment.action_post()
+
+        invoice.invalidate_recordset()
+        self.assertAlmostEqual(invoice.amount_residual, 0.0, places=2)
+        credit_lines = payment.move_id.line_ids.filtered(
+            lambda line: line.account_id == self.receivable_account
+            and line.partner_id == self.partner and not line.reconciled)
+        self.assertTrue(credit_lines)
+        self.assertAlmostEqual(sum(abs(line.amount_residual) for line in credit_lines), 1000.0, places=2)
+
+    def test_02c_bill_shows_live_current_due_plus_prior_arrears(self):
+        """Printed/onscreen totals are a live Receivable breakdown, not a snapshot."""
+        old_period = self.env['date.range'].create({
+            'name': 'فترة متأخرات لاختبار العرض 2026-08',
+            'type_id': self.period.type_id.id,
+            'date_start': '2026-08-01',
+            'date_end': '2026-08-31',
+            'state': 'open',
+            'period_role': 'reading',
+            'collection_state': 'reconciled',
+            'company_id': self.company.id,
+        })
+        _old_order, _old_invoice = self._create_posted_bill(
+            3000.0, 'DISPLAY-OLD', period=old_period,
+            invoice_date=date(2026, 8, 15))
+        current_order, _current_invoice = self._create_posted_bill(
+            5000.0, 'DISPLAY-CURRENT')
+
+        current_order.invalidate_recordset()
+        self.assertAlmostEqual(current_order.balance_due, 5000.0, places=2)
+        self.assertAlmostEqual(current_order.previous_balance, 3000.0, places=2)
+        self.assertAlmostEqual(current_order.total_due_amount, 8000.0, places=2)
+
 
     def test_03_payment_unreconciliation_and_reversal_integrity(self):
         """
