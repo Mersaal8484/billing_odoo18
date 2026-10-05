@@ -80,46 +80,58 @@ class UtilityBillingAPI(http.Controller):
         }
 
     @staticmethod
-    def _receivable_balances_by_customer(customers, company):
-        """Return each customer's live open Receivable balance in one query.
+    def _collectible_receivable_breakdown(customers, company):
+        """Return only explicit, safe collection targets for each customer.
 
-        A migrated opening balance is a posted Receivable move line, not an
-        invoice.  Collector synchronization must therefore use the same
-        partner-ledger source as the bill's ``previous_balance`` field rather
-        than summing only open ``account.move`` invoices.
+        A collector may settle a posted utility invoice or the one linked
+        migration opening entry.  Other partner receivable lines stay in the
+        accounting ledger but must not be offered as a utility collection
+        target without a reviewed source link.
         """
         customers = customers.filtered(lambda customer: customer.partner_id)
         if not customers:
             return {}
 
-        receivable_accounts = request.env['account.account'].sudo().search([
-            ('account_type', '=', 'asset_receivable'),
-            ('company_ids', 'in', [company.id]),
-        ])
-        if not receivable_accounts:
-            return {customer.id: 0.0 for customer in customers}
-
-        partner_to_customer = {
-            customer.partner_id.id: customer.id for customer in customers
+        balances = {
+            customer.id: {'invoices': 0.0, 'opening': 0.0, 'total': 0.0}
+            for customer in customers
         }
-        groups = request.env['account.move.line'].sudo().read_group([
+        invoice_groups = request.env['account.move'].sudo().read_group([
             ('company_id', '=', company.id),
-            ('partner_id', 'in', list(partner_to_customer)),
-            ('account_id', 'in', receivable_accounts.ids),
-            ('parent_state', '=', 'posted'),
-            ('reconciled', '=', False),
-        ], ['amount_residual:sum'], ['partner_id'])
+            ('utility_customer_id', 'in', customers.ids),
+            ('partner_id', 'in', customers.mapped('partner_id').ids),
+            ('state', '=', 'posted'),
+            ('move_type', '=', 'out_invoice'),
+            ('amount_residual', '>', 0),
+        ], ['amount_residual:sum'], ['utility_customer_id'])
+        for group in invoice_groups:
+            customer_value = group.get('utility_customer_id')
+            customer_id = customer_value[0] if customer_value else False
+            if customer_id in balances:
+                balances[customer_id]['invoices'] = float(
+                    group.get('amount_residual', 0.0) or 0.0)
 
-        balances = {customer.id: 0.0 for customer in customers}
-        for group in groups:
-            partner = group.get('partner_id')
-            partner_id = partner[0] if partner else False
-            customer_id = partner_to_customer.get(partner_id)
-            if customer_id:
-                # A customer credit is retained in Receivable, but is not an
-                # amount the collector should ask the customer to pay.
-                balances[customer_id] = max(
-                    float(group.get('amount_residual', 0.0) or 0.0), 0.0)
+        opening_moves = customers.mapped('opening_move_id').filtered(
+            lambda move: move.state == 'posted' and move.move_type == 'entry'
+            and move.utility_customer_id and move.partner_id
+            and move.company_id == company)
+        if opening_moves:
+            line_groups = request.env['account.move.line'].sudo().read_group([
+                ('move_id', 'in', opening_moves.ids),
+                ('account_id.account_type', '=', 'asset_receivable'),
+                ('reconciled', '=', False),
+                ('debit', '>', 0),
+            ], ['amount_residual:sum'], ['move_id'])
+            residual_by_move = {
+                group['move_id'][0]: max(float(group.get('amount_residual', 0.0) or 0.0), 0.0)
+                for group in line_groups if group.get('move_id')
+            }
+            for customer in customers:
+                move = customer.opening_move_id
+                if move and move.id in opening_moves.ids:
+                    balances[customer.id]['opening'] = residual_by_move.get(move.id, 0.0)
+        for balance in balances.values():
+            balance['total'] = balance['invoices'] + balance['opening']
         return balances
 
     @http.route('/api/v1/utility/customer/lookup', type='json', auth='user', methods=['POST'])
@@ -309,10 +321,12 @@ class UtilityBillingAPI(http.Controller):
                     'state': order.bill_state,
                     'overdue': bool(order.is_overdue),
                 })
-        total_due = self._receivable_balances_by_customer(
+        breakdown = self._collectible_receivable_breakdown(
             customer, customer.company_id)[customer.id]
+        total_due = breakdown['total']
         current_bill = bills[0]['amount_residual'] if bills else 0.0
-        debt_amount = max(total_due - current_bill, 0.0)
+        invoice_arrears = max(breakdown['invoices'] - current_bill, 0.0)
+        debt_amount = invoice_arrears + breakdown['opening']
         meter = customer.meter_id
         return {
             'success': True,
@@ -329,6 +343,8 @@ class UtilityBillingAPI(http.Controller):
                 'due_amount': total_due,
                 'current_bill': current_bill,
                 'debt_amount': debt_amount,
+                'invoice_arrears': invoice_arrears,
+                'opening_balance_due': breakdown['opening'],
                 'allow_partial': True,
                 'bills': bills,
             },
@@ -589,15 +605,14 @@ class UtilityBillingAPI(http.Controller):
         account = self._authorize_account(customer_number)
         if not account:
             return self._error('CUSTOMER_NOT_FOUND', 'Account not found')
-        orders = request.env['sale.order'].sudo().search([
-            ('customer_id', '=', account.id),
-            ('bill_state', 'not in', ('paid', 'cancelled')),
-        ])
-        debt = sum(orders.mapped('balance_due'))
+        breakdown = self._collectible_receivable_breakdown(
+            account, account.company_id)[account.id]
         return {
             'customer_number': account.customer_number,
             'accounting_balance': account.accounting_balance,
-            'debt': debt,
+            'debt': breakdown['total'],
+            'invoice_arrears': breakdown['invoices'],
+            'opening_balance_due': breakdown['opening'],
             'last_purchase_date': account.last_purchase_date.isoformat() if account.last_purchase_date else None,
         }
 
@@ -967,7 +982,7 @@ class UtilityBillingAPI(http.Controller):
         customer_ids = (invoices.mapped('utility_customer_id') |
                         invoices.mapped('utility_sale_order_id.customer_id')).ids
         customers = request.env['utility.customer'].sudo().browse(customer_ids)
-        open_by_customer = self._receivable_balances_by_customer(
+        open_by_customer = self._collectible_receivable_breakdown(
             customers, collector.company_id)
 
         invoice_list = []
@@ -980,7 +995,7 @@ class UtilityBillingAPI(http.Controller):
                 # customer scope.
                 continue
             meter = order.meter_id if order else False
-            total_due = open_by_customer.get(customer.id, inv.amount_residual)
+            total_due = open_by_customer.get(customer.id, {}).get('total', inv.amount_residual)
             invoice_list.append({
                 'customer_id': customer.id,
                 'customer_number': customer.customer_number,

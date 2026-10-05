@@ -445,6 +445,17 @@ class TestAccountingPaymentAndSettlementBusinessLogic(TransactionCase):
         self.assertEqual(allocation.invoice_id, opening_move)
         self.assertAlmostEqual(allocation.allocated_amount, 60.0, places=2)
 
+    def test_02f_opening_payment_action_uses_only_the_linked_move(self):
+        opening_move = self._create_opening_receivable(100.0, 'ACTION')
+
+        action = self.customer.action_register_opening_balance_payment()
+
+        self.assertEqual(action['res_model'], 'account.payment')
+        self.assertEqual(action['context']['default_opening_customer_id'], self.customer.id)
+        self.assertEqual(action['context']['default_utility_opening_move_id'], opening_move.id)
+        self.assertEqual(action['context']['default_utility_invoice_id'], opening_move.id)
+        self.assertEqual(action['context']['default_partner_id'], self.partner.id)
+
     def test_03_payment_unreconciliation_and_reversal_integrity(self):
         """
         إلغاء وعكس الدفعة واستعادة الرصيد المستحق (Unreconcile on Cancel):

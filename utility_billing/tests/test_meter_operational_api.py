@@ -149,6 +149,8 @@ class TestMeterOperationalBillingAPI(TransactionCase):
         opening = self.env['account.move'].create({
             'move_type': 'entry',
             'journal_id': general_journal.id,
+            'partner_id': customer.partner_id.id,
+            'utility_customer_id': customer.id,
             'date': date(2026, 7, 1),
             'line_ids': [
                 (0, 0, {
@@ -165,6 +167,7 @@ class TestMeterOperationalBillingAPI(TransactionCase):
             ],
         })
         opening.action_post()
+        customer.opening_move_id = opening.id
 
         controller = utility_billing_api.UtilityBillingAPI()
         with patch.object(utility_billing_api, 'request', self._request({})):

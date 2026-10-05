@@ -46,6 +46,61 @@ class TestCustomerStatementWizard(TransactionCase):
         self.assertIn('closing', totals)
         self.assertEqual(totals['opening'], 0.0)
 
+    def test_migrated_opening_entry_is_visible_and_carried_forward(self):
+        receivable = self.env['account.account'].search([
+            ('company_ids', 'in', [self.env.company.id]),
+            ('account_type', '=', 'asset_receivable'),
+        ], limit=1)
+        income = self.env['account.account'].search([
+            ('company_ids', 'in', [self.env.company.id]),
+            ('account_type', '=', 'income'),
+        ], limit=1)
+        journal = self.env['account.journal'].search([
+            ('company_id', '=', self.env.company.id),
+            ('type', '=', 'general'),
+        ], limit=1)
+        if not receivable or not income or not journal:
+            self.skipTest('Required accounting configuration is not available.')
+        opening = self.env['account.move'].create({
+            'move_type': 'entry',
+            'journal_id': journal.id,
+            'partner_id': self.partner.id,
+            'utility_customer_id': self.customer.id,
+            'date': Date.from_string('2026-01-15'),
+            'line_ids': [
+                (0, 0, {
+                    'name': 'Migrated opening receivable',
+                    'account_id': receivable.id,
+                    'partner_id': self.partner.id,
+                    'debit': 100.0,
+                }),
+                (0, 0, {
+                    'name': 'Migrated opening offset',
+                    'account_id': income.id,
+                    'credit': 100.0,
+                }),
+            ],
+        })
+        opening.action_post()
+        self.customer.opening_move_id = opening.id
+
+        in_period = self.wizard_model.create({
+            'customer_id': self.customer.id,
+            'date_from': Date.from_string('2026-01-01'),
+            'date_to': Date.from_string('2026-12-31'),
+        })
+        lines = in_period._get_statement_lines()
+        opening_line = next(line for line in lines if line['kind'] == 'opening')
+        self.assertEqual(opening_line['debit'], 100.0)
+        self.assertEqual(in_period._get_statement_totals()['closing'], 100.0)
+
+        after_period = self.wizard_model.create({
+            'customer_id': self.customer.id,
+            'date_from': Date.from_string('2026-02-01'),
+            'date_to': Date.from_string('2026-12-31'),
+        })
+        self.assertEqual(after_period._get_opening_balance(), 100.0)
+
     def test_financial_settlement_in_statement(self):
         """التحقق من ظهور التسويات المالية (مدين ودائن) في كشف الحساب والارصدة التراكمية"""
         # إنشاء تسوية دائنة (خصم)

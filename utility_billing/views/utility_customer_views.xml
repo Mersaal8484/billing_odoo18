@@ -6,6 +6,12 @@
         <field name="inherit_id" ref="utility_core.view_utility_customer_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
+                <field name="opening_receivable_residual" invisible="1"/>
+                <button name="action_register_opening_balance_payment" type="object"
+                        class="oe_stat_button" icon="fa-credit-card"
+                        invisible="opening_receivable_residual &lt;= 0">
+                    <field name="opening_receivable_residual" string="مديونية مرحلة" widget="statinfo"/>
+                </button>
                 <button name="action_view_service_charges" type="object"
                         class="oe_stat_button" icon="fa-plug" invisible="(service_charge_count == 0)">
                     <field name="service_charge_count" string="رسم إدخال الخدمة" widget="statinfo"/>

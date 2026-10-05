@@ -14,12 +14,14 @@
                 </div>
             </xpath>
             <xpath expr="//sheet/group" position="inside">
-                <group string="تفاصيل الكهرباء" invisible="(utility_sale_order_id == False) and (service_charge_id == False)">
+                <group string="تفاصيل الكهرباء" invisible="(utility_sale_order_id == False) and (utility_opening_move_id == False) and (service_charge_id == False)">
                     <field name="utility_sale_order_id" readonly="1" invisible="(utility_sale_order_id == False)"/>
                     <field name="utility_customer_id" readonly="1" invisible="(utility_customer_id == False)"/>
-                    <field name="utility_invoice_id" invisible="(utility_sale_order_id == False)" readonly="(state != 'draft')"/>
+                    <field name="opening_customer_id" readonly="1" invisible="(utility_opening_move_id == False)"/>
+                    <field name="utility_opening_move_id" readonly="1" invisible="(utility_opening_move_id == False)"/>
+                    <field name="utility_invoice_id" invisible="(utility_sale_order_id == False) and (utility_opening_move_id == False)" readonly="(state != 'draft')"/>
                     <field name="service_charge_id" readonly="1" invisible="(service_charge_id == False)"/>
-                    <field name="utility_payment_method" readonly="1" invisible="(utility_sale_order_id == False)"/>
+                    <field name="utility_payment_method" readonly="(state != 'draft')" invisible="(utility_sale_order_id == False) and (utility_opening_move_id == False)"/>
                     <field name="collector_id" invisible="((utility_sale_order_id == False) or (utility_payment_method != 'cash'))" readonly="(state != 'draft')"/>
                     <field name="electronic_doc_no" readonly="1" invisible="(utility_sale_order_id == False)"/>
                     <field name="is_invoice_verified" readonly="1" invisible="(utility_sale_order_id == False)"/>

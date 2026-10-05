@@ -116,6 +116,14 @@ class AccountPayment(models.Model):
                 or payment.utility_opening_move_id.utility_customer_id
             )
 
+    @api.onchange('utility_opening_move_id')
+    def _onchange_utility_opening_move_id(self):
+        for payment in self.filtered('utility_opening_move_id'):
+            opening_move = payment.utility_opening_move_id
+            payment.opening_customer_id = opening_move.utility_customer_id
+            payment.utility_invoice_id = opening_move
+            payment.partner_id = opening_move.partner_id
+
     def action_view_utility_allocations(self):
         self.ensure_one()
         return {
@@ -350,6 +358,25 @@ class AccountPayment(models.Model):
                         % order.date_range_id.display_name
                     )
                 vals['date_range_id'] = payment_period.id
+
+            opening_move_id = vals.get('utility_opening_move_id')
+            if opening_move_id:
+                opening_move = self.env['account.move'].browse(opening_move_id).exists()
+                if not opening_move or not opening_move.utility_customer_id:
+                    raise ValidationError(_('قيد المديونية المرحلة المحدد غير صالح.'))
+                customer = opening_move.utility_customer_id
+                if vals.get('opening_customer_id') and vals['opening_customer_id'] != customer.id:
+                    raise ValidationError(_('حساب السداد لا يطابق قيد المديونية المرحلة.'))
+                if vals.get('utility_invoice_id') and vals['utility_invoice_id'] != opening_move.id:
+                    raise ValidationError(_('المستند المحاسبي لا يطابق قيد المديونية المرحلة.'))
+                if vals.get('partner_id') and vals['partner_id'] != customer.partner_id.id:
+                    raise ValidationError(_('شريك الدفعة لا يطابق حساب المديونية المرحلة.'))
+                vals.update({
+                    'opening_customer_id': customer.id,
+                    'utility_invoice_id': opening_move.id,
+                    'partner_id': customer.partner_id.id,
+                    'utility_customer_id': customer.id,
+                })
 
             # توجيه اليومية تلقائياً إذا كان الدفع يدوياً ولم تتحدد اليومية
             payment_method = vals.get('utility_payment_method', 'cash')

@@ -108,6 +108,10 @@ class UtilityCustomerStatementWizard(models.TransientModel):
         base_opening = 0.0
         if not self.date_from:
             return base_opening
+        opening_move = self.customer_id.opening_move_id
+        if (opening_move and opening_move.state == 'posted'
+                and opening_move.date < self.date_from):
+            base_opening = self._opening_move_amount(opening_move)
         orders = self.env['sale.order'].search(self._order_domain(before=True))
         payments = self.env['account.payment'].search(self._payment_domain(before=True))
         writeoffs = self.env['utility.writeoff'].search(self._writeoff_domain(before=True))
@@ -118,9 +122,37 @@ class UtilityCustomerStatementWizard(models.TransientModel):
 
         return base_opening + sum(orders.mapped('amount_total')) + settlement_debit - sum(payments.mapped('amount')) - sum(writeoffs.mapped('amount')) - settlement_credit
 
+    def _opening_move_amount(self, move):
+        """Return the customer's audited opening debit from its receivable lines."""
+        self.ensure_one()
+        if (not move or move.state != 'posted' or move.move_type != 'entry'
+                or move.utility_customer_id != self.customer_id
+                or move.partner_id != self.customer_id.partner_id):
+            return 0.0
+        lines = move.line_ids.filtered(
+            lambda line: line.account_id.account_type == 'asset_receivable'
+            and line.partner_id == self.customer_id.partner_id
+        )
+        return sum(lines.mapped('balance'))
+
     def _get_statement_lines(self, opening_balance=None):
         self.ensure_one()
         entries = []
+        opening_move = self.customer_id.opening_move_id
+        if (opening_move and opening_move.state == 'posted'
+                and (not self.date_from or opening_move.date >= self.date_from)
+                and (not self.date_to or opening_move.date <= self.date_to)):
+            opening_amount = self._opening_move_amount(opening_move)
+            if opening_amount:
+                entries.append({
+                    'date': opening_move.date,
+                    'sequence': opening_move.id,
+                    'kind': 'opening',
+                    'ref': opening_move.name or opening_move.ref or '',
+                    'description': _('مديونية مرحلة عند التحويل'),
+                    'debit': max(opening_amount, 0.0),
+                    'credit': max(-opening_amount, 0.0),
+                })
         orders = self.env['sale.order'].search(self._order_domain(), order='date_order, id')
         for order in orders:
             entries.append({

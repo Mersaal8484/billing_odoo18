@@ -21,7 +21,7 @@
                 <group><field name="date_from"/><field name="date_to"/><field name="initial_reading"/><field name="final_reading"/></group></group>
                 <group><field name="installed_by_id"/><field name="removed_by_id"/><field name="reason"/></group>
                 <field name="notes"/>
-            </sheet><div class="oe_chatter"><field name="message_ids" widget="mail_thread"/></div></form>
+            </sheet><chatter/></form>
         </field>
     </record>
     <record id="view_utility_customer_lifecycle_event_tree" model="ir.ui.view">

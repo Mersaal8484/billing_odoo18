@@ -14,6 +14,12 @@ class UtilityCustomer(models.Model):
         string='تخصيصات التحصيل', readonly=True)
     payment_allocation_count = fields.Integer(
         'عدد تخصيصات التحصيل', compute='_compute_payment_allocation_count')
+    opening_receivable_residual = fields.Monetary(
+        string='متبقي المديونية المرحلة',
+        compute='_compute_opening_receivable_residual',
+        currency_field='company_currency_id',
+        readonly=True,
+    )
 
     @api.depends('service_charge_ids')
     def _compute_service_charge_count(self):
@@ -27,6 +33,26 @@ class UtilityCustomer(models.Model):
     def _compute_payment_allocation_count(self):
         for customer in self:
             customer.payment_allocation_count = len(customer.payment_allocation_ids)
+
+    @api.depends(
+        'opening_move_id.state', 'opening_move_id.partner_id',
+        'opening_move_id.line_ids.amount_residual',
+        'opening_move_id.line_ids.reconciled',
+        'opening_move_id.line_ids.account_id.account_type',
+    )
+    def _compute_opening_receivable_residual(self):
+        for customer in self:
+            move = customer.opening_move_id
+            if not move or move.state != 'posted' or move.partner_id != customer.partner_id:
+                customer.opening_receivable_residual = 0.0
+                continue
+            lines = move.line_ids.filtered(
+                lambda line: line.account_id.account_type == 'asset_receivable'
+                and line.partner_id == customer.partner_id
+                and line.debit > 0
+                and not line.reconciled
+            )
+            customer.opening_receivable_residual = sum(lines.mapped('amount_residual'))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -87,5 +113,33 @@ class UtilityCustomer(models.Model):
             'view_mode': 'list,form',
             'domain': [('utility_customer_id', '=', self.id)],
             'context': {'default_utility_customer_id': self.id, 'create': False},
+        }
+
+    def action_register_opening_balance_payment(self):
+        """Open a payment draft for this account's one audited opening debt."""
+        self.ensure_one()
+        opening_move = self.opening_move_id
+        if not opening_move or self.opening_receivable_residual <= 0:
+            raise UserError(_('لا توجد مديونية مرحلة مفتوحة قابلة للسداد لهذا الحساب.'))
+        if (opening_move.state != 'posted'
+                or opening_move.move_type != 'entry'
+                or opening_move.utility_customer_id != self
+                or opening_move.partner_id != self.partner_id):
+            raise UserError(_('قيد المديونية المرحلة غير صالح لهذا الحساب.'))
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('سداد المديونية المرحلة'),
+            'res_model': 'account.payment',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_payment_type': 'inbound',
+                'default_partner_type': 'customer',
+                'default_partner_id': self.partner_id.id,
+                'default_opening_customer_id': self.id,
+                'default_utility_opening_move_id': opening_move.id,
+                'default_utility_invoice_id': opening_move.id,
+                'default_amount': self.opening_receivable_residual,
+            },
         }
 
