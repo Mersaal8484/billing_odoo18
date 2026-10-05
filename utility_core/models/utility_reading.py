@@ -867,9 +867,10 @@ class UtilityReading(models.Model):
                 pass
             # Transition to 'approved' can ONLY occur through action_approve()
             elif target_state == 'approved':
-                if self.env.context.get('_internal_approval_action') is not _APPROVAL_ACTION_TOKEN:
+                if not has_bypass and self.env.context.get('_internal_approval_action') is not _APPROVAL_ACTION_TOKEN:
                     raise ValidationError(_('لا يمكن اعتماد القراءة مباشرةً عبر تعديل الحالة. يجب استخدام زر وإجراء الاعتماد الرسمي (action_approve).'))
-                self._check_approval_access()
+                if not has_bypass:
+                    self._check_approval_access()
 
                 # Enforce business approval invariants on every transition to approved
                 for r in self:
