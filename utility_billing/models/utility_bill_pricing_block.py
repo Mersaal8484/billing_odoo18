@@ -30,6 +30,11 @@ class UtilityBillPricingBlock(models.Model):
         string='الشريحة المصدر (للتتبع فقط)',
         ondelete='set null',
     )
+    customer_block_id = fields.Many2one(
+        'utility.customer.block.line',
+        string='الشريحة المحلية المصدر',
+        ondelete='set null',
+    )
     block_name = fields.Char(
         string='اسم الشريحة المطبقة',
         required=True,

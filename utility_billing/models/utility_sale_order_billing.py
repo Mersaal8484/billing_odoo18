@@ -1,3 +1,5 @@
+import json
+
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
@@ -21,9 +23,28 @@ class UtilitySaleOrderBilling(models.Model):
 
     def _calculate_amounts_inner(self):
         account = self.customer_id
+        if account and account._name != 'utility.customer':
+            raise ValidationError(
+                _('تعذر تسعير الفاتورة لأن حساب الكهرباء المرتبط غير صالح.')
+            )
         category = account.subscriber_id if account else False
         consumption = self.consumption or 0.0
         lines = []
+        had_bound_version = bool(self.contract_template_version_id)
+        pricing_snapshot = self.pricing_snapshot_id
+        # The stored computed relation can still be absent from the current
+        # record cache immediately after a snapshot was created in a prior
+        # calculation.  Read the immutable snapshot directly as a fallback:
+        # historical local pricing must never fall back to today's tariff.
+        if not pricing_snapshot and self.id:
+            pricing_snapshot = self.env['utility.bill.pricing.snapshot'].search(
+                [('sale_order_id', '=', self.id)], limit=1
+            )
+        has_frozen_local_pricing = bool(
+            pricing_snapshot
+            and pricing_snapshot.pricing_source == 'customer_local'
+            and pricing_snapshot.local_pricing_blocks_json
+        )
 
         # ── P1 Fix: Template ↔ Version consistency & Historical Pricing ─────────
         # الأولوية:
@@ -53,6 +74,20 @@ class UtilitySaleOrderBilling(models.Model):
         # تسجيل الإصدار كمستخدم ماليًا بشكل ذري ونهائي عند أول ربط
         if version:
             version.mark_as_used_in_billing()
+
+        # A version snapshot is authoritative for a historical/template bill.
+        # A customer-local tariff is selected only for a new, non-forced bill,
+        # or restored from its own immutable bill pricing snapshot.
+        use_customer_local_blocks = bool(
+            has_frozen_local_pricing
+            or (
+                account
+                and account.local_block_ids
+                and not forced_version_id
+                and not had_bound_version
+            )
+        )
+        block_pricing_version = False if use_customer_local_blocks else version
 
         # استخراج قيم التسعير التاريخية المعتمدة من الإصدار (أو القالب الحالي إذا لم يوجد إصدار)
         pricing_mode = version.pricing_mode if (version and version.pricing_mode) else (template.pricing_mode if template else 'flat')
@@ -198,11 +233,13 @@ class UtilitySaleOrderBilling(models.Model):
             if pricing_mode in ('block', 'tier') and consumption > 0:
                 if pricing_mode == 'block':
                     block_lines, block_amount, b_blocks = self._prepare_block_consumption_lines(
-                        template, consumption, kwh_product, version=version
+                        template, consumption, kwh_product,
+                        version=block_pricing_version,
                     )
                 else:
                     block_lines, block_amount, b_blocks = self._prepare_tier_consumption_lines(
-                        template, consumption, kwh_product, version=version
+                        template, consumption, kwh_product,
+                        version=block_pricing_version,
                     )
                 lines.extend(block_lines)
                 applied_pricing_blocks.extend(b_blocks)
@@ -305,9 +342,24 @@ class UtilitySaleOrderBilling(models.Model):
                 discount_data=discount_data,
                 pre_adjustment_total=pre_total,
                 min_max_adj=min_max_adj,
+                pricing_source=(
+                    'customer_local' if use_customer_local_blocks else 'template'
+                ),
+                local_pricing_blocks=(
+                    self._get_current_customer_local_pricing_blocks()
+                    if use_customer_local_blocks and not has_frozen_local_pricing
+                    else (
+                        pricing_snapshot.get_local_pricing_blocks()
+                        if has_frozen_local_pricing else []
+                    )
+                ),
             )
 
-    def _record_pricing_snapshot(self, template, version, consumption, applied_blocks, discount_data, pre_adjustment_total, min_max_adj):
+    def _record_pricing_snapshot(
+        self, template, version, consumption, applied_blocks, discount_data,
+        pre_adjustment_total, min_max_adj, pricing_source='template',
+        local_pricing_blocks=None,
+    ):
         """تسجيل أو تحديث لقطة التسعير المطبقة (Pricing Snapshot) للفاتورة لضمان الاستقرار والتدقيق التاريخي."""
         self.ensure_one()
         if not template:
@@ -325,6 +377,11 @@ class UtilitySaleOrderBilling(models.Model):
             'contract_template_id': template.id,
             'contract_template_version_id': version.id if version else template._get_or_create_active_version().id,
             'pricing_mode': template.pricing_mode,
+            'pricing_source': pricing_source,
+            'local_pricing_blocks_json': (
+                json.dumps(local_pricing_blocks, sort_keys=True)
+                if pricing_source == 'customer_local' else False
+            ),
             'billing_consumption': consumption,
             'price_per_kwh': template.price_per_kwh,
             'service_charge': template.service_charge,
@@ -352,6 +409,7 @@ class UtilitySaleOrderBilling(models.Model):
             block_commands.append((0, 0, {
                 'sequence': seq * 10,
                 'source_block_id': blk.get('source_block_id', False),
+                'customer_block_id': blk.get('customer_block_id', False),
                 'block_name': blk.get('block_name', ''),
                 'from_kwh': blk.get('from_kwh', 0.0),
                 'to_kwh': blk.get('to_kwh', 0.0),
@@ -394,6 +452,38 @@ class UtilitySaleOrderBilling(models.Model):
         }))
         self.amount_private_transformer_fee += fee
 
+    def _get_current_customer_local_pricing_blocks(self):
+        self.ensure_one()
+        account = self.customer_id
+        if not account or account._name != 'utility.customer':
+            return []
+        return [
+            {
+                'id': False,
+                'customer_block_id': line.id,
+                'name': line.name or '',
+                'sequence': line.sequence,
+                'from_kwh': line.from_kwh or 0.0,
+                'to_kwh': line.to_kwh or 0.0,
+                'price_per_kwh': line.price_per_kwh or 0.0,
+                'is_discount': False,
+            }
+            for line in account.local_block_ids.sorted(
+                key=lambda line: (line.from_kwh, line.sequence, line.id)
+            )
+        ]
+
+    def _get_frozen_local_pricing_blocks(self):
+        self.ensure_one()
+        snapshot = self.pricing_snapshot_id
+        if not snapshot and self.id:
+            snapshot = self.env['utility.bill.pricing.snapshot'].search(
+                [('sale_order_id', '=', self.id)], limit=1
+            )
+        if snapshot and snapshot.pricing_source == 'customer_local':
+            return snapshot.get_local_pricing_blocks()
+        return []
+
     def _get_pricing_blocks_for_calculation(self, template, version=None):
         """إرجاع قائمة الشرائح المعتمدة للتسعير، مع إعطاء الأولوية للقطة الإصدار التاريخي الثابتة."""
         if version:
@@ -401,6 +491,12 @@ class UtilitySaleOrderBilling(models.Model):
             if 'pricing_blocks' in snapshot:
                 blocks = snapshot.get('pricing_blocks') or []
                 return sorted(blocks, key=lambda b: (b.get('from_kwh', 0.0), b.get('sequence', 10), b.get('id', 0)))
+        frozen_local_blocks = self._get_frozen_local_pricing_blocks()
+        if frozen_local_blocks:
+            return frozen_local_blocks
+        local_blocks = self._get_current_customer_local_pricing_blocks()
+        if local_blocks:
+            return local_blocks
         if template and template.block_ids:
             return [{
                 'id': b.id,
@@ -466,6 +562,7 @@ class UtilitySaleOrderBilling(models.Model):
             }))
             applied_blocks.append({
                 'source_block_id': block.get('id', False),
+                'customer_block_id': block.get('customer_block_id', False),
                 'block_name': block_name,
                 'from_kwh': block_from,
                 'to_kwh': block.get('to_kwh') or 0.0,
@@ -563,6 +660,7 @@ class UtilitySaleOrderBilling(models.Model):
             }))
             applied_blocks.append({
                 'source_block_id': applicable_block.get('id', False) if applicable_block else False,
+                'customer_block_id': applicable_block.get('customer_block_id', False) if applicable_block else False,
                 'block_name': name,
                 'from_kwh': applicable_block.get('from_kwh', 0.0) if applicable_block else 0.0,
                 'to_kwh': applicable_block.get('to_kwh', 0.0) if applicable_block else 0.0,

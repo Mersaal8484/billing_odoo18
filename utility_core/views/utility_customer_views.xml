@@ -127,6 +127,25 @@
                                     <field name="last_invoice_reading" readonly="1"/>
                                 </group>
                             </group>
+                            <group string="التعرفة المحلية للعميل">
+                                <field name="block_tariff_config_id" options="{'no_create': True}"/>
+                                <button name="action_apply_block_tariff" type="object"
+                                        string="تحديث التعرفة" icon="fa-refresh"
+                                        class="btn-primary"
+                                        invisible="not block_tariff_config_id"
+                                        groups="utility_core.group_utility_billing_manager"/>
+                                <field name="local_block_ids" nolabel="1" readonly="1">
+                                    <list create="0" edit="0" delete="0">
+                                        <field name="sequence"/>
+                                        <field name="name"/>
+                                        <field name="from_kwh"/>
+                                        <field name="to_kwh"/>
+                                        <field name="price_per_kwh" widget="monetary"/>
+                                        <field name="billing_cycle"/>
+                                        <field name="source_config_id"/>
+                                    </list>
+                                </field>
+                            </group>
                         </page>
 
                         <!-- صفحة 3: الخلية والمحول -->

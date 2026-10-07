@@ -1,3 +1,4 @@
+import json
 import logging
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
@@ -92,6 +93,22 @@ class UtilityBillPricingSnapshot(models.Model):
     ], string='نمط التسعير المطبق', required=True, default='flat')
 
     # ── تفاصيل الاستهلاك والأسعار ──────────────────────────────────────────
+    pricing_source = fields.Selection(
+        [
+            ('template', 'قالب العقد'),
+            ('customer_local', 'تعرفة محلية للعميل'),
+        ],
+        string='مصدر شرائح التعرفة',
+        required=True,
+        default='template',
+        readonly=True,
+    )
+    local_pricing_blocks_json = fields.Text(
+        string='لقطة الشرائح المحلية',
+        readonly=True,
+        copy=False,
+    )
+
     billing_consumption = fields.Float(
         string='إجمالي الاستهلاك المفوتر (kWh)',
         required=True,
@@ -216,6 +233,35 @@ class UtilityBillPricingSnapshot(models.Model):
          'unique(sale_order_id)',
          'لكل فاتورة كهرباء لقطة تسعير واحدة فقط.'),
     ]
+
+    def get_local_pricing_blocks(self):
+        self.ensure_one()
+        if self.pricing_source != 'customer_local':
+            return []
+        if not self.local_pricing_blocks_json:
+            raise ValidationError(
+                _('لقطة التعرفة المحلية لهذه الفاتورة غير مكتملة.')
+            )
+        try:
+            blocks = json.loads(self.local_pricing_blocks_json)
+        except (TypeError, ValueError) as error:
+            raise ValidationError(
+                _('تعذر قراءة لقطة التعرفة المحلية لهذه الفاتورة.')
+            ) from error
+        if not isinstance(blocks, list) or not all(
+            isinstance(block, dict) for block in blocks
+        ):
+            raise ValidationError(
+                _('تنسيق لقطة التعرفة المحلية لهذه الفاتورة غير صالح.')
+            )
+        return sorted(
+            blocks,
+            key=lambda block: (
+                block.get('from_kwh', 0.0),
+                block.get('sequence', 10),
+                block.get('customer_block_id', 0),
+            ),
+        )
 
     @api.depends('sale_order_id.name', 'contract_template_version_id.version_code')
     def _compute_display_name(self):

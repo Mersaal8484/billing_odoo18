@@ -1,4 +1,11 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_utility_block_tariff_config_admin,utility.block.tariff.config.admin,model_utility_block_tariff_config,group_utility_admin,1,1,1,1
+access_utility_block_tariff_config_billing,utility.block.tariff.config.billing,model_utility_block_tariff_config,group_utility_billing_manager,1,1,1,0
+access_utility_block_tariff_config_line_admin,utility.block.tariff.config.line.admin,model_utility_block_tariff_config_line,group_utility_admin,1,1,1,1
+access_utility_block_tariff_config_line_billing,utility.block.tariff.config.line.billing,model_utility_block_tariff_config_line,group_utility_billing_manager,1,1,1,0
+access_utility_customer_block_line_admin,utility.customer.block.line.admin,model_utility_customer_block_line,group_utility_admin,1,1,1,1
+access_utility_customer_block_line_billing,utility.customer.block.line.billing,model_utility_customer_block_line,group_utility_billing_manager,1,1,1,1
+access_utility_customer_block_line_readonly,utility.customer.block.line.readonly,model_utility_customer_block_line,group_utility_readonly,1,0,0,0
 access_utility_region_admin,utility.region.admin,model_utility_region,group_utility_admin,1,1,1,1
 access_utility_region_readonly,utility.region.readonly,model_utility_region,group_utility_readonly,1,0,0,0
 access_utility_region_supervisor,utility.region.supervisor,model_utility_region,group_utility_supervisor,1,1,1,0

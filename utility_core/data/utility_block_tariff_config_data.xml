@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="utility_block_tariff_config_semi_monthly" model="utility.block.tariff.config">
+            <field name="name">تعرفة شرائح نصف شهرية القياسية</field>
+            <field name="billing_cycle">semi_monthly</field>
+            <field name="state">draft</field>
+        </record>
+        <record id="utility_block_tariff_config_monthly" model="utility.block.tariff.config">
+            <field name="name">تعرفة شرائح شهرية القياسية</field>
+            <field name="billing_cycle">monthly</field>
+            <field name="state">draft</field>
+        </record>
+
+        <record id="utility_block_tariff_config_semi_monthly_line_01" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_semi_monthly"/><field name="sequence">10</field><field name="name">الشريحة الأولى (0 - 3,000)</field><field name="from_kwh">0</field><field name="to_kwh">3000</field><field name="price_per_kwh">230</field></record>
+        <record id="utility_block_tariff_config_semi_monthly_line_02" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_semi_monthly"/><field name="sequence">20</field><field name="name">الشريحة الثانية (3,000 - 10,000)</field><field name="from_kwh">3000</field><field name="to_kwh">10000</field><field name="price_per_kwh">220</field></record>
+        <record id="utility_block_tariff_config_semi_monthly_line_03" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_semi_monthly"/><field name="sequence">30</field><field name="name">الشريحة الثالثة (10,000 - 20,000)</field><field name="from_kwh">10000</field><field name="to_kwh">20000</field><field name="price_per_kwh">200</field></record>
+        <record id="utility_block_tariff_config_semi_monthly_line_04" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_semi_monthly"/><field name="sequence">40</field><field name="name">الشريحة الرابعة (20,000 - 30,000)</field><field name="from_kwh">20000</field><field name="to_kwh">30000</field><field name="price_per_kwh">190</field></record>
+        <record id="utility_block_tariff_config_semi_monthly_line_05" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_semi_monthly"/><field name="sequence">50</field><field name="name">الشريحة الخامسة (30,000 - 100,000)</field><field name="from_kwh">30000</field><field name="to_kwh">100000</field><field name="price_per_kwh">185</field></record>
+        <record id="utility_block_tariff_config_semi_monthly_line_06" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_semi_monthly"/><field name="sequence">60</field><field name="name">الشريحة السادسة (100,000 - 200,000)</field><field name="from_kwh">100000</field><field name="to_kwh">200000</field><field name="price_per_kwh">180</field></record>
+        <record id="utility_block_tariff_config_semi_monthly_line_07" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_semi_monthly"/><field name="sequence">70</field><field name="name">الشريحة السابعة (200,000 - 300,000)</field><field name="from_kwh">200000</field><field name="to_kwh">300000</field><field name="price_per_kwh">175</field></record>
+        <record id="utility_block_tariff_config_semi_monthly_line_08" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_semi_monthly"/><field name="sequence">80</field><field name="name">الشريحة الثامنة (300,000 فأكثر)</field><field name="from_kwh">300000</field><field name="to_kwh">0</field><field name="price_per_kwh">170</field></record>
+
+        <record id="utility_block_tariff_config_monthly_line_01" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_monthly"/><field name="sequence">10</field><field name="name">الشريحة الأولى (0 - 3,000)</field><field name="from_kwh">0</field><field name="to_kwh">3000</field><field name="price_per_kwh">230</field></record>
+        <record id="utility_block_tariff_config_monthly_line_02" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_monthly"/><field name="sequence">20</field><field name="name">الشريحة الثانية (3,000 - 10,000)</field><field name="from_kwh">3000</field><field name="to_kwh">10000</field><field name="price_per_kwh">220</field></record>
+        <record id="utility_block_tariff_config_monthly_line_03" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_monthly"/><field name="sequence">30</field><field name="name">الشريحة الثالثة (10,000 - 20,000)</field><field name="from_kwh">10000</field><field name="to_kwh">20000</field><field name="price_per_kwh">200</field></record>
+        <record id="utility_block_tariff_config_monthly_line_04" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_monthly"/><field name="sequence">40</field><field name="name">الشريحة الرابعة (20,000 - 30,000)</field><field name="from_kwh">20000</field><field name="to_kwh">30000</field><field name="price_per_kwh">190</field></record>
+        <record id="utility_block_tariff_config_monthly_line_05" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_monthly"/><field name="sequence">50</field><field name="name">الشريحة الخامسة (30,000 - 100,000)</field><field name="from_kwh">30000</field><field name="to_kwh">100000</field><field name="price_per_kwh">185</field></record>
+        <record id="utility_block_tariff_config_monthly_line_06" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_monthly"/><field name="sequence">60</field><field name="name">الشريحة السادسة (100,000 - 200,000)</field><field name="from_kwh">100000</field><field name="to_kwh">200000</field><field name="price_per_kwh">180</field></record>
+        <record id="utility_block_tariff_config_monthly_line_07" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_monthly"/><field name="sequence">70</field><field name="name">الشريحة السابعة (200,000 - 300,000)</field><field name="from_kwh">200000</field><field name="to_kwh">300000</field><field name="price_per_kwh">175</field></record>
+        <record id="utility_block_tariff_config_monthly_line_08" model="utility.block.tariff.config.line"><field name="config_id" ref="utility_block_tariff_config_monthly"/><field name="sequence">80</field><field name="name">الشريحة الثامنة (300,000 فأكثر)</field><field name="from_kwh">300000</field><field name="to_kwh">0</field><field name="price_per_kwh">170</field></record>
+
+        <record id="utility_block_tariff_config_semi_monthly" model="utility.block.tariff.config"><field name="state">active</field></record>
+        <record id="utility_block_tariff_config_monthly" model="utility.block.tariff.config"><field name="state">active</field></record>
+    </data>
+</odoo>

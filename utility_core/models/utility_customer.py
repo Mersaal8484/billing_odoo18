@@ -1,5 +1,5 @@
 from odoo import api, fields, models, _
-from odoo.exceptions import AccessError, ValidationError
+from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.osv import expression
 from .utility_date_range import normalize_billing_cadence
 import logging
@@ -39,6 +39,19 @@ class UtilityCustomer(models.Model):
     ], string='الحالة', default='draft', tracking=True)
 
     available_contract_template_ids = fields.Many2many('utility.contract.template', compute='_compute_available_contract_template_ids')
+    block_tariff_config_id = fields.Many2one(
+        'utility.block.tariff.config',
+        string='إعداد شرائح التعرفة',
+        check_company=True,
+        tracking=True,
+        domain="[('state', '=', 'active'), ('company_id', '=', company_id)]",
+    )
+    local_block_ids = fields.One2many(
+        'utility.customer.block.line',
+        'customer_id',
+        string='شرائح التعرفة المحلية',
+        readonly=True,
+    )
     contract_template_id = fields.Many2one('utility.contract.template', string='نموذج العقد')
     contract_start_date = fields.Date('تاريخ بداية العقد')
     contract_end_date = fields.Date('تاريخ نهاية العقد')
@@ -257,6 +270,100 @@ class UtilityCustomer(models.Model):
         if not recurring_type and self.contract_template_id and self.contract_template_id.recurring_rule_type:
             recurring_type = self.contract_template_id.recurring_rule_type
         return normalize_billing_cadence(recurring_type)
+
+    def _validate_local_block_layout(self):
+        for customer in self:
+            lines = customer.local_block_ids.sorted(
+                key=lambda line: (line.from_kwh, line.sequence, line.id)
+            )
+            expected_from = 0.0
+            for index, line in enumerate(lines):
+                if abs(line.from_kwh - expected_from) > 0.000001:
+                    raise ValidationError(
+                        _(
+                            'الشرائح المحلية للعميل يجب أن تبدأ من 0 وتتصل '
+                            'بدون فجوات أو تداخل.'
+                        )
+                    )
+                if not line.to_kwh:
+                    if index != len(lines) - 1:
+                        raise ValidationError(
+                            _('الشريحة المحلية المفتوحة يجب أن تكون الأخيرة.')
+                        )
+                    continue
+                if line.to_kwh <= line.from_kwh:
+                    raise ValidationError(
+                        _('يجب أن يكون حد نهاية الشريحة أكبر من حد بدايتها.')
+                    )
+                expected_from = line.to_kwh
+            if not lines or lines[-1].to_kwh:
+                raise ValidationError(
+                    _('يجب أن تنتهي شرائح العميل بشريحة مفتوحة.')
+                )
+
+    def action_apply_block_tariff(self):
+        self.ensure_one()
+        if not (
+            self.env.user.has_group('utility_core.group_utility_admin')
+            or self.env.user.has_group('utility_core.group_utility_billing_manager')
+        ):
+            raise AccessError(_('ليس لديك صلاحية تطبيق تعرفة العميل.'))
+        self.check_access_rights('write')
+        self.check_access_rule('write')
+
+        config = self.block_tariff_config_id
+        if not config or config.state != 'active':
+            raise UserError(_('اختر إعداد تعرفة نشطاً أولاً.'))
+        if config.company_id != self.company_id:
+            raise ValidationError(_('يجب أن تتبع التعرفة شركة العميل نفسها.'))
+        if not self.contract_template_id:
+            raise UserError(_('يجب تحديد قالب عقد للعميل قبل تطبيق التعرفة.'))
+        if self.contract_template_id.pricing_mode not in ('block', 'tier'):
+            raise UserError(
+                _('يمكن تطبيق شرائح التعرفة فقط على عقود التسعير بالشرائح.')
+            )
+
+        cadence = self._get_effective_billing_period()
+        if cadence not in ('semi_monthly', 'monthly'):
+            raise ValidationError(_('تعذر تحديد دورية الفوترة الفعالة للعميل.'))
+        if config.billing_cycle != cadence:
+            raise ValidationError(
+                _(
+                    'دورية إعداد التعرفة لا تطابق دورية الفوترة الفعالة '
+                    'للعميل.'
+                )
+            )
+
+        config._validate_block_layout(require_complete=True)
+        mutation_context = dict(
+            self.env.context, _allow_customer_tariff_block_mutation=True
+        )
+        self.local_block_ids.with_context(mutation_context).unlink()
+        self.env['utility.customer.block.line'].with_context(
+            mutation_context
+        ).create([
+            {
+                'customer_id': self.id,
+                'source_config_id': config.id,
+                'billing_cycle': cadence,
+                'sequence': line.sequence,
+                'name': line.name,
+                'from_kwh': line.from_kwh,
+                'to_kwh': line.to_kwh,
+                'price_per_kwh': line.price_per_kwh,
+            }
+            for line in config.line_ids.sorted(
+                key=lambda line: (line.from_kwh, line.sequence, line.id)
+            )
+        ])
+        self._validate_local_block_layout()
+        self.message_post(
+            body=_(
+                'تم تطبيق إعداد شرائح التعرفة «%(config)s» على هذا العميل.'
+            ) % {'config': config.display_name}
+        )
+        return True
+
     def write(self, vals):
         vals = dict(vals)
         if 'external_qr_reference' in vals:

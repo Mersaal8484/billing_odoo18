@@ -21,6 +21,7 @@ from . import utility_user_role
 from . import utility_subscriber_category
 from . import utility_subscriber
 from . import utility_formula
+from . import utility_block_tariff_config
 from . import utility_contract_template
 from . import utility_contract_template_block
 from . import utility_contract_template_history

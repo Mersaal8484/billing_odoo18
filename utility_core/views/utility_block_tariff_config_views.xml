@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_utility_block_tariff_config_list" model="ir.ui.view">
+        <field name="name">utility.block.tariff.config.list</field>
+        <field name="model">utility.block.tariff.config</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="billing_cycle"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_utility_block_tariff_config_form" model="ir.ui.view">
+        <field name="name">utility.block.tariff.config.form</field>
+        <field name="model">utility.block.tariff.config</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_activate" type="object" string="تفعيل" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_set_draft" type="object" string="إعادة إلى المسودة" invisible="state != 'active'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state == 'active'"/>
+                            <field name="billing_cycle" readonly="state == 'active'"/>
+                        </group>
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="notes" readonly="state == 'active'"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" readonly="state == 'active'">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="from_kwh"/>
+                            <field name="to_kwh"/>
+                            <field name="price_per_kwh" widget="monetary"/>
+                            <field name="currency_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_utility_block_tariff_config_search" model="ir.ui.view">
+        <field name="name">utility.block.tariff.config.search</field>
+        <field name="model">utility.block.tariff.config</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="company_id"/>
+                <filter name="active" string="نشطة" domain="[('state', '=', 'active')]"/>
+                <filter name="draft" string="مسودات" domain="[('state', '=', 'draft')]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_company" string="الشركة" context="{'group_by': 'company_id'}"/>
+                    <filter name="group_cycle" string="الدورية" context="{'group_by': 'billing_cycle'}"/>
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_utility_block_tariff_config" model="ir.actions.act_window">
+        <field name="name">إعدادات شرائح التعرفة</field>
+        <field name="res_model">utility.block.tariff.config</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_utility_block_tariff_config_search"/>
+    </record>
+
+    <menuitem id="menu_utility_block_tariff_config"
+              name="إعدادات شرائح التعرفة"
+              parent="menu_utility_config"
+              action="action_utility_block_tariff_config"
+              sequence="55"
+              groups="utility_core.group_utility_billing_manager"/>
+</odoo>
