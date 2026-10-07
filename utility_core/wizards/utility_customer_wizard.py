@@ -62,12 +62,29 @@ class UtilityCustomerWizard(models.TransientModel):
 
     utility_region_id = fields.Many2one('utility.region', string="المنطقة التشغيلية", domain="[('type', '=', 'region')]")
     available_area_ids = fields.Many2many('utility.region', compute='_compute_available_area_ids')
-    utility_area_id = fields.Many2one('utility.region', string="الفرع التشغيلي",
-                                      domain="[('type', '=', 'area')]")
+    utility_area_id = fields.Many2one(
+        'utility.region', string="الفرع التشغيلي",
+        domain="[('type', '=', 'area'), ('parent_id', '=', utility_region_id)]",
+    )
 
     available_zone_ids = fields.Many2many('utility.region', compute='_compute_available_zone_ids')
     transformer_zone_id = fields.Many2one('utility.region', string="نطاق المحول",
                                           domain="[('type', '=', 'zone')]")
+
+    @api.constrains('utility_region_id', 'utility_area_id')
+    def _check_region_area_consistency(self):
+        for wizard in self:
+            if (
+                wizard.utility_region_id
+                and wizard.utility_area_id
+                and wizard.utility_area_id.parent_id != wizard.utility_region_id
+            ):
+                raise ValidationError(_(
+                    'الفرع "%s" لا يتبع المنطقة التشغيلية "%s".'
+                ) % (
+                    wizard.utility_area_id.display_name,
+                    wizard.utility_region_id.display_name,
+                ))
 
     # Private Transformer Fields
     use_private_transformer = fields.Boolean(

@@ -37,7 +37,18 @@ class UtilityMigrationTransformer(models.Model):
     cell_meter_number = fields.Char('الخلية / رقم العداد')
 
     region_id = fields.Many2one('utility.region', string='المنطقة (Odoo)', domain="[('type', '=', 'region')]")
-    area_id = fields.Many2one('utility.region', string='الفرع (Odoo)', domain="[('type', '=', 'area')]")
+    area_id = fields.Many2one(
+        'utility.region', string='الفرع (Odoo)',
+        domain="[('type', '=', 'area'), ('parent_id', '=', region_id)]",
+    )
+
+    @api.constrains('region_id', 'area_id')
+    def _check_region_area_consistency(self):
+        for record in self:
+            if record.region_id and record.area_id and record.area_id.parent_id != record.region_id:
+                raise ValidationError(_(
+                    'الفرع "%s" لا يتبع المنطقة "%s".'
+                ) % (record.area_id.display_name, record.region_id.display_name))
     feeder_id = fields.Many2one('utility.feeder', string='الفيدر / الخلية (Odoo)')
 
     state = fields.Selection([

@@ -574,9 +574,9 @@ class UtilitySaleOrder(models.Model):
                 raise ValidationError(
                     'لا يمكن إعادة الفاتورة للمسودة، يوجد فواتير محاسبية مرحلة. '
                     'قم بإلغائها أولاً.')
-            if order.bill_state in ('paid', 'cancelled'):
+            if order.bill_state == 'paid':
                 raise ValidationError(
-                    'لا يمكن إعادة فاتورة %s إلى المسودة.' % order.bill_state)
+                    'لا يمكن إعادة فاتورة مدفوعة إلى المسودة.')
         res = super(UtilitySaleOrder, self).action_draft()
         for order in self:
             if order.reading_id and order.reading_id.state == 'billed':

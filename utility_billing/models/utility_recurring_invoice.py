@@ -40,6 +40,8 @@ class UtilityContractTemplate(models.Model):
                 category = account.subscriber_id
                 if category.subsidized_enabled and consumption > 0:
                     qty, price, name = category._get_subsidized_amount(consumption, template)
+            if line.meter_line_type in ('local_fee', 'mu_allim', 'cleaning', 'municipality') and (not price or price <= 0 or not qty or qty <= 0):
+                continue
             if qty or price:
                 lines.append((0, 0, {
                     'product_id': line.product_id.id if line.product_id else False,

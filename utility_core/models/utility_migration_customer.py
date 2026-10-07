@@ -47,7 +47,18 @@ class UtilityMigrationCustomer(models.Model):
         help='رمز المحول في النظام القديم لمطابقة محول موجود فعلاً. إذا وُجد يُستخدم مباشرةً بدلاً من إنشاء محول خاص.')
 
     region_id = fields.Many2one('utility.region', string='المنطقة (Odoo)', domain="[('type', '=', 'region')]")
-    area_id = fields.Many2one('utility.region', string='الفرع (Odoo)', domain="[('type', '=', 'area')]")
+    area_id = fields.Many2one(
+        'utility.region', string='الفرع (Odoo)',
+        domain="[('type', '=', 'area'), ('parent_id', '=', region_id)]",
+    )
+
+    @api.constrains('region_id', 'area_id')
+    def _check_region_area_consistency(self):
+        for record in self:
+            if record.region_id and record.area_id and record.area_id.parent_id != record.region_id:
+                raise ValidationError(_(
+                    'الفرع "%s" لا يتبع المنطقة "%s".'
+                ) % (record.area_id.display_name, record.region_id.display_name))
     category_id = fields.Many2one('utility.subscriber.category', string='الفئة (Odoo)')
     subscriber_type_id = fields.Many2one('utility.subscriber', string='نوع المشترك (Odoo)')
     contract_template_id = fields.Many2one('utility.contract.template', string="قالب العقد (النظام)")
